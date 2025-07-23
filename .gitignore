@@ -1,0 +1,4 @@
+# ignore prettier install artefacts
+node_modules
+package.json
+package-lock.json
