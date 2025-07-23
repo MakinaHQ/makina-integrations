@@ -1,21 +1,14 @@
-name: Prettier
+name: Formatting
 
 on:
   pull_request:
 
 jobs:
-  prettier:
+  formatting:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install TOML plugin
-        run: npm i prettier-plugin-toml
-
-      - name: Prettify code
-        uses: creyD/prettier_action@v4.6
-        with:
-          allow_other_plugins: true
-          prettier_options: --plugin=prettier-plugin-toml --check **/*.{toml,yaml}
+      - uses: dprint/check@v2.3
