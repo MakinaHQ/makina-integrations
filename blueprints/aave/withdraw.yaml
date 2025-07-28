@@ -1,0 +1,30 @@
+protocol: "aavev3"
+
+constants:
+  aave_pool:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+
+inputs:
+  to:
+    type: "address"
+  token:
+    type: "address"
+
+actions:
+  withdraw_collateral:
+    calls:
+      - description: "Withdraw collateral from the Aave pool"
+        target: ${constants.aave_pool}
+        selector: "withdraw(address,uint256,address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.token}
+          - type: "uint256"
+            value: ${input_slots.amount_out}
+          - type: "address"
+            value: ${inputs.to}
+    input_slots:
+      amount_out:
+        type: "uint256"
+        description: "The amount of collateral to withdraw"

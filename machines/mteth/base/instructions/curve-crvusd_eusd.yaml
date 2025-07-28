@@ -1,0 +1,73 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "crvusd_eusd"
+    path: "../../../blueprints/curve/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
+  makina_id: "241963968685402655309198654686298022078"
+  instruction:
+    label: "crvusd_eusd"
+    path: "../../../blueprints/curve/account.yaml:account"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b"
+      lp_token_address:
+        type: "address"
+        value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
+  makina_id: "241963968685402655309198654686298022078"
+  instruction:
+    label: "crvusd_eusd"
+    path: "../../../blueprints/curve/deposit.yaml:deposit"
+    inputs:
+      tokena_address:
+        type: "address"
+        value: "0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4" # crvUSD
+      tokenb_address:
+        type: "address"
+        value: "0x417ac0e078398c154edfadd9ef675d30be60af93" # eUSD
+      pool_address:
+        type: "address"
+        value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36" # Curve pool
+      gauge_address:
+        type: "address"
+        value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b" # Curve gauge
+      lp_token_address:
+        type: "address"
+        value: "0x798D81d60966d2E909468d87e7e4b6A8DAFB1C36" # LP token
+      sender_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
+  makina_id: "241963968685402655309198654686298022078"
+  instruction:
+    label: "crvusd_eusd"
+    path: "../../../blueprints/curve/withdraw.yaml:withdraw"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b" # Curve eUSD/crvUSD-f farming gauge
+      pool_address:
+        type: "address"
+        value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36" # Curve(crvUSD,eUSD) pool
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"

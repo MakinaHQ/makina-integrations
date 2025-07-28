@@ -64,9 +64,7 @@ is_debt = false
 group_id = "0x0"
 instruction_type = 2
 affected_tokens = []
-commands = [
-  "0xe6f1daf201ffffffffffffffb2135e9b790c50fa018ca14e4b04bdb4add2a61b",
-]
+commands = ["0xe6f1daf201ffffffffffffffb2135e9b790c50fa018ca14e4b04bdb4add2a61b"]
 state = []
 bitmap = "0"
 inputs_slots = []
@@ -340,9 +338,7 @@ is_debt = false
 group_id = "0x0"
 instruction_type = 2
 affected_tokens = []
-commands = [
-  "0x3d18b91201ffffffffffffff4103a467166bbbda3694ab739b391db6c6630595",
-]
+commands = ["0x3d18b91201ffffffffffffff4103a467166bbbda3694ab739b391db6c6630595"]
 state = []
 bitmap = "0"
 inputs_slots = []

@@ -1,0 +1,83 @@
+protocol: "curve"
+
+inputs:
+  tokena_address:
+    type: "address"
+  tokenb_address:
+    type: "address"
+  pool_address:
+    type: "address"
+  gauge_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+  sender_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve token A to the pool"
+        target: "${inputs.tokena_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_tokena}"
+
+      - description: "Approve token B to the pool"
+        target: "${inputs.tokenb_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_tokenb}"
+      - description: "Add liquidity to the pool"
+        target: "${inputs.pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.amount_tokena}"
+              - type: "uint256"
+                value: "${input_slots.amount_tokenb}"
+          - type: "uint256"
+            value: "${input_slots.min_mint_amount}"
+
+      - description: "Get LP token balance"
+        target: "${inputs.lp_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.sender_address}"
+        return:
+          name: "lp_balance"
+          type: "uint256"
+
+      - description: "Approve LP tokens to the gauge"
+        target: "${inputs.lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.lp_balance}"
+      - description: "Deposit LP tokens to the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_balance}"
+    input_slots:
+      amount_tokena:
+        type: "uint256"
+        description: "The amount of token A to deposit"
+      amount_tokenb:
+        type: "uint256"
+        description: "The amount of token B to deposit"
+      min_mint_amount:
+        type: "uint256"
+        description: "The minimum amount of LP tokens to receive"

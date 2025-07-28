@@ -1,0 +1,58 @@
+protocol: "tokemak"
+
+inputs:
+  asset_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  rewarder_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve asset to vault"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit asset to vault"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares_received"
+          type: "uint256"
+
+      - description: "Approve vault shares to rewarder"
+        target: "${inputs.vault_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.rewarder_address}"
+          - type: "uint256"
+            value: "${returns.shares_received}"
+
+      - description: "Stake shares in rewarder"
+        target: "${inputs.rewarder_address}"
+        selector: "stake(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.shares_received}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of asset to deposit"

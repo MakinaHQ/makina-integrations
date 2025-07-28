@@ -1,0 +1,13 @@
+protocol: "curve"
+
+inputs:
+  gauge_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from Curve gauge"
+        target: "${inputs.gauge_address}"
+        selector: "claim_rewards()"
+        parameters: []

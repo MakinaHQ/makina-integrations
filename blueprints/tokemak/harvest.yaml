@@ -1,0 +1,13 @@
+protocol: "tokemak"
+
+inputs:
+  rewarder_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from Tokemak autopool"
+        target: "${inputs.rewarder_address}"
+        selector: "getReward()"
+        parameters: []

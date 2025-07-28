@@ -1,0 +1,55 @@
+# Blueprint for checking Curve gauge and LP token balances
+protocol: "curve"
+
+constants:
+  unsigned_math_helper:
+    type: "address"
+    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
+
+inputs:
+  gauge_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+  subject:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get the user's balance of LP tokens in the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "gauge_balance"
+          type: "uint256"
+      - description: "Get the user's balance of LP tokens"
+        target: ${constants.unsigned_math_helper}
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.gauge_balance}" # The amount of LP tokens owned by the subject
+          - type: "uint256"
+            value: "${builtins.UINT256_1}" # Fallback to zero if
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+      - description: "Calculate the amount of coin received when withdrawing LP tokens"
+        target: "${inputs.lp_token_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}" # The amount of LP tokens owned by the safe
+          - type: "int128"
+            value: "0" # Index of the coin to withdraw (0 for USDC, 1 for eUSD)
+        return:
+          name: "withdraw_amount"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.withdraw_amount}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}

@@ -1,0 +1,91 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCb327b99fF831bF8223cCEd12B1338FF3aA322Ff"] # bsdETH token
+  makina_id: "64629950981009269100215752319206236633"
+  instruction:
+    label: "bsdeth_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      collateral_token:
+        type: "address"
+        value: "0xCb327b99fF831bF8223cCEd12B1338FF3aA322Ff" # bsdETH
+      sender_address:
+        type: "address"
+        value: "${config.caliber_address}" # Translated from safe_address
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"]
+  makina_id: "224142438888882817549503184248353129445"
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Collateral Position Accounting
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens: ["0xCb327b99fF831bF8223cCEd12B1338FF3aA322Ff"] # bsdETH
+  makina_id: "64629950981009269100215752319206236633"
+  instruction:
+    label: "bsdeth_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/account.yaml:account_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Debt Position Accounting
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens: ["0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F"] # eUSD
+  makina_id: "224142438888882817549503184248353129445"
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/account.yaml:account_debt"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"]
+  makina_id: "224142438888882817549503184248353129445"
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCb327b99fF831bF8223cCEd12B1338FF3aA322Ff"]
+  makina_id: "241963968685402655309198654686298022078" # Example makina_id
+  instruction:
+    label: "bsdeth_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf" # bsdETH market
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"

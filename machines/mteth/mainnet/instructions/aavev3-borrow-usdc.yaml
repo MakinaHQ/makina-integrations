@@ -1,0 +1,54 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "usdc"
+    path: "../../../blueprints/aave/borrow.yaml:borrow_asset"
+    inputs:
+      token:
+        type: "address"
+        value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"
+      referral_code:
+        type: "uint256"
+        value: "0"
+      receiver:
+        type: "address"
+        value: ${config.caliber_address}
+
+# account for the borrowed USDC
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "usdc"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0x72E95b8931767C79bA4EeE721354d6E99a61D004"
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# repay the borrowed USDC
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"]
+  instruction:
+    label: "usdc"
+    path: "../../../blueprints/aave/repay.yaml:repay_asset"
+    inputs:
+      token_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      pool_address:
+        type: "address"
+        value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2" # Aave V3 Pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

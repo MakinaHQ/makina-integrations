@@ -1,0 +1,18 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+
+positions:
+  - id: "241963968685402655309198654686298022078"
+    group_id: "0"
+    description: "Curve CRVUSD/EUSD gauge"
+    instructions: !include "./instructions/curve-crvusd_eusd.yaml"
+  - id: "161958688841915737457758209234502192261"
+    group_id: "0"
+    description: "Tokemak USDC deposit"
+    instructions: !include "./instructions/tokemak_usdc.yaml"
+  - id: "64629950981009269100215752319206236633"
+    group_id: "1"
+    description: "Morpho BSD/ETH position"
+    instructions: !include "./instructions/morpho-bsdeth.yaml"
