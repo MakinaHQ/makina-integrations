@@ -1,0 +1,14 @@
+name = "stusd"
+chain = "mainnet"
+address = "0x4d3a449e3a14addcd8ff49ff3e5e6c80760fb68c"
+
+[calibers.mainnet]
+address = "0x598c1b2a902c5d12e24020cf957ddc895ca6bca0"
+swapper = "0x88f6ff4d868044b4b79bd4164d6e5959b0985b95"
+rootfiles = "github:MakinaHQ/config/machines/stusd/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
