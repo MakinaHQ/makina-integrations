@@ -1,0 +1,13 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0x598c1b2a902c5d12e24020cf957ddc895ca6bca0"
+  unsigned_math_helper:
+    type: "address"
+    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+
+positions:
+  - id: "77590748279218246310796884579338401703"
+    group_id: "0"
+    description: "Morpho Vault Smokehouse USDC"
+    instructions: !include "./instructions/morpho-vault-smokehouse-usdc.yaml"

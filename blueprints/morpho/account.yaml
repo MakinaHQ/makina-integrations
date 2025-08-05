@@ -1,27 +1,24 @@
 protocol: "morpho"
 
-constants:
-  morpho_contract:
+inputs:
+  morpho:
     type: "address"
-    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
   executor_helper:
     type: "address"
-    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
-  unsigned_math:
+  unsigned_math_helper:
     type: "address"
-    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
-
-inputs:
   market_id:
     type: "bytes32"
   subject:
+    type: "address"
+  vault_address:
     type: "address"
 
 actions:
   account_collateral:
     calls:
       - description: "Get user position in the market"
-        target: "${constants.morpho_contract}"
+        target: "${inputs.morpho}"
         selector: "position(bytes32,address)"
         parameters:
           - type: "bytes32"
@@ -32,8 +29,8 @@ actions:
           name: "position_data"
           type: "(uint256,uint128,uint128)"
 
-      - description: "Extract collateral shares (index 2)"
-        target: "${constants.executor_helper}"
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint256,uint128,uint128)"
@@ -41,19 +38,19 @@ actions:
           - type: "uint256"
             value: "2"
         return:
-          name: "collateral_shares"
+          name: "collateral_amount"
           type: "uint256"
 
     reserved_slots:
       - type: "uint256"
-        value: "${returns.collateral_shares}"
+        value: "${returns.collateral_amount}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"
 
   account_debt:
     calls:
       - description: "Get user position in the market"
-        target: "${constants.morpho_contract}"
+        target: "${inputs.morpho}"
         selector: "position(bytes32,address)"
         parameters:
           - type: "bytes32"
@@ -65,7 +62,7 @@ actions:
           type: "(uint256,uint128,uint128)"
 
       - description: "Extract borrow shares (index 1)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint256,uint128,uint128)"
@@ -77,7 +74,7 @@ actions:
           type: "uint256"
 
       - description: "Get market state"
-        target: "${constants.morpho_contract}"
+        target: "${inputs.morpho}"
         selector: "market(bytes32)"
         parameters:
           - type: "bytes32"
@@ -87,7 +84,7 @@ actions:
           type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
 
       - description: "Extract total borrow shares (index 3)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
@@ -99,7 +96,7 @@ actions:
           type: "uint256"
 
       - description: "Extract total borrow assets (index 2)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
@@ -111,7 +108,7 @@ actions:
           type: "uint256"
 
       - description: "Calculate debt amount: shares * totalAssets / totalShares"
-        target: "${constants.unsigned_math}"
+        target: "${inputs.unsigned_math_helper}"
         selector: "mulDiv(uint256,uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -127,5 +124,32 @@ actions:
     reserved_slots:
       - type: "uint256"
         value: "${returns.debt_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_vault:
+    calls:
+      - description: "Query caliber balance of vault tokens"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "vault_balance"
+          type: "uint256"
+      - description: "Preview redeem shares from the vault, to get our assets out"
+        target: "${inputs.vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_balance}"
+        return:
+          name: "assets_in_vault"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.assets_in_vault}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"

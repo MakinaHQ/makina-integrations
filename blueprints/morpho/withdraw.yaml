@@ -1,24 +1,24 @@
 protocol: "morpho"
 
-constants:
-  morpho_contract:
+inputs:
+  morpho:
     type: "address"
-    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
   executor_helper:
     type: "address"
-    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
-
-inputs:
   market_id:
     type: "bytes32"
   receiver_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  unsigned_math_helper:
     type: "address"
 
 actions:
   withdraw_collateral:
     calls:
       - description: "Get market parameters from market ID"
-        target: "${constants.morpho_contract}"
+        target: "${inputs.morpho}"
         selector: "idToMarketParams(bytes32)"
         parameters:
           - type: "bytes32"
@@ -28,7 +28,7 @@ actions:
           type: "(address,address,address,address,uint256)"
 
       - description: "Extract loan token address (element 0)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -40,7 +40,7 @@ actions:
           type: "address"
 
       - description: "Extract collateral token address (element 1)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -52,7 +52,7 @@ actions:
           type: "address"
 
       - description: "Extract oracle address (element 2)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -64,7 +64,7 @@ actions:
           type: "address"
 
       - description: "Extract IRM address (element 3)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -76,7 +76,7 @@ actions:
           type: "address"
 
       - description: "Extract LLTV value (element 4)"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -88,7 +88,7 @@ actions:
           type: "uint256"
 
       - description: "Withdraw collateral from Morpho market"
-        target: "${constants.morpho_contract}"
+        target: "${inputs.morpho}"
         selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -114,3 +114,59 @@ actions:
       amount_to_withdraw:
         type: "uint256"
         description: "The amount of collateral to withdraw"
+
+  redeem_vault:
+    calls:
+      - description: "Redeem shares from the vault, from input number of shares"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The number of shares to redeem from the vault"
+
+  redeem_vault_relative:
+    calls:
+      - description: "Query our balance of shares in the vault"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+      - description: "Redeem shares from the vault, from computed number of shares"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
