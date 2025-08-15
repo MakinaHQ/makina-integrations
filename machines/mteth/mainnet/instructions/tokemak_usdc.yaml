@@ -1,7 +1,6 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"] # USDC
-  makina_id: "161958688841915737457758209234502192261" # Replace with actual position ID
   instruction:
     label: "auto_usd"
     path: "../../../blueprints/tokemak/deposit.yaml:deposit"
@@ -14,7 +13,7 @@
         value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35" # Tokemak vault
       rewarder_address:
         type: "address"
-        value: "0x4103A467166bbbDA3694AB739b391db6c6630595" # Rewarder
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b" # Rewarder
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -22,7 +21,6 @@
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
-  makina_id: "161958688841915737457758209234502192261"
   instruction:
     label: "auto_usd"
     path: "../../../blueprints/tokemak/account.yaml:account"
@@ -32,25 +30,24 @@
         value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
       rewarder_address:
         type: "address"
-        value: "0x4103A467166bbbDA3694AB739b391db6c6630595"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
       subject:
         type: "address"
         value: "${config.caliber_address}"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
-  affected_tokens: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"]
-  makina_id: "161958688841915737457758209234502192261"
+  affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
   instruction:
     label: "auto_usd"
     path: "../../../blueprints/tokemak/withdraw.yaml:withdraw_max"
     inputs:
       vault_address:
         type: "address"
-        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35" # base_usd vault
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
       rewarder_address:
         type: "address"
-        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b" # base_usd rewarder
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
       receiver_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -58,7 +55,6 @@
 - is_debt: false
   instruction_type: "HARVEST"
   affected_tokens: []
-  makina_id: "161958688841915737457758209234502192261"
   instruction:
     label: "auto_usd"
     path: "../../../blueprints/tokemak/harvest.yaml:harvest"

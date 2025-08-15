@@ -25,7 +25,7 @@ actions:
           - type: "address"
             value: ${inputs.token}
           - type: "uint256"
-            value: ${input_slots.amount_in}
+            value: ${input_slots.amount_to_borrow}
           - type: "uint256"
             value: ${inputs.interest_rate_mode}
           - type: "uint256"
@@ -33,6 +33,6 @@ actions:
           - type: "address"
             value: ${inputs.receiver}
     input_slots:
-      amount_in:
+      amount_to_borrow:
         type: "uint256"
         description: "The amount of tokens to borrow"

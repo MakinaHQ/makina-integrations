@@ -21,10 +21,10 @@ actions:
           - type: "address"
             value: ${inputs.token}
           - type: "uint256"
-            value: ${input_slots.amount_out}
+            value: ${input_slots.amount_collateral_to_withdraw}
           - type: "address"
             value: ${inputs.to}
     input_slots:
-      amount_out:
+      amount_collateral_to_withdraw:
         type: "uint256"
         description: "The amount of collateral to withdraw"
