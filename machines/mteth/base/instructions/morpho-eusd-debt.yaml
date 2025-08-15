@@ -1,0 +1,66 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"]
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper}"
+
+# Debt Position Accounting
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens: ["0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"] # eUSD
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/account.yaml:account_debt"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.math_helper}"
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"]
+  instruction:
+    label: "eusd_0xf9ed_74bf"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper}"
+      loan_token:
+        type: "address"
+        value: "0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4" # eUSD

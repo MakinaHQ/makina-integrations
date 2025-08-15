@@ -1,38 +1,32 @@
 protocol: "morpho"
 
-constants:
+inputs:
   morpho:
     type: "address"
-    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
-  market_id_eusd_0xf9ed_74bf:
-    type: "bytes32"
-    value: "0xf9ed1dba3b6ba1ede10e2115a9554e9c52091c9f1b1af21f9e0fecc855ee74bf"
-  loan_token_eusd_0xf9ed_74bf:
-    type: "address"
-    value: "0xCfA3Ef56d303AE4fAabA0592388F19d7C3399FB4"
   executor_helper:
     type: "address"
-    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
-
-inputs:
   caliber_address:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  loan_token:
     type: "address"
 
 actions:
   repay_asset:
     calls:
       - description: "Get market parameters from market ID"
-        target: "${constants.morpho}"
+        target: "${inputs.morpho}"
         selector: "idToMarketParams(bytes32)"
         parameters:
           - type: "bytes32"
-            value: "${constants.market_id_eusd_0xf9ed_74bf}"
+            value: "${inputs.market_id}"
         return:
           name: "market_params"
           type: "(address,address,address,address,uint256)"
 
       - description: "Extract loan token from market params"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -44,7 +38,7 @@ actions:
           type: "address"
 
       - description: "Extract collateral token from market params"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -56,7 +50,7 @@ actions:
           type: "address"
 
       - description: "Extract oracle from market params"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -68,7 +62,7 @@ actions:
           type: "address"
 
       - description: "Extract IRM from market params"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -80,7 +74,7 @@ actions:
           type: "address"
 
       - description: "Extract LLTV from market params"
-        target: "${constants.executor_helper}"
+        target: "${inputs.executor_helper}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,address,address,uint256)"
@@ -92,16 +86,16 @@ actions:
           type: "uint256"
 
       - description: "Approve loan token for spending"
-        target: "${constants.loan_token_eusd_0xf9ed_74bf}"
+        target: "${inputs.loan_token}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${constants.morpho}"
+            value: "${inputs.morpho}"
           - type: "uint256"
             value: "${input_slots.amount_to_repay}"
 
       - description: "Repay loan on Morpho"
-        target: "${constants.morpho}"
+        target: "${inputs.morpho}"
         selector: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
         parameters:
           - type: "(address,address,address,address,uint256)"

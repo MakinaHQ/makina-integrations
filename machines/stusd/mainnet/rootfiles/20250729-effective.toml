@@ -1,0 +1,57 @@
+[instructions.morpho_vault.account.smokehouse_usdc]
+position_id = "77590748279218246310796884579338401703"
+is_debt = false
+group_id = "0x0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x70a082310102ffffffffff02beefff209270748ddd194831b3fa287a5386f5bc",
+  "0x4cdad5060102ffffffffff00beefff209270748ddd194831b3fa287a5386f5bc",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000598c1b2a902c5d12e24020cf957ddc895ca6bca0",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho_vault.deposit.smokehouse_usdc]
+position_id = "77590748279218246310796884579338401703"
+is_debt = false
+group_id = "0x0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x095ea7b3010100ffffffffffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ffffffffffbeefff209270748ddd194831b3fa287a5386f5bc",
+]
+state = [
+  "0x99a8daf1b71f292524ef087d2fc434cdacbce67100d981ca25cecd529417368e",
+  "0x000000000000000000000000beefff209270748ddd194831b3fa287a5386f5bc",
+  "0x000000000000000000000000598c1b2a902c5d12e24020cf957ddc895ca6bca0",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho_vault.deposit.smokehouse_usdc.inputs_slots]]
+index = 0
+name = "amount_in"
+type = "Uint"
+
+[instructions.morpho_vault.withdraw.smokehouse_usdc]
+position_id = "77590748279218246310796884579338401703"
+is_debt = false
+group_id = "0x0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = ["0xba08765201000101ffffffffbeefff209270748ddd194831b3fa287a5386f5bc"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000598c1b2a902c5d12e24020cf957ddc895ca6bca0",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho_vault.withdraw.smokehouse_usdc.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"

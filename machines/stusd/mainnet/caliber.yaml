@@ -5,6 +5,9 @@ config:
   unsigned_math_helper:
     type: "address"
     value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
 
 positions:
   - id: "77590748279218246310796884579338401703"

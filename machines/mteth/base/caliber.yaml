@@ -2,6 +2,24 @@ config:
   caliber_address:
     type: "address"
     value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+  caliber_helper:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  swap_module:
+    type: "address"
+    value: "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0x6b09a22087B5D6C7E1051ee9a8AA94eA56C91008"
+  oracle_registry:
+    type: "address"
+    value: "0x4B3336630e591D36ca81f0c25b798895289dDD30"
+  math_helper:
+    type: "address"
+    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
 
 positions:
   - id: "241963968685402655309198654686298022078"
@@ -12,7 +30,15 @@ positions:
     group_id: "0"
     description: "Tokemak USDC deposit"
     instructions: !include "./instructions/tokemak_usdc.yaml"
+  - id: "224142438888882817549503184248353129445"
+    group_id: "1"
+    description: "Morpho bsdETH/eusd position debt side"
+    instructions: !include "./instructions/morpho-eusd-debt.yaml"
   - id: "64629950981009269100215752319206236633"
     group_id: "1"
-    description: "Morpho BSD/ETH position"
-    instructions: !include "./instructions/morpho-bsdeth.yaml"
+    description: "Morpho bsdETH/eusd position collateral side"
+    instructions: !include "./instructions/morpho-bsdeth-collateral.yaml"
+  - id: "1234567890987654321"
+    group_id: "0"
+    description: "PT-USR/USDC Morpho Loop"
+    instructions: !include "./instructions/pt-usr-usdc-loop.yaml"

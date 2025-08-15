@@ -1,0 +1,46 @@
+# add collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x9F56094C450763769BA0EA9Fe2876070c0fD5F77" # PT-sUSDe-25SEP25
+  instruction:
+    label: "PT-sUSDe-25SEP25-0xe2e6...1b9f"
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+      market_id:
+        type: "bytes32"
+        value: "0xe2e675b00579db50f69c29a4ff980a3a90f65023d9d83505f16bc6ec65591b9f"
+      collateral_token:
+        type: "address"
+        value: "0x9F56094C450763769BA0EA9Fe2876070c0fD5F77" # PT-sUSDe-25SEP25
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# account for position collateral
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x9F56094C450763769BA0EA9Fe2876070c0fD5F77" # PT-sUSDe-25SEP25
+  instruction:
+    label: "PT-sUSDe-25SEP25-0xe2e6...1b9f"
+    path: "../../../blueprints/morpho/account.yaml:account_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xe2e675b00579db50f69c29a4ff980a3a90f65023d9d83505f16bc6ec65591b9f"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"

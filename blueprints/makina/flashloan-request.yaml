@@ -1,0 +1,37 @@
+protocol: "makina-flashloan"
+
+inputs:
+  flash_loan_aggregator:
+    type: "address"
+
+actions:
+  flashloan_request:
+    calls:
+      - description: "Request a flash loan for the specified token"
+        target: "${inputs.flash_loan_aggregator}"
+        selector: "requestFlashloan((uint8,(uint256,bool,uint256,uint8,address[],bytes32[],bytes[],uint128,bytes32[]),address,uint256))"
+        parameters:
+          - type: "(uint8,bytes,address,uint256)"
+            value:
+              - type: "uint8"
+                value: "${input_slots.flash_loan_venue}"
+              - type: "bytes"
+                value: "${input_slots.flash_loan_data}"
+              - type: "address"
+                value: "${input_slots.flash_loan_token}"
+              - type: "uint256"
+                value: "${input_slots.flash_loan_amount}"
+
+    input_slots:
+      flash_loan_token:
+        type: "address"
+        description: "The token to flash loan."
+      flash_loan_amount:
+        type: "uint256"
+        description: "The amount of tokens to flash loan."
+      flash_loan_data:
+        type: "bytes"
+        description: "Additional data for the flash loan request."
+      flash_loan_venue:
+        type: "uint8"
+        description: "Where to take the FL from. It is a makina-core enum. Morpho is 3."

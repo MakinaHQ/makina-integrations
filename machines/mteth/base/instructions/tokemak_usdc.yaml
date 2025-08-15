@@ -1,7 +1,6 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"] # USDC
-  makina_id: "161958688841915737457758209234502192261" # Replace with actual position ID
   instruction:
     label: "base_usd"
     path: "../../../blueprints/tokemak/deposit.yaml:deposit"
@@ -22,7 +21,6 @@
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"]
-  makina_id: "161958688841915737457758209234502192261"
   instruction:
     label: "base_usd"
     path: "../../../blueprints/tokemak/account.yaml:account"
@@ -40,7 +38,6 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"]
-  makina_id: "161958688841915737457758209234502192261"
   instruction:
     label: "base_usd"
     path: "../../../blueprints/tokemak/withdraw.yaml:withdraw_max"
@@ -58,7 +55,6 @@
 - is_debt: false
   instruction_type: "HARVEST"
   affected_tokens: []
-  makina_id: "161958688841915737457758209234502192261"
   instruction:
     label: "base_usd"
     path: "../../../blueprints/tokemak/harvest.yaml:harvest"
