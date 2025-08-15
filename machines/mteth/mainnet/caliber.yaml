@@ -2,6 +2,15 @@ config:
   caliber_address:
     type: "address"
     value: "0xf8e88d73636b29bddec82d71da805dc3abe55936"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
 
 positions:
   - id: "194070608470725801208780068439756007916"
@@ -20,3 +29,11 @@ positions:
     group_id: "0"
     description: "Tokemak USDC position"
     instructions: !include "./instructions/tokemak_usdc.yaml"
+  - id: "102085800190891488320502506258850684527"
+    group_id: "2"
+    description: "Morpho wstETH collateral (market: 0xb323...86cc)"
+    instructions: !include "./instructions/morpho-market-wsteth-usdc-collateral.yaml"
+  - id: "91290664943915222943338577479383966617"
+    group_id: "2"
+    description: "Morpho USDC debt (market: 0xb323...86cc)"
+    instructions: !include "./instructions/morpho-market-wsteth-usdc-debt.yaml"
