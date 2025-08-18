@@ -3,11 +3,14 @@
   affected_tokens: []
   instruction:
     label: "crvusd_eusd"
-    path: "../../../blueprints/curve/harvest.yaml:harvest"
+    path: "../../../blueprints/curve/harvest.yaml:harvest_mint"
     inputs:
       gauge_address:
         type: "address"
         value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b"
+      child_liquidity_gauge_factory_address:
+        type: "address"
+        value: "0xabC000d88f23Bb45525E447528DBF656A9D55bf5"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
