@@ -46,7 +46,7 @@ It is in the instructions files that we feed the pool/caliber/machine-specific i
 
 #### Updating the rootfiles
 
-When instructions, blueprints, or calibers are updated, the rootfiles must be regenerated. Add the new rootfiles to the corresponding `rootfiles` directory. Previous rootfiles are kept as references and remain necessary until the upgrade is applied on-chain. You can think of the rootfiles directory as a collection of “migration files.”
+When instructions, blueprints, or calibers are updated, the rootfiles must be regenerated. Add the new rootfiles to the corresponding `rootfiles` directory. Previous rootfiles are kept as references and remain necessary until the upgrade is applied on-chain. You can think of the rootfiles directory as a collection of “migration files.” The name of the rootfile should be: `[timestamp]-[name-of-the-migration].toml`. Where timestamps are in the format `YYYYMMDDHHMMSS` or `YYYYMMDD`.
 
 ## Formatting
 
