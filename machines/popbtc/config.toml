@@ -1,0 +1,14 @@
+name = "popbtc"
+chain = "mainnet"
+address = "0x9ce7de5cbbea646e1c7884162cb33224710b6e66"
+
+[calibers.mainnet]
+address = "0xc3ce183c95b93a5d938dc0f8b450483d25bb6cc0"
+swapper = "0x88f6ff4d868044b4b79bd4164d6e5959b0985b95"
+rootfiles = "github:MakinaHQ/config/machines/popbtc/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"
+decimals = 8
+name = "Coinbase Wrapped BTC"
+symbol = "cbBTC"
