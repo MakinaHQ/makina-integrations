@@ -1,0 +1,50 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC"
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      on_behalf_of:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC"
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      to:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0x5Ee5bf7ae06D1Be5997A1A72006FE6C607eC6DE8" # Aave V3 WBTC token
+      account:
+        type: "address"
+        value: "${config.caliber_address}"

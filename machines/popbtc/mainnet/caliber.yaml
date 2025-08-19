@@ -1,0 +1,25 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xc3ce183c95b93a5d938dc0f8b450483d25bb6cc0"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+
+positions:
+  - id: "43323530916310560412311476316402761071"
+    group_id: "1"
+    description: "Aave v3 supply cbBTC"
+    instructions: !include "./instructions/aave-v3-supply-cbbtc.yaml"
+  - id: "180389332028160357558976304733421188856"
+    group_id: "1"
+    description: "Aave v3 supply tBTC"
+    instructions: !include "./instructions/aave-v3-supply-tbtc.yaml"
+  - id: "154527051821373524649523573070693712755"
+    group_id: "1"
+    description: "Aave v3 supply WBTC"
+    instructions: !include "./instructions/aave-v3-supply-wbtc.yaml"
+  - id: "108116723149245972563458388330560127764"
+    group_id: "1"
+    description: "Aave v3 supply LBTC"
+    instructions: !include "./instructions/aave-v3-supply-lbtc.yaml"

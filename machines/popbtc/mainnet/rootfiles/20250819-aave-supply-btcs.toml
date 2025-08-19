@@ -1,0 +1,231 @@
+[instructions.aavev3.account.LBTC]
+position_id = "108116723149245972563458388330560127764"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x8236a87084f8b84306f72007f36f2618a5634494"]
+commands = ["0x70a082310102ff000000000065906988adee75306021c417a1a3458040239602"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.WBTC]
+position_id = "154527051821373524649523573070693712755"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"]
+commands = ["0x70a082310102ff00000000005ee5bf7ae06d1be5997a1a72006fe6c607ec6de8"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.cbBTC]
+position_id = "43323530916310560412311476316402761071"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf"]
+commands = ["0x70a082310102ff00000000005c647ce0ae10658ec44fa4e11a51c96e94efd1dd"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.tBTC]
+position_id = "180389332028160357558976304733421188856"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x18084fba666a33d37592fa2633fd49a74dd93a88"]
+commands = ["0x70a082310102ff000000000010ac93971cdb1f5c778144084242374473c350da"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.add_collateral.LBTC]
+position_id = "108116723149245972563458388330560127764"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x8236a87084f8b84306f72007f36f2618a5634494"]
+commands = [
+  "0x095ea7b3010100ff000000ff8236a87084f8b84306f72007f36f2618a5634494",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x0000000000000000000000008236a87084f8b84306f72007f36f2618a5634494",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.LBTC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.WBTC]
+position_id = "154527051821373524649523573070693712755"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"]
+commands = [
+  "0x095ea7b3010100ff000000ff2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x0000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.WBTC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.cbBTC]
+position_id = "43323530916310560412311476316402761071"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf"]
+commands = [
+  "0x095ea7b3010100ff000000ffcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000cbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.cbBTC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.tBTC]
+position_id = "180389332028160357558976304733421188856"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x18084fba666a33d37592fa2633fd49a74dd93a88"]
+commands = [
+  "0x095ea7b3010100ff000000ff18084fba666a33d37592fa2633fd49a74dd93a88",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x00000000000000000000000018084fba666a33d37592fa2633fd49a74dd93a88",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.tBTC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.LBTC]
+position_id = "108116723149245972563458388330560127764"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x8236a87084f8b84306f72007f36f2618a5634494"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x0000000000000000000000008236a87084f8b84306f72007f36f2618a5634494",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.LBTC.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.WBTC]
+position_id = "154527051821373524649523573070693712755"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x0000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c599",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.WBTC.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.cbBTC]
+position_id = "43323530916310560412311476316402761071"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000cbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.cbBTC.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.tBTC]
+position_id = "180389332028160357558976304733421188856"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x18084fba666a33d37592fa2633fd49a74dd93a88"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x00000000000000000000000018084fba666a33d37592fa2633fd49a74dd93a88",
+  "0x000000000000000000000000c3ce183c95b93a5d938dc0f8b450483d25bb6cc0",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.tBTC.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"

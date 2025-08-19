@@ -1,0 +1,50 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "cbBTC"
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      on_behalf_of:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "cbBTC"
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      to:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "cbBTC"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0x5c647cE0Ae10658ec44FA4E11A51c96e94efd1Dd" # Aave V3 cbBTC token
+      account:
+        type: "address"
+        value: "${config.caliber_address}"

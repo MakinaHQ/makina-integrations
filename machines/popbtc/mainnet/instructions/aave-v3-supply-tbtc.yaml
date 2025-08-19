@@ -1,0 +1,50 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      on_behalf_of:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      to:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0x10Ac93971cdb1F5c778144084242374473c350Da" # Aave V3 tBTC token
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
