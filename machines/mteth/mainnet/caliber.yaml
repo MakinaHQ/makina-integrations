@@ -11,6 +11,9 @@ config:
   unsigned_math_helper_address:
     type: "address"
     value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
 
 positions:
   - id: "194070608470725801208780068439756007916"
@@ -21,6 +24,10 @@ positions:
     group_id: "1"
     description: "Aave v3 supply wstETH"
     instructions: !include "./instructions/aavev3-supply-wsteth.yaml"
+  - id: "107076193902764124667576417126923441565"
+    group_id: "1"
+    description: "Aave v3 supply USDe"
+    instructions: !include "./instructions/aavev3-supply-usde.yaml"
   - id: "227329230297595858214811008018294296109"
     group_id: "1"
     description: "Aave v3 borrow USDC"

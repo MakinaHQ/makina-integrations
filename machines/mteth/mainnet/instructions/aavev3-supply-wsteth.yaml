@@ -1,7 +1,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
   instruction:
     label: "wsteth"
     path: "../../../blueprints/aave/deposit.yaml:add_collateral"
@@ -9,14 +9,17 @@
       on_behalf_of:
         type: "address"
         value: ${config.caliber_address}
-      token:
+      asset_address:
         type: "address"
-        value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+        value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
   instruction:
     label: "wsteth"
     path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
@@ -24,14 +27,17 @@
       to:
         type: "address"
         value: ${config.caliber_address}
-      token:
+      asset_address:
         type: "address"
-        value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+        value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
   instruction:
     label: "wsteth"
     path: "../../../blueprints/aave/account.yaml:account"
