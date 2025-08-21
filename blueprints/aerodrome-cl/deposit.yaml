@@ -1,0 +1,481 @@
+protocol: "aerodrome"
+
+inputs:
+  nft_id_storage_key:
+    type: "string"
+  kv_store_address:
+    type: "address"
+  revertable_caliber_helper:
+    type: "address"
+  token_a_address:
+    type: "address"
+  token_b_address:
+    type: "address"
+  nft_manager_address:
+    type: "address"
+  cl_pool_address:
+    type: "address"
+  gauge_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  swap_router:
+    type: "address"
+
+actions:
+  swap_and_deposit_cl_and_stake:
+    calls:
+      # first, need to check that we do not have an existing position
+      - description: "Need to check that we do not have a position yet. First, get from the KV store the position id."
+        target: "${inputs.kv_store_address}"
+        selector: "get(string)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "existing_position_id"
+
+      - description: "Check that it is equal to zero"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_position_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "no_position_bool" # if true, then we can go ahead, otherwise revert
+
+      - description: "Revert if the condition is False"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_position_bool}"
+
+      # proceed to the swap
+      - description: "Get the current block timestamp"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "blockTimestamp()"
+        parameters: []
+        return:
+          type: "uint256"
+          name: "block_timestamp"
+
+      - description: "Get the token 0 from the pool"
+        target: "${inputs.cl_pool_address}"
+        selector: "token0()"
+        parameters: []
+        return:
+          type: "address"
+          name: "token0"
+
+      - description: "Get the token 1 from the pool"
+        target: "${inputs.cl_pool_address}"
+        selector: "token1()"
+        parameters: []
+        return:
+          type: "address"
+          name: "token1"
+
+      - description: "Check if input_slots.token_to_swap_0_or_1 > 1"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.token_to_swap_0_or_1}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "bool"
+          name: "is_invalid_input"
+
+      - description: "Revert if the condition is True"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_invalid_input}"
+
+      - description: "Check if token_to_swap == 0"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.token_to_swap_0_or_1}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "token_to_swap_is_token_0"
+
+      - description: "Assign token_to_swap_address"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "ifElse(bool,bytes32,bytes32)"
+        parameters:
+          - type: "bool"
+            value: "${returns.token_to_swap_is_token_0}"
+          - type: "address"
+            value: "${returns.token0}"
+          - type: "address"
+            value: "${returns.token1}"
+        return:
+          type: "address"
+          name: "token_to_swap_address"
+
+      - description: "Assign token_to_receive_address"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "ifElse(bool,bytes32,bytes32)"
+        parameters:
+          - type: "bool"
+            value: "${returns.token_to_swap_is_token_0}"
+          - type: "address"
+            value: "${returns.token1}"
+          - type: "address"
+            value: "${returns.token0}"
+        return:
+          type: "address"
+          name: "token_to_receive_address"
+
+      - description: "Get the tick spacing from the pool"
+        target: "${inputs.cl_pool_address}"
+        selector: "tickSpacing()"
+        parameters: []
+        return:
+          type: "int24"
+          name: "tick_spacing"
+
+      - description: "Approve the token0 for the swap router (we dont know which token user wants to swap, so we approve both)"
+        target: "${inputs.token_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_router}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_swap}"
+
+      - description: "Approve the token1 for the swap router (we dont know which token user wants to swap, so we approve both)"
+        target: "${inputs.token_b_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_router}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_swap}"
+
+      - description: "Do the swap"
+        target: "${inputs.swap_router}"
+        selector: "exactInputSingle((address,address,int24,address,uint256,uint256,uint256,uint160))"
+        parameters:
+          - type: "(address,address,int24,address,uint256,uint256,uint256,uint160)"
+            value:
+              - type: "address"
+                value: "${returns.token_to_swap_address}"
+              - type: "address"
+                value: "${returns.token_to_receive_address}"
+              - type: "int24"
+                value: "${returns.tick_spacing}"
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint256"
+                value: "${returns.block_timestamp}"
+              - type: "uint256"
+                value: "${input_slots.amount_to_swap}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_out_from_swap}"
+              - type: "uint160"
+                value: "0" # sqrtPriceLimitX96, yolo
+
+      - description: "Revert approval token 0 for the swap router"
+        target: "${inputs.token_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_router}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Revert approval token 1 for the swap router"
+        target: "${inputs.token_b_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_router}"
+          - type: "uint256"
+            value: "0"
+
+      # now can do the deposit and stake, like in the other action.
+      - description: "Proceed to LPing on aerodrome CL. Approve token A to be spent by NFT manager"
+        target: "${inputs.token_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.nft_manager_address}"
+          - type: "uint256"
+            value: "${input_slots.desired_amount_token_a}"
+
+      - description: "Approve token B to be spent by NFT manager"
+        target: "${inputs.token_b_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.nft_manager_address}"
+          - type: "uint256"
+            value: "${input_slots.desired_amount_token_b}"
+
+      - description: "Mint the CL position with NFT manager"
+        target: "${inputs.nft_manager_address}"
+        selector: "mint((address,address,int24,int24,int24,uint256,uint256,uint256,uint256,address,uint256,uint160))"
+        parameters:
+          - type: "(address,address,int24,int24,int24,uint256,uint256,uint256,uint256,address,uint256,uint160)"
+            value:
+              - type: "address"
+                value: "${inputs.token_a_address}"
+              - type: "address"
+                value: "${inputs.token_b_address}"
+              - type: "int24"
+                value: "${returns.tick_spacing}"
+              - type: "int24"
+                value: "${input_slots.tick_lower}"
+              - type: "int24"
+                value: "${input_slots.tick_upper}"
+              - type: "uint256"
+                value: "${input_slots.desired_amount_token_a}"
+              - type: "uint256"
+                value: "${input_slots.desired_amount_token_b}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_token_a}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_token_b}"
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint256"
+                value: "${returns.block_timestamp}"
+              - type: "uint160"
+                value: "0"
+        return:
+          name: "deposit_receipt"
+          type: "(uint256,uint128,uint256,uint256)"
+
+      - description: "Extract the NFT token id"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint256,uint256)"
+            value: "${returns.deposit_receipt}"
+          - type: "uint256"
+            value: "0" # the token id is at index 0
+        return:
+          name: "new_token_id"
+          type: "uint256"
+
+      - description: "Approve the gauge to spend the NFT."
+        target: "${inputs.nft_manager_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+
+      - description: "Deposit NFT in the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+
+      - description: "Register the token id in the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(string,bytes32)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+    input_slots:
+      token_to_swap_0_or_1:
+        type: "uint256"
+        description: "Which token to swap (0 or 1)"
+      amount_to_swap:
+        type: "uint256"
+        description: "Amount of token to swap"
+      min_amount_out_from_swap:
+        type: "uint256"
+        description: "Minimum amount of token to receive from the swap"
+      desired_amount_token_a:
+        type: "uint256"
+        description: "Amount of token A to deposit"
+      min_amount_token_a:
+        type: "uint256"
+        description: "Minimum amount of token A to deposit"
+      desired_amount_token_b:
+        type: "uint256"
+        description: "Amount of token B to deposit"
+      min_amount_token_b:
+        type: "uint256"
+        description: "Minimum amount of token B to deposit"
+      tick_lower:
+        type: "int24"
+        description: "Lower tick for the position"
+      tick_upper:
+        type: "int24"
+        description: "Upper tick for the position"
+
+  deposit_cl_and_stake:
+    calls:
+      - description: "Need to check that we do not have a position yet. First, get from the KV store the position id."
+        target: "${inputs.kv_store_address}"
+        selector: "get(string)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "existing_position_id"
+
+      - description: "Check that it is equal to zero"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_position_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "no_position_bool" # if true, then we can go ahead, otherwise revert
+
+      - description: "Revert if the condition is False"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_position_bool}"
+
+      - description: "Proceed to LPing on aerodrome CL. Approve token A to be spent by NFT manager"
+        target: "${inputs.token_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.nft_manager_address}"
+          - type: "uint256"
+            value: "${input_slots.desired_amount_token_a}"
+
+      - description: "Approve token B to be spent by NFT manager"
+        target: "${inputs.token_b_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.nft_manager_address}"
+          - type: "uint256"
+            value: "${input_slots.desired_amount_token_b}"
+
+      - description: "Get the pool's tick spacing"
+        target: "${inputs.cl_pool_address}"
+        selector: "tickSpacing()"
+        parameters: []
+        return:
+          type: "int24"
+          name: "tick_spacing"
+
+      - description: "Get the block timestamp from helper"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "blockTimestamp()"
+        parameters: []
+        return:
+          type: "uint256"
+          name: "block_timestamp"
+
+      - description: "Mint the CL position with NFT manager"
+        target: "${inputs.nft_manager_address}"
+        selector: "mint((address,address,int24,int24,int24,uint256,uint256,uint256,uint256,address,uint256,uint160))"
+        parameters:
+          - type: "(address,address,int24,int24,int24,uint256,uint256,uint256,uint256,address,uint256,uint160)"
+            value:
+              - type: "address"
+                value: "${inputs.token_a_address}"
+              - type: "address"
+                value: "${inputs.token_b_address}"
+              - type: "int24"
+                value: "${returns.tick_spacing}"
+              - type: "int24"
+                value: "${input_slots.tick_lower}"
+              - type: "int24"
+                value: "${input_slots.tick_upper}"
+              - type: "uint256"
+                value: "${input_slots.desired_amount_token_a}"
+              - type: "uint256"
+                value: "${input_slots.desired_amount_token_b}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_token_a}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_token_b}"
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint256"
+                value: "${returns.block_timestamp}"
+              - type: "uint160"
+                value: "0"
+        return:
+          name: "deposit_receipt"
+          type: "(uint256,uint128,uint256,uint256)"
+
+      - description: "Extract the NFT token id"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint256,uint256)"
+            value: "${returns.deposit_receipt}"
+          - type: "uint256"
+            value: "0" # the token id is at index 0
+        return:
+          name: "new_token_id"
+          type: "uint256"
+
+      - description: "Approve the gauge to spend the NFT."
+        target: "${inputs.nft_manager_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+
+      - description: "Deposit NFT in the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+
+      - description: "Register the token id in the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(string,bytes32)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+          - type: "uint256"
+            value: "${returns.new_token_id}"
+
+    input_slots:
+      desired_amount_token_a:
+        type: "uint256"
+        description: "Amount of token A to deposit"
+      min_amount_token_a:
+        type: "uint256"
+        description: "Minimum amount of token A to deposit"
+      desired_amount_token_b:
+        type: "uint256"
+        description: "Amount of token B to deposit"
+      min_amount_token_b:
+        type: "uint256"
+        description: "Minimum amount of token B to deposit"
+      tick_lower:
+        type: "int24"
+        description: "Lower tick for the position"
+      tick_upper:
+        type: "int24"
+        description: "Upper tick for the position"

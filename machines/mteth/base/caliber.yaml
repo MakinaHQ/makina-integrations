@@ -20,6 +20,15 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  revertable_caliber_helper:
+    type: "address"
+    value: "0xA5b2637997148160F3A878E85A978E8303f863CF"
+  aerodrome_cl_helper:
+    type: "address"
+    value: "0x3fE39c78670d1A4D826deb97867d653Ae2F564F1"
+  kv_store_address:
+    type: "address"
+    value: "0x3Ee34ca78Da9C1bA96dccdA6a62701D664C47fe2"
 
 positions:
   - id: "241963968685402655309198654686298022078"
@@ -42,3 +51,7 @@ positions:
     group_id: "0"
     description: "PT-USR/USDC Morpho Loop"
     instructions: !include "./instructions/pt-usr-usdc-loop.yaml"
+  - id: "307036356294988702713034054457892480599"
+    group_id: "0"
+    description: "USDC/USDT Aerodroome CL"
+    instructions: !include "./instructions/aero-cl-usdc-usdt.yaml"

@@ -1,0 +1,149 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
+    - "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2" # USDT
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/aerodrome-cl/deposit.yaml:swap_and_deposit_cl_and_stake"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.aerodrome.0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      token_a_address:
+        type: "address"
+        value: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      token_b_address:
+        type: "address"
+        value: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      cl_pool_address:
+        type: "address"
+        value: "0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      gauge_address:
+        type: "address"
+        value: "0xBd85D45f1636fCEB2359d9Dcf839f12b3cF5AF3F"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_router:
+        type: "address"
+        value: "0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
+    - "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2" # USDT
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/aerodrome-cl/deposit.yaml:deposit_cl_and_stake"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.aerodrome.0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      token_a_address:
+        type: "address"
+        value: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      token_b_address:
+        type: "address"
+        value: "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      cl_pool_address:
+        type: "address"
+        value: "0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      gauge_address:
+        type: "address"
+        value: "0xBd85D45f1636fCEB2359d9Dcf839f12b3cF5AF3F"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
+    - "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2" # USDT
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/aerodrome-cl/account.yaml:account_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.aerodrome.0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      gauge_address:
+        type: "address"
+        value: "0xBd85D45f1636fCEB2359d9Dcf839f12b3cF5AF3F"
+      aerodrome_cl_helper:
+        type: "address"
+        value: "${config.aerodrome_cl_helper}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/aerodrome-cl/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xBd85D45f1636fCEB2359d9Dcf839f12b3cF5AF3F"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.aerodrome.0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
+    - "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2" # USDT
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/aerodrome-cl/withdraw.yaml:unstake_and_withdraw_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.aerodrome.0xa41Bc0AFfbA7Fd420d186b84899d7ab2aC57fcD1"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      gauge_address:
+        type: "address"
+        value: "0xBd85D45f1636fCEB2359d9Dcf839f12b3cF5AF3F"
+      aerodrome_cl_helper:
+        type: "address"
+        value: "${config.aerodrome_cl_helper}"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
