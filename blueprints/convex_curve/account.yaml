@@ -1,0 +1,40 @@
+protocol: "convex_curve"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account_single_sided_token_b:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Calc withdraw one coin from curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}"
+          - type: "int128"
+            value: "1"
+        return:
+          name: "amount_token_b_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_b_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

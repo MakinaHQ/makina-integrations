@@ -1,0 +1,41 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
+  instruction:
+    label: "sUSD/USDe"
+    path: "../../../blueprints/convex_curve/deposit.yaml:deposit_single_sided_token_b"
+    inputs:
+      asset_b_address:
+        type: "address"
+        value: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3" # USDe
+      curve_pool_address:
+        type: "address"
+        value: "0x59a06b97b2d566B9Dee2a368EaC8787Cfa57f95D"
+      curve_lp_token_address:
+        type: "address"
+        value: "0x59a06b97b2d566B9Dee2a368EaC8787Cfa57f95D"
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"
+      pool_id:
+        type: "uint256"
+        value: "429"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
+  instruction:
+    label: "sUSD/USDe"
+    path: "../../../blueprints/convex_curve/account.yaml:account_single_sided_token_b"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x268ee43857694fe53FF8729b8171266ee2514c69"
+      curve_pool_address:
+        type: "address"
+        value: "0x59a06b97b2d566B9Dee2a368EaC8787Cfa57f95D"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

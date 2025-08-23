@@ -44,3 +44,7 @@ positions:
     group_id: "2"
     description: "Morpho USDC debt (market: 0xb323...86cc)"
     instructions: !include "./instructions/morpho-market-wsteth-usdc-debt.yaml"
+  - id: "192769461428082155333185570845010544894"
+    group_id: "0"
+    description: "Convex sUSD/USDe position"
+    instructions: !include "./instructions/convex-curve-susd-usde.yaml"
