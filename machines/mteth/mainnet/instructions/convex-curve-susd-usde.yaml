@@ -39,3 +39,18 @@
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens:
+    - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
+  instruction:
+    label: "sUSD/USDe"
+    path: "../../../blueprints/convex_curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x268ee43857694fe53FF8729b8171266ee2514c69"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
