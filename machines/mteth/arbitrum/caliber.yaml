@@ -1,0 +1,4 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"

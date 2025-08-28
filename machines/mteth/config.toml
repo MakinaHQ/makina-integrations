@@ -23,3 +23,14 @@ address = "0x4200000000000000000000000000000000000006"
 decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
+
+[calibers.arbitrum]
+address = "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+swapper = "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+rootfiles = "github:MakinaHQ/config/machines/mteth/arbitrum/rootfiles"
+
+[calibers.arbitrum.accounting_token]
+address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
