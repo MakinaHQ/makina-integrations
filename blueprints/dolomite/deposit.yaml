@@ -1,0 +1,45 @@
+protocol: "dolomite"
+
+inputs:
+  asset_address:
+    type: "address"
+  dolo_deposit_withdrawal_router_address:
+    type: "address"
+  isolation_mode_market_id:
+    type: "uint256"
+  account_number:
+    type: "uint256"
+  market_id:
+    type: "uint256"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve the Dolomite deposit/withdrawal router"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.dolo_deposit_withdrawal_router_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit assets into Dolomite"
+        target: "${inputs.dolo_deposit_withdrawal_router_address}"
+        selector: "depositWei(uint256,uint256,uint256,uint256,uint8)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.isolation_mode_market_id}"
+          - type: "uint256"
+            value: "${inputs.account_number}"
+          - type: "uint256"
+            value: "${inputs.market_id}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "uint8"
+            value: "0"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of tokens to deposit"

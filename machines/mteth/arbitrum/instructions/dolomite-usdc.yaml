@@ -1,0 +1,89 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/dolomite/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+      dolo_deposit_withdrawal_router_address:
+        type: "address"
+        value: "0xf8b2c637A68cF6A17b1DF9F8992EeBeFf63d2dFf"
+      isolation_mode_market_id:
+        type: "uint256"
+        value: "0"
+      account_number:
+        type: "uint256"
+        value: "0"
+      market_id:
+        type: "uint256"
+        value: "17"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/dolomite/account.yaml:account"
+    inputs:
+      dolo_margin_address:
+        type: "address"
+        value: "0x6Bd780E7fDf01D77e4d475c821f1e7AE05409072"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      account_number:
+        type: "uint256"
+        value: "0"
+      market_id:
+        type: "uint256"
+        value: "17"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/dolomite/withdraw.yaml:withdraw_assets"
+    inputs:
+      dolo_deposit_withdrawal_router_address:
+        type: "address"
+        value: "0xf8b2c637A68cF6A17b1DF9F8992EeBeFf63d2dFf"
+      isolation_mode_market_id:
+        type: "uint256"
+        value: "0"
+      account_number:
+        type: "uint256"
+        value: "0"
+      market_id:
+        type: "uint256"
+        value: "17"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/dolomite/withdraw.yaml:withdraw_full"
+    inputs:
+      dolo_deposit_withdrawal_router_address:
+        type: "address"
+        value: "0xf8b2c637A68cF6A17b1DF9F8992EeBeFf63d2dFf"
+      isolation_mode_market_id:
+        type: "uint256"
+        value: "0"
+      account_number:
+        type: "uint256"
+        value: "0"
+      market_id:
+        type: "uint256"
+        value: "17"

@@ -2,3 +2,12 @@ config:
   caliber_address:
     type: "address"
     value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+  revertable_caliber_helper:
+    type: "address"
+    value: "0x6b09a22087B5D6C7E1051ee9a8AA94eA56C91008"
+
+positions:
+  - id: "153361471060907065580864088630405245628"
+    group_id: "1"
+    description: "Dolomite Supply USDC"
+    instructions: !include "./instructions/dolomite-usdc.yaml"
