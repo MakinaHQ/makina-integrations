@@ -11,3 +11,7 @@ positions:
     group_id: "1"
     description: "Dolomite Supply USDC"
     instructions: !include "./instructions/dolomite-usdc.yaml"
+  - id: "34611778462387789867459356474128356669"
+    group_id: "0"
+    description: "Silo USDC"
+    instructions: !include "./instructions/silo-deposit-usdc.yaml"

@@ -82,3 +82,78 @@ state = [
 ]
 bitmap = "319014718988379809496913694467282698240"
 inputs_slots = []
+
+[instructions.silo.account."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x70a082310102ff00000000022ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0x07a2d13a0102ff00000000002ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.silo.deposit."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x095ea7b3010100ff000000ffaf88d065e77c8cc2239327c5edb3a432268e5831",
+  "0x6e553f65010002ff000000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000002ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.silo.deposit."USDC - Varlamore USDC Growth".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.silo.redeem_shares_full."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x70a082310100ff00000000012ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0xba08765201010000ff0000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.silo.withdraw_assets."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = ["0xb460af9401000101ff0000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.silo.withdraw_assets."USDC - Varlamore USDC Growth".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"

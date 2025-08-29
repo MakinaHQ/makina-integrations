@@ -1,0 +1,49 @@
+protocol: "silo"
+
+inputs:
+  silo_vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  withdraw_assets:
+    calls:
+      - description: "Withdraw assets from the Silo vault."
+        target: "${inputs.silo_vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.assets_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      assets_to_withdraw:
+        type: "uint256"
+        description: "The amount of assets to withdraw from the Silo vault"
+
+  redeem_shares_full:
+    calls:
+      - description: "Get user's balance of vault shares"
+        target: "${inputs.silo_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "user_shares_balance"
+          type: "uint256"
+
+      - description: "Redeem all Silo vault shares for underlying assets"
+        target: "${inputs.silo_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.user_shares_balance}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"

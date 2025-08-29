@@ -1,0 +1,62 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cc2239327c5edb3a432268e5831" # USDC on Arbitrum
+  instruction:
+    label: "USDC - Varlamore USDC Growth"
+    path: "../../../blueprints/silo/deposit.yaml:deposit"
+    inputs:
+      silo_vault_address:
+        type: "address"
+        value: "0x2BA39e5388aC6C702Cb29AEA78d52aa66832f1ee" # Silo USDC market on Arbitrum
+      asset_address:
+        type: "address"
+        value: "0xaf88d065e77c8cc2239327c5edb3a432268e5831" # USDC on Arbitrum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xaf88d065e77c8cc2239327c5edb3a432268e5831" # USDC on Arbitrum
+  instruction:
+    label: "USDC - Varlamore USDC Growth"
+    path: "../../../blueprints/silo/account.yaml:account"
+    inputs:
+      silo_vault_address:
+        type: "address"
+        value: "0x2BA39e5388aC6C702Cb29AEA78d52aa66832f1ee" # Silo USDC market on Arbitrum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cc2239327c5edb3a432268e5831" # USDC on Arbitrum
+  instruction:
+    label: "USDC - Varlamore USDC Growth"
+    path: "../../../blueprints/silo/withdraw.yaml:withdraw_assets"
+    inputs:
+      silo_vault_address:
+        type: "address"
+        value: "0x2BA39e5388aC6C702Cb29AEA78d52aa66832f1ee" # Silo USDC market on Arbitrum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xaf88d065e77c8cc2239327c5edb3a432268e5831" # USDC on Arbitrum
+  instruction:
+    label: "USDC - Varlamore USDC Growth"
+    path: "../../../blueprints/silo/withdraw.yaml:redeem_shares_full"
+    inputs:
+      silo_vault_address:
+        type: "address"
+        value: "0x2BA39e5388aC6C702Cb29AEA78d52aa66832f1ee" # Silo USDC market on Arbitrum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
