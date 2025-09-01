@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+  instruction:
+    label: "EURC"
+    path: "../../../blueprints/summerfi/deposit.yaml:deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x64db8f51f1bf7064bb5a361a7265f602d348e0f0"
+      asset_address:
+        type: "address"
+        value: "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+  instruction:
+    label: "EURC"
+    path: "../../../blueprints/summerfi/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x64db8f51f1bf7064bb5a361a7265f602d348e0f0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+  instruction:
+    label: "EURC"
+    path: "../../../blueprints/summerfi/withdraw.yaml:withdraw_assets"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x64db8f51f1bf7064bb5a361a7265f602d348e0f0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42"
+  instruction:
+    label: "EURC"
+    path: "../../../blueprints/summerfi/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x64db8f51f1bf7064bb5a361a7265f602d348e0f0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.math_helper}"

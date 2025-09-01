@@ -1,0 +1,70 @@
+protocol: "summer.fi"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper_address:
+    type: "address"
+
+actions:
+  withdraw_assets:
+    calls:
+      - description: "Withdraw assets from the vault"
+        target: "${inputs.vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "Amount of asset to withdraw from the vault"
+
+  redeem_relative:
+    calls:
+      - description: "Get the caliber share balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "caliber_shares"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem the shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of our share balance to redeem (10000 = 100%)"

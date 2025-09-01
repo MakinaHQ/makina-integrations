@@ -1,0 +1,69 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22" # cbETH
+  instruction:
+    label: "cbETH_0x7fc4_929a"
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0x7fc498ddcb7707d6f85f6dc81f61edb6dc8d7f1b47a83b55808904790564929a"
+      collateral_token:
+        type: "address"
+        value: "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22" # cbETH
+      sender_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Collateral Position Accounting
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22" # cbETH
+  instruction:
+    label: "cbETH_0x7fc4_929a"
+    path: "../../../blueprints/morpho/account.yaml:account_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0x7fc498ddcb7707d6f85f6dc81f61edb6dc8d7f1b47a83b55808904790564929a"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22" # cbETH
+  instruction:
+    label: "cbETH_0x7fc4_929a"
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0x7fc498ddcb7707d6f85f6dc81f61edb6dc8d7f1b47a83b55808904790564929a"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper}"
