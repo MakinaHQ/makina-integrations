@@ -1,0 +1,85 @@
+protocol: "lagoon"
+
+inputs:
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  deposit_request_id_storage_key:
+    type: "string"
+  revertable_caliber_helper:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  request_deposit:
+    calls:
+      - description: "We must not have an existing deposit request. Check in kv store that deposit_request_id_storage_key is not set"
+        target: ${inputs.kv_store_address}
+        selector: "get(string)"
+        parameters:
+          - type: "string"
+            value: "${inputs.deposit_request_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "existing_request_id"
+
+      - description: "Check it is equal to 0, using the caliber helper."
+        target: ${inputs.revertable_caliber_helper}
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_request_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "existing_request_id_is_zero"
+
+      - description: "Revert if not existing_request_id_is_zero"
+        target: ${inputs.revertable_caliber_helper}
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.existing_request_id_is_zero}"
+
+      # now can proceed with the deposit request
+      - description: "Approve the vault to spend the assets"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Request the deposit into the vault, and store the request ID"
+        target: "${inputs.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "request_id"
+
+      - description: "Store the request ID in the KV store"
+        target: ${inputs.kv_store_address}
+        selector: "set(string,bytes32)"
+        parameters:
+          - type: "string"
+            value: "${inputs.deposit_request_id_storage_key}"
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of assets to deposit into the vault"

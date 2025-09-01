@@ -59,3 +59,7 @@ positions:
     group_id: "0"
     description: "cbETH/WETH Aerodrome CL"
     instructions: !include "./instructions/aero-cl-cbeth-weth.yaml"
+  - id: "12309812309812039812093812"
+    group_id: "0"
+    description: "Lagoon: 722capital USDC deposit"
+    instructions: !include "./instructions/lagoon-722capital-usdc.yaml"

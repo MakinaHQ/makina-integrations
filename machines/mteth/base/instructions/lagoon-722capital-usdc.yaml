@@ -1,0 +1,56 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 # USDC
+  instruction:
+    label: "722capital-usdc"
+    path: "../../../blueprints/lagoon/deposit.yaml:request_deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xB09F761Cb13baCa8eC087Ac476647361b6314F98"
+      asset_address:
+        type: "address"
+        value: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      deposit_request_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.lagoon.deposit.722capital-usdc"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 # USDC
+  instruction:
+    label: "722capital-usdc"
+    path: "../../../blueprints/lagoon/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xB09F761Cb13baCa8eC087Ac476647361b6314F98"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      deposit_request_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.lagoon.deposit.722capital-usdc"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      redeem_request_id_storage_key:
+        type: "string"
+        value: "makina.mteth.base.lagoon.redeem.722capital-usdc"
+      math_helper:
+        type: "address"
+        value: "${config.math_helper}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
