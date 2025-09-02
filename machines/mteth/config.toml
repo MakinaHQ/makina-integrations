@@ -35,6 +35,17 @@ decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
 
+[calibers.ink]
+address = "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+swapper = "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+rootfiles = "github:MakinaHQ/config/machines/mteth/ink/rootfiles"
+
+[calibers.ink.accounting_token]
+address = "0x4200000000000000000000000000000000000006"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
 [ntt.mainnet]
 token = "0x5B4b8fD619a38F2906D4Ae22b6FE338550c3b449"
 manager = "0xf46c5bcbfe0d25554B736E475331b32eE7342154"
