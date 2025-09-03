@@ -1,0 +1,25 @@
+protocol: merkl
+
+inputs:
+  merkl_distributor_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from Merkl distributor"
+        target: "${inputs.merkl_distributor_address}"
+        selector: "claim(address[],address[],uint256[],bytes32[][])"
+        parameters:
+          - type: "address[]"
+            value: "${input_slots.merkl_claim_data.users}"
+          - type: "address[]"
+            value: "${input_slots.merkl_claim_data.tokens}"
+          - type: "uint256[]"
+            value: "${input_slots.merkl_claim_data.amounts}"
+          - type: "bytes32[][]"
+            value: "${input_slots.merkl_claim_data.proofs}"
+
+    input_slots:
+      merkl_claim_data:
+        type: "MerklClaimData"

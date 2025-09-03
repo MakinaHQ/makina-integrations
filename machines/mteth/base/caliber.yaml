@@ -75,3 +75,7 @@ positions:
     group_id: "0"
     description: "Summer.fi EURC"
     instructions: !include "./instructions/summerfi-eurc.yaml"
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
