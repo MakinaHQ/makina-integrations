@@ -1,1 +1,14 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
 
+positions:
+  - id: "94762063857736077325751890544106482829"
+    group_id: "1"
+    description: "Shroomy WETH collateral"
+    instructions: !include "./instructions/shroomy-supply-weth.yaml"
+  - id: "294966152223424580465970944084363898523"
+    group_id: "1"
+    description: "Shroomy USDC.e debt"
+    instructions: !include "./instructions/shroomy-debt-usdce.yaml"

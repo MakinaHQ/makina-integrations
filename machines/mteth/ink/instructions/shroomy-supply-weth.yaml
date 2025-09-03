@@ -1,0 +1,50 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/shroomy/deposit.yaml:add_collateral"
+    inputs:
+      shroomy_pool_instance:
+        type: "address"
+        value: "0x70c88e98578BC521a799DE0b1c65a2b12d6f99E4"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x4200000000000000000000000000000000000006"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/shroomy/account.yaml:account"
+    inputs:
+      shroomy_token:
+        type: "address"
+        value: "0x1A594176E4609FF86b799342dfE010F80f6A37B3"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/shroomy/withdraw.yaml:withdraw_collateral"
+    inputs:
+      shroomy_pool_instance:
+        type: "address"
+        value: "0x70c88e98578BC521a799DE0b1c65a2b12d6f99E4"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: "0x4200000000000000000000000000000000000006"

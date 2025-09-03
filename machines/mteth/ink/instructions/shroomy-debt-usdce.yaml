@@ -1,0 +1,59 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "USDC.e"
+    path: "../../../blueprints/shroomy/borrow.yaml:borrow_asset"
+    inputs:
+      shroomy_pool_instance:
+        type: "address"
+        value: "0x70c88e98578BC521a799DE0b1c65a2b12d6f99E4"
+      token_address:
+        type: "address"
+        value: "0xF1815bd50389c46847f0Bda824eC8da914045D14"
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"
+      referral_code:
+        type: "uint256"
+        value: "0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "USDC.e"
+    path: "../../../blueprints/shroomy/account.yaml:account"
+    inputs:
+      shroomy_token:
+        type: "address"
+        value: "0x3491bDAC316b8b441C0b236bC22bb3766d0E0e2c"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "USDC.e"
+    path: "../../../blueprints/shroomy/repay.yaml:repay_asset"
+    inputs:
+      token_address:
+        type: "address"
+        value: "0xF1815bd50389c46847f0Bda824eC8da914045D14"
+      shroomy_pool_instance:
+        type: "address"
+        value: "0x70c88e98578BC521a799DE0b1c65a2b12d6f99E4"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"

@@ -1,0 +1,37 @@
+protocol: "shroomy"
+
+inputs:
+  shroomy_pool_instance:
+    type: "address"
+  caliber_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve the Shroomy pool to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.shroomy_pool_instance}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+      - description: "Supply collateral to the Shroomy pool"
+        target: ${inputs.shroomy_pool_instance}
+        selector: "supply(address,uint256,address,uint16)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.caliber_address}
+          - type: "uint256"
+            value: "0"
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of tokens to add as collateral"

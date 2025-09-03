@@ -1,0 +1,41 @@
+protocol: "shroomy"
+
+inputs:
+  token_address:
+    type: "address"
+  shroomy_pool_instance:
+    type: "address"
+  caliber_address:
+    type: "address"
+  interest_rate_mode:
+    type: "uint256"
+
+actions:
+  repay_asset:
+    calls:
+      - description: "Approve token to the Shroomy pool"
+        target: "${inputs.token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.shroomy_pool_instance}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_repay}"
+
+      - description: "Repay asset to Shroomy pool"
+        target: "${inputs.shroomy_pool_instance}"
+        selector: "repay(address,uint256,uint256,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.token_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_repay}"
+          - type: "uint256"
+            value: "${inputs.interest_rate_mode}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_repay:
+        type: "uint256"
+        description: "The amount to repay to the pool"
