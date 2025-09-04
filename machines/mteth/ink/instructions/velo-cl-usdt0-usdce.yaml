@@ -44,7 +44,7 @@
     - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
     - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
   instruction:
-    label: "usdc_usdt"
+    label: "USD₮0/USDC.e"
     path: "../../../blueprints/velodrome-cl/account.yaml:account_cl"
     inputs:
       nft_id_storage_key:

@@ -116,7 +116,7 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
-[instructions.velodrome.account_cl.usdc_usdt]
+[instructions.velodrome.account_cl."USD₮0/USDC.e"]
 position_id = "191830371864168154903064690391135115026"
 is_debt = false
 group_id = "0"
