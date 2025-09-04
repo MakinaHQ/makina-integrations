@@ -1,0 +1,29 @@
+protocol: "velodrome"
+
+inputs:
+  gauge_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  nft_id_storage_key:
+    type: "string"
+
+actions:
+  harvest:
+    calls:
+      - description: "Get the position id from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(string)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "position_id"
+
+      - description: "Claim rewards from the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "getReward(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.position_id}"

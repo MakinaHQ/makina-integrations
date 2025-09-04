@@ -2,6 +2,15 @@ config:
   caliber_address:
     type: "address"
     value: "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+  kv_store_address:
+    type: "address"
+    value: "0x6b09a22087B5D6C7E1051ee9a8AA94eA56C91008"
+  revertable_caliber_helper:
+    type: "address"
+    value: "0x3Ee34ca78Da9C1bA96dccdA6a62701D664C47fe2"
+  velodrome_cl_helper:
+    type: "address"
+    value: "0xA5b2637997148160F3A878E85A978E8303f863CF"
 
 positions:
   - id: "94762063857736077325751890544106482829"
@@ -12,3 +21,7 @@ positions:
     group_id: "1"
     description: "Shroomy USDC.e debt"
     instructions: !include "./instructions/shroomy-debt-usdce.yaml"
+  - id: "191830371864168154903064690391135115026"
+    group_id: "0"
+    description: "USD₮0/USDC.e Velodrome CL"
+    instructions: !include "./instructions/velo-cl-usdt0-usdce.yaml"

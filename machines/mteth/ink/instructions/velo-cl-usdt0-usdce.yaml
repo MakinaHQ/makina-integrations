@@ -1,0 +1,112 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "USD₮0/USDC.e"
+    path: "../../../blueprints/velodrome-cl/deposit.yaml:swap_and_deposit_cl_and_stake"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.ink.velodrome.0x317728bcCE5d1C2895b71b01eEBbB6989ae504aE"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      token_a_address:
+        type: "address"
+        value: "0x0200C29006150606B650577BBE7B6248F58470c1"
+      token_b_address:
+        type: "address"
+        value: "0xF1815bd50389c46847f0Bda824eC8da914045D14"
+      nft_manager_address:
+        type: "address"
+        value: "0x991d5546C4B442B4c5fdc4c8B8b8d131DEB24702"
+      cl_pool_address:
+        type: "address"
+        value: "0x317728bcCE5d1C2895b71b01eEBbB6989ae504aE"
+      gauge_address:
+        type: "address"
+        value: "0x2C568357E5e4BEee207Ab46b5bA5C1196D0D5Ecf"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_router:
+        type: "address"
+        value: "0x63951637d667f23D5251DEdc0f9123D22d8595be"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "usdc_usdt"
+    path: "../../../blueprints/velodrome-cl/account.yaml:account_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.ink.velodrome.0x317728bcCE5d1C2895b71b01eEBbB6989ae504aE"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      gauge_address:
+        type: "address"
+        value: "0x2C568357E5e4BEee207Ab46b5bA5C1196D0D5Ecf"
+      velodrome_cl_helper:
+        type: "address"
+        value: "${config.velodrome_cl_helper}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USD₮0/USDC.e"
+    path: "../../../blueprints/velodrome-cl/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0x2C568357E5e4BEee207Ab46b5bA5C1196D0D5Ecf"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.ink.velodrome.0x317728bcCE5d1C2895b71b01eEBbB6989ae504aE"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+    - "0xF1815bd50389c46847f0Bda824eC8da914045D14" # USDC.e
+  instruction:
+    label: "USD₮0/USDC.e"
+    path: "../../../blueprints/velodrome-cl/withdraw.yaml:unstake_and_withdraw_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "string"
+        value: "makina.mteth.ink.velodrome.0x317728bcCE5d1C2895b71b01eEBbB6989ae504aE"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      gauge_address:
+        type: "address"
+        value: "0x2C568357E5e4BEee207Ab46b5bA5C1196D0D5Ecf"
+      velodrome_cl_helper:
+        type: "address"
+        value: "${config.velodrome_cl_helper}"
+      nft_manager_address:
+        type: "address"
+        value: "0x991d5546C4B442B4c5fdc4c8B8b8d131DEB24702"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
