@@ -1,0 +1,92 @@
+protocol: "curve-llamalend"
+
+inputs:
+  vault_address:
+    type: "address"
+  controller_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw_collateral:
+    calls:
+      - description: "Withdraw collateral from Curve LlamaLend"
+        target: "${inputs.controller_address}"
+        selector: "remove_collateral(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.collateral_to_withdraw}"
+
+    input_slots:
+      collateral_to_withdraw:
+        type: "uint256"
+        description: "The amount of collateral to withdraw from the controller"
+
+  withdraw_vault:
+    calls:
+      - description: "Withdraw assets from Curve LlamaLend vault"
+        target: "${inputs.vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.assets_to_withdraw}"
+
+    input_slots:
+      assets_to_withdraw:
+        type: "uint256"
+        description: "The amount of underlying assets (crvUSD) to withdraw from the vault"
+
+  redeem_vault:
+    calls:
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The amount of vault shares to redeem for underlying assets"
+
+  redeem_vault_relative:
+    calls:
+      - description: "Query our balance of shares in the vault"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"

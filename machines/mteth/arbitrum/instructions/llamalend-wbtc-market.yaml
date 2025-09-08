@@ -1,0 +1,59 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WBTC/crvUSD"
+    path: "../../../blueprints/curve-llamalend/deposit.yaml:lend_crvusd"
+    inputs:
+      crvusd_address:
+        type: "address"
+        value: "${config.crvusd_address}"
+      vault_address:
+        type: "address"
+        value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WBTC/crvUSD"
+    path: "../../../blueprints/curve-llamalend/account.yaml:account_lend"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WBTC/crvUSD"
+    path: "../../../blueprints/curve-llamalend/withdraw.yaml:withdraw_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WBTC/crvUSD"
+    path: "../../../blueprints/curve-llamalend/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper}"

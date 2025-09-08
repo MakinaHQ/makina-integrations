@@ -5,6 +5,12 @@ config:
   revertable_caliber_helper:
     type: "address"
     value: "0x6b09a22087B5D6C7E1051ee9a8AA94eA56C91008"
+  crvusd_address:
+    type: "address"
+    value: "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5"
+  unsigned_math_helper:
+    type: "address"
+    value: "0x49a05b9c885086D0BA363281628e48E0aB86dEAf"
 
 positions:
   - id: "153361471060907065580864088630405245628"
@@ -15,3 +21,15 @@ positions:
     group_id: "0"
     description: "Silo USDC"
     instructions: !include "./instructions/silo-deposit-usdc.yaml"
+  - id: "91541348045817861118799056768114004662"
+    group_id: "0"
+    description: "Lend crvUSD to the WBTC/crvUSD market"
+    instructions: !include "./instructions/llamalend-wbtc-market.yaml"
+  - id: "239800149542707855645066961710296544455"
+    group_id: "2"
+    description: "Supply WETH collateral to the WETH/crvUSD market"
+    instructions: !include "./instructions/llamalend-weth-market-collateral.yaml"
+  - id: "132614784324280023713960241286994124312"
+    group_id: "2"
+    description: "Manage debt in the WETH/crvUSD market"
+    instructions: !include "./instructions/llamalend-weth-market-debt.yaml"

@@ -1,0 +1,390 @@
+[instructions.curve-llamalend.account_collateral."WETH/crvUSD"]
+position_id = "239800149542707855645066961710296544455"
+is_debt = false
+group_id = "2"
+instruction_type = 1
+affected_tokens = [
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+  "0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5",
+]
+commands = [
+  "0xec74d0a88103ff0000000083b5c6082d3307088c98da8d79991501e113e6365d",
+  "0x62de91e9018304ff000000006b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0x62de91e9018305ff000000016b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+]
+state = [
+  "0x",
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "79753679747094952374228423616820674560"
+inputs_slots = []
+
+[instructions.curve-llamalend.account_debt."WETH/crvUSD"]
+position_id = "132614784324280023713960241286994124312"
+is_debt = true
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = [
+  "0xec74d0a88102ff0000000082b5c6082d3307088c98da8d79991501e113e6365d",
+  "0x62de91e9018203ff000000006b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.curve-llamalend.account_lend."WBTC/crvUSD"]
+position_id = "91541348045817861118799056768114004662"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = [
+  "0x70a082310102ff0000000002e07f1151887b8fdc6800f737252f6b91b46b5865",
+  "0x07a2d13a0102ff0000000000e07f1151887b8fdc6800f737252f6b91b46b5865",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.curve-llamalend.borrow_asset."WETH/crvUSD"]
+position_id = "132614784324280023713960241286994124312"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = ["0xdd171e7c010100ff000000ffb5c6082d3307088c98da8d79991501e113e6365d"]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.curve-llamalend.borrow_asset."WETH/crvUSD".inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.curve-llamalend.create_loan_and_add_collateral."WETH/crvUSD"]
+position_id = "239800149542707855645066961710296544455"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"]
+commands = [
+  "0x095ea7b3010200ff000000ff82af49447d8a07e3bd95bd0d56f35241523fbab1",
+  "0x23cfed0301000301ff0000ffb5c6082d3307088c98da8d79991501e113e6365d",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x6e3ce4a3f057ccd650de8bb85a00cf012bef365c391333391895e7f1ed00d7c2",
+  "0x000000000000000000000000b5c6082d3307088c98da8d79991501e113e6365d",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.curve-llamalend.create_loan_and_add_collateral."WETH/crvUSD".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[[instructions.curve-llamalend.create_loan_and_add_collateral."WETH/crvUSD".inputs_slots]]
+index = 1
+name = "bands_to_deposit_into"
+type = "Uint"
+
+[instructions.curve-llamalend.lend_crvusd."WBTC/crvUSD"]
+position_id = "91541348045817861118799056768114004662"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = [
+  "0x095ea7b3010100ff000000ff498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5",
+  "0xb6b55f250100ff00000000ffe07f1151887b8fdc6800f737252f6b91b46b5865",
+]
+state = [
+  "0x4872f2a740e3fd7abac17246438d21c32afc362f2a2f6f8e9f5e3e5942a83ad2",
+  "0x000000000000000000000000e07f1151887b8fdc6800f737252f6b91b46b5865",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.curve-llamalend.lend_crvusd."WBTC/crvUSD".inputs_slots]]
+index = 0
+name = "amount_to_lend"
+type = "Uint"
+
+[instructions.curve-llamalend.redeem_vault_relative."WBTC/crvUSD"]
+position_id = "91541348045817861118799056768114004662"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = [
+  "0x70a082310101ff0000000001e07f1151887b8fdc6800f737252f6b91b46b5865",
+  "0xaa9a091201010002ff00000149a05b9c885086d0ba363281628e48e0ab86deaf",
+  "0xdb006a750101ff00000000ffe07f1151887b8fdc6800f737252f6b91b46b5865",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.curve-llamalend.redeem_vault_relative."WBTC/crvUSD".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.curve-llamalend.repay_asset."WETH/crvUSD"]
+position_id = "132614784324280023713960241286994124312"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = [
+  "0xec74d0a88101ff0000000081b5c6082d3307088c98da8d79991501e113e6365d",
+  "0x62de91e9018102ff000000016b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0xb67d77c5010301ff0000000149a05b9c885086d0ba363281628e48e0ab86deaf",
+  "0x7ae2b5c7010001ff0000000149a05b9c885086d0ba363281628e48e0ab86deaf",
+  "0x095ea7b3010401ff000000ff498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5",
+  "0x371fd8e60101ff00000000ffb5c6082d3307088c98da8d79991501e113e6365d",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000b5c6082d3307088c98da8d79991501e113e6365d",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.curve-llamalend.repay_asset."WETH/crvUSD".inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.curve-llamalend.top_up_collateral."WETH/crvUSD"]
+position_id = "239800149542707855645066961710296544455"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"]
+commands = [
+  "0x095ea7b3010100ff000000ff82af49447d8a07e3bd95bd0d56f35241523fbab1",
+  "0x6f972f120100ff00000000ffb5c6082d3307088c98da8d79991501e113e6365d",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000b5c6082d3307088c98da8d79991501e113e6365d",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.curve-llamalend.top_up_collateral."WETH/crvUSD".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.curve-llamalend.withdraw_collateral."WETH/crvUSD"]
+position_id = "239800149542707855645066961710296544455"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"]
+commands = ["0xd14ff5b60100ff00000000ffb5c6082d3307088c98da8d79991501e113e6365d"]
+state = ["0xdfcecf8277ae4c0444523f671e10a39ab7d8b1776134d7979818a4770e15d911"]
+bitmap = "0"
+
+[[instructions.curve-llamalend.withdraw_collateral."WETH/crvUSD".inputs_slots]]
+index = 0
+name = "collateral_to_withdraw"
+type = "Uint"
+
+[instructions.curve-llamalend.withdraw_vault."WBTC/crvUSD"]
+position_id = "91541348045817861118799056768114004662"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x498bf2b1e120fed3ad3d42ea2165e9b73f99c1e5"]
+commands = ["0x2e1a7d4d0100ff00000000ffe07f1151887b8fdc6800f737252f6b91b46b5865"]
+state = ["0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de"]
+bitmap = "0"
+
+[[instructions.curve-llamalend.withdraw_vault."WBTC/crvUSD".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.dolomite.account.USDC]
+position_id = "153361471060907065580864088630405245628"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0xc190c2ec81020503ff0000836bd780e7fdf01d77e4d475c821f1e7ae05409072",
+  "0x62de91e9018305ff000000026b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0xb0ad3a5f0102ff00000000026b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0x62de91e9018304ff000000006b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0x21e5749b010005ff000000056b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0x9f6ee0fc010205ff000000056b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+  "0xd2f46b650105ff00000000ff6b09a22087b5d6c7e1051ee9a8aa94ea56c91008",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x0000000000000000000000000000000000000000000000000000000000000011",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.dolomite.deposit.USDC]
+position_id = "153361471060907065580864088630405245628"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x095ea7b3010100ff000000ffaf88d065e77c8cc2239327c5edb3a432268e5831",
+  "0xb6f32e03010303020003fffff8b2c637a68cf6a17b1df9f8992eebeff63d2dff",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000f8b2c637a68cf6a17b1df9f8992eebeff63d2dff",
+  "0x0000000000000000000000000000000000000000000000000000000000000011",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.dolomite.deposit.USDC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.dolomite.withdraw_assets.USDC]
+position_id = "153361471060907065580864088630405245628"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = ["0xcc8832d9010101020003fffff8b2c637a68cf6a17b1df9f8992eebeff63d2dff"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000011",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.dolomite.withdraw_assets.USDC.inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.dolomite.withdraw_full.USDC]
+position_id = "153361471060907065580864088630405245628"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = ["0xcc8832d9010000010203fffff8b2c637a68cf6a17b1df9f8992eebeff63d2dff"]
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000011",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "319014718988379809496913694467282698240"
+inputs_slots = []
+
+[instructions.silo.account."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x70a082310102ff00000000022ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0x07a2d13a0102ff00000000002ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.silo.deposit."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x095ea7b3010100ff000000ffaf88d065e77c8cc2239327c5edb3a432268e5831",
+  "0x6e553f65010002ff000000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000002ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.silo.deposit."USDC - Varlamore USDC Growth".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.silo.redeem_shares_full."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = [
+  "0x70a082310100ff00000000012ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+  "0xba08765201010000ff0000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee",
+]
+state = [
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.silo.withdraw_assets."USDC - Varlamore USDC Growth"]
+position_id = "34611778462387789867459356474128356669"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xaf88d065e77c8cc2239327c5edb3a432268e5831"]
+commands = ["0xb460af9401000101ff0000ff2ba39e5388ac6c702cb29aea78d52aa66832f1ee"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000d1da9924c8ea15a8e35951b4702aa4937a9dd70a",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.silo.withdraw_assets."USDC - Varlamore USDC Growth".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"

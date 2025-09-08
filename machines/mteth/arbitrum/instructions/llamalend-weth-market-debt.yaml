@@ -1,0 +1,53 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/borrow.yaml:borrow_asset"
+    inputs:
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/repay.yaml:repay_asset"
+    inputs:
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+      crvusd_address:
+        type: "address"
+        value: "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper}"
+
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/account.yaml:account_debt"
+    inputs:
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"

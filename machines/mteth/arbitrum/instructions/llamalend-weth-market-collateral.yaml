@@ -1,0 +1,62 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" # WETH
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/deposit.yaml:create_loan_and_add_collateral"
+    inputs:
+      collateral_address:
+        type: "address"
+        value: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" # WETH
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/deposit.yaml:top_up_collateral"
+    inputs:
+      collateral_address:
+        type: "address"
+        value: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" # WETH
+    - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/account.yaml:account_collateral"
+    inputs:
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+## SUPPOSEDLY, YOU CANT REMOVE COLLATERAL WHEN IN SOFT LIQUIDATION AND FURTHER DOWN
+## SO REMOVE_COLLATERAL CAN ONLY GIVE YOU BACK THE COLLATERAL TOKEN, NO CRVUSD
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1" # WETH
+  instruction:
+    label: "WETH/crvUSD"
+    path: "../../../blueprints/curve-llamalend/withdraw.yaml:withdraw_collateral"
+    inputs:
+      controller_address:
+        type: "address"
+        value: "0xB5c6082d3307088C98dA8D79991501E113e6365d"
