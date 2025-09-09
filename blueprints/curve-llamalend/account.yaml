@@ -11,6 +11,8 @@ inputs:
     type: "address"
   revertable_caliber_helper:
     type: "address"
+  gauge_address:
+    type: "address"
 
 actions:
   account_debt:
@@ -89,8 +91,8 @@ actions:
 
   account_lend:
     calls:
-      - description: "Get the caliber's balance of vault shares"
-        target: "${inputs.vault_address}"
+      - description: "Get the caliber's balance of vault shares inside the gauge"
+        target: "${inputs.gauge_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"

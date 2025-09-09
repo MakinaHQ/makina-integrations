@@ -9,6 +9,8 @@ inputs:
     type: "address"
   collateral_address:
     type: "address"
+  gauge_address:
+    type: "address"
 
 actions:
   create_loan_and_add_collateral:
@@ -64,7 +66,7 @@ actions:
         type: "uint256"
         description: "The amount of collateral to deposit"
 
-  lend_crvusd:
+  lend_crvusd_and_stake:
     calls:
       - description: "Approve vault to spend crvUSD"
         target: "${inputs.crvusd_address}"
@@ -81,6 +83,25 @@ actions:
         parameters:
           - type: "uint256"
             value: "${input_slots.amount_to_lend}"
+        return:
+          type: "uint256"
+          name: "shares_received"
+
+      - description: "Approve gauge to spend vault shares"
+        target: "${inputs.vault_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.shares_received}"
+
+      - description: "Deposit shares in the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_received}"
 
     input_slots:
       amount_to_lend:

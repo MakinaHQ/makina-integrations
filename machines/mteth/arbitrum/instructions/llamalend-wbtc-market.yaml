@@ -4,7 +4,7 @@
     - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
   instruction:
     label: "WBTC/crvUSD"
-    path: "../../../blueprints/curve-llamalend/deposit.yaml:lend_crvusd"
+    path: "../../../blueprints/curve-llamalend/deposit.yaml:lend_crvusd_and_stake"
     inputs:
       crvusd_address:
         type: "address"
@@ -12,6 +12,9 @@
       vault_address:
         type: "address"
         value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+      gauge_address:
+        type: "address"
+        value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
@@ -27,6 +30,9 @@
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
+      gauge_address:
+        type: "address"
+        value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
@@ -34,11 +40,17 @@
     - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
   instruction:
     label: "WBTC/crvUSD"
-    path: "../../../blueprints/curve-llamalend/withdraw.yaml:withdraw_vault"
+    path: "../../../blueprints/curve-llamalend/withdraw.yaml:unstake_and_withdraw_vault"
     inputs:
       vault_address:
         type: "address"
         value: "0xe07f1151887b8FDC6800f737252f6b91b46b5865"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      gauge_address:
+        type: "address"
+        value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
@@ -46,7 +58,7 @@
     - "0x498Bf2B1e120FeD3ad3D42EA2165E9b73f99C1e5" # crvUSD
   instruction:
     label: "WBTC/crvUSD"
-    path: "../../../blueprints/curve-llamalend/withdraw.yaml:redeem_vault_relative"
+    path: "../../../blueprints/curve-llamalend/withdraw.yaml:unstake_and_redeem_vault_relative"
     inputs:
       vault_address:
         type: "address"
@@ -57,3 +69,17 @@
       unsigned_math_helper:
         type: "address"
         value: "${config.unsigned_math_helper}"
+      gauge_address:
+        type: "address"
+        value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "WBTC/crvUSD"
+    path: "../../../blueprints/curve-llamalend/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
