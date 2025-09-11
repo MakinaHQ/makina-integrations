@@ -1,0 +1,20 @@
+name = "mtusd"
+chain = "mainnet"
+address = "0x3D15348dbEAFfAC0A1889799124488C54164B371"
+
+# machines without calibers are treates a pre-deploy vaults
+[calibers]
+
+[ntt.mainnet]
+token = "0x5b53C12d431D1e4A39fe7890Aaab42dDA000339c"
+manager = "0x2040E70aaB50aEA09a16DAAb35Eb7fFf6ebf7791"
+
+[ntt.mainnet.transceivers]
+wormhole = "0x498d9dE2a3FA9ec0D0051b73d4E911eFaf902459"
+
+[ntt.ink]
+token = "0x0f88aFE60e2d6FA9219312C5F8E3b7f93C358538"
+manager = "0x2040E70aaB50aEA09a16DAAb35Eb7fFf6ebf7791"
+
+[ntt.ink.transceivers]
+wormhole = "0x498d9dE2a3FA9ec0D0051b73d4E911eFaf902459"
