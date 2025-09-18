@@ -2,7 +2,7 @@ name = "mtusd"
 chain = "mainnet"
 address = "0x3D15348dbEAFfAC0A1889799124488C54164B371"
 
-# machines without calibers are treates a pre-deploy vaults
+# machines without calibers are treated a pre-deploy vaults
 [calibers]
 
 [ntt.mainnet]
