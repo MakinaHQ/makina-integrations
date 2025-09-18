@@ -1,0 +1,6 @@
+name = "ctfeth"
+chain = "mainnet"
+address = "0xfdbec10c751e1ef8738ef57c5eedf01517038f2d"
+
+# machines without calibers are treates a pre-deploy vaults
+[calibers]
