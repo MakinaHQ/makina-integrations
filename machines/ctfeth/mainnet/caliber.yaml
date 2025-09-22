@@ -1,0 +1,21 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0x4938cb1c765889a37112a39d910a8bbd7902252f"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+
+positions:
+  - id: "132834842824704009878878367726033477050"
+    group_id: "1"
+    description: "Aave v3 supply WETH"
+    instructions: !include "./instructions/aavev3-supply-weth.yaml"
+  - id: "227329230297595858214811008018294296109"
+    group_id: "1"
+    description: "Aave v3 borrow USDC"
+    instructions: !include "./instructions/aavev3-borrow-usdc.yaml"
+  - id: "290856874055430279541720015104659950815"
+    group_id: "0"
+    description: "Tokemak autoUSD pool"
+    instructions: !include "./instructions/tokemak-usdc.yaml"

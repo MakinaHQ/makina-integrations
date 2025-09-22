@@ -1,0 +1,64 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"] # USDC
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/tokemak/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35" # Tokemak vault
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b" # Rewarder
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/tokemak/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/tokemak/withdraw.yaml:withdraw_max"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/tokemak/harvest.yaml:harvest"
+    inputs:
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
