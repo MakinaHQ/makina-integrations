@@ -1,6 +1,28 @@
 name = "ctfeth"
 chain = "mainnet"
-address = "0xfdbec10c751e1ef8738ef57c5eedf01517038f2d"
+address = "0xe51638dad0ebaff103de9262f0c32796daa26d3d"
 
 # machines without calibers are treated a pre-deploy vaults
 [calibers]
+
+[calibers.mainnet]
+address = "0x4938cb1c765889a37112a39d910a8bbd7902252f"
+swapper = "0x4791DF672BA1a368181f84eA0A831c9E9B65A3C4"
+rootfiles = "github:MakinaHQ/config/machines/ctfeth/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+# [calibers.base]
+# address = "0x0000000000000000000000000000000000000000"
+# swapper = "0x4791DF672BA1a368181f84eA0A831c9E9B65A3C4"
+# rootfiles = "github:MakinaHQ/config/machines/ctfeth/base/rootfiles"
+#
+# [calibers.base.accounting_token]
+# address = "0x4200000000000000000000000000000000000006"
+# decimals = 18
+# name = "Wrapped Ether"
+# symbol = "WETH"
