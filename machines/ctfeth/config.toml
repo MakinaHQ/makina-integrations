@@ -16,13 +16,13 @@ decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
 
-# [calibers.base]
-# address = "0x0000000000000000000000000000000000000000"
-# swapper = "0x4791DF672BA1a368181f84eA0A831c9E9B65A3C4"
-# rootfiles = "github:MakinaHQ/config/machines/ctfeth/base/rootfiles"
-#
-# [calibers.base.accounting_token]
-# address = "0x4200000000000000000000000000000000000006"
-# decimals = 18
-# name = "Wrapped Ether"
-# symbol = "WETH"
+[calibers.base]
+address = "0x4938cb1c765889a37112a39d910a8bbd7902252f"
+swapper = "0x4791DF672BA1a368181f84eA0A831c9E9B65A3C4"
+rootfiles = "github:MakinaHQ/config/machines/ctfeth/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x4200000000000000000000000000000000000006"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
