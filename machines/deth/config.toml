@@ -1,0 +1,6 @@
+name = "deth"
+chain = "mainnet"
+address = "0xefc8e0fce12c164eafcb588915c6f0ca7ca41a53"
+
+# machines without calibers are treated as pre-deposit vaults
+[calibers]

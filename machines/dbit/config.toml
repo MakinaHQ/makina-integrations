@@ -1,0 +1,6 @@
+name = "dbit"
+chain = "mainnet"
+address = "0x49af2649eefbc7e3847b41100fddcf91134a549e"
+
+# machines without calibers are treated a pre-deploy vaults
+[calibers]

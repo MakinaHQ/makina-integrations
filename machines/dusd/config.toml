@@ -1,0 +1,6 @@
+name = "dusd"
+chain = "mainnet"
+address = "0x5df4cb0aaae0fcc9de3f41e72348609e30a49c44"
+
+# machines without calibers are treated as pre-deposit vaults
+[calibers]
