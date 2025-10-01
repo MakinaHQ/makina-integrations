@@ -18,9 +18,9 @@ inputs:
   caliber_address:
     type: "address"
 
-# 1. We have on the wallet, after the flash loan, the USDC equity component and the flash loaned amount
-# 2. Sum these two, we get the total amount of USDC to swap for USR
-# 3. Approve the swap module to spend our USDC
+# 1. We have on the wallet, after the flash loan, the LOAN_TOKEN equity component and the flash loaned amount
+# 2. Sum these two, we get the total amount of LOAN_TOKEN to swap for PT_UNDERLYING_ASSET
+# 3. Approve the swap module to spend our LOAN_TOKEN
 # 4. Swap to intermediary token
 # 5. Approve the swap module to spend our intermediary token
 # 6. Swap to PT collateral token

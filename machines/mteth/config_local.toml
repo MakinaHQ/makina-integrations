@@ -1,0 +1,61 @@
+name = "mteth"
+chain = "mainnet"
+address = "0x444f2fd17048b4ae220a1a47d073fb453248e7ec"
+
+[calibers.mainnet]
+address = "0xf8e88d73636b29bddec82d71da805dc3abe55936"
+swapper = "0x88f6ff4d868044B4b79bD4164D6E5959B0985b95"
+rootfiles = "local:/Users/theodorecurtil/Desktop/dialectic/makina-config/machines/mteth/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[calibers.base]
+address = "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+swapper = "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+rootfiles = "local:/Users/theodorecurtil/Desktop/dialectic/makina-config/machines/mteth/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x4200000000000000000000000000000000000006"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[calibers.arbitrum]
+address = "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+swapper = "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+rootfiles = "local:/Users/theodorecurtil/Desktop/dialectic/makina-config/machines/mteth/arbitrum/rootfiles"
+
+[calibers.arbitrum.accounting_token]
+address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[calibers.ink]
+address = "0xd1da9924c8ea15a8e35951b4702aa4937a9dd70a"
+swapper = "0x3288F966821B08B81EE82e30B1412C43Ba7dfAAD"
+rootfiles = "local:/Users/theodorecurtil/Desktop/dialectic/makina-config/machines/mteth/ink/rootfiles"
+
+[calibers.ink.accounting_token]
+address = "0x4200000000000000000000000000000000000006"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[ntt.mainnet]
+token = "0x5B4b8fD619a38F2906D4Ae22b6FE338550c3b449"
+manager = "0xf46c5bcbfe0d25554B736E475331b32eE7342154"
+
+[ntt.mainnet.transceivers]
+wormhole = "0x498d9dE2a3FA9ec0D0051b73d4E911eFaf902459"
+
+[ntt.ink]
+token = "0x22aD4ACaD96BCD5131E7967144D4bb8e526aa876"
+manager = "0xf46c5bcbfe0d25554B736E475331b32eE7342154"
+
+[ntt.ink.transceivers]
+wormhole = "0x498d9dE2a3FA9ec0D0051b73d4E911eFaf902459"
