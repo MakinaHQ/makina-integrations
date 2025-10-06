@@ -4,3 +4,7 @@ config:
     value: "0x4938cb1c765889a37112a39d910a8bbd7902252f"
 
 positions:
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"

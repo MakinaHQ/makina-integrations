@@ -19,3 +19,7 @@ positions:
     group_id: "0"
     description: "Tokemak autoUSD pool"
     instructions: !include "./instructions/tokemak-usdc.yaml"
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
