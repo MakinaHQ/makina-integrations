@@ -149,7 +149,7 @@ actions:
           - type: "bytes"
             value: "0x"
 
-      - desciption: "Revoke approval to Morpho"
+      - description: "Revoke approval to Morpho"
         target: ${inputs.flash_loan_token}
         selector: "approve(address,uint256)"
         parameters:
@@ -218,7 +218,7 @@ actions:
           - type: "uint256"
             value: "${input_slots.second_swap_data.inputAmount}"
 
-      - description: "Swap the intermediary token for the PT collateral token."
+      - description: "Swap the intermediary token for the flash loan token."
         target: ${inputs.swap_module}
         selector: "swap((uint16,bytes,address,address,uint256,uint256))"
         parameters:
