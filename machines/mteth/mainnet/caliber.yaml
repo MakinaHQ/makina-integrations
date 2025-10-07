@@ -48,3 +48,7 @@ positions:
     group_id: "0"
     description: "Convex sUSD/USDe position"
     instructions: !include "./instructions/convex-curve-susd-usde.yaml"
+  - id: "67455048500815099373010214600379800724"
+    group_id: "0"
+    description: "Convex GHO/crvUSD position"
+    instructions: !include "./instructions/convex-curve-gho-crvusd.yaml"
