@@ -1,0 +1,43 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/deposit.yaml:deposit"
+    inputs:
+      usdc_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      fx_diamond:
+        type: "address"
+        value: "0x33636D49FbefBE798e15e7F356E8DBef543CC708"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      converter_address:
+        type: "address"
+        value: "0x12AF4529129303D7FbD2563E242C4a2890525912"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/account.yaml:account"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"

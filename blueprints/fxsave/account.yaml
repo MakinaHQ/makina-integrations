@@ -1,0 +1,76 @@
+protocol: "fxSAVE"
+
+inputs:
+  fx_save_address:
+    type: "address"
+  fx_sp_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get our balance of fxSAVE"
+        target: "${inputs.fx_save_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_save_balance"
+          type: "uint256"
+
+      - description: "Convert fxSAVE to assets (fxSP)"
+        target: "${inputs.fx_save_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_save_balance}"
+        return:
+          name: "fx_sp_balance"
+          type: "uint256"
+
+      - description: "Preview redeem fxSP from fxSP contract, for (fxUSD, USDC)"
+        target: "${inputs.fx_sp_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_balance}"
+        return:
+          name: "tokens_balances"
+          type: "(uint256,uint256)"
+
+      - description: "Extract first field (fxUSD balance)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.tokens_balances}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "fxusd_amount"
+          type: "uint256"
+
+      - description: "Extract second field (USDC balance)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.tokens_balances}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.fxusd_amount}"
+      - type: "uint256"
+        value: "${returns.usdc_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

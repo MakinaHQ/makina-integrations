@@ -52,3 +52,7 @@ positions:
     group_id: "0"
     description: "Convex GHO/crvUSD position"
     instructions: !include "./instructions/convex-curve-gho-crvusd.yaml"
+  - id: "44945688424358326878175149972352928818"
+    group_id: "0"
+    description: "fxSAVE position"
+    instructions: !include "./instructions/fxsave-usdc.yaml"
