@@ -1,0 +1,104 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH/rETH"
+    path: "../../../blueprints/convex-curve/deposit.yaml:deposit_single_sided_token_a"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+      asset_b_address:
+        type: "address"
+        value: "0xae78736Cd615f374D3085123A210448E74Fc6393" # rETH
+      curve_pool_address:
+        type: "address"
+        value: "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+      curve_lp_token_address:
+        type: "address"
+        value: "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"
+      pool_id:
+        type: "uint256"
+        value: "287"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH/rETH"
+    path: "../../../blueprints/convex-curve/withdraw.yaml:withdraw_single_sided_token_a"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x2686e9E88AAc7a3B3007CAD5b7a2253438cac6D4"
+      curve_pool_address:
+        type: "address"
+        value: "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH/rETH"
+    path: "../../../blueprints/convex-curve/withdraw.yaml:withdraw_single_sided_token_a_relative"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x2686e9E88AAc7a3B3007CAD5b7a2253438cac6D4"
+      curve_pool_address:
+        type: "address"
+        value: "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH/rETH"
+    path: "../../../blueprints/convex-curve/account.yaml:account_single_sided_token_a"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x2686e9E88AAc7a3B3007CAD5b7a2253438cac6D4"
+      curve_pool_address:
+        type: "address"
+        value: "0x9EfE1A1Cbd6Ca51Ee8319AFc4573d253C3B732af"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x9e0A248528Aa933ff1F8f707ea75F61eD780836E"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

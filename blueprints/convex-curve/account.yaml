@@ -1,4 +1,4 @@
-protocol: "convex_curve"
+protocol: "convex-curve"
 
 inputs:
   convex_reward_contract_address:
@@ -11,6 +11,48 @@ inputs:
     type: "address"
 
 actions:
+  account_single_sided_token_a:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Make sure the LP balance is non-zero"
+        target: ${inputs.unsigned_math_helper}
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}" # The amount of LP tokens owned by the subject
+          - type: "uint256"
+            value: "${builtins.UINT256_1}" # Fallback to zero if
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
+      - description: "Calc withdraw one coin from curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}"
+          - type: "int128"
+            value: "0"
+        return:
+          name: "amount_token_a_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_a_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
   account_single_sided_token_b:
     calls:
       - description: "Get the user's staked balance in Convex"
@@ -23,12 +65,24 @@ actions:
           name: "caliber_lp_balance"
           type: "uint256"
 
+      - description: "Make sure the LP balance is non-zero"
+        target: ${inputs.unsigned_math_helper}
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}" # The amount of LP tokens owned by the subject
+          - type: "uint256"
+            value: "${builtins.UINT256_1}" # Fallback to zero if
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
       - description: "Calc withdraw one coin from curve pool"
         target: "${inputs.curve_pool_address}"
         selector: "calc_withdraw_one_coin(uint256,int128)"
         parameters:
           - type: "uint256"
-            value: "${returns.caliber_lp_balance}"
+            value: "${returns.non_zero_lp_balance}"
           - type: "int128"
             value: "1"
         return:

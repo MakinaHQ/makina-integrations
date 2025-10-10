@@ -1,4 +1,4 @@
-protocol: "convex_curve"
+protocol: "convex-curve"
 
 inputs:
   convex_reward_contract_address:

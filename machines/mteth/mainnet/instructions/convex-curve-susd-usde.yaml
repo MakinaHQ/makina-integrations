@@ -4,7 +4,7 @@
     - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
   instruction:
     label: "sUSD/USDe"
-    path: "../../../blueprints/convex_curve/deposit.yaml:deposit_single_sided_token_b"
+    path: "../../../blueprints/convex-curve/deposit.yaml:deposit_single_sided_token_b"
     inputs:
       asset_b_address:
         type: "address"
@@ -28,7 +28,7 @@
     - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
   instruction:
     label: "sUSD/USDe"
-    path: "../../../blueprints/convex_curve/account.yaml:account_single_sided_token_b"
+    path: "../../../blueprints/convex-curve/account.yaml:account_single_sided_token_b"
     inputs:
       convex_reward_contract_address:
         type: "address"
@@ -39,6 +39,9 @@
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
 
 - is_debt: false
   instruction_type: "HARVEST"
@@ -46,7 +49,7 @@
     - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
   instruction:
     label: "sUSD/USDe"
-    path: "../../../blueprints/convex_curve/harvest.yaml:harvest"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
     inputs:
       convex_reward_contract_address:
         type: "address"

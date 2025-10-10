@@ -1,4 +1,4 @@
-protocol: "convex_curve"
+protocol: "convex-curve"
 
 inputs:
   asset_a_address:
@@ -15,6 +15,60 @@ inputs:
     type: "address"
 
 actions:
+  deposit_single_sided_token_a:
+    calls:
+      - description: "Approve token a to be spent by Curve pool"
+        target: "${inputs.asset_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_asset_a}"
+
+      - description: "Add liquidity to Curve pool, single sided"
+        target: "${inputs.curve_pool_address}"
+        selector: "add_liquidity(uint256[],uint256)"
+        parameters:
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.amount_asset_a}"
+              - type: "uint256"
+                value: "0"
+          - type: "uint256"
+            value: "${input_slots.min_lp_amount}"
+        return:
+          name: "lp_tokens_received"
+          type: "uint256"
+
+      - description: "Approve LP tokens to the Convex Booster"
+        target: "${inputs.curve_lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_booster_address}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+      - description: "Deposit LP tokens through Convex Booster"
+        target: "${inputs.convex_booster_address}"
+        selector: "deposit(uint256,uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.pool_id}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+          - type: "bool"
+            value: "true"
+
+    input_slots:
+      amount_asset_a:
+        type: "uint256"
+        description: "The amount of asset A to deposit in the Curve pool"
+      min_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of LP tokens to receive from Curve"
   deposit_single_sided_token_b:
     calls:
       - description: "Approve token b to be spent by Curve pool"
