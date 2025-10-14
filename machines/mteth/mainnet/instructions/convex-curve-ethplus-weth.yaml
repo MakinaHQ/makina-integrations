@@ -94,9 +94,7 @@
 
 - is_debt: false
   instruction_type: "HARVEST"
-  affected_tokens:
-    - "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  affected_tokens: []
   instruction:
     label: "ETH+/WETH"
     path: "../../../blueprints/convex-curve/harvest.yaml:harvest"

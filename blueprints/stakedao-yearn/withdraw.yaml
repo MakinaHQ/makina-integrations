@@ -1,0 +1,88 @@
+protocol: "stakedao-yearn"
+
+inputs:
+  yearn_vault_address:
+    type: "address"
+  stakedao_vault_address:
+    type: "address"
+  stakedao_gauge_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw:
+    calls:
+      - description: "Withdraw specified shares from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_withdraw}"
+
+      - description: "Redeem Yearn vault shares for underlying asset"
+        target: "${inputs.yearn_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_withdraw:
+        type: "uint256"
+        description: "The amount of StakeDAO gauge shares to withdraw"
+
+  withdraw_relative:
+    calls:
+      - description: "Get staked shares balance in StakeDAO gauge"
+        target: "${inputs.stakedao_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "gauge_shares_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to withdraw based on percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.gauge_shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_withdraw}"
+
+      - description: "Redeem Yearn vault shares for underlying asset"
+        target: "${inputs.yearn_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of staked position to withdraw, in basis points (bps), 10000 bps = 100%"

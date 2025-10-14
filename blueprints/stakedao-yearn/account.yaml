@@ -1,0 +1,38 @@
+protocol: "stakedao-yearn"
+
+inputs:
+  yearn_vault_address:
+    type: "address"
+  stakedao_gauge_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get staked balance in StakeDAO gauge"
+        target: "${inputs.stakedao_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "stakedao_shares"
+          type: "uint256"
+
+      - description: "Convert StakeDAO shares to underlying asset"
+        target: "${inputs.yearn_vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stakedao_shares}"
+        return:
+          name: "underlying_asset_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.underlying_asset_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

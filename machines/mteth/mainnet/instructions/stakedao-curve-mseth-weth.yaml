@@ -1,0 +1,111 @@
+# DEPOSIT - Single-sided WETH
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "MSETH/WETH"
+    path: "../../../blueprints/stakedao-curve/deposit-v6.yaml:deposit_single_sided_token_b"
+    inputs:
+      token0_address:
+        type: "address"
+        value: "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa" # MSETH ( token0)
+      token1_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH ( token1)
+      curve_pool_address:
+        type: "address"
+        value: "0xa4c567c662349BeC3D0fB94C4e7f85bA95E208e4" # LP token
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7053fa875c478045124ce3ef740a189b6037df91"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ACCOUNTING - Single-sided WETH
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "MSETH/WETH"
+    path: "../../../blueprints/stakedao-curve/account.yaml:account_single_sided_token_b"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7053fa875c478045124ce3ef740a189b6037df91"
+      lp_token_address:
+        type: "address"
+        value: "0xa4c567c662349BeC3D0fB94C4e7f85bA95E208e4" # LP token
+      token0_address:
+        type: "address"
+        value: "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa" # MSETH ( token0)
+      token1_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH ( token1)
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# WITHDRAW - Single-sided WETH
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "MSETH/WETH"
+    path: "../../../blueprints/stakedao-curve/withdraw-v6.yaml:withdraw_single_sided_token_b"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7053fa875c478045124ce3ef740a189b6037df91"
+      curve_pool_address:
+        type: "address"
+        value: "0xa4c567c662349BeC3D0fB94C4e7f85bA95E208e4" # LP token
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# WITHDRAW - Single-sided WETH Relative (percentage-based)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "MSETH/WETH"
+    path: "../../../blueprints/stakedao-curve/withdraw-v6.yaml:withdraw_single_sided_token_b_relative"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7053fa875c478045124ce3ef740a189b6037df91"
+      curve_pool_address:
+        type: "address"
+        value: "0xa4c567c662349BeC3D0fB94C4e7f85bA95E208e4" # LP token
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# HARVEST - StakeDAO Rewards
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "MSETH/WETH"
+    path: "../../../blueprints/stakedao-curve/harvest.yaml:harvest"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7053fa875c478045124ce3ef740a189b6037df91" # StakeDAO vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

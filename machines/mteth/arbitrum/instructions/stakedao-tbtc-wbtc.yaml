@@ -1,0 +1,121 @@
+# StakeDAO WBTC/tBTC Pool Instructions
+# Dialectic ID: c0643b2804539dc10be87f60f0d58177
+# Chain: Arbitrum
+
+# Deposit - Balanced (both tokens)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+    - "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+  instruction:
+    label: "WBTC/tBTC"
+    path: "../../../blueprints/stakedao-curve/deposit-v7.yaml:deposit"
+    inputs:
+      token0_address:
+        type: "address"
+        value: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+      token1_address:
+        type: "address"
+        value: "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+      curve_pool_address:
+        type: "address"
+        value: "0x186cF879186986A20aADFb7eAD50e3C20cb26CeC" # Curve LP token
+      stakedao_vault_address:
+        type: "address"
+        value: "0x9cf30c829406368244fd1db1567652b9cf6583f2" # StakeDAO vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Accounting - Balanced
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+    - "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+  instruction:
+    label: "WBTC/tBTC"
+    path: "../../../blueprints/stakedao-curve/account.yaml:account"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x9cf30c829406368244fd1db1567652b9cf6583f2" # StakeDAO vault
+      lp_token_address:
+        type: "address"
+        value: "0x186cF879186986A20aADFb7eAD50e3C20cb26CeC" # Curve LP token
+      token0_address:
+        type: "address"
+        value: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+      token1_address:
+        type: "address"
+        value: "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Withdraw - Absolute Amount
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+    - "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+  instruction:
+    label: "WBTC/tBTC"
+    path: "../../../blueprints/stakedao-curve/withdraw-v7.yaml:withdraw"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x9cf30c829406368244fd1db1567652b9cf6583f2" # StakeDAO vault
+      curve_pool_address:
+        type: "address"
+        value: "0x186cF879186986A20aADFb7eAD50e3C20cb26CeC" # Curve LP token
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper}"
+
+# Withdraw - Relative (Percentage-based)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+    - "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+  instruction:
+    label: "WBTC/tBTC"
+    path: "../../../blueprints/stakedao-curve/withdraw-v7.yaml:withdraw_relative"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x9cf30c829406368244fd1db1567652b9cf6583f2" # StakeDAO vault
+      curve_pool_address:
+        type: "address"
+        value: "0x186cF879186986A20aADFb7eAD50e3C20cb26CeC" # Curve LP token
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper}"
+
+# Harvest Rewards
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens:
+    - "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f" # WBTC
+    - "0x6c84a8f1c29108f47a79964b5fe888d4f4d0de40" # tBTC
+  instruction:
+    label: "WBTC/tBTC"
+    path: "../../../blueprints/stakedao-curve/harvest.yaml:harvest"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0xB7e23A438C9cad2575d3C048248A943a7a03f3fA" # StakeDAO gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

@@ -1,0 +1,100 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdC035D45d973E3EC169d2276DDab16f1e407384F" # USDS
+  instruction:
+    label: "USDS"
+    path: "../../../blueprints/stakedao-yearn/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xdC035D45d973E3EC169d2276DDab16f1e407384F" # USDS
+      yearn_vault_address:
+        type: "address"
+        value: "0x182863131F9a4630fF9E27830d945B1413e347E8" # yvUSDS-1
+      stakedao_vault_address:
+        type: "address"
+        value: "0x4551285DF024dc71D7d1CdB95906B305f1922383" # StakeDAO Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xdC035D45d973E3EC169d2276DDab16f1e407384F" # USDS
+  instruction:
+    label: "USDS"
+    path: "../../../blueprints/stakedao-yearn/account.yaml:account"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0x182863131F9a4630fF9E27830d945B1413e347E8" # yvUSDS-1
+      stakedao_gauge_address:
+        type: "address"
+        value: "0x401590Cc4cBFdea4fd0970e0BeC6F76363765E07" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdC035D45d973E3EC169d2276DDab16f1e407384F" # USDS on Ethereum
+  instruction:
+    label: "USDS"
+    path: "../../../blueprints/stakedao-yearn/withdraw.yaml:withdraw"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0x182863131F9a4630fF9E27830d945B1413e347E8" # yvUSDS-1
+      stakedao_vault_address:
+        type: "address"
+        value: "0x4551285DF024dc71D7d1CdB95906B305f1922383" # StakeDAO Vault
+      stakedao_gauge_address:
+        type: "address"
+        value: "0x401590Cc4cBFdea4fd0970e0BeC6F76363765E07" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdC035D45d973E3EC169d2276DDab16f1e407384F" # USDS on Ethereum
+  instruction:
+    label: "USDS"
+    path: "../../../blueprints/stakedao-yearn/withdraw.yaml:withdraw_relative"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0x182863131F9a4630fF9E27830d945B1413e347E8" # yvUSDS-1
+      stakedao_vault_address:
+        type: "address"
+        value: "0x4551285DF024dc71D7d1CdB95906B305f1922383" # StakeDAO Vault
+      stakedao_gauge_address:
+        type: "address"
+        value: "0x401590Cc4cBFdea4fd0970e0BeC6F76363765E07" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDS - Yearn-StakeDAO Vault Rewards"
+    path: "../../../blueprints/stakedao-yearn/harvest.yaml:harvest"
+    inputs:
+      stakedao_gauge_address:
+        type: "address"
+        value: "0x401590Cc4cBFdea4fd0970e0BeC6F76363765E07" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

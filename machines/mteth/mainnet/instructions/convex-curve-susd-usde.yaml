@@ -45,8 +45,7 @@
 
 - is_debt: false
   instruction_type: "HARVEST"
-  affected_tokens:
-    - 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3 # USDe
+  affected_tokens: []
   instruction:
     label: "sUSD/USDe"
     path: "../../../blueprints/convex-curve/harvest.yaml:harvest"

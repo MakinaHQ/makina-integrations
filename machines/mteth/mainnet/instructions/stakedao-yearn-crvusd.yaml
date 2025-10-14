@@ -1,0 +1,100 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "crvUSD"
+    path: "../../../blueprints/stakedao-yearn/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+      yearn_vault_address:
+        type: "address"
+        value: "0xBF319dDC2Edc1Eb6FDf9910E39b37Be221C8805F" # yvcrvUSD-2
+      stakedao_vault_address:
+        type: "address"
+        value: "0x1f9cB92aCf713FE649888ec005c8a2300814999F" # StakeDAO Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "crvUSD"
+    path: "../../../blueprints/stakedao-yearn/account.yaml:account"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0xBF319dDC2Edc1Eb6FDf9910E39b37Be221C8805F" # yvcrvUSD-2
+      stakedao_gauge_address:
+        type: "address"
+        value: "0xeE9B201859bC2C51A14FDd09780D0534037aDb35" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "crvUSD"
+    path: "../../../blueprints/stakedao-yearn/withdraw.yaml:withdraw"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0xBF319dDC2Edc1Eb6FDf9910E39b37Be221C8805F" # yvcrvUSD-2
+      stakedao_vault_address:
+        type: "address"
+        value: "0x1f9cB92aCf713FE649888ec005c8a2300814999F" # StakeDAO Vault
+      stakedao_gauge_address:
+        type: "address"
+        value: "0xeE9B201859bC2C51A14FDd09780D0534037aDb35" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "crvUSD"
+    path: "../../../blueprints/stakedao-yearn/withdraw.yaml:withdraw_relative"
+    inputs:
+      yearn_vault_address:
+        type: "address"
+        value: "0xBF319dDC2Edc1Eb6FDf9910E39b37Be221C8805F" # yvcrvUSD-2
+      stakedao_vault_address:
+        type: "address"
+        value: "0x1f9cB92aCf713FE649888ec005c8a2300814999F" # StakeDAO Vault
+      stakedao_gauge_address:
+        type: "address"
+        value: "0xeE9B201859bC2C51A14FDd09780D0534037aDb35" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "crvUSD"
+    path: "../../../blueprints/stakedao-yearn/harvest.yaml:harvest"
+    inputs:
+      stakedao_gauge_address:
+        type: "address"
+        value: "0xeE9B201859bC2C51A14FDd09780D0534037aDb35" # StakeDAO Gauge
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
