@@ -1,0 +1,68 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "PT-mHYPER/USDC Morpho Loop"
+    path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
+    inputs:
+      flash_loan_aggregator:
+        type: "address"
+        value: "${config.flash_loan_aggregator}"
+
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "PT-mHYPER/USDC Morpho Loop"
+    path: "../../../blueprints/morpho-pendle-pt-loop/mhyper.yaml:loop_in"
+    inputs:
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      flash_loan_token:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      pt_collateral_token:
+        type: "address"
+        value: "0xE4d30cCF87Cb3E5E637b64A2EE21bD5d3901839A"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x1ca75949a91c157183f53282d73c37191e7cd84002310f6632047d874aad4a0f"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "PT-mHYPER/USDC Morpho Loop"
+    path: "../../../blueprints/morpho-pendle-pt-loop/mhyper.yaml:account_loop"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x1ca75949a91c157183f53282d73c37191e7cd84002310f6632047d874aad4a0f"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      morpho_oracle:
+        type: "address"
+        value: "0x8Ad7D0E0523555CEB9ba9ac4d3c90DF211F959bF"

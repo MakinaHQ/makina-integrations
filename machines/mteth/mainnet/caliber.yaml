@@ -14,6 +14,12 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0xa7912D4F83024702Ec26F55BF5Fe6C03EEa76841"
+  swap_module:
+    type: "address"
+    value: "0x88f6ff4d868044B4b79bD4164D6E5959B0985b95"
 
 positions:
   - id: "194070608470725801208780068439756007916"
@@ -80,3 +86,7 @@ positions:
     group_id: "0"
     description: "fxSAVE position"
     instructions: !include "./instructions/fxsave-usdc.yaml"
+  - id: "12380192487758324910982301"
+    group_id: "0"
+    description: "PT-mHYPER/USDC Morpho Loop"
+    instructions: !include "./instructions/pt-mhyper-usdc-loop.yaml"
