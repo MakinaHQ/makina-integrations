@@ -78,8 +78,11 @@
   affected_tokens: []
   instruction:
     label: "WBTC/crvUSD"
-    path: "../../../blueprints/curve-llamalend/harvest.yaml:harvest"
+    path: "../../../blueprints/curve-llamalend/harvest.yaml:harvest_l2"
     inputs:
       gauge_address:
         type: "address"
         value: "0x46cC987dcd1D4D84ea5ecb2ce081ac4913b7C305"
+      child_gauge_factory_address:
+        type: "address"
+        value: "0xabC000d88f23Bb45525E447528DBF656A9D55bf5"

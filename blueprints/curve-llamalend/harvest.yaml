@@ -3,6 +3,8 @@ protocol: "curve-llamalend"
 inputs:
   gauge_address:
     type: "address"
+  child_gauge_factory_address:
+    type: "address"
 
 actions:
   harvest:
@@ -11,3 +13,12 @@ actions:
         target: "${inputs.gauge_address}"
         selector: "claim_rewards()"
         parameters: []
+
+  harvest_l2:
+    calls:
+      - description: "Claim rewards from Curve Child Liquidity Gauge Factory"
+        target: "${inputs.child_gauge_factory_address}"
+        selector: "mint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
