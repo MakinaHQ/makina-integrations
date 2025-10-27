@@ -1,0 +1,48 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/tydro/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: "0x4200000000000000000000000000000000000006" # WETH
+      referral_code:
+        type: "uint16"
+        value: "0"
+
+- name: withdraw_collateral_weth
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/tydro/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to_address:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: "0x4200000000000000000000000000000000000006" # WETH
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x4200000000000000000000000000000000000006" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/tydro/account.yaml:account"
+    inputs:
+      a_token_address:
+        type: "address"
+        value: "0x2B35eF056728BaFFaC103e3b81cB029788006EF9"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

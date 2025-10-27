@@ -1,0 +1,31 @@
+protocol: "Tydro"
+
+constants:
+  tydro_pool:
+    type: "address"
+    value: "0x2816cf15F6d2A220E789aA011D5EE4eB6c47FEbA"
+
+inputs:
+  to_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  withdraw_collateral:
+    calls:
+      - description: "Withdraw collateral from the Tydro pool"
+        target: ${constants.tydro_pool}
+        selector: "withdraw(address,uint256,address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_collateral_to_withdraw}
+          - type: "address"
+            value: ${inputs.to_address}
+
+    input_slots:
+      amount_collateral_to_withdraw:
+        type: "uint256"
+        description: "The amount of collateral to withdraw"

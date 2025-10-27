@@ -1,0 +1,44 @@
+protocol: "Tydro"
+
+constants:
+  tydro_pool:
+    type: "address"
+    value: "0x2816cf15F6d2A220E789aA011D5EE4eB6c47FEbA"
+
+inputs:
+  on_behalf_of:
+    type: "address"
+  asset_address:
+    type: "address"
+  referral_code:
+    type: "uint16"
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve the Tydro pool to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${constants.tydro_pool}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+
+      - description: "Supply collateral to the Tydro pool"
+        target: ${constants.tydro_pool}
+        selector: "supply(address,uint256,address,uint16)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+          - type: "uint16"
+            value: "${inputs.referral_code}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of tokens to add as collateral"

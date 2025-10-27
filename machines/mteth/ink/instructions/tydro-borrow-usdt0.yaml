@@ -1,0 +1,54 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+  instruction:
+    label: "USD₮0"
+    path: "../../../blueprints/tydro/borrow.yaml:borrow_asset"
+    inputs:
+      token_address:
+        type: "address"
+        value: "0x0200C29006150606B650577BBE7B6248F58470c1"
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"
+      referral_code:
+        type: "uint16"
+        value: "0"
+      receiver_address:
+        type: "address"
+        value: ${config.caliber_address}
+
+# account for the borrowed USD₮0
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+  instruction:
+    label: "USD₮0"
+    path: "../../../blueprints/tydro/account.yaml:account"
+    inputs:
+      a_token_address:
+        type: "address"
+        value: "0xA5d61eF3D06234371507e54FB709F401E590719a"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# repay the borrowed USD₮0
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0x0200C29006150606B650577BBE7B6248F58470c1"]
+  instruction:
+    label: "USD₮0"
+    path: "../../../blueprints/tydro/repay.yaml:repay_asset"
+    inputs:
+      token_address:
+        type: "address"
+        value: "0x0200C29006150606B650577BBE7B6248F58470c1" # USD₮0
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"
