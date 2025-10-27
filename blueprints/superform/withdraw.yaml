@@ -1,0 +1,70 @@
+protocol: "superform"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  redeem:
+    calls:
+      - description: "Redeem specific amount of SuperVault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The absolute amount of shares to redeem from the SuperVault"
+
+  redeem_relative:
+    calls:
+      - description: "Get user's balance of vault shares"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "user_shares_balance"
+          type: "uint256"
+
+      - description: "Calculate shares to redeem based on basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.user_shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem calculated shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage in basis points to withdraw (e.g., 5000 = 50%, 10000 = 100%)"
