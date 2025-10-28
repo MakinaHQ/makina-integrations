@@ -1,0 +1,72 @@
+# Makina id : 78512042317512863701209651856036596332
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC - Frontier mevBTC"
+    path: "../../../blueprints/euler-lend/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+      vault_address:
+        type: "address"
+        value: "0xbed968285CB7E32463dfc1324c329BA458dc650D"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC - Frontier mevBTC"
+    path: "../../../blueprints/euler-lend/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xbed968285CB7E32463dfc1324c329BA458dc650D"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC - Frontier mevBTC"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xbed968285CB7E32463dfc1324c329BA458dc650D"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "WBTC - Frontier mevBTC"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xbed968285CB7E32463dfc1324c329BA458dc650D"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

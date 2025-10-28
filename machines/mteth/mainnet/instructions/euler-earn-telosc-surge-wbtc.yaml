@@ -1,0 +1,73 @@
+# makina id : 166551142638865787604670127029645152713
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "TelosC Surge WBTC"
+    path: "../../../blueprints/euler-earn/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+      vault_address:
+        type: "address"
+        value: "0xA5cbf5cd429af63EA9989aE1ff4C9d37acFa6767" # TelosC Surge WBTC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "TelosC Surge WBTC"
+    path: "../../../blueprints/euler-earn/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xA5cbf5cd429af63EA9989aE1ff4C9d37acFa6767" # TelosC Surge WBTC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "TelosC Surge WBTC"
+    path: "../../../blueprints/euler-earn/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xA5cbf5cd429af63EA9989aE1ff4C9d37acFa6767" # TelosC Surge WBTC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599" # WBTC
+  instruction:
+    label: "TelosC Surge WBTC"
+    path: "../../../blueprints/euler-earn/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xA5cbf5cd429af63EA9989aE1ff4C9d37acFa6767" # TelosC Surge WBTC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

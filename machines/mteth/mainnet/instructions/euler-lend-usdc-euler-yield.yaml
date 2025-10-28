@@ -1,0 +1,72 @@
+# Makina id : 94455782291051278663691610733342657772
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC - Euler Yield"
+    path: "../../../blueprints/euler-lend/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      vault_address:
+        type: "address"
+        value: "0xe0a80d35bB6618CBA260120b279d357978c42BCE" # euler-lend Yield USDC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC - Euler Yield"
+    path: "../../../blueprints/euler-lend/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe0a80d35bB6618CBA260120b279d357978c42BCE" # euler-lend Yield USDC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC - Euler Yield"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe0a80d35bB6618CBA260120b279d357978c42BCE" # euler-lend Yield USDC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC - Euler Yield"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe0a80d35bB6618CBA260120b279d357978c42BCE" # Euler Yield USDC vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

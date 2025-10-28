@@ -1,0 +1,72 @@
+# Makina id : 321312126107059154923781351704430560101
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "RLUSD - Euler Yield"
+    path: "../../../blueprints/euler-lend/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+      vault_address:
+        type: "address"
+        value: "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10" # EVK Vault eRLUSD-1
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "RLUSD - Euler Yield"
+    path: "../../../blueprints/euler-lend/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10" # EVK Vault eRLUSD-1
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "RLUSD - Euler Yield"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10" # EVK Vault eRLUSD-1
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "RLUSD - Euler Yield"
+    path: "../../../blueprints/euler-lend/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10" # EVK Vault eRLUSD-1
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
