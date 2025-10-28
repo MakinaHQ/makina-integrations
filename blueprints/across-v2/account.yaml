@@ -1,0 +1,74 @@
+protocol: "across-v2"
+
+inputs:
+  asset_address:
+    type: "address"
+  hubpool_address:
+    type: "address"
+  accelerating_distributor_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get the user's staked LP balance in Accelerating Distributor"
+        target: "${inputs.accelerating_distributor_address}"
+        selector: "getUserStake(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.lp_token_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "user_stake_info"
+          type: "(uint256,uint256,uint256,uint256)"
+
+      - description: "Extract staked LP balance (index 0 from the tuple)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256,uint256)"
+            value: "${returns.user_stake_info}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "staked_lp_balance"
+          type: "uint256"
+
+      - description: "Convert LP tokens to underlying assets using HubPool exchange rate"
+        target: "${inputs.hubpool_address}"
+        selector: "exchangeRateCurrent(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.asset_address}"
+        return:
+          name: "exchange_rate"
+          type: "uint256"
+
+      - description: "Calculate underlying asset value (LP balance * exchange rate / 1e18)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.staked_lp_balance}"
+          - type: "uint256"
+            value: "${returns.exchange_rate}"
+          - type: "uint256"
+            value: "1000000000000000000"
+        return:
+          name: "underlying_assets_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.underlying_assets_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
