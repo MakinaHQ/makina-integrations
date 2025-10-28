@@ -1,0 +1,34 @@
+protocol: "sturdy-v2"
+inputs:
+  asset_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve asset to the vault"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit assets into the vault and receive shares"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of underlying assets to deposit into the vault"

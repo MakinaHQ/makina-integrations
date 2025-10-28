@@ -1,0 +1,70 @@
+protocol: "sturdy-v2"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  redeem:
+    calls:
+      - description: "Redeem shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The amount of vault shares to redeem"
+
+  redeem_relative:
+    calls:
+      - description: "Query the caliber's balance of vault shares"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "share_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.share_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of vault shares to withdraw, in basis points (bps), 10000 bps = 100%"
