@@ -2,7 +2,7 @@
   instruction_type: "HARVEST"
   affected_tokens: []
   instruction:
-    label: "crvusd_eusd"
+    label: "eUSD/crvUSD"
     path: "../../../blueprints/curve/harvest.yaml:harvest_mint"
     inputs:
       gauge_address:
@@ -17,8 +17,8 @@
   affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
   makina_id: "241963968685402655309198654686298022078"
   instruction:
-    label: "crvusd_eusd"
-    path: "../../../blueprints/curve/account.yaml:account"
+    label: "eUSD/crvUSD"
+    path: "../../../blueprints/curve/account.yaml:account_single_sided_token_a"
     inputs:
       gauge_address:
         type: "address"
@@ -26,17 +26,20 @@
       lp_token_address:
         type: "address"
         value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36"
-      subject:
+      caliber_address:
         type: "address"
         value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.math_helper}"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
   makina_id: "241963968685402655309198654686298022078"
   instruction:
-    label: "crvusd_eusd"
-    path: "../../../blueprints/curve/deposit.yaml:deposit"
+    label: "eUSD/crvUSD"
+    path: "../../../blueprints/.deprecated/curve/deposit.yaml:deposit_single_sided_token_a"
     inputs:
       tokena_address:
         type: "address"
@@ -53,7 +56,7 @@
       lp_token_address:
         type: "address"
         value: "0x798D81d60966d2E909468d87e7e4b6A8DAFB1C36" # LP token
-      sender_address:
+      caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
@@ -62,8 +65,8 @@
   affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
   makina_id: "241963968685402655309198654686298022078"
   instruction:
-    label: "crvusd_eusd"
-    path: "../../../blueprints/curve/withdraw.yaml:withdraw"
+    label: "eUSD/crvUSD"
+    path: "../../../blueprints/.deprecated/curve/withdraw.yaml:withdraw_single_sided_token_a"
     inputs:
       gauge_address:
         type: "address"
@@ -71,6 +74,30 @@
       pool_address:
         type: "address"
         value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36" # Curve(crvUSD,eUSD) pool
-      receiver_address:
+      caliber_address:
         type: "address"
         value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.math_helper}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: ["0xcfa3ef56d303ae4faaba0592388f19d7c3399fb4"]
+  makina_id: "241963968685402655309198654686298022078"
+  instruction:
+    label: "eUSD/crvUSD"
+    path: "../../../blueprints/.deprecated/curve/withdraw.yaml:withdraw_single_sided_token_a_relative"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xb2135e9b790c50fa018ca14e4b04bdb4add2a61b" # Curve eUSD/crvUSD-f farming gauge
+      pool_address:
+        type: "address"
+        value: "0x798d81d60966d2e909468d87e7e4b6a8dafb1c36" # Curve(crvUSD,eUSD) pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.math_helper}"

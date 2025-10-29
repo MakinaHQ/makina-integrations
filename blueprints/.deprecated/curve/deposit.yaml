@@ -11,11 +11,11 @@ inputs:
     type: "address"
   lp_token_address:
     type: "address"
-  sender_address:
+  caliber_address:
     type: "address"
 
 actions:
-  deposit:
+  deposit_single_sided_token_a:
     calls:
       - description: "Approve token A to the pool"
         target: "${inputs.tokena_address}"
@@ -26,15 +26,7 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_tokena}"
 
-      - description: "Approve token B to the pool"
-        target: "${inputs.tokenb_address}"
-        selector: "approve(address,uint256)"
-        parameters:
-          - type: "address"
-            value: "${inputs.pool_address}"
-          - type: "uint256"
-            value: "${input_slots.amount_tokenb}"
-      - description: "Add liquidity to the pool"
+      - description: "Add liquidity single-sided with token A"
         target: "${inputs.pool_address}"
         selector: "add_liquidity(uint256[2],uint256)"
         parameters:
@@ -43,7 +35,7 @@ actions:
               - type: "uint256"
                 value: "${input_slots.amount_tokena}"
               - type: "uint256"
-                value: "${input_slots.amount_tokenb}"
+                value: "0"
           - type: "uint256"
             value: "${input_slots.min_mint_amount}"
 
@@ -52,7 +44,7 @@ actions:
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
-            value: "${inputs.sender_address}"
+            value: "${inputs.caliber_address}"
         return:
           name: "lp_balance"
           type: "uint256"
@@ -65,16 +57,73 @@ actions:
             value: "${inputs.gauge_address}"
           - type: "uint256"
             value: "${returns.lp_balance}"
+
       - description: "Deposit LP tokens to the gauge"
         target: "${inputs.gauge_address}"
         selector: "deposit(uint256)"
         parameters:
           - type: "uint256"
             value: "${returns.lp_balance}"
+
     input_slots:
       amount_tokena:
         type: "uint256"
         description: "The amount of token A to deposit"
+      min_mint_amount:
+        type: "uint256"
+        description: "The minimum amount of LP tokens to receive"
+
+  deposit_single_sided_token_b:
+    calls:
+      - description: "Approve token B to the pool"
+        target: "${inputs.tokenb_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_tokenb}"
+
+      - description: "Add liquidity single-sided with token B"
+        target: "${inputs.pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "0"
+              - type: "uint256"
+                value: "${input_slots.amount_tokenb}"
+          - type: "uint256"
+            value: "${input_slots.min_mint_amount}"
+
+      - description: "Get LP token balance"
+        target: "${inputs.lp_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "lp_balance"
+          type: "uint256"
+
+      - description: "Approve LP tokens to the gauge"
+        target: "${inputs.lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.lp_balance}"
+
+      - description: "Deposit LP tokens to the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_balance}"
+
+    input_slots:
       amount_tokenb:
         type: "uint256"
         description: "The amount of token B to deposit"
