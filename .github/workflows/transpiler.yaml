@@ -1,0 +1,98 @@
+name: Transpiler
+
+# specs:
+# - if a new rootfile[s] is added, the timestamp should be the most recent one
+#  - for that rootfile, find the clostest caliber and run the transpiler on it
+#  - if the transpiler fails, the PR should fail
+#  - if the transpiler succeeds, compare that with the current rootfile
+#  - if the new rootfile is different, the PR should fail
+#  - if the new rootfile is the same, the PR should pass
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-run-transpiler:
+    name: Verify new rootfiles correctness with the transpiler
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v5
+
+      - name: Get changed rootfiles files
+        id: changed-rootfiles
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
+        with:
+          files: machines/**/rootfiles/**.toml
+
+      # We don't allow anyone to modify existing rootfiles, only to add new ones.
+      - name: Reject PR if existing rootfiles are modified
+        if: steps.changed-rootfiles.outputs.modified_files_count > 0
+        env:
+          MODIFIED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.modified_files }}
+        run: |
+          for file in ${MODIFIED_ROOTFILES}; do
+            echo "Error: $file was modified. Existing rootfiles are not allowed to be modified."
+          done
+          exit 1
+
+      # Rootfiles filename format: YYYYMMDDHHMMSS-<name>.toml
+      # New rootfiles should start with the most recent timestamp in the directory
+      # [naive alphabetical order - not checking YYYYMMDD format]
+      - name: Verify new rootfiles filename format
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+        run: |
+          for file in ${ADDED_ROOTFILES}; do
+            dir=$(cd -- "$(dirname -- "$file")" && pwd)
+            base=$(basename -- "$file")
+
+            # Get the lexicographically smallest regular file name in the directory (ascending order)
+            top=$(
+              cd -- "$dir"
+              LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r | head -n 1
+            )
+
+            if [[ "$base" == "$top" ]]; then
+              exit 0
+            else
+              echo "Error: The name of the new rootfile '$base' should start with the most recent timestamp in '$dir'. First is '$top'." >&2
+              exit 1
+            fi
+          done
+
+      - name: Checkout makina-rs repository
+        uses: actions/checkout@v5
+        with:
+          repository: MakinaHQ/makina-rs
+          ssh-key: ${{ secrets.MAKINA_RS_DEPLOY_KEY }} # linked to "Makina Github Deploy Key" on the makina-rs repo
+          path: makina-rs
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: makina-rs
+
+      - name: Build transpiler
+        working-directory: makina-rs
+        run: cargo build --release --package transpiler
+
+      - name: Run transpiler
+        working-directory: makina-rs
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+        run: |
+          for file in ${ADDED_ROOTFILES}; do
+            caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
+            new_file="../$(dirname "$file")/generated.toml"
+            echo "Running transpiler for $caliber - to verify $file rootfile)"
+            cargo run -r -p transpiler -- -i "$caliber" -o "$new_file"
+            diff "../$file" "$new_file" || exit 1
+            rm "$new_file"
+          done
