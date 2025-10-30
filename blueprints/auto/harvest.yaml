@@ -1,0 +1,13 @@
+protocol: "auto"
+
+inputs:
+  rewarder_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from autopool"
+        target: "${inputs.rewarder_address}"
+        selector: "getReward()"
+        parameters: []
