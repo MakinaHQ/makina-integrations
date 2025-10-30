@@ -1,0 +1,53 @@
+protocol: Aave Umbrella
+
+inputs:
+  stake_token_address:
+    type: address
+  asset_address:
+    type: address
+  umbrella_batch_helper_address:
+    type: address
+  caliber_address:
+    type: address
+
+actions:
+  start_cooldown:
+    calls:
+      - description: "Trigger cooldown on the stake token"
+        target: "${inputs.stake_token_address}"
+        selector: "cooldown()"
+        parameters: []
+
+  claim_cooldown:
+    calls:
+      - description: "Get the max redeemable amount from the stake token, which is > 0 during the unstaking window only."
+        target: "${inputs.stake_token_address}"
+        selector: "maxRedeem(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "max_redeemable"
+          type: "uint256"
+
+      - description: "Approve the Umbrella batch helper to spend the stake token"
+        target: "${inputs.stake_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.umbrella_batch_helper_address}"
+          - type: "uint256"
+            value: "${returns.max_redeemable}"
+
+      - description: "After cooldown and during unstaking window, redeem using umbrella batch helper"
+        target: "${inputs.umbrella_batch_helper_address}"
+        selector: "redeem((address,address,uint256))"
+        parameters:
+          - type: "(address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.stake_token_address}"
+              - type: "address"
+                value: "${inputs.asset_address}"
+              - type: "uint256"
+                value: "${returns.max_redeemable}"

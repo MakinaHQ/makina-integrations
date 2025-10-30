@@ -20,6 +20,9 @@ config:
   swap_module:
     type: "address"
     value: "0x88f6ff4d868044B4b79bD4164D6E5959B0985b95"
+  aave_umbrella_batch_helper:
+    type: "address"
+    value: "0xCe6Ced23118EDEb23054E06118a702797b13fc2F"
 
 positions:
   - id: "194070608470725801208780068439756007916"
@@ -146,3 +149,15 @@ positions:
     group_id: "0"
     description: "Curve USDC/RLUSD"
     instructions: !include "./instructions/curve-usdc-rlusd.yaml"
+  - id: "3523756351941927223895267305661455553"
+    group_id: "0"
+    description: "Aave Umbrella WETH"
+    instructions: !include "./instructions/aave-umbrella-weth.yaml"
+  - id: "176021688445186810403025048632929053161"
+    group_id: "0"
+    description: "Aave Umbrella USDC"
+    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+  - id: "293691712937964969352275672791079139559"
+    group_id: "0"
+    description: "Aave Umbrella USDT"
+    instructions: !include "./instructions/aave-umbrella-usdt.yaml"
