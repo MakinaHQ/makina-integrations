@@ -1,0 +1,103 @@
+protocol: "dolomite"
+
+inputs:
+  dolo_margin_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  account_number:
+    type: "uint256"
+  market_id:
+    type: "uint256"
+  revertable_caliber_helper:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get our wei balance in the market from the Dolomite margin contract"
+        target: "${inputs.dolo_margin_address}"
+        selector: "getAccountWei((address,uint256),uint256)"
+        parameters:
+          - type: "(address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint256"
+                value: "${inputs.account_number}"
+          - type: "uint256"
+            value: "${inputs.market_id}"
+        return:
+          name: "account_balance"
+          type: "(bool,uint256)" # bool is True if positive and False if negative
+
+      - description: "Unpack sign and balance"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(bool,uint256)"
+            value: "${returns.account_balance}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "is_positive"
+
+      - description: "Turn into is_negative"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "not(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_positive}"
+        return:
+          type: "bool"
+          name: "is_negative"
+
+      - description: "Unpack account balance"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(bool,uint256)"
+            value: "${returns.account_balance}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "uint256"
+          name: "asset_balance"
+
+      - description: "Make a condition 'is_asset_balance > 0'"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_balance}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "is_strictly_positive"
+
+      - description: "Logical operation: is_negative AND is_strictly_positive. If True, should revert."
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "and(bool,bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_negative}"
+          - type: "bool"
+            value: "${returns.is_strictly_positive}"
+        return:
+          type: "bool"
+          name: "should_revert"
+
+      - description: "Revert if should_revert is True"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.should_revert}"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.asset_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

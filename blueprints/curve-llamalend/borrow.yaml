@@ -1,0 +1,22 @@
+protocol: "curve-llamalend"
+
+inputs:
+  controller_address:
+    type: "address"
+
+actions:
+  borrow_asset:
+    calls:
+      - description: "Borrow crvUSD from llamalend"
+        target: "${inputs.controller_address}"
+        selector: "borrow_more(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0" # amount of collateral to top up
+          - type: "uint256"
+            value: "${input_slots.amount_to_borrow}"
+
+    input_slots:
+      amount_to_borrow:
+        type: "uint256"
+        description: "The amount of crvUSD to borrow"

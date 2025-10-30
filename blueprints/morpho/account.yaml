@@ -1,0 +1,155 @@
+protocol: "morpho"
+
+inputs:
+  morpho:
+    type: "address"
+  executor_helper:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  subject:
+    type: "address"
+  vault_address:
+    type: "address"
+
+actions:
+  account_collateral:
+    calls:
+      - description: "Get user position in the market"
+        target: "${inputs.morpho}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.collateral_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_debt:
+    calls:
+      - description: "Get user position in the market"
+        target: "${inputs.morpho}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total borrow shares (index 3)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "total_borrow_shares"
+          type: "uint256"
+
+      - description: "Extract total borrow assets (index 2)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "total_borrow_assets"
+          type: "uint256"
+
+      - description: "Calculate debt amount: shares * totalAssets / totalShares"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "uint256"
+            value: "${returns.total_borrow_assets}"
+          - type: "uint256"
+            value: "${returns.total_borrow_shares}"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.debt_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_vault:
+    calls:
+      - description: "Query caliber balance of vault tokens"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "vault_balance"
+          type: "uint256"
+      - description: "Preview redeem shares from the vault, to get our assets out"
+        target: "${inputs.vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_balance}"
+        return:
+          name: "assets_in_vault"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.assets_in_vault}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

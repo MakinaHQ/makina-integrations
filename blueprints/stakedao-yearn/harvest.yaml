@@ -1,0 +1,17 @@
+protocol: "stakedao-yearn"
+
+inputs:
+  stakedao_gauge_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim all rewards from StakeDAO gauge"
+        target: "${inputs.stakedao_gauge_address}"
+        selector: "claim_rewards(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"

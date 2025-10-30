@@ -1,0 +1,27 @@
+protocol: "stakedao-curve"
+
+inputs:
+  stakedao_vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Get list of reward tokens from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "getRewardTokens()"
+        parameters: []
+        return:
+          name: "reward_tokens"
+          type: "address[]"
+
+      - description: "Claim all rewards from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "claim(address[],address)"
+        parameters:
+          - type: "address[]"
+            value: "${returns.reward_tokens}"
+          - type: "address"
+            value: "${inputs.caliber_address}"

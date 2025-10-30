@@ -1,0 +1,39 @@
+protocol: "Tydro"
+
+constants:
+  tydro_pool:
+    type: "address"
+    value: "0x2816cf15F6d2A220E789aA011D5EE4eB6c47FEbA"
+
+inputs:
+  token_address:
+    type: "address"
+  interest_rate_mode:
+    type: "uint256"
+  referral_code:
+    type: "uint16"
+  receiver_address:
+    type: "address"
+
+actions:
+  borrow_asset:
+    calls:
+      - description: "Borrow an asset from the Tydro pool"
+        target: ${constants.tydro_pool}
+        selector: "borrow(address,uint256,uint256,uint16,address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.token_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_borrow}
+          - type: "uint256"
+            value: ${inputs.interest_rate_mode}
+          - type: "uint16"
+            value: ${inputs.referral_code}
+          - type: "address"
+            value: ${inputs.receiver_address}
+
+    input_slots:
+      amount_to_borrow:
+        type: "uint256"
+        description: "The amount of tokens to borrow"

@@ -1,0 +1,109 @@
+protocol: "curve-llamalend"
+
+inputs:
+  crvusd_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  controller_address:
+    type: "address"
+  collateral_address:
+    type: "address"
+  gauge_address:
+    type: "address"
+
+actions:
+  create_loan_and_add_collateral:
+    calls:
+      - description: "Approve controller to spend collateral token"
+        target: "${inputs.collateral_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.controller_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Create loan and take one wei of debt to not revert"
+        target: "${inputs.controller_address}"
+        selector: "create_loan(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "uint256"
+            value: "1" # 1 wei of debt
+          - type: "uint256"
+            value: "${input_slots.bands_to_deposit_into}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of collateral to deposit"
+      bands_to_deposit_into:
+        type: "uint256"
+        description: "Number of bands to deposit into; must range between MIN_TICKS and MAX_TICKS"
+
+  top_up_collateral:
+    calls:
+      - description: "Top up collateral on existing loan"
+        target: "${inputs.collateral_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.controller_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Add collateral to existing loan"
+        target: "${inputs.controller_address}"
+        selector: "add_collateral(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of collateral to deposit"
+
+  lend_crvusd_and_stake:
+    calls:
+      - description: "Approve vault to spend crvUSD"
+        target: "${inputs.crvusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_lend}"
+
+      - description: "Deposit assets in the vault"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_lend}"
+        return:
+          type: "uint256"
+          name: "shares_received"
+
+      - description: "Approve gauge to spend vault shares"
+        target: "${inputs.vault_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
+          - type: "uint256"
+            value: "${returns.shares_received}"
+
+      - description: "Deposit shares in the gauge"
+        target: "${inputs.gauge_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_received}"
+
+    input_slots:
+      amount_to_lend:
+        type: "uint256"
+        description: "The amount of crvUSD to lend to the vault"

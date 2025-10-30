@@ -1,0 +1,279 @@
+protocol: "morpho-pendle-pt-loop"
+
+constants:
+  unit:
+    type: "uint256"
+    value: "1"
+  twap_duration:
+    type: "uint32"
+    value: "900"
+  wad:
+    type: "uint256"
+    value: "1000000000000000000"
+
+inputs:
+  morpho_address:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_helper:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  pendle_oracle:
+    type: "address"
+  pendle_market:
+    type: "address"
+  pendle_underlying_asset:
+    type: "address"
+  oracle_registry:
+    type: "address"
+
+actions:
+  account_loop:
+    calls:
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Accrue interest on the loan, for precise accounting"
+        target: "${inputs.morpho_address}"
+        selector: "accrueInterest((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+
+      - description: "Get our collateral amount"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho_address}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total borrow shares (index 3)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "total_borrow_shares"
+          type: "uint256"
+
+      - description: "Extract total borrow assets (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "total_borrow_assets"
+          type: "uint256"
+
+      - description: "Calculate debt amount: shares * totalAssets / totalShares"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "uint256"
+            value: "${returns.total_borrow_assets}"
+          - type: "uint256"
+            value: "${returns.total_borrow_shares}"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+      # At this point, we have returns.collateral_amount and returns.debt_amount
+      - desciption: "Get the price of 1 PT in terms of the input asset"
+        target: "${inputs.pendle_oracle}"
+        selector: "getPtToAssetRate(address,uint32)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pendle_market}"
+          - type: "uint32"
+            value: "${constants.twap_duration}"
+        return:
+          name: "pt_to_asset_rate"
+          type: "uint256"
+
+      - description: "Get the price of input_asset/loan_token"
+        target: "${inputs.oracle_registry}"
+        selector: "getPrice(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pendle_underlying_asset}"
+          - type: "address"
+            value: "${returns.loan_token}"
+        return:
+          name: "input_asset_to_loan_token"
+          type: "uint256"
+
+      - description: "collateral * pt_to_asset_rate / 1e18"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "uint256"
+            value: "${returns.pt_to_asset_rate}"
+          - type: "uint256"
+            value: "${constants.wad}"
+        return:
+          name: "collateral_in_asset"
+          type: "uint256"
+
+      - description: "collateral_in_asset * input_asset_to_loan_token / 1e18"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_in_asset}"
+          - type: "uint256"
+            value: "${returns.input_asset_to_loan_token}"
+          - type: "uint256"
+            value: "${constants.wad}"
+        return:
+          name: "collateral_in_loan_token"
+          type: "uint256"
+
+      - description: "Return the difference between collateral in loan token and debt amount. sub(a, b) = b - a"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.debt_amount}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "equity_in_loan_token"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.equity_in_loan_token}"
+      - type: "uint256"
+        value: "0" # because there is some dust from the swap. like this it will be accouted for.
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

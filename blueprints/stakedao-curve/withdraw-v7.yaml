@@ -1,0 +1,281 @@
+protocol: "stakedao-curve"
+
+inputs:
+  stakedao_vault_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+    description: "Address of the UnsignedMathHelper contract"
+
+actions:
+  withdraw:
+    calls:
+      # Step 1: Withdraw from StakeDAO vault (ERC4626)
+      - description: "Withdraw from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.vault_amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+          - type: "address"
+            value: "${inputs.caliber_address}" # owner
+
+      # Step 2: Get Curve LP token balance after vault withdrawal
+      - description: "Get Curve LP token balance"
+        target: "${inputs.curve_pool_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "curve_lp_balance"
+          type: "uint256"
+
+      # Step 3: Remove liquidity proportionally from Curve pool
+      - description: "Remove liquidity proportionally from Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[],address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.curve_lp_balance}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_0}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_1}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+
+    input_slots:
+      vault_amount_to_withdraw:
+        type: "uint256"
+        description: "Amount to withdraw from vault (use gauge balance amount)"
+      min_amount_0:
+        type: "uint256"
+        description: "Minimum amount of token 0 to receive (slippage protection)"
+      min_amount_1:
+        type: "uint256"
+        description: "Minimum amount of token 1 to receive (slippage protection)"
+
+  withdraw_relative:
+    calls:
+      # Step 1: Query vault shares balance
+      - description: "Get vault shares balance"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      # Step 2: Convert shares to underlying assets (Curve LP tokens)
+      - description: "Convert vault shares to assets"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+        return:
+          name: "vault_assets_balance"
+          type: "uint256"
+
+      # Step 3: Compute the amount to withdraw based on percentage
+      - description: "Compute the amount of assets to withdraw based on percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_assets_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "vault_amount_to_withdraw"
+          type: "uint256"
+
+      # Step 4: Withdraw from StakeDAO vault
+      - description: "Withdraw from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+          - type: "address"
+            value: "${inputs.caliber_address}" # owner
+
+      # Step 5: Get Curve LP token balance after vault withdrawal
+      - description: "Get Curve LP token balance"
+        target: "${inputs.curve_pool_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "curve_lp_balance"
+          type: "uint256"
+
+      # Step 6: Remove liquidity proportionally from Curve pool
+      - description: "Remove liquidity proportionally from Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[],address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.curve_lp_balance}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_0}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_1}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of vault position to withdraw, in basis points (bps), 10000 bps = 100%"
+      min_amount_0:
+        type: "uint256"
+        description: "Minimum amount of token 0 to receive (slippage protection)"
+      min_amount_1:
+        type: "uint256"
+        description: "Minimum amount of token 1 to receive (slippage protection)"
+
+  withdraw_single_sided_token_b:
+    calls:
+      # Step 1: Withdraw from StakeDAO vault (ERC4626)
+      - description: "Withdraw from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.vault_amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+          - type: "address"
+            value: "${inputs.caliber_address}" # owner
+
+      # Step 2: Get Curve LP token balance after vault withdrawal
+      - description: "Get Curve LP token balance"
+        target: "${inputs.curve_pool_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "curve_lp_balance"
+          type: "uint256"
+
+      # Step 3: Remove liquidity single-sided as token1 from Curve pool
+      - description: "Remove liquidity single-sided as token1 from Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.curve_lp_balance}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_amount_token1}"
+
+    input_slots:
+      vault_amount_to_withdraw:
+        type: "uint256"
+        description: "Amount to withdraw from vault (use gauge balance amount)"
+      min_amount_token1:
+        type: "uint256"
+        description: "Minimum amount of token1 to receive (slippage protection)"
+
+  withdraw_single_sided_token_b_relative:
+    calls:
+      # Step 1: Query vault shares balance
+      - description: "Get vault shares balance"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      # Step 2: Convert shares to underlying assets (Curve LP tokens)
+      - description: "Convert vault shares to assets"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+        return:
+          name: "vault_assets_balance"
+          type: "uint256"
+
+      # Step 3: Compute the amount to withdraw based on percentage
+      - description: "Compute the amount of assets to withdraw based on percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_assets_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "vault_amount_to_withdraw"
+          type: "uint256"
+
+      # Step 4: Withdraw from StakeDAO vault
+      - description: "Withdraw from StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}" # receiver
+          - type: "address"
+            value: "${inputs.caliber_address}" # owner
+
+      # Step 5: Get Curve LP token balance after vault withdrawal
+      - description: "Get Curve LP token balance"
+        target: "${inputs.curve_pool_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "curve_lp_balance"
+          type: "uint256"
+
+      # Step 6: Remove liquidity single-sided as token1 from Curve pool
+      - description: "Remove liquidity single-sided as token1 from Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.curve_lp_balance}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_amount_token1}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of vault position to withdraw, in basis points (bps), 10000 bps = 100%"
+      min_amount_token1:
+        type: "uint256"
+        description: "Minimum amount of token1 to receive (slippage protection)"

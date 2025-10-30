@@ -1,0 +1,73 @@
+protocol: "euler-lend"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  redeem:
+    calls:
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "assets_received"
+          type: "uint256"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The amount of vault shares to redeem from the Euler Earn vault"
+
+  redeem_relative:
+    calls:
+      - description: "Get the caliber's vault shares balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of vault shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage of vault shares to redeem from the Euler Earn vault, in basis points (bps), 10000 bps = 100%"

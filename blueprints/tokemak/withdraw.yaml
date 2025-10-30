@@ -1,0 +1,44 @@
+protocol: "tokemak"
+
+inputs:
+  vault_address:
+    type: "address"
+  rewarder_address:
+    type: "address"
+  receiver_address:
+    type: "address"
+
+actions:
+  withdraw_max:
+    calls:
+      - description: "Get balance of tokens in rewarder"
+        target: "${inputs.rewarder_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "rewarder_balance"
+          type: "uint256"
+
+      - description: "Withdraw from rewarder with rewards"
+        target: "${inputs.rewarder_address}"
+        selector: "withdraw(address,uint256,bool)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "uint256"
+            value: "${returns.rewarder_balance}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Redeem tokens from vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.rewarder_balance}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"

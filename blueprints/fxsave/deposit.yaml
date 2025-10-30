@@ -1,0 +1,53 @@
+protocol: "fxSAVE"
+
+inputs:
+  usdc_address:
+    type: "address"
+  fx_diamond:
+    type: "address"
+  caliber_address:
+    type: "address"
+  converter_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve fx_diamond to spend USDC"
+        target: "${inputs.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_diamond}"
+          - type: "uint256"
+            value: "${input_slots.fx_save_data.amountToDeposit}"
+
+      - description: "Deposit USDC into fxSAVE"
+        target: "${inputs.fx_diamond}"
+        selector: "depositToFxSave((address,uint256,address,bytes,uint256,bytes),address,uint256,address)"
+        parameters:
+          - type: "(address,uint256,address,bytes,uint256,bytes)"
+            value:
+              - type: "address"
+                value: "${input_slots.fx_save_data.tokenIn}"
+              - type: "uint256"
+                value: "${input_slots.fx_save_data.amountToDeposit}"
+              - type: "address"
+                value: "${inputs.converter_address}"
+              - type: "bytes"
+                value: "${input_slots.fx_save_data.abiEncodeConvert}"
+              - type: "uint256"
+                value: "${input_slots.fx_save_data.amountToDeposit}" # seems unused in contract
+              - type: "bytes"
+                value: "0x"
+          - type: "address"
+            value: "${input_slots.fx_save_data.tokenIn}"
+          - type: "uint256"
+            value: "${input_slots.fx_save_data.minAmountOut}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      fx_save_data:
+        type: "FxSaveData"
+        description: "data to deposit into fxSAVE"

@@ -1,0 +1,155 @@
+protocol: "stakedao-curve"
+
+inputs:
+  stakedao_vault_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      # Step 0: Checkpoint
+      - description: "Checkpoint accounting state"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "checkpoint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      # Step 1: Get the user's balance of vault shares
+      - description: "Get the user's balance of vault shares"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_share_balance"
+          type: "uint256"
+
+      # Step 2: Get total supply of LP tokens for proportional calculation
+      - description: "Get total supply of LP tokens for proportional calculation"
+        target: "${inputs.lp_token_address}"
+        selector: "totalSupply()"
+        parameters: []
+        return:
+          name: "lp_total_supply"
+          type: "uint256"
+
+      # Step 3: Get token0 balance directly
+      - description: "Get token0 balance from pool"
+        target: "${inputs.lp_token_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "pool_token0_balance"
+          type: "uint256"
+
+      # Step 4: Get token1 balance directly
+      - description: "Get token1 balance from pool"
+        target: "${inputs.lp_token_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "pool_token1_balance"
+          type: "uint256"
+
+      # Step 5: Calculate user's proportional token0 amount
+      - description: "Calculate user's proportional token0 amount"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_token0_balance}"
+          - type: "uint256"
+            value: "${returns.vault_share_balance}"
+          - type: "uint256"
+            value: "${returns.lp_total_supply}"
+        return:
+          name: "user_token0_balance"
+          type: "uint256"
+
+      # Step 6: Calculate user's proportional token1 amount
+      - description: "Calculate user's proportional token1 amount"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_token1_balance}"
+          - type: "uint256"
+            value: "${returns.vault_share_balance}"
+          - type: "uint256"
+            value: "${returns.lp_total_supply}"
+        return:
+          name: "user_token1_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.user_token0_balance}"
+      - type: "uint256"
+        value: "${returns.user_token1_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_single_sided_token_b:
+    calls:
+      # Step 0: Checkpoint
+      - description: "Checkpoint accounting state"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "checkpoint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      # Step 1: Get the user's balance of vault shares
+      - description: "Get the user's balance of vault shares"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_share_balance"
+          type: "uint256"
+
+      # Step 2: Make sure the balance is non-zero to avoid division errors
+      - description: "Make sure the vault share balance is non-zero"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_share_balance}"
+          - type: "uint256"
+            value: "${builtins.UINT256_1}"
+        return:
+          name: "non_zero_share_balance"
+          type: "uint256"
+
+      # Step 3: Calculate withdrawal as single-sided token1 (index 1)
+      - description: "Calculate single-sided withdrawal amount for token1"
+        target: "${inputs.lp_token_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_share_balance}"
+          - type: "int128"
+            value: "1"
+        return:
+          name: "amount_token1_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token1_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

@@ -1,0 +1,24 @@
+protocol: "curve"
+
+inputs:
+  gauge_address:
+    type: "address"
+  child_liquidity_gauge_factory_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from Curve gauge"
+        target: "${inputs.gauge_address}"
+        selector: "claim_rewards()"
+        parameters: []
+
+  harvest_mint:
+    calls:
+      - description: "Claim rewards for a given gauge on child chains. https://docs.curve.finance/liquidity-gauges-and-minting-crv/xchain-gauges/ChildGaugeFactory/#mint"
+        target: "${inputs.child_liquidity_gauge_factory_address}"
+        selector: "mint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"

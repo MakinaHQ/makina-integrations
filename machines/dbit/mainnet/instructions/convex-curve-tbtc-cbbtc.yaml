@@ -1,0 +1,104 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/deposit.yaml:deposit_balanced"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+      asset_b_address:
+        type: "address"
+        value: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+      curve_pool_address:
+        type: "address"
+        value: "0xAE6Ee608b297305AbF3EB609B81FEBbb8F6A0bb3" # Curve LP pool
+      curve_lp_token_address:
+        type: "address"
+        value: "0xAE6Ee608b297305AbF3EB609B81FEBbb8F6A0bb3" # Curve LP token
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" # Convex Booster
+      pool_id:
+        type: "uint256"
+        value: "402"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/account.yaml:account_balanced"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xB683a3D855D016A1c78c3e7887812A7CAB3989B0"
+      curve_pool_address:
+        type: "address"
+        value: "0xAE6Ee608b297305AbF3EB609B81FEBbb8F6A0bb3" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xB683a3D855D016A1c78c3e7887812A7CAB3989B0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/withdraw.yaml:withdraw_balanced"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xB683a3D855D016A1c78c3e7887812A7CAB3989B0"
+      curve_pool_address:
+        type: "address"
+        value: "0xAE6Ee608b297305AbF3EB609B81FEBbb8F6A0bb3" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC
+    - "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf" # cbBTC
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/withdraw.yaml:withdraw_balanced_relative"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xB683a3D855D016A1c78c3e7887812A7CAB3989B0"
+      curve_pool_address:
+        type: "address"
+        value: "0xAE6Ee608b297305AbF3EB609B81FEBbb8F6A0bb3" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

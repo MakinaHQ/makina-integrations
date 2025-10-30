@@ -1,0 +1,37 @@
+protocol: "aavev3"
+
+inputs:
+  aave_pool_instance:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve the Aave pool to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.aave_pool_instance}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+      - description: "Supply collateral to the Aave pool"
+        target: ${inputs.aave_pool_instance}
+        selector: "supply(address,uint256,address,uint16)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+          - type: "uint256"
+            value: "0"
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of tokens to add as collateral"

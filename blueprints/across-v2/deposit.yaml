@@ -1,0 +1,67 @@
+protocol: "across-v2"
+
+inputs:
+  asset_address:
+    type: "address"
+  hubpool_address:
+    type: "address"
+  accelerating_distributor_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve underlying asset to the HubPool"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.hubpool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Add liquidity to HubPool and receive LP tokens"
+        target: "${inputs.hubpool_address}"
+        selector: "addLiquidity(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.asset_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Get LP token balance"
+        target: "${inputs.lp_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "lp_token_balance"
+          type: "uint256"
+
+      - description: "Approve LP tokens to the Accelerating Distributor"
+        target: "${inputs.lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.accelerating_distributor_address}"
+          - type: "uint256"
+            value: "${returns.lp_token_balance}"
+
+      - description: "Stake LP tokens in Accelerating Distributor"
+        target: "${inputs.accelerating_distributor_address}"
+        selector: "stake(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.lp_token_address}"
+          - type: "uint256"
+            value: "${returns.lp_token_balance}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of underlying assets to deposit into the HubPool"

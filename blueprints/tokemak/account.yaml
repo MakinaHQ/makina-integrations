@@ -1,0 +1,38 @@
+protocol: "tokemak"
+
+inputs:
+  vault_address:
+    type: "address"
+  rewarder_address:
+    type: "address"
+  subject:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get the caliber staked balance"
+        target: "${inputs.rewarder_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "staked_balance"
+          type: "uint256"
+
+      - description: "Preview redeem to get actual amount"
+        target: "${inputs.vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.staked_balance}"
+        return:
+          name: "redeem_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.redeem_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

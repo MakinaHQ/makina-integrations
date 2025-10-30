@@ -1,0 +1,83 @@
+protocol: "curve-llamalend"
+
+inputs:
+  controller_address:
+    type: "address"
+  crvusd_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  revertable_caliber_helper:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  repay_asset:
+    calls:
+      - description: "Need to cap the repay amount to debt - 1wei, to not have the loan closing and collateral returning. Get the current debt."
+        target: "${inputs.controller_address}"
+        selector: "user_state(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "user_state"
+          type: "(uint256,uint256,uint256,uint256)"
+
+      - description: "Extract debt amount (index 2)"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256,uint256)"
+            value: "${returns.user_state}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+      - description: "Cap the repay amount to debt - 1 wei"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "sub(uint256,uint256)" # sub(a, b) = b - a
+        parameters:
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "${returns.debt_amount}"
+        return:
+          name: "max_repay_amount"
+          type: "uint256"
+
+      - description: "Get the final amount to repay (min between user input and max repay amount)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_repay}"
+          - type: "uint256"
+            value: "${returns.max_repay_amount}"
+        return:
+          name: "final_repay_amount"
+          type: "uint256"
+
+      - description: "Approve controller to spend crvUSD"
+        target: "${inputs.crvusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.controller_address}"
+          - type: "uint256"
+            value: "${returns.final_repay_amount}"
+
+      - description: "Repay crvUSD to llamalend"
+        target: "${inputs.controller_address}"
+        selector: "repay(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.final_repay_amount}"
+
+    input_slots:
+      amount_to_repay:
+        type: "uint256"
+        description: "The amount of crvUSD to repay"

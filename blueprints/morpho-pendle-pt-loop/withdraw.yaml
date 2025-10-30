@@ -1,0 +1,246 @@
+protocol: "morpho-pendle-pt-loop"
+
+inputs:
+  swap_module:
+    type: "address"
+  flash_loan_token:
+    type: "address"
+  intermediary_token:
+    type: "address"
+  pt_collateral_token:
+    type: "address"
+  morpho_address:
+    type: "address"
+  caliber_helper:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+
+# 0. Flashloan the LOAN_TOKEN amount needed to pay for the morpho debt
+# 1. We have on the wallet, after the flash loan, the LOAN_TOKEN debt amount to repay.
+# 2. Repay the debt to morpho (based on debt share, not debt amounts)
+# 3. Withdraw the collateral from morpho, we get PT_UNDERLYING_ASSET
+# 4. Approve the swap module to spend our PT_UNDERLYING_ASSET
+# 5. Swap to intermediary token
+# 6. Approve the swap module to spend our intermediary token
+# 7. Swap to LOAN_TOKEN
+
+actions:
+  loop_out_full:
+    calls:
+      # Get position params
+      - description: "Get caliber's position in Morpho market"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "morpho_position"
+          type: "(uint256,uint256,uint256)" # (supply_share, borrow_share, collateral_amount)
+
+      - description: "Extract borrow share from position"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.morpho_position}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_share"
+          type: "uint256"
+
+      - description: "Extract collateral amount from position"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.morpho_position}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      # get the market params
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      # Do the actions
+      - description: "Approve Morpho to spend unlimited amount of LOAN_TOKEN"
+        target: ${inputs.flash_loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+
+      - description: "Repay the full debt to Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.flash_loan_token}"
+              - type: "address"
+                value: "${inputs.pt_collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "0" # 0 assets
+          - type: "uint256"
+            value: "${returns.borrow_share}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Revoke approval to Morpho"
+        target: ${inputs.flash_loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Withdraw the full collateral from Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.flash_loan_token}"
+              - type: "address"
+                value: "${inputs.pt_collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Approve the swap module to spend our pt collateral token"
+        target: ${inputs.pt_collateral_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.first_swap_data.inputAmount}"
+
+      - description: "Swap the PT collateral token for the intermediary token."
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.first_swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.first_swap_data.data}"
+              - type: "address"
+                value: "${inputs.pt_collateral_token}"
+              - type: "address"
+                value: "${inputs.intermediary_token}"
+              - type: "uint256"
+                value: "${input_slots.first_swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.first_swap_data.minOutputAmount}"
+
+      - description: "Approve the swap module to spend our intermediary token"
+        target: ${inputs.intermediary_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.second_swap_data.inputAmount}"
+
+      - description: "Swap the intermediary token for the flash loan token."
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.second_swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.second_swap_data.data}"
+              - type: "address"
+                value: "${inputs.intermediary_token}"
+              - type: "address"
+                value: "${inputs.flash_loan_token}"
+              - type: "uint256"
+                value: "${input_slots.second_swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.second_swap_data.minOutputAmount}"
+
+    input_slots:
+      first_swap_data:
+        type: "SwapData"
+        description: "Data for the first swap. (PT -> Intermediary)"
+      second_swap_data:
+        type: "SwapData"
+        description: "Data for the second swap. (Intermediary -> Flashloan token)"

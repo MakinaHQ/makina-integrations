@@ -1,0 +1,38 @@
+protocol: "aavev3"
+
+constants:
+  aave_pool:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+
+inputs:
+  token:
+    type: "address"
+  interest_rate_mode:
+    type: "uint256"
+  referral_code:
+    type: "uint256"
+  receiver:
+    type: "address"
+
+actions:
+  borrow_asset:
+    calls:
+      - description: "Borrow an asset from the Aave pool"
+        target: ${constants.aave_pool}
+        selector: "borrow(address,uint256,uint256,uint16,address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.token}
+          - type: "uint256"
+            value: ${input_slots.amount_to_borrow}
+          - type: "uint256"
+            value: ${inputs.interest_rate_mode}
+          - type: "uint256"
+            value: ${inputs.referral_code}
+          - type: "address"
+            value: ${inputs.receiver}
+    input_slots:
+      amount_to_borrow:
+        type: "uint256"
+        description: "The amount of tokens to borrow"

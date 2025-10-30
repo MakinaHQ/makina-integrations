@@ -1,0 +1,172 @@
+protocol: "morpho"
+
+inputs:
+  morpho:
+    type: "address"
+  executor_helper:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  receiver_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw_collateral:
+    calls:
+      - description: "Get market parameters from market ID"
+        target: "${inputs.morpho}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token address (element 0)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token address (element 1)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle address (element 2)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM address (element 3)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV value (element 4)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Withdraw collateral from Morpho market"
+        target: "${inputs.morpho}"
+        selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "The amount of collateral to withdraw"
+
+  redeem_vault:
+    calls:
+      - description: "Redeem shares from the vault, from input number of shares"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The number of shares to redeem from the vault"
+
+  redeem_vault_relative:
+    calls:
+      - description: "Query our balance of shares in the vault"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+      - description: "Redeem shares from the vault, from computed number of shares"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"

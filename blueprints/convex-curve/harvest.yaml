@@ -1,0 +1,19 @@
+protocol: "convex-curve"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Harvest rewards from the Convex reward contract"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "getReward(address,bool)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bool"
+            value: "true"

@@ -1,0 +1,69 @@
+# Makina id: 44388127972640049658248824753228810288
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC on Ethereum
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/sturdy-v2/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC on Ethereum
+      vault_address:
+        type: "address"
+        value: "0xAeD098db0e39bed6DDc2c07727B8FfC0BA470D9C" # Sturdy tBTC Aggregator Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC on Ethereum
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/sturdy-v2/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xAeD098db0e39bed6DDc2c07727B8FfC0BA470D9C" # Sturdy tBTC Aggregator Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC on Ethereum
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/sturdy-v2/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xAeD098db0e39bed6DDc2c07727B8FfC0BA470D9C" # Sturdy tBTC Aggregator Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x18084fbA666a33d37592fA2633fD49a74DD93a88" # tBTC on Ethereum
+  instruction:
+    label: "tBTC"
+    path: "../../../blueprints/sturdy-v2/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xAeD098db0e39bed6DDc2c07727B8FfC0BA470D9C" # Sturdy tBTC Aggregator Vault
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

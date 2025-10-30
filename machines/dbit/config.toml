@@ -1,0 +1,14 @@
+name = "dbit"
+chain = "mainnet"
+address = "0xfcbe132452b6caa32addd4768db8fa02af73d841"
+
+[calibers.mainnet]
+address = "0xd1a3c20488899c038b7daae1ede0c6da6c36c326"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/config/machines/dbit/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+decimals = 8
+name = "Wrapped BTC"
+symbol = "WBTC"

@@ -1,0 +1,35 @@
+protocol: "summer.fi"
+
+inputs:
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve the vault to spend assets"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit into the vault"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of asset to deposit into the vault"

@@ -1,0 +1,17 @@
+protocol: "across-v2"
+
+inputs:
+  accelerating_distributor_address:
+    type: "address"
+  lp_token_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Withdraw rewards from Accelerating Distributor"
+        target: "${inputs.accelerating_distributor_address}"
+        selector: "withdrawReward(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.lp_token_address}"

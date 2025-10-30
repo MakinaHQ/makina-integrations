@@ -1,0 +1,110 @@
+protocol: "curve"
+
+inputs:
+  gauge_address:
+    type: "address"
+  pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw_balanced:
+    calls:
+      - description: "Withdraw LP tokens from gauge with rewards claiming"
+        target: "${inputs.gauge_address}"
+        selector: "withdraw(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity balanced from pool"
+        target: "${inputs.pool_address}"
+        selector: "remove_liquidity(uint256,uint256[],address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_token_a}"
+              - type: "uint256"
+                value: "${input_slots.min_token_b}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "The amount of LP tokens to withdraw from the gauge"
+      min_token_a:
+        type: "uint256"
+        description: "Minimum amount of token A to receive"
+      min_token_b:
+        type: "uint256"
+        description: "Minimum amount of token B to receive"
+
+  withdraw_balanced_relative:
+    calls:
+      - description: "Get gauge balance"
+        target: "${inputs.gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "gauge_balance"
+          type: "uint256"
+
+      - description: "Calculate amount to withdraw based on basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.gauge_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw LP tokens from gauge with rewards claiming"
+        target: "${inputs.gauge_address}"
+        selector: "withdraw(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity balanced from pool"
+        target: "${inputs.pool_address}"
+        selector: "remove_liquidity(uint256,uint256[],address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_token_a}"
+              - type: "uint256"
+                value: "${input_slots.min_token_b}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of gauge position to withdraw, in basis points (10000 bps = 100%)"
+      min_token_a:
+        type: "uint256"
+        description: "Minimum amount of token A to receive"
+      min_token_b:
+        type: "uint256"
+        description: "Minimum amount of token B to receive"

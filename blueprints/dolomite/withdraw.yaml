@@ -1,0 +1,51 @@
+protocol: "dolomite"
+
+inputs:
+  dolo_deposit_withdrawal_router_address:
+    type: "address"
+  isolation_mode_market_id:
+    type: "uint256"
+  account_number:
+    type: "uint256"
+  market_id:
+    type: "uint256"
+
+actions:
+  withdraw_assets:
+    calls:
+      - description: "Withdraw assets from Dolomite"
+        target: "${inputs.dolo_deposit_withdrawal_router_address}"
+        selector: "withdrawWei(uint256,uint256,uint256,uint256,uint8)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.isolation_mode_market_id}"
+          - type: "uint256"
+            value: "${inputs.account_number}"
+          - type: "uint256"
+            value: "${inputs.market_id}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "uint8"
+            value: "1" # enum BalanceCheckFlag: Checks that either BOTH, FROM, or TO accounts all have non-negative balances
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "The amount of tokens to withdraw"
+
+  withdraw_full:
+    calls:
+      - description: "Withdraw all assets from Dolomite"
+        target: "${inputs.dolo_deposit_withdrawal_router_address}"
+        selector: "withdrawWei(uint256,uint256,uint256,uint256,uint8)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.isolation_mode_market_id}"
+          - type: "uint256"
+            value: "${inputs.account_number}"
+          - type: "uint256"
+            value: "${inputs.market_id}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+          - type: "uint8"
+            value: "1"

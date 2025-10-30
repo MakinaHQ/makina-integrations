@@ -1,0 +1,152 @@
+protocol: "morpho"
+
+inputs:
+  morpho:
+    type: "address"
+  executor_helper:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  collateral_token:
+    type: "address"
+  caliber_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve collateral token to Morpho"
+        target: "${inputs.collateral_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token_extracted"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Supply collateral to Morpho"
+        target: "${inputs.morpho}"
+        selector: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token_extracted}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of collateral to deposit"
+
+  deposit_vault:
+    calls:
+      - description: "Approve vault to spend the asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit asset into the vault"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of asset to deposit into the vault"

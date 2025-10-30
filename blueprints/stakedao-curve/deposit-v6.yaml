@@ -1,0 +1,141 @@
+protocol: "stakedao-curve"
+
+inputs:
+  token0_address:
+    type: "address"
+  token1_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  stakedao_vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      # Step 1: Approve token0 to Curve pool
+      - description: "Approve token0 to Curve pool"
+        target: "${inputs.token0_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_token0}"
+
+      # Step 2: Approve token1 to Curve pool
+      - description: "Approve token1 to Curve pool"
+        target: "${inputs.token1_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_token1}"
+
+      # Step 3: Add liquidity to Curve pool
+      - description: "Add liquidity to Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.amount_token0}"
+              - type: "uint256"
+                value: "${input_slots.amount_token1}"
+          - type: "uint256"
+            value: "${input_slots.min_lp_amount}"
+        return:
+          name: "lp_tokens_received"
+          type: "uint256"
+
+      # Step 4: Approve Curve LP tokens to StakeDAO vault
+      - description: "Approve Curve LP tokens to StakeDAO vault"
+        target: "${inputs.curve_pool_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stakedao_vault_address}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+      # Step 5: Deposit LP tokens into StakeDAO vault
+      - description: "Deposit LP tokens into StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_token0:
+        type: "uint256"
+        description: "The amount of token0 to deposit"
+      amount_token1:
+        type: "uint256"
+        description: "The amount of token1 to deposit"
+      min_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of Curve LP tokens to receive and stake"
+
+  deposit_single_sided_token_b:
+    calls:
+      # Step 1: Approve token1 to Curve pool
+      - description: "Approve token1 to Curve pool"
+        target: "${inputs.token1_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_token1}"
+
+      # Step 2: Add liquidity to Curve pool, single sided token1
+      - description: "Add liquidity to Curve pool, single sided token1"
+        target: "${inputs.curve_pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "0"
+              - type: "uint256"
+                value: "${input_slots.amount_token1}"
+          - type: "uint256"
+            value: "${input_slots.min_lp_amount}"
+        return:
+          name: "lp_tokens_received"
+          type: "uint256"
+
+      # Step 3: Approve Curve LP tokens to StakeDAO vault
+      - description: "Approve Curve LP tokens to StakeDAO vault"
+        target: "${inputs.curve_pool_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stakedao_vault_address}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+      # Step 4: Deposit LP tokens into StakeDAO vault
+      - description: "Deposit LP tokens into StakeDAO vault"
+        target: "${inputs.stakedao_vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_token1:
+        type: "uint256"
+        description: "The amount of token1 to deposit"
+      min_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of Curve LP tokens to receive and stake"

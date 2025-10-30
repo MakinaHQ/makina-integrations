@@ -1,0 +1,102 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDT/crvUSD"
+    path: "../../../blueprints/stakedao-curve/deposit-v6.yaml:deposit"
+    inputs:
+      token0_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      token1_address:
+        type: "address"
+        value: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+      curve_pool_address:
+        type: "address"
+        value: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      stakedao_vault_address:
+        type: "address"
+        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDT/crvUSD"
+    path: "../../../blueprints/stakedao-curve/account.yaml:account"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
+      lp_token_address:
+        type: "address"
+        value: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDT/crvUSD"
+    path: "../../../blueprints/stakedao-curve/withdraw-v6.yaml:withdraw"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
+      curve_pool_address:
+        type: "address"
+        value: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDT/crvUSD"
+    path: "../../../blueprints/stakedao-curve/withdraw-v6.yaml:withdraw_relative"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
+      curve_pool_address:
+        type: "address"
+        value: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# HARVEST - StakeDAO Rewards
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDT/crvUSD"
+    path: "../../../blueprints/stakedao-curve/harvest.yaml:harvest"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

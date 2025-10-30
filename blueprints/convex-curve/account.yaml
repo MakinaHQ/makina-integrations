@@ -1,0 +1,172 @@
+protocol: "convex-curve"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  account_single_sided_token_a:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Make sure the LP balance is non-zero"
+        target: ${inputs.unsigned_math_helper}
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}" # The amount of LP tokens owned by the subject
+          - type: "uint256"
+            value: "${builtins.UINT256_1}" # Fallback to zero if
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
+      - description: "Calc withdraw one coin from curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}"
+          - type: "int128"
+            value: "0"
+        return:
+          name: "amount_token_a_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_a_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_single_sided_token_b:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Make sure the LP balance is non-zero"
+        target: ${inputs.unsigned_math_helper}
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}" # The amount of LP tokens owned by the subject
+          - type: "uint256"
+            value: "${builtins.UINT256_1}" # Fallback to zero if
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
+      - description: "Calc withdraw one coin from curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}"
+          - type: "int128"
+            value: "1"
+        return:
+          name: "amount_token_b_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_b_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_balanced:
+    calls:
+      - description: "Get the user's staked LP balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Get total LP supply from Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "totalSupply()"
+        parameters: []
+        return:
+          name: "total_lp_supply"
+          type: "uint256"
+
+      - description: "Get pool balance of token A"
+        target: "${inputs.curve_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "pool_balance_token_a"
+          type: "uint256"
+
+      - description: "Get pool balance of token B"
+        target: "${inputs.curve_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "pool_balance_token_b"
+          type: "uint256"
+
+      - description: "Calculate pro-rata share of token A"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_balance_token_a}"
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}"
+          - type: "uint256"
+            value: "${returns.total_lp_supply}"
+        return:
+          name: "amount_token_a_out"
+          type: "uint256"
+
+      - description: "Calculate pro-rata share of token B"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_balance_token_b}"
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}"
+          - type: "uint256"
+            value: "${returns.total_lp_supply}"
+        return:
+          name: "amount_token_b_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_a_out}"
+      - type: "uint256"
+        value: "${returns.amount_token_b_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

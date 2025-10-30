@@ -1,0 +1,134 @@
+protocol: "aerodrome"
+
+inputs:
+  nft_id_storage_key:
+    type: "string"
+  kv_store_address:
+    type: "address"
+  gauge_address:
+    type: "address"
+  aerodrome_cl_helper:
+    type: "address"
+  revertable_caliber_helper:
+    type: "address"
+
+actions:
+  account_cl:
+    calls:
+      - description: "Get the token id from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(string)"
+        parameters:
+          - type: "string"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "token_id"
+
+      - description: "Get the position state for that token id from the aero helper"
+        target: "${inputs.aerodrome_cl_helper}"
+        selector: "getPositionStateForTokenId(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.token_id}"
+          - type: "address"
+            value: "${inputs.gauge_address}"
+        return:
+          type: "(uint128,uint160,uint160,uint160)"
+          name: "position_state"
+
+      - description: "Extract liquidity value from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint128"
+          name: "liquidity"
+
+      - description: "Extract current price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "uint160"
+          name: "current_price"
+
+      - description: "Extract lower tick price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "2"
+        return:
+          type: "uint160"
+          name: "lower_tick_price"
+
+      - description: "Extract upper tick price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "3"
+        return:
+          type: "uint160"
+          name: "upper_tick_price"
+
+      - description: "Get amounts for liquidity, in cl helper"
+        target: "${inputs.aerodrome_cl_helper}"
+        selector: "getAmountsForLiquidity(uint160,uint160,uint160,uint128)"
+        parameters:
+          - type: "uint160"
+            value: "${returns.current_price}"
+          - type: "uint160"
+            value: "${returns.lower_tick_price}"
+          - type: "uint160"
+            value: "${returns.upper_tick_price}"
+          - type: "uint128"
+            value: "${returns.liquidity}"
+        return:
+          type: "(uint256,uint256)"
+          name: "amounts_in_position"
+
+      - description: "Get amount token a"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.amounts_in_position}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "amount_token_a"
+
+      - description: "Get amount token b"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.amounts_in_position}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "uint256"
+          name: "amount_token_b"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_a}"
+      - type: "uint256"
+        value: "${returns.amount_token_b}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

@@ -1,0 +1,25 @@
+protocol: "shroomy"
+
+inputs:
+  shroomy_token:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Account the Shroomy token position"
+        target: ${inputs.shroomy_token}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.caliber_address}
+        return:
+          name: "shroomy_token_balance"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.shroomy_token_balance}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}
