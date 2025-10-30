@@ -1,0 +1,107 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "USDC/RLUSD"
+    path: "../../../blueprints/curve/deposit-v7.yaml:deposit_balanced"
+    inputs:
+      tokena_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      tokenb_address:
+        type: "address"
+        value: "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+      pool_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      gauge_address:
+        type: "address"
+        value: "0xFc3212Bd9Ad9A28Da6B2bd50a2918969C126894F"
+      lp_token_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "USDC/RLUSD"
+    path: "../../../blueprints/curve/account.yaml:account_balanced"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xFc3212Bd9Ad9A28Da6B2bd50a2918969C126894F"
+      lp_token_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      pool_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "USDC/RLUSD"
+    path: "../../../blueprints/curve/withdraw-v7.yaml:withdraw_balanced"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xFc3212Bd9Ad9A28Da6B2bd50a2918969C126894F"
+      pool_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD" # RLUSD
+  instruction:
+    label: "USDC/RLUSD"
+    path: "../../../blueprints/curve/withdraw-v7.yaml:withdraw_balanced_relative"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xFc3212Bd9Ad9A28Da6B2bd50a2918969C126894F"
+      pool_address:
+        type: "address"
+        value: "0xD001aE433f254283FeCE51d4ACcE8c53263aa186"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDC/RLUSD"
+    path: "../../../blueprints/curve/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: "0xFc3212Bd9Ad9A28Da6B2bd50a2918969C126894F"

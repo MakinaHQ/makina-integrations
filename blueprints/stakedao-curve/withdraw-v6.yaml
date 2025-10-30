@@ -9,19 +9,11 @@ inputs:
     type: "address"
   unsigned_math_helper:
     type: "address"
-    description: "Address of the UnsignedMathHelper contract"
 
 actions:
   withdraw:
     calls:
-      # Step 1: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-      # Step 2: Withdraw from StakeDAO vault (ERC4626)
+      # Step 1: Withdraw from StakeDAO vault (ERC4626)
       - description: "Withdraw from StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
         selector: "withdraw(uint256,address,address)"
@@ -35,7 +27,8 @@ actions:
         return:
           name: "curve_lp_balance"
           type: "uint256"
-      # Step 3: Remove liquidity proportionally from Curve pool
+
+      # Step 2: Remove liquidity proportionally from Curve pool
       - description: "Remove liquidity proportionally from Curve pool"
         target: "${inputs.curve_pool_address}"
         selector: "remove_liquidity(uint256,uint256[2],address)"
@@ -50,6 +43,7 @@ actions:
                 value: "${input_slots.min_amount_1}"
           - type: "address"
             value: "${inputs.caliber_address}" # receiver
+
     input_slots:
       vault_amount_to_withdraw:
         type: "uint256"
@@ -63,14 +57,7 @@ actions:
 
   withdraw_relative:
     calls:
-      # Step 1: Checkpoint accounting before withdrawal
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-      # Step 2: Query vault shares balance
+      # Step 1: Query vault shares balance
       - description: "Get vault shares balance"
         target: "${inputs.stakedao_vault_address}"
         selector: "balanceOf(address)"
@@ -81,24 +68,13 @@ actions:
           name: "vault_shares_balance"
           type: "uint256"
 
-      # Step 3: Convert shares to underlying assets (Curve LP tokens)
-      - description: "Convert vault shares to assets"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "convertToAssets(uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.vault_shares_balance}"
-        return:
-          name: "vault_assets_balance"
-          type: "uint256"
-
-      # Step 4: Compute the amount to withdraw based on percentage
+      # Step 2: Compute the amount to withdraw based on percentage
       - description: "Compute the amount of assets to withdraw based on percentage"
         target: "${inputs.unsigned_math_helper}"
         selector: "mulDiv(uint256,uint256,uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.vault_assets_balance}"
+            value: "${returns.vault_shares_balance}"
           - type: "uint256"
             value: "${input_slots.bps_to_withdraw}"
           - type: "uint256"
@@ -107,7 +83,7 @@ actions:
           name: "vault_amount_to_withdraw"
           type: "uint256"
 
-      # Step 5: Withdraw from StakeDAO vault
+      # Step 3: Withdraw from StakeDAO vault
       - description: "Withdraw from StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
         selector: "withdraw(uint256,address,address)"
@@ -122,14 +98,14 @@ actions:
           name: "curve_lp_balance"
           type: "uint256"
 
-      # Step 6: Remove liquidity proportionally from Curve pool
+      # Step 4: Remove liquidity proportionally from Curve pool
       - description: "Remove liquidity proportionally from Curve pool"
         target: "${inputs.curve_pool_address}"
-        selector: "remove_liquidity(uint256,uint256[],address)"
+        selector: "remove_liquidity(uint256,uint256[2],address)"
         parameters:
           - type: "uint256"
             value: "${returns.curve_lp_balance}"
-          - type: "uint256[]"
+          - type: "uint256[2]"
             value:
               - type: "uint256"
                 value: "${input_slots.min_amount_0}"
@@ -137,6 +113,7 @@ actions:
                 value: "${input_slots.min_amount_1}"
           - type: "address"
             value: "${inputs.caliber_address}" # receiver
+
     input_slots:
       bps_to_withdraw:
         type: "uint256"
@@ -150,14 +127,6 @@ actions:
 
   withdraw_single_sided_token_b:
     calls:
-      # Step 0: Checkpoint accounting before withdrawal
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Withdraw from StakeDAO vault (ERC4626)
       - description: "Withdraw from StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
@@ -203,14 +172,6 @@ actions:
 
   withdraw_single_sided_token_b_relative:
     calls:
-      # Step 0: Checkpoint accounting before withdrawal
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Query vault shares balance
       - description: "Get vault shares balance"
         target: "${inputs.stakedao_vault_address}"

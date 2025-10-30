@@ -15,13 +15,6 @@ inputs:
 actions:
   deposit:
     calls:
-      # Step 0: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
       # Step 1: Approve token0 to Curve pool
       - description: "Approve token0 to Curve pool"
         target: "${inputs.token0_address}"
@@ -55,19 +48,11 @@ actions:
                 value: "${input_slots.amount_token1}"
           - type: "uint256"
             value: "${input_slots.min_lp_amount}"
-
-      # Step 4: Get Curve LP token balance
-      - description: "Get Curve LP token balance"
-        target: "${inputs.curve_pool_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
         return:
-          name: "curve_lp_balance"
+          name: "lp_tokens_received"
           type: "uint256"
 
-      # Step 5: Approve Curve LP tokens to StakeDAO vault
+      # Step 4: Approve Curve LP tokens to StakeDAO vault
       - description: "Approve Curve LP tokens to StakeDAO vault"
         target: "${inputs.curve_pool_address}"
         selector: "approve(address,uint256)"
@@ -75,15 +60,15 @@ actions:
           - type: "address"
             value: "${inputs.stakedao_vault_address}"
           - type: "uint256"
-            value: "${returns.curve_lp_balance}"
+            value: "${returns.lp_tokens_received}"
 
-      # Step 6: Deposit LP tokens into StakeDAO vault
-      - description: "Deposit LP tokens intox StakeDAO vault"
+      # Step 5: Deposit LP tokens into StakeDAO vault
+      - description: "Deposit LP tokens into StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"
-            value: "${returns.curve_lp_balance}"
+            value: "${returns.lp_tokens_received}"
           - type: "address"
             value: "${inputs.caliber_address}"
 
@@ -100,14 +85,6 @@ actions:
 
   deposit_single_sided_token_b:
     calls:
-      # Step 0: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Approve token1 to Curve pool
       - description: "Approve token1 to Curve pool"
         target: "${inputs.token1_address}"
@@ -131,19 +108,11 @@ actions:
                 value: "${input_slots.amount_token1}"
           - type: "uint256"
             value: "${input_slots.min_lp_amount}"
-
-      # Step 3: Get Curve LP token balance
-      - description: "Get Curve LP token balance"
-        target: "${inputs.curve_pool_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
         return:
-          name: "curve_lp_balance"
+          name: "lp_tokens_received"
           type: "uint256"
 
-      # Step 4: Approve Curve LP tokens to StakeDAO vault
+      # Step 3: Approve Curve LP tokens to StakeDAO vault
       - description: "Approve Curve LP tokens to StakeDAO vault"
         target: "${inputs.curve_pool_address}"
         selector: "approve(address,uint256)"
@@ -151,15 +120,15 @@ actions:
           - type: "address"
             value: "${inputs.stakedao_vault_address}"
           - type: "uint256"
-            value: "${returns.curve_lp_balance}"
+            value: "${returns.lp_tokens_received}"
 
-      # Step 5: Deposit LP tokens into StakeDAO vault
+      # Step 4: Deposit LP tokens into StakeDAO vault
       - description: "Deposit LP tokens into StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"
-            value: "${returns.curve_lp_balance}"
+            value: "${returns.lp_tokens_received}"
           - type: "address"
             value: "${inputs.caliber_address}"
 

@@ -14,13 +14,6 @@ inputs:
 actions:
   withdraw:
     calls:
-      # Step 0: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
       # Step 1: Withdraw from StakeDAO vault (ERC4626)
       - description: "Withdraw from StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
@@ -59,6 +52,7 @@ actions:
                 value: "${input_slots.min_amount_1}"
           - type: "address"
             value: "${inputs.caliber_address}" # receiver
+
     input_slots:
       vault_amount_to_withdraw:
         type: "uint256"
@@ -72,12 +66,6 @@ actions:
 
   withdraw_relative:
     calls:
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
       # Step 1: Query vault shares balance
       - description: "Get vault shares balance"
         target: "${inputs.stakedao_vault_address}"
@@ -153,6 +141,7 @@ actions:
                 value: "${input_slots.min_amount_1}"
           - type: "address"
             value: "${inputs.caliber_address}" # receiver
+
     input_slots:
       bps_to_withdraw:
         type: "uint256"
@@ -166,14 +155,6 @@ actions:
 
   withdraw_single_sided_token_b:
     calls:
-      # Step 0: Checkpoint accounting before withdrawal
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Withdraw from StakeDAO vault (ERC4626)
       - description: "Withdraw from StakeDAO vault"
         target: "${inputs.stakedao_vault_address}"
@@ -219,14 +200,6 @@ actions:
 
   withdraw_single_sided_token_b_relative:
     calls:
-      # Step 0: Checkpoint accounting before withdrawal
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Query vault shares balance
       - description: "Get vault shares balance"
         target: "${inputs.stakedao_vault_address}"

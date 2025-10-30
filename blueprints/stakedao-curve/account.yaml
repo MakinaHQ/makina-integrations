@@ -5,10 +5,6 @@ inputs:
     type: "address"
   lp_token_address:
     type: "address"
-  token0_address:
-    type: "address"
-  token1_address:
-    type: "address"
   unsigned_math_helper_address:
     type: "address"
   caliber_address:
@@ -24,7 +20,8 @@ actions:
         parameters:
           - type: "address"
             value: "${inputs.caliber_address}"
-      # Step 1: Get the user's balance of VAULT SHARES
+
+      # Step 1: Get the user's balance of vault shares
       - description: "Get the user's balance of vault shares"
         target: "${inputs.stakedao_vault_address}"
         selector: "balanceOf(address)"

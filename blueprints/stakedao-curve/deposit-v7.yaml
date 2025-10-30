@@ -15,13 +15,6 @@ inputs:
 actions:
   deposit:
     calls:
-      # Step 0: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
       # Step 1: Approve token0 to Curve pool
       - description: "Approve token0 to Curve pool"
         target: "${inputs.token0_address}"
@@ -100,14 +93,6 @@ actions:
 
   deposit_single_sided_token_b:
     calls:
-      # Step 0: Checkpoint accounting before deposit
-      - description: "Checkpoint accounting state"
-        target: "${inputs.stakedao_vault_address}"
-        selector: "checkpoint(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-
       # Step 1: Approve token1 to Curve pool
       - description: "Approve token1 to Curve pool"
         target: "${inputs.token1_address}"
