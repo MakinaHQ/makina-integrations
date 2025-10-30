@@ -1,0 +1,146 @@
+protocol: "fluid"
+
+inputs:
+  vault_address:
+    type: "address"
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper_address:
+    type: "address"
+
+actions:
+  redeem_staked:
+    calls:
+      - description: "Withdraw staked shares from Fluid staking contract"
+        target: "${inputs.staking_contract_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The exact amount of vault shares to redeem"
+
+  redeem_staked_relative:
+    calls:
+      - description: "Get the caliber staked share balance"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "caliber_staked_shares"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_staked_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Withdraw staked shares from Fluid staking contract"
+        target: "${inputs.staking_contract_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of staked share balance to redeem (10000 = 100%)"
+
+  redeem:
+    calls:
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The exact amount of vault shares to redeem"
+
+  redeem_relative:
+    calls:
+      - description: "Get the caliber vault share balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "caliber_vault_shares"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_vault_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem vault shares for underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of vault share balance to redeem (10000 = 100%)"

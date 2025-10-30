@@ -1,0 +1,68 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f" # GHO on Ethereum
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/fluid/deposit.yaml:deposit"
+    inputs:
+      underlying_asset_address:
+        type: "address"
+        value: "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f" # GHO on Ethereum
+      vault_address:
+        type: "address"
+        value: "0x6A29A46E21C730DcA1d8b23d637c101cec605C5B" # fGHO vault on Ethereum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f" # GHO on Ethereum
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/fluid/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x6A29A46E21C730DcA1d8b23d637c101cec605C5B" # fGHO vault on Ethereum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f" # GHO on Ethereum
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/fluid/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x6A29A46E21C730DcA1d8b23d637c101cec605C5B" # fGHO vault on Ethereum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f" # GHO on Ethereum
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/fluid/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x6A29A46E21C730DcA1d8b23d637c101cec605C5B" # fGHO vault on Ethereum
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

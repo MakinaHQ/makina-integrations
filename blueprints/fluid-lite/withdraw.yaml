@@ -1,0 +1,70 @@
+protocol: "fluid-lite"
+
+inputs:
+  fluid_vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper_address:
+    type: "address"
+
+actions:
+  redeem:
+    calls:
+      - description: "Redeem specified amount of vault shares for underlying assets"
+        target: "${inputs.fluid_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The amount of vault shares to redeem"
+
+  redeem_relative:
+    calls:
+      - description: "Get the caliber share balance"
+        target: "${inputs.fluid_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_shares"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem the shares from the vault"
+        target: "${inputs.fluid_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of our share balance to redeem (10000 = 100%)"

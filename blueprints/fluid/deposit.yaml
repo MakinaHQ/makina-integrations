@@ -1,0 +1,91 @@
+protocol: "fluid"
+
+inputs:
+  underlying_asset_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit_and_stake:
+    calls:
+      - description: "Approve underlying asset to the Fluid vault"
+        target: "${inputs.underlying_asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Deposit asset into Fluid vault to receive vault shares"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.min_vault_shares}"
+        return:
+          name: "vault_shares_received"
+          type: "uint256"
+
+      - description: "Approve vault shares to the staking contract"
+        target: "${inputs.vault_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.staking_contract_address}"
+          - type: "uint256"
+            value: "${returns.vault_shares_received}"
+
+      - description: "Stake vault shares in the staking contract"
+        target: "${inputs.staking_contract_address}"
+        selector: "stake(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_received}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "The amount of underlying asset to deposit into the Fluid vault"
+      min_vault_shares:
+        type: "uint256"
+        description: "The minimum amount of vault shares to receive (slippage protection)"
+
+  deposit:
+    calls:
+      - description: "Approve underlying asset to the Fluid vault"
+        target: "${inputs.underlying_asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Deposit asset into Fluid vault to receive vault shares"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.min_vault_shares}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "The amount of underlying asset to deposit into the Fluid vault"
+      min_vault_shares:
+        type: "uint256"
+        description: "The minimum amount of vault shares to receive (slippage protection)"
