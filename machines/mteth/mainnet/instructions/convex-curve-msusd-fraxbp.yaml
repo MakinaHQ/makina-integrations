@@ -1,0 +1,136 @@
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "msUSD/FRAX/USDC"
+    path: "../../../blueprints/convex-curve-metapool/account.yaml:account_single_sided_token_c"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xF189A4a1E845Fd62944F93De497409798523B397"
+      metapool_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      base_pool_address:
+        type: "address"
+        value: "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "msUSD/FRAX/USDC"
+    path: "../../../blueprints/convex-curve-metapool/deposit-v6.yaml:deposit_single_sided_token_c"
+    inputs:
+      base_asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      base_pool_address:
+        type: "address"
+        value: "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+      base_pool_lp_token_address:
+        type: "address"
+        value: "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC"
+      metapool_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      metapool_lp_token_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31"
+      pool_id:
+        type: "uint256"
+        value: "144"
+
+# Absolute withdrawal - withdraw exact amount of LP tokens
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "msUSD/FRAX/USDC"
+    path: "../../../blueprints/convex-curve-metapool/withdraw.yaml:withdraw_single_sided_token_c"
+    inputs:
+      base_asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      base_pool_address:
+        type: "address"
+        value: "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+      base_pool_lp_token_address:
+        type: "address"
+        value: "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC"
+      metapool_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      metapool_lp_token_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xF189A4a1E845Fd62944F93De497409798523B397"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# Relative withdrawal - withdraw percentage of position using basis points
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "msUSD/FRAX/USDC"
+    path: "../../../blueprints/convex-curve-metapool/withdraw.yaml:withdraw_single_sided_token_c_relative"
+    inputs:
+      base_asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      base_pool_address:
+        type: "address"
+        value: "0xDcEF968d416a41Cdac0ED8702fAC8128A64241A2"
+      base_pool_lp_token_address:
+        type: "address"
+        value: "0x3175Df0976dFA876431C2E9eE6Bc45b65d3473CC"
+      metapool_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      metapool_lp_token_address:
+        type: "address"
+        value: "0xc3b19502F8c02be75F3f77fd673503520DEB51dD"
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xF189A4a1E845Fd62944F93De497409798523B397"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "msUSD/FRAX/USDC"
+    path: "../../../blueprints/convex-curve-metapool/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xF189A4a1E845Fd62944F93De497409798523B397"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

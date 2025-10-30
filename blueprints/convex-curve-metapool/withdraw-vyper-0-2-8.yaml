@@ -1,0 +1,178 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  base_pool_address:
+    type: "address"
+  metapool_address:
+    type: "address"
+  convex_reward_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  caliber_helper:
+    type: "address"
+
+actions:
+  withdraw_tripool:
+    calls:
+      - description: "Withdraw and unwrap LP tokens from Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "withdrawAndUnwrap(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_lp_to_withdraw}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity from metapool to get base pool LP tokens"
+        target: "${inputs.metapool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_lp_to_withdraw}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_pool_lp_amount}"
+        return:
+          name: "padded_base_pool_lp_received"
+          type: "(uint256,bytes32)"
+
+      - description: "Extract base pool LP amount from padded return"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,bytes32)"
+            value: "${returns.padded_base_pool_lp_received}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "base_pool_lp_received"
+
+      - description: "Remove liquidity from base pool in balanced proportions"
+        target: "${inputs.base_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[3])"
+        parameters:
+          - type: "uint256"
+            value: "${returns.base_pool_lp_received}"
+          - type: "uint256[3]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_a}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_b}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_c}"
+
+    input_slots:
+      amount_lp_to_withdraw:
+        type: "uint256"
+        description: "The amount of metapool LP tokens to withdraw from Convex"
+      min_base_pool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of base pool LP tokens to receive from metapool"
+      min_amount_a:
+        type: "uint256"
+        description: "The minimum amount of token A to receive"
+      min_amount_b:
+        type: "uint256"
+        description: "The minimum amount of token B to receive"
+      min_amount_c:
+        type: "uint256"
+        description: "The minimum amount of token C to receive"
+
+  withdraw_tripool_relative:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "total_lp_balance"
+          type: "uint256"
+
+      - description: "Calculate amount to withdraw based on basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_lp_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_lp_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw and unwrap LP tokens from Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "withdrawAndUnwrap(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_lp_to_withdraw}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity from metapool to get base pool LP tokens"
+        target: "${inputs.metapool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_lp_to_withdraw}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_pool_lp_amount}"
+        return:
+          name: "padded_base_pool_lp_received"
+          type: "(uint256,bytes32)"
+
+      - description: "Extract base pool LP amount from padded return"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,bytes32)"
+            value: "${returns.padded_base_pool_lp_received}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "base_pool_lp_received"
+
+      - description: "Remove liquidity from base pool in balanced proportions"
+        target: "${inputs.base_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[3])"
+        parameters:
+          - type: "uint256"
+            value: "${returns.base_pool_lp_received}"
+          - type: "uint256[3]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_a}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_b}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_c}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage to withdraw in basis points (e.g., 5000 = 50%, 10000 = 100%)"
+      min_base_pool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of base pool LP tokens to receive from metapool"
+      min_amount_a:
+        type: "uint256"
+        description: "The minimum amount of token A to receive"
+      min_amount_b:
+        type: "uint256"
+        description: "The minimum amount of token B to receive"
+      min_amount_c:
+        type: "uint256"
+        description: "The minimum amount of token C to receive"

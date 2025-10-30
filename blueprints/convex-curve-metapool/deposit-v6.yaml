@@ -1,0 +1,102 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  base_asset_address:
+    type: "address"
+  base_pool_address:
+    type: "address"
+  base_pool_lp_token_address:
+    type: "address"
+  metapool_address:
+    type: "address"
+  metapool_lp_token_address:
+    type: "address"
+  convex_booster_address:
+    type: "address"
+  pool_id:
+    type: "uint256"
+
+actions:
+  # assumes a meta pool with 3 assets in total
+  deposit_single_sided_token_c:
+    calls:
+      - description: "Approve base asset to be spent by base pool"
+        target: "${inputs.base_asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.base_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_base_asset}"
+
+      - description: "Add liquidity to base pool to receive base pool LP tokens"
+        target: "${inputs.base_pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "0"
+              - type: "uint256"
+                value: "${input_slots.amount_base_asset}"
+          - type: "uint256"
+            value: "${input_slots.min_base_pool_lp_amount}"
+        return:
+          name: "base_pool_lp_received"
+          type: "uint256"
+
+      - description: "Approve base pool LP tokens to be spent by metapool"
+        target: "${inputs.base_pool_lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.metapool_address}"
+          - type: "uint256"
+            value: "${returns.base_pool_lp_received}"
+
+      - description: "Add liquidity to metapool single-sided with base pool LP tokens"
+        target: "${inputs.metapool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "0"
+              - type: "uint256"
+                value: "${returns.base_pool_lp_received}"
+          - type: "uint256"
+            value: "${input_slots.min_metapool_lp_amount}"
+        return:
+          name: "metapool_lp_received"
+          type: "uint256"
+
+      - description: "Approve metapool LP tokens to Convex Booster"
+        target: "${inputs.metapool_lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_booster_address}"
+          - type: "uint256"
+            value: "${returns.metapool_lp_received}"
+
+      - description: "Deposit metapool LP tokens through Convex Booster"
+        target: "${inputs.convex_booster_address}"
+        selector: "deposit(uint256,uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.pool_id}"
+          - type: "uint256"
+            value: "${returns.metapool_lp_received}"
+          - type: "bool"
+            value: "true"
+
+    input_slots:
+      amount_base_asset:
+        type: "uint256"
+        description: "The amount of base asset to deposit"
+      min_base_pool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of base pool LP tokens to receive"
+      min_metapool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of metapool LP tokens to receive"
