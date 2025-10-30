@@ -1,8 +1,8 @@
 # Makina Integrations
 
-This repo is used to store the public integrations used by the `makina-rs CLI` as well as public machines' rootfiles ([spellcaster](https://github.com/MakinaHQ/makina-rs/tree/main/crates/spellcaster)). Please note that if you are a private operator, configs can also live locally, or on another private GitHub repository. Refer to the Makina CLI documentation for more information on how to use local configs (`github:` and `local:`).
+This repo is used to store the public integrations used by the `makina-rs CLI` as well as public machines' rootfiles. Please note that if you are a private operator, configs can also live locally, or on another private GitHub repository. Refer to the Makina CLI documentation for more information on how to use local configs (`github:` and `local:`).
 
-It is made of "source files" (instructions, blueprints, calibers) which are then transpiled into rootfiles by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
+It is made of "source files" (instructions, blueprints, calibers) which are then transpiled into rootfiles by the `makina-rs transpiler`.
 
 ## Project Structure
 
@@ -36,9 +36,7 @@ Every machine gets its own toplevel directory (`machines`) for its rootfiles and
 
 Network names (`[network-name-N]`) should match the chains defined in `config.toml`.
 
-\* Transpiling of instructions is done by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
-
-The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file and the output is stored in the `[machine-name]/[network-name]/rootfiles/[timestamp]-[name-of-the-migration].toml` file.
+The `makina-rs transpiler` is run on the `[machine-name]/[network-name]/caliber.yaml` file and the output is stored in the `[machine-name]/[network-name]/rootfiles/[timestamp]-[name-of-the-migration].toml` file.
 
 #### Instructions
 
