@@ -12,3 +12,25 @@ address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 decimals = 6
 name = "USD Coin"
 symbol = "USDC"
+
+[calibers.base]
+address = "0xd1a1c248b253f1fc60eacd90777b9a63f8c8c1bc"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dusd/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
+
+[calibers.arbitrum]
+address = "0xd1a1c248b253f1fc60eacd90777b9a63f8c8c1bc"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dusd/arbitrum/rootfiles"
+
+[calibers.arbitrum.accounting_token]
+address = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
