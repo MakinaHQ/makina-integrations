@@ -68,7 +68,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: MakinaHQ/makina-rs
-          ssh-key: ${{ secrets.MAKINA_RS_DEPLOY_KEY }} # linked to "Makina Github Deploy Key" on the makina-rs repo
+          ssh-key: ${{ secrets.MAKINA_RS_DEPLOY_KEY }} # linked to "Makina Integrations GitHub Deploy Key" on the makina-rs repo
           path: makina-rs
 
       - name: Install Rust toolchain
