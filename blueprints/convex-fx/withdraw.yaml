@@ -1,0 +1,136 @@
+protocol: "convex-fx"
+
+inputs:
+  revertable_caliber_helper:
+    type: "address"
+  convex_vault_address:
+    type: "address"
+  fx_base_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  fx_gauge_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+
+actions:
+
+  # Request redemption from the stability pool.
+  request_redemption:
+    calls:
+      - description: "Withdraw shares from Convex FX vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+      - description: "Request redemption from fxBASE"
+        target: "${inputs.fx_base_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of fxBASE shares to request redemption for"
+
+  # Redeem from the stability pool, after cooldown period.
+  redeem:
+    calls:
+      - description: "Get the pending redemption amount"
+        target: "${inputs.fx_base_address}"
+        selector: "redeemRequests(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "(uint128,uint128)"
+          name: "caliber_redeem_request"
+
+      - description: "Extract the amount to redeem from the tuple"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128)"
+            value: "${returns.caliber_redeem_request}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "amount_to_redeem"
+
+      - description: "Redeem from fxBASE (receive a mix of fxUSD and USDC)"
+        target: "${inputs.fx_base_address}"
+        selector: "redeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.amount_to_redeem}"
+
+  # Emergency redeem from the stability pool, paying the 1% instant withdrawal fee.
+  emergency_redeem:
+    calls:
+      - description: "Emergency withdrawal taking the 1% instant withdrawal fee. Withdraw all from convex FX vault."
+        target: "${inputs.fx_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+        return:
+          type: "uint256"
+          name: "fx_sp_balance_in_gauge"
+
+      - description: "Withdraw the fxSP from Convex FX vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_balance_in_gauge}"
+
+      - description: "Instant withdrawal from fxBASE (paying the 1% fee)"
+        target: "${inputs.fx_base_address}"
+        selector: "instantRedeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.fx_sp_balance_in_gauge}"
+
+  # Withdraw from the curve pool through the Convex FX vault.
+  withdraw_curve:
+    calls:
+      - description: "Withdraw shares from Convex FX vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+      - description: "Remove liquidity from Curve pool, balanced"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[])"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_usdc}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_fxusd}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of shares (Curve LP tokens) to withdraw from the Convex FX vault"
+      min_amount_usdc:
+        type: "uint256"
+        description: "Minimum amount of USDC to receive from the Curve pool withdrawal"
+      min_amount_fxusd:
+        type: "uint256"
+        description: "Minimum amount of fxUSD to receive from the Curve pool withdrawal"

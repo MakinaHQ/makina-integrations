@@ -23,6 +23,12 @@ config:
   aave_umbrella_batch_helper:
     type: "address"
     value: "0xCe6Ced23118EDEb23054E06118a702797b13fc2F"
+  kv_store_address:
+    type: "address"
+    value: "0x780064A9A020bA4dc1339Cbc81fa5198d426484c"
+  revertable_caliber_helper:
+    type: "address"
+    value: "0xC6B5888830eB10D19267680b339FeBcD75569B62"
 
 positions:
   - id: "194070608470725801208780068439756007916"
@@ -181,3 +187,11 @@ positions:
     group_id: "0"
     description: "Convex msUSD/FRAXBP position"
     instructions: !include "./instructions/convex-curve-msusd-fraxbp.yaml"
+  - id: "192943760885949192717828730582901913452"
+    group_id: "0"
+    description: "Stability Pool - USDC - Earns wstETH"
+    instructions: !include "./instructions/convex-fx-fxsp.yaml"
+  - id: "147403525593287433774057570606136062652"
+    group_id: "0"
+    description: "Curve Pool - USDC/fxUSD"
+    instructions: !include "./instructions/convex-fx-curve-usdc-fxusd.yaml"
