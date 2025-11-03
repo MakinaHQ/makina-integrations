@@ -5,10 +5,32 @@ address = "0x0447d0ad7fd6a3409b48ecbb9ddb075c1e11d735"
 [calibers.mainnet]
 address = "0xd1a2d9df5db842da2ee81075fa441602b2352915"
 swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
-rootfiles = "github:MakinaHQ/config/machines/deth/mainnet/rootfiles"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/deth/mainnet/rootfiles"
 
 [calibers.mainnet.accounting_token]
 address = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[calibers.base]
+address = "0xd1a2d9df5db842da2ee81075fa441602b2352915"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/deth/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x4200000000000000000000000000000000000006"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
+[calibers.arbitrum]
+address = "0xd1a2d9df5db842da2ee81075fa441602b2352915"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/deth/arbitrum/rootfiles"
+
+[calibers.arbitrum.accounting_token]
+address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
 decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
