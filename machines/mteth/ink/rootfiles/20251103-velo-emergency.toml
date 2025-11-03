@@ -475,6 +475,7 @@ type = "Int"
 [instructions.velodrome.unstake_and_withdraw_cl."USD₮0/USDC.e"]
 position_id = "191830371864168154903064690391135115026"
 description = "USD₮0/USDC.e Velodrome CL"
+tags = ["223834"]
 is_debt = false
 group_id = "0"
 instruction_type = 0
