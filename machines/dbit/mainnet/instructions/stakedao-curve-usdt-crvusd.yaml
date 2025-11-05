@@ -94,9 +94,9 @@
     label: "USDT/crvUSD"
     path: "../../../blueprints/stakedao-curve/harvest.yaml:harvest"
     inputs:
-      stakedao_vault_address:
+      stakedao_accountant_address:
         type: "address"
-        value: "0xF980f195A93577DcCe48e91e98124D3B71C4a066"
-      caliber_address:
+        value: "0x93b4B9bd266fFA8AF68e39EDFa8cFe2A62011Ce0"
+      curve_gauge_address:
         type: "address"
-        value: "${config.caliber_address}"
+        value: "0x4e6bB6B7447B7B2Aa268C16AB87F4Bb48BF57939"
