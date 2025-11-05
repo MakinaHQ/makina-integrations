@@ -1,0 +1,130 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "Curve Pool - USDC/fxUSD"
+    path: "../../../blueprints/convex-fx/deposit.yaml:create_vault"
+    inputs:
+      convex_pid:
+        type: "uint256"
+        value: "32"
+      vault_storage_key:
+        type: "bytes32"
+        value: "0x968a5a59fb04b8c0dff68bf59d710c4db850b0e7b4063ae3dfb3b183aaef78f6" # makina.mainnet.convex-fx.32
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      convex_fx_booster_address:
+        type: "address"
+        value: "0xAffe966B27ba3E4Ebb8A0eC124C7b7019CC762f8"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+    - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+  instruction:
+    label: "Curve Pool - USDC/fxUSD"
+    path: "../../../blueprints/convex-fx/account.yaml:account_curve_pool"
+    inputs:
+      vault_storage_key:
+        type: "bytes32"
+        value: "0x968a5a59fb04b8c0dff68bf59d710c4db850b0e7b4063ae3dfb3b183aaef78f6" # makina.mainnet.convex-fx.32
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      fx_gauge_address:
+        type: "address"
+        value: "0xf1E141C804BA39b4a031fDF46e8c08dBa7a0df60"
+      curve_pool_address:
+        type: "address"
+        value: "0x5018BE882DccE5E3F2f3B0913AE2096B9b3fB61f"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+## Will get activated after vault is created
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+#     - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+#   instruction:
+#     label: "Curve Pool - USDC/fxUSD"
+#     path: "../../../blueprints/convex-fx/deposit.yaml:deposit_curve_pool"
+#     inputs:
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#       usdc_address:
+#         type: "address"
+#         value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+#       fxusd_address:
+#         type: "address"
+#         value: "0x085780639CC2cACd35E474e71f4d000e2405d8f6"
+#       curve_pool_address:
+#         type: "address"
+#         value: "0x5018BE882DccE5E3F2f3B0913AE2096B9b3fB61f"
+#       revertable_caliber_helper:
+#         type: "address"
+#         value: "${config.revertable_caliber_helper}"
+#       kv_store_address:
+#         type: "address"
+#         value: "${config.key_value_store_address}"
+#       vault_storage_key:
+#         type: "bytes32"
+#         value: "0x968a5a59fb04b8c0dff68bf59d710c4db850b0e7b4063ae3dfb3b183aaef78f6" # makina.mainnet.convex-fx.32
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens: []
+#   instruction:
+#     label: "Curve Pool - USDC/fxUSD"
+#     path: "../../../blueprints/convex-fx/withdraw.yaml:request_redemption"
+#     inputs:
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+#     - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+#   instruction:
+#     label: "Curve Pool - USDC/fxUSD"
+#     path: "../../../blueprints/convex-fx/withdraw.yaml:redeem"
+#     inputs:
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+#       caliber_address:
+#         type: "address"
+#         value: "${config.caliber_address}"
+#       revertable_caliber_helper:
+#         type: "address"
+#         value: "${config.revertable_caliber_helper}"
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#
+# - is_debt: false
+#   instruction_type: "HARVEST"
+#   affected_tokens: []
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/harvest.yaml:harvest"
+#     inputs:
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"

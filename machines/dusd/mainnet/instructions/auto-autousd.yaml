@@ -1,0 +1,70 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/auto/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35" # Tokemak vault
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b" # Rewarder
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/auto/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/auto/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xa7569a44f348d3d70d8ad5889e50f78e33d80d35"
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "autoUSD"
+    path: "../../../blueprints/auto/harvest.yaml:harvest"
+    inputs:
+      rewarder_address:
+        type: "address"
+        value: "0x726104cfbd7ece2d1f5b3654a19109a9e2b6c27b"

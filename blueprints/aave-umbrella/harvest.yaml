@@ -1,0 +1,21 @@
+protocol: Aave Umbrella
+
+inputs:
+  rewards_controller_address:
+    type: address
+  stake_token_address:
+    type: address
+  caliber_address:
+    type: address
+
+actions:
+  harvest:
+    calls:
+      - description: "Claims all existing `rewards` for a certain `asset` on behalf of `msg.sender`. Makes an update and calculates new `index` and `accrued` `rewards` before claim."
+        target: "${inputs.rewards_controller_address}"
+        selector: "claimAllRewards(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stake_token_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"

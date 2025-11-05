@@ -1,0 +1,171 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "MIM/DAI/USDC/USDT"
+    path: "../../../blueprints/convex-curve-metapool/deposit-vyper-0-2-8.yaml:deposit_balanced_tripool"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+      asset_b_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      asset_c_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      base_pool_address:
+        type: "address"
+        value: "0xbeBc44782C7dB0a1A60Cb6fe97d0b483032FF1C7" # 3pool
+      base_pool_lp_token_address:
+        type: "address"
+        value: "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490" # 3CRV
+      metapool_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV metapool
+      metapool_lp_token_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV LP
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" # Convex Booster
+      pool_id:
+        type: "uint256"
+        value: "40"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "MIM/DAI/USDC/USDT"
+    path: "../../../blueprints/convex-curve-metapool/account-vyper-0-2-8.yaml:account_balanced_tripool"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xFd5AbF66b003881b88567EB9Ed9c651F14Dc4771" # Convex BaseRewardPool for Pool 40
+      metapool_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV metapool
+      base_pool_address:
+        type: "address"
+        value: "0xbeBc44782C7dB0a1A60Cb6fe97d0b483032FF1C7" # 3pool (DAI/USDC/USDT)
+      base_pool_lp_token_address:
+        type: "address"
+        value: "0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490" # 3CRV LP token
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "MIM/DAI/USDC/USDT"
+    path: "../../../blueprints/convex-curve-metapool/withdraw-vyper-0-2-8.yaml:withdraw_tripool"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+      asset_b_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      asset_c_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      base_pool_address:
+        type: "address"
+        value: "0xbeBc44782C7dB0a1A60Cb6fe97d0b483032FF1C7" # 3pool
+      metapool_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV metapool
+      metapool_lp_token_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV LP
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xFd5AbF66b003881b88567EB9Ed9c651F14Dc4771" # Convex BaseRewardPool for Pool 40
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "MIM/DAI/USDC/USDT"
+    path: "../../../blueprints/convex-curve-metapool/withdraw-vyper-0-2-8.yaml:withdraw_tripool_relative"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0x6B175474E89094C44Da98b954EedeAC495271d0F" # DAI
+      asset_b_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      asset_c_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      base_pool_address:
+        type: "address"
+        value: "0xbeBc44782C7dB0a1A60Cb6fe97d0b483032FF1C7" # 3pool
+      metapool_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV metapool
+      metapool_lp_token_address:
+        type: "address"
+        value: "0x5a6A4D54456819380173272A5E8E9B9904BdF41B" # MIM-3CRV LP
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xFd5AbF66b003881b88567EB9Ed9c651F14Dc4771" # Convex BaseRewardPool for Pool 40
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "MIM/DAI/USDC/USDT"
+    path: "../../../blueprints/convex-curve-metapool/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xFd5AbF66b003881b88567EB9Ed9c651F14Dc4771" # Convex BaseRewardPool for Pool 40
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

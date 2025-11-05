@@ -1,0 +1,167 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "Stability Pool - Earns wstETH"
+    path: "../../../blueprints/convex-fx/deposit.yaml:create_vault"
+    inputs:
+      convex_pid:
+        type: "uint256"
+        value: "36"
+      vault_storage_key:
+        type: "bytes32"
+        value: "0xbcc3a3a37d35824b8082f2244e1b1da3fc8f755d676cc9550c581c2494676aa8" # makina.mainnet.convex-fx.36
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      convex_fx_booster_address:
+        type: "address"
+        value: "0xAffe966B27ba3E4Ebb8A0eC124C7b7019CC762f8"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "Stability Pool - Earns wstETH"
+    path: "../../../blueprints/convex-fx/account.yaml:account_stability_pool"
+    inputs:
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      vault_storage_key:
+        type: "bytes32"
+        value: "0xbcc3a3a37d35824b8082f2244e1b1da3fc8f755d676cc9550c581c2494676aa8" # makina.mainnet.convex-fx.36
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      fx_gauge_address:
+        type: "address"
+        value: "0xEd92dDe3214c24Ae04F5f96927E3bE8f8DbC3289"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+## Will get activated after vault is created
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+#     - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/deposit.yaml:deposit_stability_pool"
+#     inputs:
+#       vault_storage_key:
+#         type: "bytes32"
+#         value: "0xbcc3a3a37d35824b8082f2244e1b1da3fc8f755d676cc9550c581c2494676aa8"
+#       revertable_caliber_helper:
+#         type: "address"
+#         value: "${config.revertable_caliber_helper}"
+#       kv_store_address:
+#         type: "address"
+#         value: "${config.key_value_store_address}"
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#       fx_diamond_address:
+#         type: "address"
+#         value: "0x33636D49FbefBE798e15e7F356E8DBef543CC708"
+#       usdc_address:
+#         type: "address"
+#         value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+#       fxusd_address:
+#         type: "address"
+#         value: "0x085780639CC2cACd35E474e71f4d000e2405d8f6"
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+#       caliber_address:
+#         type: "address"
+#         value: "${config.caliber_address}"
+#       converter_address:
+#         type: "address"
+#         value: "0x12AF4529129303D7FbD2563E242C4a2890525912"
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens: []
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/withdraw.yaml:request_redemption"
+#     inputs:
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+#     - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/withdraw.yaml:redeem"
+#     inputs:
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+#       caliber_address:
+#         type: "address"
+#         value: "${config.caliber_address}"
+#       revertable_caliber_helper:
+#         type: "address"
+#         value: "${config.revertable_caliber_helper}"
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+#     - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/withdraw.yaml:emergency_redeem"
+#     inputs:
+#       fx_base_address:
+#         type: "address"
+#         value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+#       caliber_address:
+#         type: "address"
+#         value: "${config.caliber_address}"
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"
+#       fx_gauge_address:
+#         type: "address"
+#         value: "0xEd92dDe3214c24Ae04F5f96927E3bE8f8DbC3289"
+
+# - is_debt: false
+#   instruction_type: "HARVEST"
+#   affected_tokens: []
+#   instruction:
+#     label: "Stability Pool - Earns wstETH"
+#     path: "../../../blueprints/convex-fx/harvest.yaml:harvest"
+#     inputs:
+#       convex_vault_address:
+#         type: "address"
+#         value: "TODO"

@@ -9,13 +9,13 @@ inputs:
     type: "address"
   fx_sp_address:
     type: "address"
-  revertable_caliber_helper:
-    type: "address"
   caliber_address:
     type: "address"
   unsigned_math_helper:
     type: "address"
   curve_pool_address:
+    type: "address"
+  caliber_helper_address:
     type: "address"
 
 actions:
@@ -74,7 +74,7 @@ actions:
           type: "(uint256,uint256)"
 
       - description: "Extract first field (fxUSD balance)"
-        target: "${inputs.revertable_caliber_helper}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint256,uint256)"
@@ -86,7 +86,7 @@ actions:
           type: "uint256"
 
       - description: "Extract second field (USDC balance)"
-        target: "${inputs.revertable_caliber_helper}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(uint256,uint256)"
