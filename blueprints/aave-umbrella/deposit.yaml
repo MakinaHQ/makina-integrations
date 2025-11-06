@@ -1,0 +1,39 @@
+protocol: Aave Umbrella
+
+inputs:
+  asset_address:
+    type: address
+  stake_token_address:
+    type: address
+  umbrella_batch_helper_address:
+    type: address
+
+actions:
+  stake:
+    calls:
+      - description: "Approve the Umbrella batch helper to spend the underlying asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.umbrella_batch_helper_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+      - description: "Deposit through the Umbrella batch helper."
+        target: "${inputs.umbrella_batch_helper_address}"
+        selector: "deposit((address,address,uint256))"
+        parameters:
+          - type: "(address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.stake_token_address}"
+              - type: "address"
+                value: "${inputs.asset_address}"
+              - type: "uint256"
+                value: "${input_slots.amount_to_stake}"
+
+    input_slots:
+      amount_to_stake:
+        type: uint256
+        description: "The amount of the underlying asset to deposit into Aave Umbrella module."

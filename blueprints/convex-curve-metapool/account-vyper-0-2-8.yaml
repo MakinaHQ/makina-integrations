@@ -1,0 +1,156 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  metapool_address:
+    type: "address"
+  base_pool_address:
+    type: "address"
+  base_pool_lp_token_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  caliber_helper:
+    type: "address"
+
+actions:
+  account_balanced_tripool:
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Make sure the LP balance is non-zero. In case it is use 1wei. This is a safe approx."
+        target: "${inputs.unsigned_math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}"
+          - type: "uint256"
+            value: "${builtins.UINT256_1}"
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
+      - description: "Attempt to return calc_withdraw_one_coin from metapool (Vyper 0.2.8 workaround)"
+        target: "${inputs.metapool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}"
+          - type: "int128"
+            value: "1"
+        return:
+          type: "(uint256,bytes32)"
+          name: "padded_base_pool_lp_amount"
+
+      - description: "Extract base pool LP amount from padded return"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,bytes32)"
+            value: "${returns.padded_base_pool_lp_amount}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "base_pool_lp_amount"
+
+      - description: "Get total LP supply from base pool"
+        target: "${inputs.base_pool_lp_token_address}"
+        selector: "totalSupply()"
+        parameters: []
+        return:
+          name: "total_lp_supply"
+          type: "uint256"
+
+      - description: "Get pool balance of token A (DAI)"
+        target: "${inputs.base_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "pool_balance_token_a"
+          type: "uint256"
+
+      - description: "Get pool balance of token B (USDC)"
+        target: "${inputs.base_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "pool_balance_token_b"
+          type: "uint256"
+
+      - description: "Get pool balance of token C (USDT)"
+        target: "${inputs.base_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "pool_balance_token_c"
+          type: "uint256"
+
+      - description: "Calculate pro-rata share of token A"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_balance_token_a}"
+          - type: "uint256"
+            value: "${returns.base_pool_lp_amount}"
+          - type: "uint256"
+            value: "${returns.total_lp_supply}"
+        return:
+          name: "amount_token_a_out"
+          type: "uint256"
+
+      - description: "Calculate pro-rata share of token B"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_balance_token_b}"
+          - type: "uint256"
+            value: "${returns.base_pool_lp_amount}"
+          - type: "uint256"
+            value: "${returns.total_lp_supply}"
+        return:
+          name: "amount_token_b_out"
+          type: "uint256"
+
+      - description: "Calculate pro-rata share of token C"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pool_balance_token_c}"
+          - type: "uint256"
+            value: "${returns.base_pool_lp_amount}"
+          - type: "uint256"
+            value: "${returns.total_lp_supply}"
+        return:
+          name: "amount_token_c_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_a_out}"
+      - type: "uint256"
+        value: "${returns.amount_token_b_out}"
+      - type: "uint256"
+        value: "${returns.amount_token_c_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

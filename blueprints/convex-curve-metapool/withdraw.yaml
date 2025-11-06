@@ -1,0 +1,132 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  base_pool_address:
+    type: "address"
+  metapool_address:
+    type: "address"
+  convex_reward_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw_single_sided_token_c:
+    calls:
+      - description: "Withdraw staked LP tokens from Convex reward contract"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "withdrawAndUnwrap(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_metapool_lp}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity from metapool single-sided to get base pool LP tokens"
+        target: "${inputs.metapool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_metapool_lp}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_pool_lp_amount}"
+        return:
+          name: "base_pool_lp_received"
+          type: "uint256"
+
+      - description: "Remove liquidity from base pool single-sided to get base asset"
+        target: "${inputs.base_pool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.base_pool_lp_received}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_asset_amount}"
+
+    input_slots:
+      amount_metapool_lp:
+        type: "uint256"
+        description: "The amount of metapool LP tokens to withdraw from Convex"
+      min_base_pool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of base pool LP tokens to receive from metapool"
+      min_base_asset_amount:
+        type: "uint256"
+        description: "The minimum amount of base asset to receive from base pool"
+
+  withdraw_single_sided_token_c_relative:
+    calls:
+      - description: "Get user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "user_staked_balance"
+          type: "uint256"
+
+      - description: "Calculate amount to withdraw based on basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.user_staked_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw staked LP tokens from Convex reward contract"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "withdrawAndUnwrap(uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+          - type: "bool"
+            value: "true"
+
+      - description: "Remove liquidity from metapool single-sided to get base pool LP tokens"
+        target: "${inputs.metapool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_pool_lp_amount}"
+        return:
+          name: "base_pool_lp_received"
+          type: "uint256"
+
+      - description: "Remove liquidity from base pool single-sided to get base asset"
+        target: "${inputs.base_pool_address}"
+        selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.base_pool_lp_received}"
+          - type: "int128"
+            value: "1"
+          - type: "uint256"
+            value: "${input_slots.min_base_asset_amount}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "Percentage to withdraw in basis points (10000 = 100%, 5000 = 50%)"
+      min_base_pool_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of base pool LP tokens to receive from metapool"
+      min_base_asset_amount:
+        type: "uint256"
+        description: "The minimum amount of base asset to receive from base pool"

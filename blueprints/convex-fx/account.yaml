@@ -1,0 +1,192 @@
+protocol: "convex-fx"
+
+inputs:
+  vault_storage_key:
+    type: "bytes32"
+  kv_store_address:
+    type: "address"
+  fx_gauge_address:
+    type: "address"
+  fx_sp_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+
+actions:
+  account_stability_pool:
+    calls:
+      - description: "Get vault address from KV store (if 0, then the whole accounting will return 0, as expected)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+        return:
+          type: "address"
+          name: "vault_address"
+
+      - description: "Get the amount of fxSP in the Convex FX gauge for that vault"
+        target: "${inputs.fx_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.vault_address}"
+        return:
+          type: "uint256"
+          name: "fx_sp_in_gauge"
+
+      - description: "In case we triggered a redemption request, we have the fxBASE tokens on hand, so we need to include them too"
+        target: "${inputs.fx_sp_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "fx_sp_in_caliber"
+
+      - description: "Calculate total fxSP balance (in gauge + in caliber)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_in_gauge}"
+          - type: "uint256"
+            value: "${returns.fx_sp_in_caliber}"
+        return:
+          type: "uint256"
+          name: "fx_sp_total_balance"
+
+      - description: "Preview redeem from fxSP contract, for (fxUSD, USDC)"
+        target: "${inputs.fx_sp_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_total_balance}"
+        return:
+          name: "tokens_balances"
+          type: "(uint256,uint256)"
+
+      - description: "Extract first field (fxUSD balance)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.tokens_balances}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "fxusd_amount"
+          type: "uint256"
+
+      - description: "Extract second field (USDC balance)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.tokens_balances}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.fxusd_amount}"
+      - type: "uint256"
+        value: "${returns.usdc_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account_curve_pool:
+    calls:
+      - description: "Get vault address from KV store (if 0, then the whole accounting will return 0, as expected)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+        return:
+          type: "address"
+          name: "vault_address"
+
+      - description: "Get the vault's balance in the FX gauge."
+        target: "${inputs.fx_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.vault_address}"
+        return:
+          type: "uint256"
+          name: "lp_token_balance"
+
+      - description: "Get the total supply of Curve LP tokens"
+        target: "${inputs.curve_pool_address}"
+        selector: "totalSupply()"
+        parameters: []
+        return:
+          type: "uint256"
+          name: "lp_token_total_supply"
+
+      - description: "Get the reserves of USDC in the Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0" # USDC index
+        return:
+          type: "uint256"
+          name: "usdc_reserve"
+
+      - description: "Get the reserves of fxUSD in the Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "balances(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "1" # fxUSD index
+        return:
+          type: "uint256"
+          name: "fxusd_reserve"
+
+      - description: "Calculate vault's share of USDC in the Curve pool"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_token_balance}"
+          - type: "uint256"
+            value: "${returns.usdc_reserve}"
+          - type: "uint256"
+            value: "${returns.lp_token_total_supply}"
+        return:
+          type: "uint256"
+          name: "usdc_amount"
+
+      - description: "Calculate vault's share of fxUSD in the Curve pool"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_token_balance}"
+          - type: "uint256"
+            value: "${returns.fxusd_reserve}"
+          - type: "uint256"
+            value: "${returns.lp_token_total_supply}"
+        return:
+          type: "uint256"
+          name: "fxusd_amount"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usdc_amount}"
+      - type: "uint256"
+        value: "${returns.fxusd_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

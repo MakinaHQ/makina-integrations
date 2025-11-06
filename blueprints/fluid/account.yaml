@@ -1,0 +1,66 @@
+protocol: "fluid"
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account_staked:
+    calls:
+      - description: "Get the user's staked balance in Fluid staking contract"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "staked_shares_balance"
+          type: "uint256"
+
+      - description: "Convert staked shares to underlying vault assets"
+        target: "${inputs.vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.staked_shares_balance}"
+        return:
+          name: "underlying_assets_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.underlying_assets_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  account:
+    calls:
+      - description: "Get the user's vault share balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      - description: "Convert vault shares to underlying assets"
+        target: "${inputs.vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+        return:
+          name: "underlying_assets_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.underlying_assets_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

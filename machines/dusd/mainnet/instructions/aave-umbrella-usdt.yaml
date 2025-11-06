@@ -1,0 +1,85 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "USDT"
+    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "USDT"
+    path: "../../../blueprints/aave-umbrella/account.yaml:account"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+      wrapped_a_token_address:
+        type: "address"
+        value: "0x7Bc3485026Ac48b6cf9BaF0A377477Fff5703Af8" # waUSDT
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "USDT"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:start_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "USDT"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+      asset_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDT"
+    path: "../../../blueprints/aave-umbrella/harvest.yaml:harvest"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      rewards_controller_address:
+        type: "address"
+        value: "0x4655Ce3D625a63d30bA704087E52B4C31E38188B" # Aave Umbrella Rewards Controller

@@ -1,0 +1,80 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  metapool_address:
+    type: "address"
+  base_pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  account_single_sided_token_c: # (1,1)
+    calls:
+      - description: "Get the user's staked balance in Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_lp_balance"
+          type: "uint256"
+
+      - description: "Make sure the LP balance is non-zero"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_lp_balance}"
+          - type: "uint256"
+            value: "${builtins.UINT256_1}"
+        return:
+          name: "non_zero_lp_balance"
+          type: "uint256"
+
+      - description: "Calculate withdrawal from metapool to base pool LP tokens (index 1)"
+        target: "${inputs.metapool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_lp_balance}"
+          - type: "int128"
+            value: "1"
+        return:
+          name: "base_pool_lp_amount"
+          type: "uint256"
+
+      - description: "Make sure the base pool LP amount is non-zero"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.base_pool_lp_amount}"
+          - type: "uint256"
+            value: "${builtins.UINT256_1}"
+        return:
+          name: "non_zero_base_pool_lp"
+          type: "uint256"
+
+      - description: "Calc withdraw one coin from curve pool"
+        target: "${inputs.base_pool_address}"
+        selector: "calc_withdraw_one_coin(uint256,int128)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.non_zero_base_pool_lp}"
+          - type: "int128"
+            value: "1"
+        return:
+          name: "amount_token_c_out"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.amount_token_c_out}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
