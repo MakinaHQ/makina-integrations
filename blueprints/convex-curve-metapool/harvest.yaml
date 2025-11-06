@@ -1,0 +1,15 @@
+protocol: "convex-curve-metapool"
+
+inputs:
+  convex_reward_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim CRV and CVX rewards from Convex"
+        target: "${inputs.convex_reward_contract_address}"
+        selector: "getReward()"
+        parameters: []

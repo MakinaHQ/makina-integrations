@@ -1,0 +1,56 @@
+protocol: Aave Umbrella
+
+inputs:
+  stake_token_address:
+    type: address
+  wrapped_a_token_address:
+    type: address
+  caliber_address:
+    type: address
+
+actions:
+  account:
+    calls:
+      - description: "Get balance of caliber in stake token"
+        target: "${inputs.stake_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_balance"
+          type: "uint256"
+
+      - description: "Convert to aTokens (1:1 with actual token) on wrapped token contract"
+        target: "${inputs.wrapped_a_token_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_balance}"
+        return:
+          name: "staked_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.staked_amount}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}
+
+  account-gho:
+    calls:
+      - description: "Get balance of caliber in stake token. For GHO, stkGHO exchanges 1:1 with GHO. Yield needs to get claimed"
+        target: "${inputs.stake_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.caliber_balance}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}

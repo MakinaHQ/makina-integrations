@@ -1,0 +1,13 @@
+protocol: "convex-fx"
+
+inputs:
+  convex_vault_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim rewards from Convex f(x) Vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "getReward()"
+        parameters: []

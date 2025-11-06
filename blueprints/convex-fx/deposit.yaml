@@ -1,0 +1,314 @@
+protocol: "convex-fx"
+
+constants:
+  zero_address:
+    type: "address"
+    value: "0x0000000000000000000000000000000000000000"
+
+inputs:
+  convex_pid:
+    type: "uint256"
+  vault_storage_key:
+    type: "bytes32"
+  caliber_helper:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  convex_fx_booster_address:
+    type: "address"
+  convex_vault_address:
+    type: "address"
+  fx_diamond_address:
+    type: "address"
+  usdc_address:
+    type: "address"
+  fxusd_address:
+    type: "address"
+  fx_base_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  converter_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+
+actions:
+
+  # The first time caliber opens a convex-fx position, need to create the convex vault first, and retrieve the vault address.
+  # specs:
+  #  - The action should revert if a vault is already registered in the KV store for the given storage key.
+  create_vault:
+    calls:
+      - description: "Get vault address from KV store (if any)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+        return:
+          type: "address"
+          name: "vault_address"
+
+      - description: "Check if vault address is bytes32(0)"
+        target: "${inputs.caliber_helper}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.vault_address}"
+          - type: "address"
+            value: "${constants.zero_address}"
+        return:
+          type: "bool"
+          name: "is_no_existing_vault"
+
+      - description: "Revert if vault already exists"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_no_existing_vault}"
+
+      - description: "Create new Convex FX vault"
+        target: "${inputs.convex_fx_booster_address}"
+        selector: "createVault(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.convex_pid}"
+        return:
+          type: "address"
+          name: "new_vault_address"
+
+      - description: "Store new vault address in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+          - type: "address"
+            value: "${returns.new_vault_address}"
+
+  # Deposit in the stability pool through Convex vault.
+  # specs:
+  #  - The caliber should have an existing vault registered in the KV store for the given storage key.
+  #  - The vault address retrieved from the KV store should match the provided convex_vault_address input.
+  deposit_stability_pool:
+    calls:
+      - description: "Get vault address from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+        return:
+          type: "address"
+          name: "vault_address"
+
+      - description: "Check if address is equal to convex_vault_address"
+        target: "${inputs.caliber_helper}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.vault_address}"
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+        return:
+          type: "bool"
+          name: "is_valid_vault"
+
+      - description: "Revert if vault address is not valid"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_valid_vault}"
+
+      - description: "Approve fx_diamond to spend USDC" # will revert approval later
+        target: "${inputs.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_diamond_address}"
+          - type: "uint256"
+            value: "${input_slots.fx_base_data.amountToDeposit}"
+
+      - description: "Approve fx_diamond to spend fxUSD" # will revert approval later
+        target: "${inputs.fxusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_diamond_address}"
+          - type: "uint256"
+            value: "${input_slots.fx_base_data.amountToDeposit}"
+
+      - description: "Deposit token into fxBASE (either USDC or fxUSD)"
+        target: "${inputs.fx_diamond_address}"
+        selector: "depositToFxBase((address,uint256,address,bytes,uint256,bytes),address,uint256,address)"
+        parameters:
+          - type: "(address,uint256,address,bytes,uint256,bytes)"
+            value:
+              - type: "address"
+                value: "${input_slots.fx_base_data.tokenIn}"
+              - type: "uint256"
+                value: "${input_slots.fx_base_data.amountToDeposit}"
+              - type: "address"
+                value: "${inputs.converter_address}"
+              - type: "bytes"
+                value: "${input_slots.fx_base_data.abiEncodeConvert}"
+              - type: "uint256"
+                value: "${input_slots.fx_base_data.amountToDeposit}" # seems unused in contract
+              - type: "bytes"
+                value: "0x"
+          - type: "address"
+            value: "${input_slots.fx_base_data.tokenIn}"
+          - type: "uint256"
+            value: "${input_slots.fx_base_data.minAmountOut}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Get balance of fxBASE tokens in the caliber"
+        target: "${inputs.fx_base_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "fx_base_balance"
+
+      - description: "Approve vault to spend fxBASE tokens"
+        target: "${inputs.fx_base_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+          - type: "uint256"
+            value: "${returns.fx_base_balance}"
+
+      - description: "Deposit fxBASE tokens in the Convex FX vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_base_balance}"
+
+      - description: "Revoke fx_diamond USDC approval"
+        target: "${inputs.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_diamond_address}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Revoke fx_diamond fxUSD approval"
+        target: "${inputs.fxusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_diamond_address}"
+          - type: "uint256"
+            value: "0"
+
+    input_slots:
+      fx_base_data:
+        type: "FxSaveData"
+        description: "data to deposit into fxBASE"
+
+  # Deposit in the curve pool through and stake LP tokens in Convex vault.
+  # specs:
+  #  - The caliber should have an existing vault registered in the KV store for the given storage key.
+  #  - The vault address retrieved from the KV store should match the provided convex_vault_address input.
+  deposit_curve_pool:
+    calls:
+      - description: "Get vault address from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.vault_storage_key}"
+        return:
+          type: "address"
+          name: "vault_address"
+
+      - description: "Check if address is equal to convex_vault_address"
+        target: "${inputs.caliber_helper}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.vault_address}"
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+        return:
+          type: "bool"
+          name: "is_valid_vault"
+
+      - description: "Revert if vault address is not valid"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_valid_vault}"
+
+      - description: "Approve Curve pool to spend USDC"
+        target: "${inputs.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_usdc}"
+
+      - description: "Approve Curve pool to spend fxUSD"
+        target: "${inputs.fxusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_fxusd}"
+
+      - description: "Add liquidity to Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "add_liquidity(uint256[],uint256)"
+        parameters:
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.amount_usdc}"
+              - type: "uint256"
+                value: "${input_slots.amount_fxusd}"
+          - type: "uint256"
+            value: "${input_slots.min_lp_out}"
+        return:
+          type: "uint256"
+          name: "lp_tokens_received"
+
+      - description: "Approve Convex vault to spend Curve LP tokens"
+        target: "${inputs.curve_pool_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+      - description: "Deposit Curve LP tokens into Convex vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "deposit(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+    input_slots:
+      amount_usdc:
+        type: "uint256"
+        description: "Amount of USDC to deposit into the Curve pool"
+      amount_fxusd:
+        type: "uint256"
+        description: "Amount of fxUSD to deposit into the Curve pool"
+      min_lp_out:
+        type: "uint256"
+        description: "Minimum amount of LP tokens to receive from Curve pool"
