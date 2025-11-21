@@ -1,0 +1,71 @@
+# take debt
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "wstETH/USDC (0x6d2f...31c2)"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# repay asset
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "wstETH/USDC (0x6d2f...31c2)"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      loan_token:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# account for position debt
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "wstETH/USDC (0x6d2f...31c2)"
+    path: "../../../blueprints/morpho/account.yaml:account_debt"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

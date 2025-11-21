@@ -1,0 +1,64 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "ETH correlated"
+    path: "../../../blueprints/aave/deposit.yaml:set_e_mode"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      e_mode:
+        type: "uint8"
+        value: "1"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee" # weETH
+  instruction:
+    label: "weETH"
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee" # weETH
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee" # weETH
+  instruction:
+    label: "weETH"
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee" # weETH
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee" # weETH
+  instruction:
+    label: "weETH"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0xBdfa7b7893081B35Fb54027489e2Bc7A38275129"
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
