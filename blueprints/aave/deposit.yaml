@@ -7,6 +7,8 @@ inputs:
     type: "address"
   asset_address:
     type: "address"
+  e_mode:
+    type: "uint8"
 
 actions:
   add_collateral:
@@ -35,3 +37,12 @@ actions:
       amount_to_deposit:
         type: "uint256"
         description: "The amount of tokens to add as collateral"
+
+  set_e_mode:
+    calls:
+      - description: "Set the e-mode for the user"
+        target: ${inputs.aave_pool_instance}
+        selector: "setUserEMode(uint8)"
+        parameters:
+          - type: "uint8"
+            value: ${inputs.e_mode}

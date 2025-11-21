@@ -1,0 +1,68 @@
+# add collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+  instruction:
+    label: "wstETH/USDC (0xb323...86cc)"
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc"
+      collateral_token:
+        type: "address"
+        value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# withdraw collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+  instruction:
+    label: "wstETH/USDC (0xb323...86cc)"
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# account for position collateral
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0" # wstETH
+  instruction:
+    label: "wstETH/USDC (0xb323...86cc)"
+    path: "../../../blueprints/morpho/account.yaml:account_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
