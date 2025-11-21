@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "Yearn OG WETH"
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+      vault_address:
+        type: "address"
+        value: "0xE89371eAaAC6D46d4C3ED23453241987916224FC"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "Yearn OG WETH"
+    path: "../../../blueprints/morpho/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xE89371eAaAC6D46d4C3ED23453241987916224FC"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "Yearn OG WETH"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xE89371eAaAC6D46d4C3ED23453241987916224FC"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "Yearn OG WETH"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xE89371eAaAC6D46d4C3ED23453241987916224FC"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

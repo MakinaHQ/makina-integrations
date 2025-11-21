@@ -1,0 +1,102 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/stakedao-curve/deposit-v7.yaml:deposit"
+    inputs:
+      token0_address:
+        type: "address"
+        value: "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
+      token1_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+      curve_pool_address:
+        type: "address"
+        value: "0x2c683fAd51da2cd17793219CC86439C1875c353e"
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7d3dB01a4AC4aa27534d2951e58d59992686EA5C"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/stakedao-curve/account.yaml:account"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7d3dB01a4AC4aa27534d2951e58d59992686EA5C"
+      lp_token_address:
+        type: "address"
+        value: "0x2c683fAd51da2cd17793219CC86439C1875c353e"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/stakedao-curve/withdraw-v7.yaml:withdraw"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7d3dB01a4AC4aa27534d2951e58d59992686EA5C"
+      curve_pool_address:
+        type: "address"
+        value: "0x2c683fAd51da2cd17793219CC86439C1875c353e"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE72B141DF173b999AE7c1aDcbF60Cc9833Ce56a8" # ETH+
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/stakedao-curve/withdraw-v7.yaml:withdraw_relative"
+    inputs:
+      stakedao_vault_address:
+        type: "address"
+        value: "0x7d3dB01a4AC4aa27534d2951e58d59992686EA5C"
+      curve_pool_address:
+        type: "address"
+        value: "0x2c683fAd51da2cd17793219CC86439C1875c353e"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# HARVEST - StakeDAO Rewards
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "ETH+/WETH"
+    path: "../../../blueprints/stakedao-curve/harvest.yaml:harvest"
+    inputs:
+      stakedao_accountant_address:
+        type: "address"
+        value: "0x93b4B9bd266fFA8AF68e39EDFa8cFe2A62011Ce0"
+      curve_gauge_address:
+        type: "address"
+        value: "0xAD6D1a4B1B2F33712A8b18BeDc95c0A1f9832269"
