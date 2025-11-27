@@ -64,12 +64,11 @@ jobs:
             fi
           done
 
-      - name: Checkout makina-rs repository
+      - name: Checkout transpiler repository
         uses: actions/checkout@v5
         with:
-          repository: MakinaHQ/makina-rs
-          ssh-key: ${{ secrets.MAKINA_RS_DEPLOY_KEY }} # linked to "Makina Integrations GitHub Deploy Key" on the makina-rs repo
-          path: makina-rs
+          repository: MakinaHQ/transpiler
+          path: transpiler
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -77,14 +76,14 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: makina-rs
+          workspaces: transpiler
 
       - name: Build transpiler
-        working-directory: makina-rs
-        run: cargo build --release --package transpiler
+        working-directory: transpiler
+        run: cargo build --release
 
       - name: Run transpiler
-        working-directory: makina-rs
+        working-directory: transpiler
         env:
           ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
         run: |
@@ -92,7 +91,7 @@ jobs:
             caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
             new_file="../$(dirname "$file")/generated.toml"
             echo "Running transpiler for $caliber - to verify $file rootfile)"
-            cargo run -r -p transpiler -- -i "$caliber" -o "$new_file"
+            cargo run -r -- -i "$caliber" -o "$new_file"
             diff "../$file" "$new_file" || exit 1
             rm "$new_file"
           done
