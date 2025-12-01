@@ -1,0 +1,68 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "SuperUSDC"
+    path: "../../../blueprints/superform/deposit.yaml:deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xF7DE3c70F2db39a188A81052d2f3C8e3e217822a"
+      asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "SuperUSDC"
+    path: "../../../blueprints/superform/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xF7DE3c70F2db39a188A81052d2f3C8e3e217822a"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "SuperUSDC"
+    path: "../../../blueprints/superform/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xF7DE3c70F2db39a188A81052d2f3C8e3e217822a"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  instruction:
+    label: "SuperUSDC"
+    path: "../../../blueprints/superform/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xF7DE3c70F2db39a188A81052d2f3C8e3e217822a"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
