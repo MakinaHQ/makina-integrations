@@ -1,0 +1,83 @@
+protocol: "convex-curve"
+
+inputs:
+  asset_a_address:
+    type: "address"
+  asset_b_address:
+    type: "address"
+  curve_pool_address:
+    type: "address"
+  convex_booster_address:
+    type: "address"
+  pool_id:
+    type: "uint256"
+  curve_lp_token_address:
+    type: "address"
+
+actions:
+  deposit_balanced:
+    calls:
+      - description: "Approve token A to be spent by Curve pool"
+        target: "${inputs.asset_a_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_asset_a}"
+
+      - description: "Approve token B to be spent by Curve pool"
+        target: "${inputs.asset_b_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.curve_pool_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_asset_b}"
+
+      - description: "Add liquidity to Curve pool"
+        target: "${inputs.curve_pool_address}"
+        selector: "add_liquidity(uint256[2],uint256)"
+        parameters:
+          - type: "uint256[2]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.amount_asset_a}"
+              - type: "uint256"
+                value: "${input_slots.amount_asset_b}"
+          - type: "uint256"
+            value: "${input_slots.min_lp_amount}"
+        return:
+          name: "lp_tokens_received"
+          type: "uint256"
+
+      - description: "Approve LP tokens to the Convex Booster"
+        target: "${inputs.curve_lp_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_booster_address}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+
+      - description: "Deposit LP tokens through Convex Booster"
+        target: "${inputs.convex_booster_address}"
+        selector: "deposit(uint256,uint256,bool)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.pool_id}"
+          - type: "uint256"
+            value: "${returns.lp_tokens_received}"
+          - type: "bool"
+            value: "true"
+
+    input_slots:
+      amount_asset_a:
+        type: "uint256"
+        description: "The amount of asset A to deposit in the Curve pool"
+      amount_asset_b:
+        type: "uint256"
+        description: "The amount of asset B to deposit in the Curve pool"
+      min_lp_amount:
+        type: "uint256"
+        description: "The minimum amount of LP tokens to receive from Curve"

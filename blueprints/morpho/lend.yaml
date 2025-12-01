@@ -1,0 +1,369 @@
+protocol: "morpho"
+
+inputs:
+  morpho:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  loan_token:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  lend_to_market:
+    calls:
+      - description: "Approve loan token to Morpho"
+        target: "${inputs.loan_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_lend}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token_extracted"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Supply loan tokens to Morpho market"
+        target: "${inputs.morpho}"
+        selector: "supply((address,address,address,address,uint256),uint256,uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token_extracted}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_lend}"
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+    input_slots:
+      amount_to_lend:
+        type: "uint256"
+        description: "Amount of loan token to lend"
+
+  withdraw_from_market:
+    calls:
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token_extracted"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Withdraw loan tokens from Morpho market"
+        target: "${inputs.morpho}"
+        selector: "withdraw((address,address,address,address,uint256),uint256,uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token_extracted}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "Amount of loan token to withdraw"
+
+  redeem_from_market_relative:
+    calls:
+      - description: "Get the caliber's position in the market"
+        target: "${inputs.morpho}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract our balance of lent shares"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "lend_shares"
+          type: "uint256"
+
+      - description: "Calculate amount to withdraw based on bps"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lend_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token_extracted"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Withdraw loan tokens from Morpho market"
+        target: "${inputs.morpho}"
+        selector: "withdraw((address,address,address,address,uint256),uint256,uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token_extracted}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "0"
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of the lent amount to withdraw (10000 = 100%)"

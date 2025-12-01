@@ -1,0 +1,79 @@
+protocol: "pendle-pt"
+
+inputs:
+  pt_token_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  pendle_pylp_oracle_address:
+    type: "address"
+  twap_duration:
+    type: "uint32"
+  pendle_market_address:
+    type: "address"
+  decimals_adjustment:
+    type: "uint256"
+  vault_token_address:
+    type: "address"
+
+actions:
+  account-pt-4626:
+    # eg: PT-siUSD -> siUSD -> iUSD (which is base token)
+    # 1. Get PT balance
+    # 2. Get PT -> SY price from Pendle Oracle
+    # 3. Calculate SY equivalent of PT balance
+    # 4. SY is 4626, so convertToAssets to get asset balance
+    calls:
+      - description: "Get PT token balance"
+        target: ${inputs.pt_token_address}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pt_token_balance"
+          type: "uint256"
+
+      - description: "Get SY per PT from Pendle Oracle"
+        target: "${inputs.pendle_pylp_oracle_address}"
+        selector: "getPtToSyRate(address,uint32)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pendle_market_address}"
+          - type: "uint32"
+            value: "${inputs.twap_duration}"
+        return:
+          name: "sy_per_pt"
+          type: "uint256"
+
+      - description: "Calculate SY equivalent of PT balance"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pt_token_balance}"
+          - type: "uint256"
+            value: "${returns.sy_per_pt}"
+          - type: "uint256"
+            value: "${inputs.decimals_adjustment}"
+        return:
+          name: "sy_equivalent_balance"
+          type: "uint256"
+
+      - description: "Convert SY equivalent balance to asset balance using 4626 vault. There is a 1:1 mapping between SY and IBT, but need to be aware of decimal offset!"
+        target: "${inputs.vault_token_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.sy_equivalent_balance}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.asset_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

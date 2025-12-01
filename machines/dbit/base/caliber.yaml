@@ -1,3 +1,19 @@
-config: {}
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd1a3c20488899c038b7daae1ede0c6da6c36c326"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  caliber_helper_address:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
 
-positions: []
+positions:
+  - id: "59690312341088102818345637935930600458"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x9103...1836)"
+    instructions: !include "./instructions/morpho-lend-usdc-0x9103-1836.yaml"

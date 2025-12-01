@@ -1,0 +1,104 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/deposit-v6.yaml:deposit_balanced"
+    inputs:
+      asset_a_address:
+        type: "address"
+        value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+      asset_b_address:
+        type: "address"
+        value: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+      curve_pool_address:
+        type: "address"
+        value: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E" # Curve LP pool
+      curve_lp_token_address:
+        type: "address"
+        value: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E" # Curve LP token
+      convex_booster_address:
+        type: "address"
+        value: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31" # Convex Booster
+      pool_id:
+        type: "uint256"
+        value: "182"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/account.yaml:account_balanced"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      curve_pool_address:
+        type: "address"
+        value: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/withdraw-v6.yaml:withdraw_balanced"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      curve_pool_address:
+        type: "address"
+        value: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/withdraw-v6.yaml:withdraw_balanced_relative"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      curve_pool_address:
+        type: "address"
+        value: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E" # Curve LP pool
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

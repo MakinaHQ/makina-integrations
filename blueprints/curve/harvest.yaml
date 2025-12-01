@@ -5,6 +5,8 @@ inputs:
     type: "address"
   child_liquidity_gauge_factory_address:
     type: "address"
+  token_minter_address:
+    type: "address"
 
 actions:
   harvest:
@@ -13,6 +15,15 @@ actions:
         target: "${inputs.gauge_address}"
         selector: "claim_rewards()"
         parameters: []
+
+  harvest_from_minter:
+    calls:
+      - description: "Claim rewards from Token Minter. https://docs.curve.finance/liquidity-gauges-and-minting-crv/minter/Minter/"
+        target: "${inputs.token_minter_address}"
+        selector: "mint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.gauge_address}"
 
   harvest_mint:
     calls:
