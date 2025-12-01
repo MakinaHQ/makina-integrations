@@ -127,6 +127,86 @@ actions:
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"
 
+  account_loan:
+    calls:
+      - description: "Get user position in the market"
+        target: "${inputs.morpho}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract loan shares (index 0)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total supply shares (index 1)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "total_supply_shares"
+          type: "uint256"
+
+      - description: "Extract total supply assets (index 0)"
+        target: "${inputs.executor_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "total_supply_assets"
+          type: "uint256"
+
+      - description: "Calculate loan amount: shares * totalAssets / totalShares"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.loan_shares}"
+          - type: "uint256"
+            value: "${returns.total_supply_assets}"
+          - type: "uint256"
+            value: "${returns.total_supply_shares}"
+        return:
+          name: "loan_amount"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.loan_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
   account_vault:
     calls:
       - description: "Query caliber balance of vault tokens"

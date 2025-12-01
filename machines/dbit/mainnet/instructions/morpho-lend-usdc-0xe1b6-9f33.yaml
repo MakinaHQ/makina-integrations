@@ -1,0 +1,98 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "RLP/USDC (0xe1b6...9f33)"
+    path: "../../../blueprints/morpho/lend.yaml:lend_to_market"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xe1b65304edd8ceaea9b629df4c3c926a37d1216e27900505c04f14b2ed279f33"
+      loan_token:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "RLP/USDC (0xe1b6...9f33)"
+    path: "../../../blueprints/morpho/lend.yaml:withdraw_from_market"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xe1b65304edd8ceaea9b629df4c3c926a37d1216e27900505c04f14b2ed279f33"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "RLP/USDC (0xe1b6...9f33)"
+    path: "../../../blueprints/morpho/lend.yaml:redeem_from_market_relative"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xe1b65304edd8ceaea9b629df4c3c926a37d1216e27900505c04f14b2ed279f33"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "RLP/USDC (0xe1b6...9f33)"
+    path: "../../../blueprints/morpho/account.yaml:account_loan"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: "0xe1b65304edd8ceaea9b629df4c3c926a37d1216e27900505c04f14b2ed279f33"
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

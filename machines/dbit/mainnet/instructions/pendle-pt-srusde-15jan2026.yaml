@@ -1,0 +1,80 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3" # USDe
+  instruction:
+    label: "PT-srUSDe-15JAN2026"
+    path: "../../../blueprints/pendle-pt/deposit.yaml:buy-pt"
+    inputs:
+      input_token_address:
+        type: "address"
+        value: "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3" # USDe
+      pt_token_address:
+        type: "address"
+        value: "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c" # PT-srUSDe-15JAN2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3" # USDe
+  instruction:
+    label: "PT-srUSDe-15JAN2026"
+    path: "../../../blueprints/pendle-pt/account.yaml:account-pt-4626"
+    inputs:
+      pt_token_address:
+        type: "address"
+        value: "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c" # PT-srUSDe-15JAN2026
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      pendle_pylp_oracle_address:
+        type: "address"
+        value: "0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2"
+      twap_duration:
+        type: "uint32"
+        value: "900" # 15 minutes
+      pendle_market_address:
+        type: "address"
+        value: "0xa83174f1dd8475378abca9d676dad3ce97409e0a"
+      decimals_adjustment:
+        type: "uint256"
+        value: "1000000000000000000" # 1e18
+      vault_token_address:
+        type: "address"
+        value: "0x3d7d6fdf07EE548B939A80edbc9B2256d0cdc003" # srUSDe
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497" # sUSDe
+  instruction:
+    label: "PT-srUSDe-15JAN2026"
+    path: "../../../blueprints/pendle-pt/withdraw.yaml:sell-pt"
+    inputs:
+      output_token_address:
+        type: "address"
+        value: "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497" # sUSDe
+      pt_token_address:
+        type: "address"
+        value: "0x1Fb3C5c35D95F48e48FFC8e36bCCe5CB5f29F57c" # PT-srUSDe-15JAN2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"

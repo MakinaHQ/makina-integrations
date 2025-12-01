@@ -1,0 +1,88 @@
+protocol: "pendle-pt"
+
+inputs:
+  input_token_address:
+    type: "address"
+  pt_token_address:
+    type: "address"
+  swap_module:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+
+actions:
+  buy-pt:
+    calls:
+      # Start with input and output token validation
+      - description: "Check that input token is same as input token from swap input slot."
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.input_token_address}"
+          - type: "address"
+            value: "${input_slots.pendle_swap_data.inputToken}"
+        return:
+          name: "is_input_token_valid"
+          type: "bool"
+
+      - description: "Revert if input token is invalid."
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_input_token_valid}"
+
+      - description: "Check that PT token is same as output token from swap input slot."
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pt_token_address}"
+          - type: "address"
+            value: "${input_slots.pendle_swap_data.outputToken}"
+        return:
+          name: "is_pt_token_valid"
+          type: "bool"
+
+      - description: "Revert if PT token is invalid."
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_pt_token_valid}"
+
+      - description: "Approve the swap module to spend the input token."
+        target: ${inputs.input_token_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.pendle_swap_data.inputAmount}"
+
+      - description: "Swap the input token for the PT token."
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.pendle_swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.pendle_swap_data.data}"
+              - type: "address"
+                value: "${inputs.input_token_address}"
+              - type: "address"
+                value: "${inputs.pt_token_address}"
+              - type: "uint256"
+                value: "${input_slots.pendle_swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.pendle_swap_data.minOutputAmount}"
+
+    input_slots:
+      pendle_swap_data:
+        type: "SwapData"
+        description: "Data for swap from input token to PT token."

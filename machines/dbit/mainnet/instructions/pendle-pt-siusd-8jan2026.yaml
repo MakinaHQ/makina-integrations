@@ -1,0 +1,80 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: "PT-siUSD-8JAN2026"
+    path: "../../../blueprints/pendle-pt/deposit.yaml:buy-pt"
+    inputs:
+      input_token_address:
+        type: "address"
+        value: "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+      pt_token_address:
+        type: "address"
+        value: "0x5510B080449d5E3Bf345b6635eD40A35B36b081f" # PT-siUSD-8JAN2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: "PT-siUSD-8JAN2026"
+    path: "../../../blueprints/pendle-pt/account.yaml:account-pt-4626"
+    inputs:
+      pt_token_address:
+        type: "address"
+        value: "0x5510B080449d5E3Bf345b6635eD40A35B36b081f" # PT-siUSD-8JAN2026
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      pendle_pylp_oracle_address:
+        type: "address"
+        value: "0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2"
+      twap_duration:
+        type: "uint32"
+        value: "900" # 15 minutes
+      pendle_market_address:
+        type: "address"
+        value: "0x126b8f10b8a6f3d3dbe5dc991ceb14aba6345e04"
+      decimals_adjustment:
+        type: "uint256"
+        value: "1000000000000000000" # 1e18
+      vault_token_address:
+        type: "address"
+        value: "0xDBDC1Ef57537E34680B898E1FEBD3D68c7389bCB" # siUSD
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: "PT-siUSD-8JAN2026"
+    path: "../../../blueprints/pendle-pt/withdraw.yaml:sell-pt"
+    inputs:
+      output_token_address:
+        type: "address"
+        value: "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+      pt_token_address:
+        type: "address"
+        value: "0x5510B080449d5E3Bf345b6635eD40A35B36b081f" # PT-siUSD-8JAN2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
