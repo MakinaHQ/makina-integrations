@@ -105,5 +105,5 @@ jobs:
           for file in ${ADDED_ROOTFILES}; do
             caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
             echo "Running transpiler for $caliber - to check $file rootfile)"
-            cargo run -r -- -i "$caliber" --github-errors check
+            cargo run -r -- -i "$caliber" check --github-errors
           done
