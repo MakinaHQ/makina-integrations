@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F" # eUSD
+  instruction:
+    label: "Gauntlet eUSD Core"
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F" # eUSD
+      vault_address:
+        type: "address"
+        value: "0xc080f56504e0278828A403269DB945F6c6D6E014"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F" # eUSD
+  instruction:
+    label: "Gauntlet eUSD Core"
+    path: "../../../blueprints/morpho/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xc080f56504e0278828A403269DB945F6c6D6E014"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F" # eUSD
+  instruction:
+    label: "Gauntlet eUSD Core"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xc080f56504e0278828A403269DB945F6c6D6E014"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F" # eUSD
+  instruction:
+    label: "Gauntlet eUSD Core"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xc080f56504e0278828A403269DB945F6c6D6E014"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
