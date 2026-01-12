@@ -95,3 +95,15 @@ jobs:
             diff "../$file" "$new_file" || exit 1
             rm "$new_file"
           done
+
+      - name: Run transpiler checks
+        working-directory: transpiler
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+        run: |
+          export ETHERSCAN_API_KEY=${{ secrets.ETHERSCAN_API_KEY }}
+          for file in ${ADDED_ROOTFILES}; do
+            caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
+            echo "Running transpiler for $caliber - to check $file rootfile)"
+            cargo run -r -- -i "$caliber" check --github-errors
+          done
