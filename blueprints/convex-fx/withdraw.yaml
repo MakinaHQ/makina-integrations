@@ -13,6 +13,8 @@ inputs:
     type: "address"
   curve_pool_address:
     type: "address"
+  unsigned_math_helper:
+    type: "address"
 
 actions:
 
@@ -134,3 +136,61 @@ actions:
       min_amount_fxusd:
         type: "uint256"
         description: "Minimum amount of fxUSD to receive from the Curve pool withdrawal"
+
+  # Withdraw from the curve pool through the Convex FX vault, relative to the vault's balance of LP tokens.
+  withdraw_curve_relative:
+    calls:
+      - description: "Get gauge balance"
+        target: "${inputs.fx_gauge_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.convex_vault_address}"
+        return:
+          name: "gauge_balance"
+          type: "uint256"
+
+      - description: "Calculate amount to withdraw based on basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.gauge_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw shares from Convex FX vault"
+        target: "${inputs.convex_vault_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+
+      - description: "Remove liquidity from Curve pool, balanced"
+        target: "${inputs.curve_pool_address}"
+        selector: "remove_liquidity(uint256,uint256[])"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${input_slots.min_amount_usdc}"
+              - type: "uint256"
+                value: "${input_slots.min_amount_fxusd}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "The percentage of gauge position to withdraw, in basis points (10000 bps = 100%)"
+      min_amount_usdc:
+        type: "uint256"
+        description: "Minimum amount of USDC to receive"
+      min_amount_fxusd:
+        type: "uint256"
+        description: "Minimum amount of fxUSD to receive"
