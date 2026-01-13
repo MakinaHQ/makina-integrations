@@ -1,0 +1,189 @@
+# King Protocol KING Token Rewards Claim Specifications
+# Generated: 2026-01-07
+# Contract Type: CumulativeMerkleDrop (Merkle-based rewards distribution)
+
+pool:
+  id: "0ca14ca5d31ea9be7e5cb14f8097d9be"
+  name: "King Protocol KING Rewards Claim"
+  protocol: "king"
+  version: "1.0"
+  network: "mainnet"
+  category: "rewards"
+
+contracts:
+  claims_contract:
+    address: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+    name: "UUPSProxy"
+    abi_source: "https://etherscan.io/address/0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64#code"
+    proxy_type: "ERC-1967 UUPS"
+    implementation:
+      address: "0x5E226B1De8b0F387d7C77f78CBa2571D2a1be511"
+      name: "CumulativeMerkleDrop"
+      abi_source: "https://etherscan.io/address/0x5E226B1De8b0F387d7C77f78CBa2571D2a1be511#code"
+
+  reward_token:
+    address: "0x8F08B70456eb22f6109F57b8fafE862ED28E6040"
+    symbol: "KING"
+    name: "King Protocol"
+    decimals: 18
+
+  layerzero_endpoint:
+    address: "0x1a44076050125825900e736c501f859c50fE728c"
+    description: "LayerZero V2 Endpoint for cross-chain claiming"
+
+flows:
+  harvest:
+    description: |
+      Claim KING token rewards using a merkle proof. This is a cumulative merkle drop,
+      meaning the cumulativeAmount represents the total amount ever claimable (not just
+      the current claim). The contract tracks what has already been claimed and only
+      transfers the difference.
+
+    preconditions:
+      - "User must have a valid merkle proof for their address and cumulative amount"
+      - "The expectedMerkleRoot must match the current on-chain merkleRoot"
+      - "User must be claiming on the correct chain (validated via LayerZero endpoint ID)"
+      - "Contract must not be paused"
+      - "cumulativeAmount must be greater than user's cumulativeClaimed amount"
+
+    steps:
+      - action: claim
+        contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+        function: "claim(address,uint256,bytes32,bytes32[])"
+        selector: "0x1d7d4ebc"
+        params:
+          account:
+            type: "address"
+            description: "The address claiming rewards (typically msg.sender or the caliber address)"
+          cumulativeAmount:
+            type: "uint256"
+            description: "Total cumulative amount ever claimable by this account (in wei, 18 decimals)"
+          expectedMerkleRoot:
+            type: "bytes32"
+            description: "The merkle root the proof was generated against. Must match current on-chain root."
+          merkleProof:
+            type: "bytes32[]"
+            description: "Array of bytes32 hashes forming the merkle proof path"
+        notes:
+          - "No approval required - this is a claim/transfer from the contract to the user"
+          - "The actual amount transferred = cumulativeAmount - cumulativeClaimed[account]"
+          - "The merkle leaf is computed as: keccak256(abi.encodePacked(account, cumulativeAmount))"
+
+    events_to_monitor:
+      - signature: "Claimed(address indexed account, uint256 amount)"
+        description: "Emitted when rewards are successfully claimed"
+
+    token_movements:
+      in: []
+      out:
+        - token: "0x8F08B70456eb22f6109F57b8fafE862ED28E6040"
+          symbol: "KING"
+          description: "KING tokens transferred from claims contract to account"
+
+  accounting:
+    description: "Query claimable rewards and claim status"
+
+    cumulative_claimed_query:
+      contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+      function: "cumulativeClaimed(address)"
+      selector: "0x865590b9"
+      params:
+        account:
+          type: "address"
+          description: "Address to check claimed amount for"
+      returns:
+        type: "uint256"
+        description: "Total amount already claimed by this address (in wei)"
+
+    merkle_root_query:
+      contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+      function: "merkleRoot()"
+      selector: "0x2eb4a7ab"
+      returns:
+        type: "bytes32"
+        description: "Current merkle root for proof verification"
+
+    verify_proof:
+      contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+      function: "verify(address,uint256,bytes32,bytes32[])"
+      selector: "0xc23b139e"
+      params:
+        account:
+          type: "address"
+        cumulativeAmount:
+          type: "uint256"
+        expectedMerkleRoot:
+          type: "bytes32"
+        merkleProof:
+          type: "bytes32[]"
+      returns:
+        type: "bool"
+        description: "True if the proof is valid"
+
+    claim_chain_query:
+      contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+      function: "getClaimEid(address)"
+      selector: "0x7f5a7c7a"
+      params:
+        user:
+          type: "address"
+      returns:
+        type: "uint32"
+        description: "LayerZero endpoint ID where this user should claim"
+
+    paused_query:
+      contract: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"
+      function: "paused()"
+      selector: "0x5c975abb"
+      returns:
+        type: "bool"
+        description: "True if contract is paused"
+
+    calculating_claimable:
+      description: |
+        To calculate the claimable amount:
+        1. Get the user's cumulativeAmount from the merkle tree data (off-chain)
+        2. Get cumulativeClaimed[account] from the contract
+        3. claimable = cumulativeAmount - cumulativeClaimed
+
+        Note: The merkle proof and cumulativeAmount must be obtained from King Protocol's
+        claim API or merkle tree data source, not from the contract itself.
+
+merkle_proof_details:
+  leaf_computation: "keccak256(abi.encodePacked(account, cumulativeAmount))"
+  verification_algorithm: "Standard Merkle proof verification (OpenZeppelin style)"
+  data_source: |
+    The merkle proof and cumulative amount must be obtained from King Protocol's
+    claim interface or API. The contract only stores the merkle root, not individual
+    claim data.
+
+  example_leaf_computation: |
+    // Solidity
+    bytes32 leaf = keccak256(abi.encodePacked(account, cumulativeAmount));
+
+    // Python (web3.py)
+    from web3 import Web3
+    leaf = Web3.solidity_keccak(['address', 'uint256'], [account, cumulative_amount])
+
+cross_chain_claiming:
+  description: |
+    This contract supports cross-chain claiming via LayerZero. Users may need to
+    claim on a specific chain determined by getClaimEid(). For Ethereum mainnet
+    claiming, ensure the user's claim EID matches the Ethereum endpoint ID.
+
+  ethereum_endpoint_id: 30101
+  layerzero_endpoint: "0x1a44076050125825900e736c501f859c50fE728c"
+
+metadata:
+  generated_at: "2026-01-07T17:30:00Z"
+  data_sources:
+    - etherscan
+    - tenderly_rpc
+    - on_chain_verification
+  implementation_license: "MIT (1inch CumulativeMerkleDrop)"
+  notes:
+    - "Contract is a UUPS proxy - implementation can be upgraded"
+    - "Uses cumulative claiming model - cumulativeAmount is lifetime total, not per-claim"
+    - "Supports LayerZero cross-chain messaging for multi-chain deployment"
+    - "Contract has pause functionality controlled by PAUSER_ROLE"
+    - "Merkle root updates are done by OPERATING_ADMIN_ROLE"

@@ -1,0 +1,89 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "harvest-rewards"
+  pool_name: "Fluid INST Rewards Harvest"
+  protocol: "fluid"
+  chain: "ethereum"
+  machine: "dusd"
+  actions: [harvest]
+  base_tokens: [] # harvest doesn't require base tokens
+  context: "DUSD caliber already has fluid integrations. it is missing the integration to harvest rewards. add the harvest blueprint + instruction for fluid. Proof and stuff needs to be claimed from api: https://merkle.api.fluid.instadapp.io/programs/inst-rewards-dec-2024/users/{CALIBER-ADDRESS}/claims Address of the claim contract: 0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent: { status: completed, timestamp: "2026-01-12T00:00:00Z" }
+  1_specs:
+    status: completed
+    timestamp: "2026-01-12T00:00:00Z"
+    artifacts:
+      - specs.yaml
+      - SUMMARY.md
+  1b_enrich:
+    status: completed
+    timestamp: "2026-01-12T00:00:00Z"
+    artifacts:
+      - functions.md
+  1c_offchain:
+    status: completed
+    timestamp: "2026-01-12T00:00:00Z"
+    artifacts:
+      - API.md
+      - METATYPES.md
+  2_harvest:
+    status: completed
+    timestamp: "2026-01-12T00:00:00Z"
+    artifacts:
+      - execution-harvest.md
+  3_blueprint:
+    status: completed
+    timestamp: "2026-01-12T00:00:00Z"
+    artifacts:
+      - blueprints/fluid/harvest.yaml
+      - machines/dusd/mainnet/instructions/fluid-gho.yaml
+  4_test: {
+    status: pending,
+    note: "Requires FluidClaimData metatype implementation in makina-rs",
+  }
+
+# Shared resources
+testnets:
+  harvest_test:
+    id: "b012ef92-874e-4988-b4c2-25f51cbfb6dd"
+    rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/14928908-f7cd-4fe5-945a-75d44e12126f"
+
+# Execution results
+execution_results:
+  harvest:
+    claim_contract: "0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+    reward_token: "0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb"
+    reward_token_symbol: "FLUID"
+    api_endpoint: "https://merkle.api.fluid.instadapp.io/programs/inst-rewards-dec-2024/users/{caliber_address}/claims"
+    function_signature: "claim(address,uint256,uint8,bytes32,uint256,bytes32[],bytes)"
+    parameters:
+      - name: "recipient"
+        type: "address"
+        description: "The caliber address receiving rewards"
+      - name: "cumulativeAmount"
+        type: "uint256"
+        description: "Total cumulative amount to claim (from API cumulativeAmountWei)"
+      - name: "positionType"
+        type: "uint8"
+        description: "Position type (1 for lending vaults)"
+      - name: "positionId"
+        type: "bytes32"
+        description: "Position ID - vault address left-padded to 32 bytes"
+      - name: "cycle"
+        type: "uint256"
+        description: "Current merkle cycle from API"
+      - name: "merkleProof"
+        type: "bytes32[]"
+        description: "Merkle proof array from API"
+      - name: "metadata"
+        type: "bytes"
+        description: "Metadata bytes (usually 0x)"
+    test_tx:
+      hash: "2f443a35f5d062458fd250952a70aef1bb79dc975d33462f37025294acfd7cf7"
+      gas_used: 114913
+      status: "SUCCESS"
+      tokens_claimed: "2727.350841 FLUID"

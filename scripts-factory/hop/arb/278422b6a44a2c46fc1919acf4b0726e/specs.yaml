@@ -1,0 +1,348 @@
+# Hop Protocol USDC/hUSDC AMM Pool Specifications
+# Arbitrum Network
+# Generated: 2026-01-07
+
+pool:
+  id: "278422b6a44a2c46fc1919acf4b0726e"
+  name: "Hop USDC/hUSDC"
+  protocol: "hop"
+  version: "v1"
+  network: "arbitrum"
+  type: "stableswap_amm"
+
+contracts:
+  # Main Swap contract (Saddle StableSwap fork)
+  swap:
+    address: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+    name: "Hop USDC Swap"
+    description: "StableSwap AMM for USDC/hUSDC pair"
+
+  # LP Token contract
+  lp_token:
+    address: "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
+    symbol: "HOP-LP-USDC"
+    name: "Hop USDC LP Token"
+    decimals: 18
+
+  # Underlying tokens
+  tokens:
+    - index: 0
+      address: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+      symbol: "USDC"
+      name: "USD Coin (Arb1)"
+      decimals: 6
+      type: "canonical"
+      note: "Bridged USDC.e on Arbitrum (deprecated in favor of native USDC)"
+
+    - index: 1
+      address: "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d"
+      symbol: "hUSDC"
+      name: "USD Coin Hop Token"
+      decimals: 6
+      type: "hop_token"
+      note: "Hop Protocol's wrapped USDC for cross-chain transfers"
+
+pool_parameters:
+  a_parameter: 200
+  a_precise: 20000
+  swap_fee: "4000000" # 0.04% (in 1e-10 units, so 4000000 / 1e10 = 0.0004)
+  admin_fee: "0"
+  default_withdraw_fee: "0"
+  virtual_price: "1048499301607852500" # ~1.0485 (18 decimals)
+
+flows:
+  deposit:
+    description: "Add liquidity to the Hop USDC/hUSDC pool by depositing one or both tokens"
+    contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+    function:
+      name: "addLiquidity"
+      signature: "addLiquidity(uint256[],uint256,uint256)"
+      selector: "0x4d49e87d"
+    parameters:
+      - name: "amounts"
+        type: "uint256[]"
+        description: "Array of token amounts to deposit [USDC_amount, hUSDC_amount]. Can provide one or both."
+        index_mapping:
+          0: "USDC amount (6 decimals)"
+          1: "hUSDC amount (6 decimals)"
+      - name: "minToMint"
+        type: "uint256"
+        description: "Minimum LP tokens to receive (slippage protection)"
+      - name: "deadline"
+        type: "uint256"
+        description: "Unix timestamp deadline for transaction"
+    returns:
+      - name: "lpAmount"
+        type: "uint256"
+        description: "Amount of LP tokens minted"
+    preconditions:
+      - action: "approve"
+        description: "Approve USDC spending if depositing USDC"
+        contract: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"
+        spender: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function: "approve(address,uint256)"
+      - action: "approve"
+        description: "Approve hUSDC spending if depositing hUSDC"
+        contract: "0x0ce6c85cF43553DE10FC56cecA0aef6Ff0DD444d"
+        spender: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function: "approve(address,uint256)"
+    events:
+      - name: "AddLiquidity"
+        signature: "AddLiquidity(address indexed provider, uint256[] tokenAmounts, uint256[] fees, uint256 invariant, uint256 lpTokenSupply)"
+      - name: "Transfer"
+        contract: "lp_token"
+        signature: "Transfer(address indexed from, address indexed to, uint256 value)"
+        note: "LP token minting from zero address to provider"
+
+  withdraw:
+    description: "Remove liquidity from the pool. Multiple withdrawal methods available."
+    contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+    methods:
+      # Method 1: Withdraw proportionally
+      - name: "removeLiquidity"
+        description: "Remove liquidity and receive both tokens proportionally"
+        function:
+          name: "removeLiquidity"
+          signature: "removeLiquidity(uint256,uint256[],uint256)"
+          selector: "0x31cd52b0"
+        parameters:
+          - name: "amount"
+            type: "uint256"
+            description: "Amount of LP tokens to burn"
+          - name: "minAmounts"
+            type: "uint256[]"
+            description: "Minimum amounts of each token to receive [minUSDC, minHUSDC]"
+          - name: "deadline"
+            type: "uint256"
+            description: "Unix timestamp deadline"
+        returns:
+          - name: "amounts"
+            type: "uint256[]"
+            description: "Actual amounts of tokens received"
+        events:
+          - name: "RemoveLiquidity"
+            signature: "RemoveLiquidity(address indexed provider, uint256[] tokenAmounts, uint256 lpTokenSupply)"
+
+      # Method 2: Withdraw single token
+      - name: "removeLiquidityOneToken"
+        description: "Remove liquidity and receive only one token (may incur price impact)"
+        function:
+          name: "removeLiquidityOneToken"
+          signature: "removeLiquidityOneToken(uint256,uint8,uint256,uint256)"
+          selector: "0x3e3a1560"
+        parameters:
+          - name: "tokenAmount"
+            type: "uint256"
+            description: "Amount of LP tokens to burn"
+          - name: "tokenIndex"
+            type: "uint8"
+            description: "Index of token to receive (0=USDC, 1=hUSDC)"
+          - name: "minAmount"
+            type: "uint256"
+            description: "Minimum amount of token to receive"
+          - name: "deadline"
+            type: "uint256"
+            description: "Unix timestamp deadline"
+        returns:
+          - name: "amount"
+            type: "uint256"
+            description: "Actual amount of token received"
+        events:
+          - name: "RemoveLiquidityOne"
+            signature: "RemoveLiquidityOne(address indexed provider, uint256 lpTokenAmount, uint256 lpTokenSupply, uint256 boughtId, uint256 tokensBought)"
+
+      # Method 3: Withdraw imbalanced amounts
+      - name: "removeLiquidityImbalance"
+        description: "Remove liquidity specifying exact output amounts (flexible LP burn)"
+        function:
+          name: "removeLiquidityImbalance"
+          signature: "removeLiquidityImbalance(uint256[],uint256,uint256)"
+          selector: "0x84cdd9bc"
+        parameters:
+          - name: "amounts"
+            type: "uint256[]"
+            description: "Exact amounts of each token to withdraw [USDC, hUSDC]"
+          - name: "maxBurnAmount"
+            type: "uint256"
+            description: "Maximum LP tokens to burn (slippage protection)"
+          - name: "deadline"
+            type: "uint256"
+            description: "Unix timestamp deadline"
+        returns:
+          - name: "lpBurned"
+            type: "uint256"
+            description: "Actual amount of LP tokens burned"
+        events:
+          - name: "RemoveLiquidityImbalance"
+            signature: "RemoveLiquidityImbalance(address indexed provider, uint256[] tokenAmounts, uint256[] fees, uint256 invariant, uint256 lpTokenSupply)"
+
+  accounting:
+    description: "Query position values and pool state"
+    queries:
+      # LP Token balance
+      - name: "lp_balance"
+        description: "Get LP token balance of an address"
+        contract: "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
+        function:
+          name: "balanceOf"
+          signature: "balanceOf(address)"
+        parameters:
+          - name: "account"
+            type: "address"
+        returns:
+          - name: "balance"
+            type: "uint256"
+            decimals: 18
+
+      # Calculate LP value in underlying tokens
+      - name: "calculate_remove_liquidity"
+        description: "Calculate how much of each token would be received for burning LP tokens"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "calculateRemoveLiquidity"
+          signature: "calculateRemoveLiquidity(address,uint256)"
+        parameters:
+          - name: "account"
+            type: "address"
+            description: "Address to calculate for (affects withdraw fee)"
+          - name: "amount"
+            type: "uint256"
+            description: "LP token amount"
+        returns:
+          - name: "amounts"
+            type: "uint256[]"
+            description: "[USDC_amount, hUSDC_amount]"
+
+      # Calculate single token withdrawal
+      - name: "calculate_remove_liquidity_one_token"
+        description: "Calculate output for single-token withdrawal"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "calculateRemoveLiquidityOneToken"
+          signature: "calculateRemoveLiquidityOneToken(address,uint256,uint8)"
+        parameters:
+          - name: "account"
+            type: "address"
+          - name: "tokenAmount"
+            type: "uint256"
+            description: "LP token amount to burn"
+          - name: "tokenIndex"
+            type: "uint8"
+            description: "Token index (0=USDC, 1=hUSDC)"
+        returns:
+          - name: "availableTokenAmount"
+            type: "uint256"
+
+      # Calculate LP tokens for deposit
+      - name: "calculate_token_amount"
+        description: "Calculate LP tokens that would be minted for a deposit"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "calculateTokenAmount"
+          signature: "calculateTokenAmount(address,uint256[],bool)"
+        parameters:
+          - name: "account"
+            type: "address"
+          - name: "amounts"
+            type: "uint256[]"
+            description: "[USDC_amount, hUSDC_amount]"
+          - name: "deposit"
+            type: "bool"
+            description: "true for deposit calculation"
+        returns:
+          - name: "lpAmount"
+            type: "uint256"
+
+      # Virtual price (LP token value)
+      - name: "virtual_price"
+        description: "Get LP token virtual price (grows with fees)"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "getVirtualPrice"
+          signature: "getVirtualPrice()"
+        returns:
+          - name: "virtualPrice"
+            type: "uint256"
+            decimals: 18
+            note: "1e18 = 1.0, increases as pool earns fees"
+
+      # Pool token balances
+      - name: "token_balance"
+        description: "Get pool's balance of a specific token"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "getTokenBalance"
+          signature: "getTokenBalance(uint8)"
+        parameters:
+          - name: "index"
+            type: "uint8"
+            description: "Token index (0=USDC, 1=hUSDC)"
+        returns:
+          - name: "balance"
+            type: "uint256"
+
+      # Total LP supply
+      - name: "total_supply"
+        description: "Get total LP token supply"
+        contract: "0xB67c014FA700E69681a673876eb8BAFAA36BFf71"
+        function:
+          name: "totalSupply"
+          signature: "totalSupply()"
+        returns:
+          - name: "totalSupply"
+            type: "uint256"
+            decimals: 18
+
+      # Withdraw fee for user
+      - name: "withdraw_fee"
+        description: "Get current withdraw fee for a user (decreases over time after deposit)"
+        contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+        function:
+          name: "calculateCurrentWithdrawFee"
+          signature: "calculateCurrentWithdrawFee(address)"
+        parameters:
+          - name: "user"
+            type: "address"
+        returns:
+          - name: "fee"
+            type: "uint256"
+            note: "Fee in basis points, decays from default over 4 weeks"
+
+helpers:
+  note: "Hop Protocol does not have a separate router contract for liquidity operations. Interact directly with the Swap contract."
+
+  useful_view_functions:
+    - contract: "0x10541b07d8Ad2647Dc6cD67abd4c03575dade261"
+      functions:
+        - "getA() returns (uint256)"
+        - "getVirtualPrice() returns (uint256)"
+        - "getToken(uint8 index) returns (address)"
+        - "getTokenBalance(uint8 index) returns (uint256)"
+        - "getTokenIndex(address tokenAddress) returns (uint8)"
+        - "swapStorage() returns (uint256 initialA, uint256 futureA, uint256 initialATime, uint256 futureATime, uint256 swapFee, uint256 adminFee, uint256 defaultWithdrawFee, address lpToken)"
+        - "calculateSwap(uint8 tokenIndexFrom, uint8 tokenIndexTo, uint256 dx) returns (uint256)"
+        - "calculateTokenAmount(address account, uint256[] amounts, bool deposit) returns (uint256)"
+        - "calculateRemoveLiquidity(address account, uint256 amount) returns (uint256[])"
+        - "calculateRemoveLiquidityOneToken(address account, uint256 tokenAmount, uint8 tokenIndex) returns (uint256)"
+        - "calculateCurrentWithdrawFee(address user) returns (uint256)"
+        - "getDepositTimestamp(address user) returns (uint256)"
+
+metadata:
+  generated_at: "2026-01-07T10:00:00Z"
+  data_sources:
+    - "pool_mcp (dialectic_id: 278422b6a44a2c46fc1919acf4b0726e)"
+    - "etherscan_arb (contract verification)"
+    - "tenderly_rpc (on-chain queries)"
+    - "hop_protocol_docs"
+  contract_verification:
+    swap: "verified"
+    lp_token: "verified"
+    usdc: "verified (proxy)"
+    husdc: "verified"
+  notes:
+    - "This pool uses Saddle Finance's StableSwap implementation (Curve fork)"
+    - "USDC is the bridged USDC.e token on Arbitrum, not native USDC"
+    - "hUSDC is Hop's wrapped token used for cross-chain bridging"
+    - "Withdraw fee decays from default over 4 weeks after deposit (currently 0)"
+    - "Pool has been live since Hop's launch on Arbitrum"
+    - "A parameter of 200 indicates moderate curve tightness for stable pairs"

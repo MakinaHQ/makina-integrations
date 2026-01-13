@@ -1,0 +1,10 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "KING"
+    path: "../../../blueprints/king/harvest.yaml:harvest"
+    inputs:
+      claims_contract_address:
+        type: "address"
+        value: "0x6Db24Ee656843E3fE03eb8762a54D86186bA6B64"

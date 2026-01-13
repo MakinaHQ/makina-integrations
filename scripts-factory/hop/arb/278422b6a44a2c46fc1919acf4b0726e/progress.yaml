@@ -1,0 +1,32 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "278422b6a44a2c46fc1919acf4b0726e"
+  pool_name: "Hop USDC/hUSDC"
+  pool_address: "0xb67c014fa700e69681a673876eb8bafaa36bff71"
+  protocol: "hop"
+  chain: "arb"
+  machine: "dusd"
+  actions: [deposit, withdraw]
+  base_tokens:
+    - address: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+      symbol: "USDC"
+      decimals: 6
+      index: 0
+    - address: "0x0ce6c85cf43553de10fc56ceca0aef6ff0dd444d"
+      symbol: "hUSDC"
+      decimals: 6
+      index: 1
+
+# Progress tracking
+current_stage: 2
+stages:
+  0_intent: { status: completed, timestamp: "2026-01-07T00:00:00Z" }
+  1_specs: { status: completed }
+  1b_enrich: { status: completed }
+  2_deposit: { status: completed }
+  2_withdraw: { status: completed }
+  3_blueprint: { status: completed }
+  4_test: { status: in_progress }
+
+# Shared resources (populated as stages run)
+testnets: {}

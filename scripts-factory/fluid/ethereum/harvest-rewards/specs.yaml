@@ -1,0 +1,153 @@
+# Fluid Protocol INST/FLUID Token Rewards Claim Specifications
+# Generated: 2026-01-12
+# Contract Type: Merkle-based rewards distribution
+
+pool:
+  id: "harvest-rewards"
+  name: "Fluid INST Rewards Claim"
+  protocol: "fluid"
+  version: "1.0"
+  network: "mainnet"
+  category: "rewards"
+
+contracts:
+  claims_contract:
+    address: "0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+    name: "Fluid Merkle Claims"
+    abi_source: "https://etherscan.io/address/0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0#code"
+
+  reward_token:
+    address: "0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb"
+    symbol: "FLUID"
+    name: "Fluid (formerly INST)"
+    decimals: 18
+
+flows:
+  harvest:
+    description: |
+      Claim FLUID token rewards using a merkle proof. This is a cumulative merkle drop,
+      meaning the cumulativeAmount represents the total amount ever claimable (not just
+      the current claim). The contract tracks what has already been claimed per
+      (address, positionId) pair and only transfers the difference.
+
+    preconditions:
+      - "User must have a valid merkle proof for their address, position, and cumulative amount"
+      - "The proof must be generated against the current on-chain merkle cycle"
+      - "Contract must not be paused"
+      - "cumulativeAmount must be greater than claimed[user][positionId]"
+      - "msg.sender must equal recipient_ parameter"
+
+    offchain_indicators:
+      - type: "merkle_proof"
+        description: "Merkle proof must be fetched from Fluid API"
+        api_endpoint: "https://merkle.api.fluid.instadapp.io/programs/inst-rewards-dec-2024/users/{address}/claims"
+      - type: "cumulative_amount"
+        description: "Cumulative claimable amount from API"
+      - type: "position_data"
+        description: "Position type and ID identifying the DeFi position"
+
+    steps:
+      - action: claim
+        contract: "0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+        function: "claim(address,uint256,uint8,bytes32,uint256,bytes32[],bytes)"
+        selector: "0x..."
+        params:
+          recipient:
+            type: "address"
+            description: "The address claiming rewards (must equal msg.sender)"
+          cumulativeAmount:
+            type: "uint256"
+            description: "Total cumulative amount ever claimable by this account for this position (in wei, 18 decimals)"
+          positionType:
+            type: "uint8"
+            description: "Type of DeFi position (1 = lending vault)"
+          positionId:
+            type: "bytes32"
+            description: "Position identifier - vault address left-padded to 32 bytes"
+          cycle:
+            type: "uint256"
+            description: "Merkle tree cycle number"
+          merkleProof:
+            type: "bytes32[]"
+            description: "Array of bytes32 hashes forming the merkle proof path"
+          metadata:
+            type: "bytes"
+            description: "Additional metadata bytes (typically empty 0x)"
+        notes:
+          - "No approval required - this is a claim/transfer from the contract to the user"
+          - "The actual amount transferred = cumulativeAmount - claimed[recipient][positionId]"
+          - "positionId from API is a 20-byte address that must be left-padded to 32 bytes"
+
+    events_to_monitor:
+      - signature: "LogClaimed(address user, uint256 amount, uint256 cycle, uint8 positionType, bytes32 positionId, uint256 timestamp, uint256 blockNumber)"
+        description: "Emitted when rewards are successfully claimed"
+
+    token_movements:
+      in: []
+      out:
+        - token: "0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb"
+          symbol: "FLUID"
+          description: "FLUID tokens transferred from claims contract to recipient"
+
+  accounting:
+    description: "Query claimable rewards and claim status"
+
+    claimed_query:
+      contract: "0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+      function: "claimed(address,bytes32)"
+      params:
+        user:
+          type: "address"
+          description: "Address to check claimed amount for"
+        positionId:
+          type: "bytes32"
+          description: "Position identifier (left-padded vault address)"
+      returns:
+        type: "uint256"
+        description: "Total amount already claimed by this address for this position (in wei)"
+
+    current_cycle_query:
+      contract: "0x7060FE0Dd3E31be01EFAc6B28C8D38018fD163B0"
+      function: "currentMerkleCycle()"
+      returns:
+        type: "tuple"
+        description: "Current merkle cycle data (root, contentHash, cycle, timestamp, etc.)"
+
+    calculating_claimable:
+      description: |
+        To calculate the claimable amount:
+        1. Get the user's cumulativeAmount from the Fluid API
+        2. Get claimed[user][positionId] from the contract
+        3. claimable = cumulativeAmount - claimed
+
+        Note: The merkle proof and cumulativeAmount must be obtained from Fluid's
+        claim API, not from the contract itself. The contract only stores the merkle root.
+
+merkle_proof_details:
+  leaf_computation: "Custom encoding - see API documentation"
+  verification_algorithm: "Standard Merkle proof verification"
+  data_source: |
+    The merkle proof and cumulative amount must be obtained from Fluid's
+    claim API. The contract only stores the merkle root, not individual
+    claim data.
+
+  api_endpoint: "https://merkle.api.fluid.instadapp.io/programs/inst-rewards-dec-2024/users/{address}/claims"
+
+  key_transformation: |
+    The positionId from the API is a 20-byte address but must be left-padded
+    to 32 bytes for the contract call:
+    - API returns: 0x6a29a46e21c730dca1d8b23d637c101cec605c5b
+    - Contract expects: 0x0000000000000000000000006a29a46e21c730dca1d8b23d637c101cec605c5b
+
+metadata:
+  generated_at: "2026-01-12T00:00:00Z"
+  data_sources:
+    - etherscan
+    - tenderly_rpc
+    - fluid_api
+  notes:
+    - "Uses cumulative claiming model - cumulativeAmount is lifetime total, not per-claim"
+    - "Claims are tracked per (user, positionId) pair"
+    - "Contract has pause functionality"
+    - "Merkle root updates are done periodically (check cycle field)"
+    - "positionType 1 = lending vault positions"

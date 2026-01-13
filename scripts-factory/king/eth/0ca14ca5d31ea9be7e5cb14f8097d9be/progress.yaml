@@ -1,0 +1,31 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "0ca14ca5d31ea9be7e5cb14f8097d9be"
+  pool_name: "King Rewards Claim"
+  protocol: "king"
+  chain: "eth"
+  machine: "deth"
+  actions: [harvest]
+  base_tokens: [] # Reward tokens to be discovered during specs generation
+
+# Progress tracking
+current_stage: 1
+stages:
+  0_intent: { status: completed, timestamp: "2026-01-07T00:00:00Z" }
+  1_specs: { status: completed, timestamp: "2026-01-07T17:30:00Z" }
+  1b_enrich: { status: completed, timestamp: "2026-01-07T17:45:00Z" }
+  2_harvest: { status: completed, timestamp: "2026-01-07T18:00:00Z" }
+  3_blueprint:
+    status: blocked
+    error: "Transpiler missing KingClaimData metatype"
+    comment: |
+      Blueprint and instruction files created but compilation fails.
+      The transpiler needs KingClaimData metatype added to meta_sol_types.rs.
+      See METATYPES.md for implementation details.
+    files_created:
+      - blueprints/king/harvest.yaml
+      - machines/deth/mainnet/instructions/king-harvest.yaml
+  4_test: { status: pending }
+
+# Shared resources (populated as stages run)
+testnets: {}
