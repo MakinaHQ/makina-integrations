@@ -22,6 +22,7 @@ config:
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
 
 positions:
+  # Harvest
   - id: "777"
     group_id: "0"
     description: "Merkl Harvest"
@@ -30,6 +31,8 @@ positions:
     group_id: "0"
     description: "King Harvest"
     instructions: !include "./instructions/king-harvest.yaml"
+
+  # Positions
   - id: "147403525593287433774057570606136062652"
     group_id: "0"
     description: "Convex f(x) - Curve - USDC/fxUSD"
@@ -54,6 +57,12 @@ positions:
     group_id: "0"
     description: "Morpho Vault WETH Yearn OG"
     instructions: !include "./instructions/morpho-vault-weth-yearn-og.yaml"
+  - id: "94131231672247278449408134973807954755"
+    group_id: "0"
+    description: "Fluid Lite stETH (deposit wstETH)"
+    instructions: !include "./instructions/fluid-lite-steth.yaml"
+    tags:
+      - "225616:redeem_full"
   - id: "187700311405102813120959141419172413799"
     group_id: "1"
     description: "AaveV3 weETH collateral"

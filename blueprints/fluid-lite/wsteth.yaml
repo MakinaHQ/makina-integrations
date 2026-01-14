@@ -1,0 +1,206 @@
+protocol: "fluid-lite"
+
+inputs:
+  fluid_vault_address:
+    type: "address"
+  wsteth_address:
+    type: "address"
+  steth_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  # redeem
+  math_helper_address:
+    type: "address"
+
+actions:
+  # 1. Unwrap wstETH to stETH
+  # 2. Approve stETH to Fluid Lite vault
+  # 3. Deposit stETH to Fluid Lite vault and receive shares
+  deposit:
+    calls:
+      - description: "Unwrap wstETH to stETH"
+        target: "${inputs.wsteth_address}"
+        selector: "unwrap(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+        return:
+          name: "steth_received"
+          type: "uint256"
+
+      - description: "Approve stETH to the Fluid Lite vault"
+        target: "${inputs.steth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fluid_vault_address}"
+          - type: "uint256"
+            value: "${returns.steth_received}"
+
+      - description: "Deposit stETH to Fluid Lite vault and receive shares"
+        target: "${inputs.fluid_vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.steth_received}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of wstETH to deposit into the Fluid Lite vault"
+
+  # 1. Redeem to stETH
+  # 2. Wrap stETH to wstETH
+  redeem_relative:
+    calls:
+      # 1. Redeem to stETH
+      - description: "Get the caliber share balance"
+        target: "${inputs.fluid_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_shares"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem the shares from the vault"
+        target: "${inputs.fluid_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "steth_received"
+          type: "uint256"
+
+      # 2. Wrap stETH to wstETH
+      - description: "Approve stETH to wstETH contract"
+        target: "${inputs.steth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.wsteth_address}"
+          - type: "uint256"
+            value: "${returns.steth_received}"
+
+      - description: "Wrap stETH to wstETH"
+        target: "${inputs.wsteth_address}"
+        selector: "wrap(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.steth_received}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of our share balance to redeem (10000 = 100%)"
+
+  # 1. Redeem to stETH
+  # 2. Wrap stETH to wstETH
+  redeem_full:
+    calls:
+      # 1. Redeem to stETH
+      - description: "Get the caliber share balance"
+        target: "${inputs.fluid_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_shares"
+          type: "uint256"
+
+      - description: "Redeem the shares from the vault"
+        target: "${inputs.fluid_vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "steth_received"
+          type: "uint256"
+
+      # 2. Wrap stETH to wstETH
+      - description: "Approve stETH to wstETH contract"
+        target: "${inputs.steth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.wsteth_address}"
+          - type: "uint256"
+            value: "${returns.steth_received}"
+
+      - description: "Wrap stETH to wstETH"
+        target: "${inputs.wsteth_address}"
+        selector: "wrap(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.steth_received}"
+
+  # 1. Account to stETH
+  # 2. Convert stETH to wstETH
+  account:
+    calls:
+      # 1. Account to stETH
+      - description: "Get the caliber's balance of Fluid Lite vault shares"
+        target: "${inputs.fluid_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      - description: "Convert vault shares to stETH"
+        target: "${inputs.fluid_vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+        return:
+          name: "underlying_assets_value"
+          type: "uint256"
+
+      # 2. Convert stETH to wstETH
+      - description: "Convert stETH to wstETH"
+        target: "${inputs.wsteth_address}"
+        selector: "getWstETHByStETH(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.underlying_assets_value}"
+        return:
+          name: "wsteth_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.wsteth_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
