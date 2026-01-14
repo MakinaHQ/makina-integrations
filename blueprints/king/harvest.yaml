@@ -1,0 +1,25 @@
+protocol: "king"
+
+inputs:
+  claims_contract_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim KING rewards using merkle proof"
+        target: "${inputs.claims_contract_address}"
+        selector: "claim(address,uint256,bytes32,bytes32[])"
+        parameters:
+          - type: "address"
+            value: "${input_slots.king_claim_data.account}"
+          - type: "uint256"
+            value: "${input_slots.king_claim_data.cumulative_amount}"
+          - type: "bytes32"
+            value: "${input_slots.king_claim_data.expected_merkle_root}"
+          - type: "bytes32[]"
+            value: "${input_slots.king_claim_data.merkle_proof}"
+
+    input_slots:
+      king_claim_data:
+        type: "KingClaimData"

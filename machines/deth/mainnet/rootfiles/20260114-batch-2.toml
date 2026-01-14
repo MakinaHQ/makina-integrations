@@ -1,0 +1,1661 @@
+# this is a generated file - do not edit manually
+# root: 0x149a1b5a49a752daff540030f1710f380e090d6311995b69e5640c1ac729503d
+
+[instructions."Aave Umbrella".account.WETH]
+position_id = "3523756351941927223895267305661455553"
+description = "Aave Umbrella WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff0000000002aafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x07a2d13a0102ff00000000000bfc9d54fc184518a81162f8fb99c2eaca081202",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions."Aave Umbrella".claim_cooldown.WETH]
+position_id = "3523756351941927223895267305661455553"
+description = "Aave Umbrella WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0xd905777e0100ff0000000000aafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x095ea7b3010100ff000000ffaafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x38957dd901020300ff0000ffce6ced23118edeb23054e06118a702797b13fc2f",
+]
+state = [
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x000000000000000000000000ce6ced23118edeb23054e06118a702797b13fc2f",
+  "0x000000000000000000000000aafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+bitmap = "319014718988379809496913694467282698240"
+inputs_slots = []
+
+[instructions."Aave Umbrella".harvest.WETH]
+position_id = "3523756351941927223895267305661455553"
+description = "Aave Umbrella WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+commands = ["0x7e9dc742010001ff000000ff4655ce3d625a63d30ba704087e52b4c31e38188b"]
+state = [
+  "0x000000000000000000000000aafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions."Aave Umbrella".stake.WETH]
+position_id = "3523756351941927223895267305661455553"
+description = "Aave Umbrella WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x0f198b3001020300ff0000ffce6ced23118edeb23054e06118a702797b13fc2f",
+]
+state = [
+  "0x101804838ffa2ce98ec74ddd0e2c1ba89185ea10d28267b5f0dc70c1528483cb",
+  "0x000000000000000000000000ce6ced23118edeb23054e06118a702797b13fc2f",
+  "0x000000000000000000000000aafd07d53a7365d3e9fb6f3a3b09ec19676b73ce",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions."Aave Umbrella".stake.WETH.inputs_slots]]
+index = 0
+name = "amount_to_stake"
+type = "Uint"
+
+[instructions."Aave Umbrella".start_cooldown.WETH]
+position_id = "3523756351941927223895267305661455553"
+description = "Aave Umbrella WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0x787a08a601ff0000000000ffaafd07d53a7365d3e9fb6f3a3b09ec19676b73ce"]
+state = []
+bitmap = "0"
+inputs_slots = []
+
+[instructions.aavev3.account.WETH]
+position_id = "168833951435768327164903999099923269368"
+description = "AaveV3 WETH debt"
+is_debt = true
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0x70a082310102ff0000000000ea51d7853eefb32b6ee06b1c12e6dcca88be0ffe"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account."WETH (collateral)"]
+position_id = "132834842824704009878878367726033477050"
+description = "AaveV3 WETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0x70a082310102ff00000000004d5f47fa6a74757f35c14fd3a6ef8e3c9bc514e8"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.weETH]
+position_id = "187700311405102813120959141419172413799"
+description = "AaveV3 weETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"]
+commands = ["0x70a082310102ff0000000000bdfa7b7893081b35fb54027489e2bc7a38275129"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.add_collateral."WETH (collateral)"]
+position_id = "132834842824704009878878367726033477050"
+description = "AaveV3 WETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."WETH (collateral)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.weETH]
+position_id = "187700311405102813120959141419172413799"
+description = "AaveV3 weETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"]
+commands = [
+  "0x095ea7b3010100ff000000ffcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000cd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.weETH.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.borrow_asset.WETH]
+position_id = "168833951435768327164903999099923269368"
+description = "AaveV3 WETH debt"
+is_debt = true
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0xa415bcad010100020304ffff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.borrow_asset.WETH.inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.aavev3.repay_asset.WETH]
+position_id = "168833951435768327164903999099923269368"
+description = "AaveV3 WETH debt"
+is_debt = true
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x573ade810102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.repay_asset.WETH.inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.aavev3.set_e_mode."ETH correlated"]
+position_id = "187700311405102813120959141419172413799"
+description = "AaveV3 weETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+commands = ["0x28530a470100ff00000000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = ["0x0000000000000000000000000000000000000000000000000000000000000001"]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.aavev3.withdraw_collateral."WETH (collateral)"]
+position_id = "132834842824704009878878367726033477050"
+description = "AaveV3 WETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."WETH (collateral)".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.weETH]
+position_id = "187700311405102813120959141419172413799"
+description = "AaveV3 weETH collateral"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"]
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000cd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.weETH.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.convex-fx.account_curve_pool."Curve Pool - USDC/fxUSD"]
+position_id = "147403525593287433774057570606136062652"
+description = "Convex f(x) - Curve - USDC/fxUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = [
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+]
+commands = [
+  "0x8eaa6ac00103ff0000000003f5b4df5e5a446a64c89294fd4a6a1caa56e77437",
+  "0x70a082310103ff0000000003f1e141c804ba39b4a031fdf46e8c08dba7a0df60",
+  "0x18160ddd01ff0000000000065018be882dcce5e3f2f3b0913ae2096b9b3fb61f",
+  "0x4903b0d10104ff00000000045018be882dcce5e3f2f3b0913ae2096b9b3fb61f",
+  "0x4903b0d10105ff00000000055018be882dcce5e3f2f3b0913ae2096b9b3fb61f",
+  "0xaa9a091201030406ff000000836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xaa9a091201030506ff000001836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x968a5a59fb04b8c0dff68bf59d710c4db850b0e7b4063ae3dfb3b183aaef78f6",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x",
+]
+bitmap = "79753679747094952374228423616820674560"
+inputs_slots = []
+
+[instructions.convex-fx.create_vault."Curve Pool - USDC/fxUSD"]
+position_id = "147403525593287433774057570606136062652"
+description = "Convex f(x) - Curve - USDC/fxUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+commands = [
+  "0x8eaa6ac00102ff0000000003f5b4df5e5a446a64c89294fd4a6a1caa56e77437",
+  "0x16694e5b010300ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x711ecf590103ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x9abbdf4b0101ff0000000001affe966b27ba3e4ebb8a0ec124c7b7019cc762f8",
+  "0xf71f7a25010201ff000000fff5b4df5e5a446a64c89294fd4a6a1caa56e77437",
+]
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000020",
+  "0x968a5a59fb04b8c0dff68bf59d710c4db850b0e7b4063ae3dfb3b183aaef78f6",
+  "0x",
+]
+bitmap = "297747071055821155530452781502797185024"
+inputs_slots = []
+
+[instructions.fluid-lite.account."stETH (deposit wstETH)"]
+position_id = "94131231672247278449408134973807954755"
+description = "Fluid Lite stETH (deposit wstETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x70a082310102ff0000000002a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0x07a2d13a0102ff0000000002a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0xb0e389000102ff00000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.fluid-lite.deposit."stETH (deposit wstETH)"]
+position_id = "94131231672247278449408134973807954755"
+description = "Fluid Lite stETH (deposit wstETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0xde0e9a3e0100ff00000000037f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x095ea7b3010103ff000000ffae7ab96520de3a18e5e111b5eaab095312d7fe84",
+  "0x6e553f65010302ff000000ffa0d3707c569ff8c87fa923d3823ec5d81c98be78",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.fluid-lite.deposit."stETH (deposit wstETH)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.fluid-lite.redeem_full."stETH (deposit wstETH)"]
+position_id = "94131231672247278449408134973807954755"
+description = "Fluid Lite stETH (deposit wstETH)"
+tags = ["225616"]
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x70a082310100ff0000000002a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0xba08765201020000ff000002a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0x095ea7b3010102ff000000ffae7ab96520de3a18e5e111b5eaab095312d7fe84",
+  "0xea598cb00102ff00000000ff7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+]
+state = [
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.fluid-lite.redeem_relative."stETH (deposit wstETH)"]
+position_id = "94131231672247278449408134973807954755"
+description = "Fluid Lite stETH (deposit wstETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x70a082310102ff0000000004a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0xaa9a091201040001ff000004836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201040202ff000004a0d3707c569ff8c87fa923d3823ec5d81c98be78",
+  "0x095ea7b3010304ff000000ffae7ab96520de3a18e5e111b5eaab095312d7fe84",
+  "0xea598cb00104ff00000000ff7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000007f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.fluid-lite.redeem_relative."stETH (deposit wstETH)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.king.harvest.KING]
+position_id = "778"
+description = "King Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+commands = ["0x1d7d4ebc0100010283ff00ff6db24ee656843e3fe03eb8762a54d86186ba6b64"]
+state = [
+  "0xc2e0c495dae2b05672a473ca8f273164a77c52bbf41f31c95e74de11df828fbb",
+  "0x1ad2fa0212f882cffb09a5f374438742a644c1e3eb3ae52efaa7d7222d9ff119",
+  "0xd02c67e2a92c61e2d3e5fe6e4eb1e33ba7856b1d70c25b63dc6a926ab694dc7c",
+  "0xa9758767478ac105ca28d7c44e454b358ab6b4b3f70d9f8dcfad174f7eba0af1",
+]
+bitmap = "0"
+
+[[instructions.king.harvest.KING.inputs_slots]]
+index = 0
+name = "king_claim_data.account"
+type = "Address"
+
+[instructions.king.harvest.KING.inputs_slots.meta_type]
+type = "KingClaimData"
+name = "king_claim_data"
+field = "account"
+
+[[instructions.king.harvest.KING.inputs_slots]]
+index = 1
+name = "king_claim_data.cumulative_amount"
+type = "Uint"
+
+[instructions.king.harvest.KING.inputs_slots.meta_type]
+type = "KingClaimData"
+name = "king_claim_data"
+field = "cumulative_amount"
+
+[[instructions.king.harvest.KING.inputs_slots]]
+index = 2
+name = "king_claim_data.expected_merkle_root"
+type = "FixedBytes32"
+
+[instructions.king.harvest.KING.inputs_slots.meta_type]
+type = "KingClaimData"
+name = "king_claim_data"
+field = "expected_merkle_root"
+
+[[instructions.king.harvest.KING.inputs_slots]]
+index = 3
+name = "king_claim_data.merkle_proof"
+
+[instructions.king.harvest.KING.inputs_slots.type]
+Array = "FixedBytes32"
+
+[instructions.king.harvest.KING.inputs_slots.meta_type]
+type = "KingClaimData"
+name = "king_claim_data"
+field = "merkle_proof"
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
+[instructions.morpho.account_collateral."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "327342762600167818033133681100900962486"
+description = "Morpho wstETH collateral (market: 0x6d2f...31c2)"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x93c52062810203ff00000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.morpho.account_collateral."wstETH/USDC (0xb323...86cc)"]
+position_id = "102085800190891488320502506258850684527"
+description = "Morpho wstETH collateral (market: 0xb323...86cc)"
+is_debt = false
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x93c52062810203ff00000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.morpho.account_collateral."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "228752854137756671577525718546471569592"
+description = "Morpho wstETH collateral (market: 0xe7e9...87d2)"
+is_debt = false
+group_id = "4"
+instruction_type = 1
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x93c52062810203ff00000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.morpho.account_debt."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "70667808894144221407616324166664387747"
+description = "Morpho USDC debt (market: 0x6d2f...31c2)"
+is_debt = true
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x93c52062810402ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8104ff0000000084bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018405ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018406ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020405ff000000836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "167482727468899399985879689595323416576"
+inputs_slots = []
+
+[instructions.morpho.account_debt."wstETH/USDC (0xb323...86cc)"]
+position_id = "91290664943915222943338577479383966617"
+description = "Morpho USDC debt (market: 0xb323...86cc)"
+is_debt = true
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x93c52062810402ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8104ff0000000084bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018405ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018406ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020405ff000000836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "167482727468899399985879689595323416576"
+inputs_slots = []
+
+[instructions.morpho.account_debt."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "231865414965890906957476782409120809184"
+description = "Morpho USDT debt (market: 0xe7e9...87d2)"
+is_debt = true
+group_id = "4"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+commands = [
+  "0x93c52062810402ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8104ff0000000084bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018405ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018406ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020405ff000000836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "167482727468899399985879689595323416576"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Gauntlet WETH Prime"]
+position_id = "94863143728566985956902386915891910693"
+description = "Morpho Vault WETH Gauntlet"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff00000000022371e134e3455e0593363cbf89d3b6cf53740618",
+  "0x4cdad5060102ff00000000002371e134e3455e0593363cbf89d3b6cf53740618",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse WETH"]
+position_id = "205295664156465280560294343765044329943"
+description = "Morpho Vault WETH Steakhouse"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff0000000002beef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+  "0x4cdad5060102ff0000000000beef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Vault Bridge WETH"]
+position_id = "170715880202946670315163698633126718068"
+description = "Morpho Vault WETH Vault Bridge"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff000000000231a5684983eee865d943a696aac155363ba024f9",
+  "0x4cdad5060102ff000000000031a5684983eee865d943a696aac155363ba024f9",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Yearn OG WETH"]
+position_id = "46073922549441983303808590388878370744"
+description = "Morpho Vault WETH Yearn OG"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff0000000002e89371eaaac6d46d4c3ed23453241987916224fc",
+  "0x4cdad5060102ff0000000000e89371eaaac6d46d4c3ed23453241987916224fc",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "327342762600167818033133681100900962486"
+description = "Morpho wstETH collateral (market: 0x6d2f...31c2)"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x095ea7b3010100ff000000ff7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000066e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018207ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x238d657941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0304050602000889ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)"]
+position_id = "102085800190891488320502506258850684527"
+description = "Morpho wstETH collateral (market: 0xb323...86cc)"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x095ea7b3010100ff000000ff7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000066e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018207ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x238d657941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0304050602000889ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "228752854137756671577525718546471569592"
+description = "Morpho wstETH collateral (market: 0xe7e9...87d2)"
+is_debt = false
+group_id = "4"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x095ea7b3010100ff000000ff7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000066e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018207ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x238d657941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0304050602000889ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.add_collateral."wstETH/USDT (0xe7e9...87d2)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.borrow."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "70667808894144221407616324166664387747"
+description = "Morpho USDC debt (market: 0x6d2f...31c2)"
+is_debt = true
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x50d8cd4b41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.borrow."wstETH/USDC (0x6d2f...31c2)".inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.morpho.borrow."wstETH/USDC (0xb323...86cc)"]
+position_id = "91290664943915222943338577479383966617"
+description = "Morpho USDC debt (market: 0xb323...86cc)"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x50d8cd4b41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.borrow."wstETH/USDC (0xb323...86cc)".inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.morpho.borrow."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "231865414965890906957476782409120809184"
+description = "Morpho USDT debt (market: 0xe7e9...87d2)"
+is_debt = true
+group_id = "4"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x50d8cd4b41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.borrow."wstETH/USDT (0xe7e9...87d2)".inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Gauntlet WETH Prime"]
+position_id = "94863143728566985956902386915891910693"
+description = "Morpho Vault WETH Gauntlet"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x6e553f65010002ff000000ff2371e134e3455e0593363cbf89d3b6cf53740618",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000002371e134e3455e0593363cbf89d3b6cf53740618",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Gauntlet WETH Prime".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse WETH"]
+position_id = "205295664156465280560294343765044329943"
+description = "Morpho Vault WETH Steakhouse"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x6e553f65010002ff000000ffbeef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse WETH".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Vault Bridge WETH"]
+position_id = "170715880202946670315163698633126718068"
+description = "Morpho Vault WETH Vault Bridge"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x6e553f65010002ff000000ff31a5684983eee865d943a696aac155363ba024f9",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000031a5684983eee865d943a696aac155363ba024f9",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Vault Bridge WETH".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Yearn OG WETH"]
+position_id = "46073922549441983303808590388878370744"
+description = "Morpho Vault WETH Yearn OG"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x095ea7b3010100ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0x6e553f65010002ff000000ffe89371eaaac6d46d4c3ed23453241987916224fc",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000e89371eaaac6d46d4c3ed23453241987916224fc",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Yearn OG WETH".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Gauntlet WETH Prime"]
+position_id = "94863143728566985956902386915891910693"
+description = "Morpho Vault WETH Gauntlet"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0xba08765201000101ff0000ff2371e134e3455e0593363cbf89d3b6cf53740618"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Gauntlet WETH Prime".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse WETH"]
+position_id = "205295664156465280560294343765044329943"
+description = "Morpho Vault WETH Steakhouse"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0xba08765201000101ff0000ffbeef050ecd6a16c4e7bffbb52ebba7846c4b8cd4"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse WETH".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Vault Bridge WETH"]
+position_id = "170715880202946670315163698633126718068"
+description = "Morpho Vault WETH Vault Bridge"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0xba08765201000101ff0000ff31a5684983eee865d943a696aac155363ba024f9"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Vault Bridge WETH".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Yearn OG WETH"]
+position_id = "46073922549441983303808590388878370744"
+description = "Morpho Vault WETH Yearn OG"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = ["0xba08765201000101ff0000ffe89371eaaac6d46d4c3ed23453241987916224fc"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Yearn OG WETH".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Gauntlet WETH Prime"]
+position_id = "94863143728566985956902386915891910693"
+description = "Morpho Vault WETH Gauntlet"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff00000000032371e134e3455e0593363cbf89d3b6cf53740618",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000ff2371e134e3455e0593363cbf89d3b6cf53740618",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Gauntlet WETH Prime".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse WETH"]
+position_id = "205295664156465280560294343765044329943"
+description = "Morpho Vault WETH Steakhouse"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff0000000003beef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000ffbeef050ecd6a16c4e7bffbb52ebba7846c4b8cd4",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse WETH".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Vault Bridge WETH"]
+position_id = "170715880202946670315163698633126718068"
+description = "Morpho Vault WETH Vault Bridge"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff000000000331a5684983eee865d943a696aac155363ba024f9",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000ff31a5684983eee865d943a696aac155363ba024f9",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Vault Bridge WETH".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Yearn OG WETH"]
+position_id = "46073922549441983303808590388878370744"
+description = "Morpho Vault WETH Yearn OG"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+commands = [
+  "0x70a082310102ff0000000003e89371eaaac6d46d4c3ed23453241987916224fc",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000ffe89371eaaac6d46d4c3ed23453241987916224fc",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Yearn OG WETH".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "70667808894144221407616324166664387747"
+description = "Morpho USDC debt (market: 0x6d2f...31c2)"
+is_debt = true
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018107ff0000000a6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x095ea7b3010600ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x20b76e8141000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0a0203040100070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)".inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)"]
+position_id = "91290664943915222943338577479383966617"
+description = "Morpho USDC debt (market: 0xb323...86cc)"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018107ff0000000a6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x095ea7b3010600ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x20b76e8141000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0a0203040100070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)".inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "231865414965890906957476782409120809184"
+description = "Morpho USDT debt (market: 0xe7e9...87d2)"
+is_debt = true
+group_id = "4"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018107ff0000000a6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x095ea7b3010600ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x20b76e8141000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0a0203040100070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.repay_asset."wstETH/USDT (0xe7e9...87d2)".inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.morpho.withdraw_collateral."wstETH/USDC (0x6d2f...31c2)"]
+position_id = "327342762600167818033133681100900962486"
+description = "Morpho wstETH collateral (market: 0x6d2f...31c2)"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018106ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x8720316d41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0203040501000707ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_collateral."wstETH/USDC (0x6d2f...31c2)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_collateral."wstETH/USDC (0xb323...86cc)"]
+position_id = "102085800190891488320502506258850684527"
+description = "Morpho wstETH collateral (market: 0xb323...86cc)"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018106ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x8720316d41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0203040501000707ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_collateral."wstETH/USDC (0xb323...86cc)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_collateral."wstETH/USDT (0xe7e9...87d2)"]
+position_id = "228752854137756671577525718546471569592"
+description = "Morpho wstETH collateral (market: 0xe7e9...87d2)"
+is_debt = false
+group_id = "4"
+instruction_type = 0
+affected_tokens = ["0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"]
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018106ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x8720316d41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0203040501000707ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_collateral."wstETH/USDT (0xe7e9...87d2)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.stakedao-curve.account."ETH+/WETH"]
+position_id = "72711783954023964506691756459537554589"
+description = "StakeDAO - Curve - ETH+/WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = [
+  "0xe72b141df173b999ae7c1adcbf60cc9833ce56a8",
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+commands = [
+  "0xa972985e0103ff00000000ff7d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x70a082310103ff00000000037d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x18160ddd01ff0000000000062c683fad51da2cd17793219cc86439c1875c353e",
+  "0x4903b0d10104ff00000000042c683fad51da2cd17793219cc86439c1875c353e",
+  "0x4903b0d10105ff00000000052c683fad51da2cd17793219cc86439c1875c353e",
+  "0xaa9a091201040306ff000000836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xaa9a091201050306ff000001836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x",
+]
+bitmap = "79753679747094952374228423616820674560"
+inputs_slots = []
+
+[instructions.stakedao-curve.deposit."ETH+/WETH"]
+position_id = "72711783954023964506691756459537554589"
+description = "StakeDAO - Curve - ETH+/WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0xe72b141df173b999ae7c1adcbf60cc9833ce56a8",
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+commands = [
+  "0x095ea7b3010300ff000000ffe72b141df173b999ae7c1adcbf60cc9833ce56a8",
+  "0x095ea7b3010301ff000000ffc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  "0xb72df5de01fd040001fb02ff2c683fad51da2cd17793219cc86439c1875c353e",
+  "0x70a082310106ff00000000042c683fad51da2cd17793219cc86439c1875c353e",
+  "0x095ea7b3010504ff000000ff2c683fad51da2cd17793219cc86439c1875c353e",
+  "0x6e553f65010406ff000000ff7d3db01a4ac4aa27534d2951e58d59992686ea5c",
+]
+state = [
+  "0x0bb513fbc5c85550ee62f3ab076301ea201f7fb8db8c9f525ad154057b25cb68",
+  "0x1714f1480d3b059580e500bfb14b79be53a326e862b47ee5935a93a7c5e6ee5e",
+  "0xcd6482d6f25daeab2a860d965aed89d8772ef3e61e3a4c31e3112c72dfea1478",
+  "0x0000000000000000000000002c683fad51da2cd17793219cc86439c1875c353e",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000007d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+]
+bitmap = "29243015907268149203883755326167580672"
+
+[[instructions.stakedao-curve.deposit."ETH+/WETH".inputs_slots]]
+index = 0
+name = "amount_token0"
+type = "Uint"
+
+[[instructions.stakedao-curve.deposit."ETH+/WETH".inputs_slots]]
+index = 1
+name = "amount_token1"
+type = "Uint"
+
+[[instructions.stakedao-curve.deposit."ETH+/WETH".inputs_slots]]
+index = 2
+name = "min_lp_amount"
+type = "Uint"
+
+[instructions.stakedao-curve.harvest."ETH+/WETH"]
+position_id = "72711783954023964506691756459537554589"
+description = "StakeDAO - Curve - ETH+/WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+commands = [
+  "0xef933df041000000000000ff93b4b9bd266ffa8af68e39edfa8cfe2a62011ce0",
+  "0xfd0100fbfd0182fbff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x000000000000000000000000ad6d1a4b1b2f33712a8b18bedc95c0a1f9832269",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "212676479325586539664609129644855132160"
+inputs_slots = []
+
+[instructions.stakedao-curve.withdraw."ETH+/WETH"]
+position_id = "72711783954023964506691756459537554589"
+description = "StakeDAO - Curve - ETH+/WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0xe72b141df173b999ae7c1adcbf60cc9833ce56a8",
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+commands = [
+  "0xb460af9401000404ff0000ff7d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x70a082310104ff00000000052c683fad51da2cd17793219cc86439c1875c353e",
+  "0x5e604cd241000000000000ff2c683fad51da2cd17793219cc86439c1875c353e",
+  "0x05fd030102fb04ff000000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x115e941850472d96a0d64e7b7ff66a51efeda217b7aaf32f5173fa4304dbba81",
+  "0x895fddacbd09d6af25b3cc41096746fe6bad475575d544100b80a6551a5cc872",
+  "0xed62ab1828f84db7b092cae8d18edc744f3ffb8f572467c7d95503712a66f322",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "10633823966279326983230456482242756608"
+
+[[instructions.stakedao-curve.withdraw."ETH+/WETH".inputs_slots]]
+index = 0
+name = "vault_amount_to_withdraw"
+type = "Uint"
+
+[[instructions.stakedao-curve.withdraw."ETH+/WETH".inputs_slots]]
+index = 1
+name = "min_amount_0"
+type = "Uint"
+
+[[instructions.stakedao-curve.withdraw."ETH+/WETH".inputs_slots]]
+index = 2
+name = "min_amount_1"
+type = "Uint"
+
+[instructions.stakedao-curve.withdraw_relative."ETH+/WETH"]
+position_id = "72711783954023964506691756459537554589"
+description = "StakeDAO - Curve - ETH+/WETH"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0xe72b141df173b999ae7c1adcbf60cc9833ce56a8",
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+]
+commands = [
+  "0x70a082310105ff00000000067d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x07a2d13a0106ff00000000067d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0xaa9a091201060003ff000006836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xb460af9401060505ff0000ff7d3db01a4ac4aa27534d2951e58d59992686ea5c",
+  "0x70a082310105ff00000000062c683fad51da2cd17793219cc86439c1875c353e",
+  "0x5e604cd241000000000000ff2c683fad51da2cd17793219cc86439c1875c353e",
+  "0x06fd040102fb05ff000000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xe03955617d04c9ad72e38844b404f0293b4da0d20aaaa0b0fa9bc28814ec552d",
+  "0x895fddacbd09d6af25b3cc41096746fe6bad475575d544100b80a6551a5cc872",
+  "0xed62ab1828f84db7b092cae8d18edc744f3ffb8f572467c7d95503712a66f322",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x000000000000000000000000d1a2d9df5db842da2ee81075fa441602b2352915",
+  "0x",
+]
+bitmap = "26584559915698317458076141205606891520"
+
+[[instructions.stakedao-curve.withdraw_relative."ETH+/WETH".inputs_slots]]
+index = 0
+name = "bps_to_withdraw"
+type = "Uint"
+
+[[instructions.stakedao-curve.withdraw_relative."ETH+/WETH".inputs_slots]]
+index = 1
+name = "min_amount_0"
+type = "Uint"
+
+[[instructions.stakedao-curve.withdraw_relative."ETH+/WETH".inputs_slots]]
+index = 2
+name = "min_amount_1"
+type = "Uint"

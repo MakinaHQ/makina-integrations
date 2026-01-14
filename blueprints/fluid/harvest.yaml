@@ -1,0 +1,31 @@
+protocol: "fluid"
+
+inputs:
+  claims_contract_address:
+    type: "address"
+
+actions:
+  harvest:
+    calls:
+      - description: "Claim FLUID rewards using merkle proof"
+        target: "${inputs.claims_contract_address}"
+        selector: "claim(address,uint256,uint8,bytes32,uint256,bytes32[],bytes)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.fluid_claim_data.recipient}"
+          - type: "uint256"
+            value: "${input_slots.fluid_claim_data.cumulative_amount}"
+          - type: "uint8"
+            value: "${input_slots.fluid_claim_data.position_type}"
+          - type: "bytes32"
+            value: "${input_slots.fluid_claim_data.position_id}"
+          - type: "uint256"
+            value: "${input_slots.fluid_claim_data.cycle}"
+          - type: "bytes32[]"
+            value: "${input_slots.fluid_claim_data.merkle_proof}"
+          - type: "bytes"
+            value: "${input_slots.fluid_claim_data.metadata}"
+
+    input_slots:
+      fluid_claim_data:
+        type: "FluidClaimData"
