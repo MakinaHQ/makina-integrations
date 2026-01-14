@@ -1,0 +1,85 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/account.yaml:account"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      wrapped_a_token_address:
+        type: "address"
+        value: "0x0bfc9d54Fc184518A81162F8fB99c2eACa081202" # waEthWETH
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:start_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      asset_address:
+        type: "address"
+        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/harvest.yaml:harvest"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      rewards_controller_address:
+        type: "address"
+        value: "0x4655Ce3D625a63d30bA704087E52B4C31E38188B" # Aave Umbrella Rewards Controller
