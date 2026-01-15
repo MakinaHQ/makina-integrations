@@ -1,0 +1,36 @@
+protocol: "fluid-lite"
+
+inputs:
+  fluid_vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get the user's balance of Fluid Lite vault shares"
+        target: "${inputs.fluid_vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "vault_shares_balance"
+          type: "uint256"
+
+      - description: "Convert vault shares to underlying assets"
+        target: "${inputs.fluid_vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_shares_balance}"
+        return:
+          name: "underlying_assets_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.underlying_assets_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

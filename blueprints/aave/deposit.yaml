@@ -21,6 +21,7 @@ actions:
             value: ${inputs.aave_pool_instance}
           - type: "uint256"
             value: ${input_slots.amount_to_deposit}
+
       - description: "Supply collateral to the Aave pool"
         target: ${inputs.aave_pool_instance}
         selector: "supply(address,uint256,address,uint16)"
