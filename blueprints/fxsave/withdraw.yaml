@@ -1,0 +1,78 @@
+protocol: "fxSAVE"
+
+inputs:
+  fx_save_address:
+    type: "address"
+  fx_sp_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  revertable_caliber_helper:
+    type: "address"
+
+actions:
+  # Request redemption from fxSAVE through the stability pool.
+  # This first redeems fxSAVE shares to fxSP tokens, then requests redemption from the stability pool.
+  # After this action, the fxSP tokens are locked in the stability pool with a cooldown period.
+  request_redeem:
+    calls:
+      - description: "Redeem fxSAVE shares to fxSP tokens"
+        target: "${inputs.fx_save_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "fx_sp_received"
+
+      - description: "Request redemption from fxSP (stability pool)"
+        target: "${inputs.fx_sp_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_received}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of fxSAVE shares to redeem"
+
+  # Claim from the stability pool after the cooldown period.
+  # This redeems the locked fxSP tokens to receive fxUSD and USDC.
+  claim:
+    calls:
+      - description: "Get the pending redemption amount"
+        target: "${inputs.fx_sp_address}"
+        selector: "redeemRequests(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "(uint128,uint128)"
+          name: "caliber_redeem_request"
+
+      - description: "Extract the amount to redeem from the tuple"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128)"
+            value: "${returns.caliber_redeem_request}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "amount_to_redeem"
+
+      - description: "Redeem from fxSP (receive a mix of fxUSD and USDC)"
+        target: "${inputs.fx_sp_address}"
+        selector: "redeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.amount_to_redeem}"

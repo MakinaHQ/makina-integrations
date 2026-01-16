@@ -1,0 +1,517 @@
+# this is a generated file - do not edit manually
+# root: 0xfe0e77503f0bf1c9deeca11728d060d882b20cd84069d169ddfc2c41adcb1583
+
+[instructions.convex-curve.account_single_sided_token_b."sUSD/USDe"]
+position_id = "192769461428082155333185570845010544894"
+description = "Convex sUSD/USDe position"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x4c9edd5852cd905f086c759e8383e09bff1e68b3"]
+commands = [
+  "0x70a082310102ff0000000002268ee43857694fe53ff8729b8171266ee2514c69",
+  "0x6d5433e6010203ff00000002836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xcc2b27d7010203ff0000000059a06b97b2d566b9dee2a368eac8787cfa57f95d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.convex-curve.deposit_single_sided_token_b."sUSD/USDe"]
+position_id = "192769461428082155333185570845010544894"
+description = "Convex sUSD/USDe position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x4c9edd5852cd905f086c759e8383e09bff1e68b3"]
+commands = [
+  "0x095ea7b3010200ff000000ff4c9edd5852cd905f086c759e8383e09bff1e68b3",
+  "0xb72df5de01fd030400fb010459a06b97b2d566b9dee2a368eac8787cfa57f95d",
+  "0x095ea7b3010504ff000000ff59a06b97b2d566b9dee2a368eac8787cfa57f95d",
+  "0x43a0d06601060407ff0000fff403c135812408bfbe8713b5a23a04b3d48aae31",
+]
+state = [
+  "0xece8bb32ef6f93c3b204f080fc7f7bd1e6fe03aebc083f381f5ff7a5c70e7d5e",
+  "0xcd6482d6f25daeab2a860d965aed89d8772ef3e61e3a4c31e3112c72dfea1478",
+  "0x00000000000000000000000059a06b97b2d566b9dee2a368eac8787cfa57f95d",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000f403c135812408bfbe8713b5a23a04b3d48aae31",
+  "0x00000000000000000000000000000000000000000000000000000000000001ad",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "62473715801891046026478931833176195072"
+
+[[instructions.convex-curve.deposit_single_sided_token_b."sUSD/USDe".inputs_slots]]
+index = 0
+name = "amount_asset_b"
+type = "Uint"
+
+[[instructions.convex-curve.deposit_single_sided_token_b."sUSD/USDe".inputs_slots]]
+index = 1
+name = "min_lp_amount"
+type = "Uint"
+
+[instructions.convex-curve.harvest."sUSD/USDe"]
+position_id = "192769461428082155333185570845010544894"
+description = "Convex sUSD/USDe position"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+commands = ["0x7050ccd9010001ff000000ff268ee43857694fe53ff8729b8171266ee2514c69"]
+state = [
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.convex-curve.withdraw_single_sided_token_b_relative."sUSD/USDe"]
+position_id = "192769461428082155333185570845010544894"
+description = "Convex sUSD/USDe position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x4c9edd5852cd905f086c759e8383e09bff1e68b3"]
+commands = [
+  "0x70a082310102ff0000000002268ee43857694fe53ff8729b8171266ee2514c69",
+  "0xaa9a091201020003ff000002836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xc32e7202010204ff000000ff268ee43857694fe53ff8729b8171266ee2514c69",
+  "0x1a4d01d201020501ff0000ff59a06b97b2d566b9dee2a368eac8787cfa57f95d",
+]
+state = [
+  "0xe03955617d04c9ad72e38844b404f0293b4da0d20aaaa0b0fa9bc28814ec552d",
+  "0xbada4b1d837490dbc92760398ba95ec0eb3d6bb632632823ea292f373b20e403",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "79753679747094952374228423616820674560"
+
+[[instructions.convex-curve.withdraw_single_sided_token_b_relative."sUSD/USDe".inputs_slots]]
+index = 0
+name = "bps_to_withdraw"
+type = "Uint"
+
+[[instructions.convex-curve.withdraw_single_sided_token_b_relative."sUSD/USDe".inputs_slots]]
+index = 1
+name = "min_amount_token_b"
+type = "Uint"
+
+[instructions.fxSAVE.account.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+commands = [
+  "0x70a082310103ff00000000067743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x07a2d13a0106ff00000000067743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x70a082310103ff000000000365c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x771602f7010603ff00000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0x4cdad5068103ff000000008365c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x",
+]
+bitmap = "79753679747094952374228423616820674560"
+inputs_slots = []
+
+[instructions.fxSAVE.claim.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+commands = [
+  "0x8d158c2a8101ff000000008265c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x62de91e9018200ff00000002c6b5888830eb10d19267680b339febcd75569b62",
+  "0x1e9a6950010102ff000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.fxSAVE.deposit.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+commands = [
+  "0x095ea7b3010401ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x3ea34dc041000000000000ff33636d49fbefbe798e15e7f356e8dbef543cc708",
+  "0xfc000105830186fb000207ff0000000000000000000000000000000000000000",
+]
+state = [
+  "0x49eaa8becab4ac0004b6b96bf2a0b96c5cd097714fa7dd1adb25a839a69736d3",
+  "0xf75c711de87b74289629ce8e8dc8a743e490acbd7d3b5a332f1eb964afb92d82",
+  "0xc6c29504c6127130f285d88a5557c180eee101ab77daec302397b7cc4520f63e",
+  "0x56b742e151e613143e9143eaaa38d87ff2d82d1e6c6deac5760352387b757dd1",
+  "0x00000000000000000000000033636d49fbefbe798e15e7f356e8dbef543cc708",
+  "0x00000000000000000000000012af4529129303d7fbd2563e242c4a2890525912",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+]
+bitmap = "19938419936773738093557105904205168640"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 0
+name = "fx_save_data.tokenIn"
+type = "Address"
+
+[instructions.fxSAVE.deposit.fxSAVE.inputs_slots.meta_type]
+type = "FxSaveData"
+name = "fx_save_data"
+field = "tokenIn"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 1
+name = "fx_save_data.amountToDeposit"
+type = "Uint"
+
+[instructions.fxSAVE.deposit.fxSAVE.inputs_slots.meta_type]
+type = "FxSaveData"
+name = "fx_save_data"
+field = "amountToDeposit"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 2
+name = "fx_save_data.minAmountOut"
+type = "Uint"
+
+[instructions.fxSAVE.deposit.fxSAVE.inputs_slots.meta_type]
+type = "FxSaveData"
+name = "fx_save_data"
+field = "minAmountOut"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 3
+name = "fx_save_data.abiEncodeConvert"
+type = "Bytes"
+
+[instructions.fxSAVE.deposit.fxSAVE.inputs_slots.meta_type]
+type = "FxSaveData"
+name = "fx_save_data"
+field = "abiEncodeConvert"
+
+[instructions.fxSAVE.request_redeem.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+commands = [
+  "0xba08765201000101ff0000017743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0xaa2f892d0101ff00000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.fxSAVE.request_redeem.fxSAVE.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.makina-flashloan.flashloan_request."PT-mHYPER/USDC Morpho Loop"]
+position_id = "12380192487758324910982301"
+description = "PT-mHYPER/USDC Morpho Loop"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = ["0xa0a27dad01fc03820001fbffa7912d4f83024702ec26f55bf5fe6c03eea76841"]
+state = [
+  "0x904fbacc5501b25c31329356f9ca30103ef09ae47be690568944ccc39ed4890a",
+  "0xc6281954458230e603513a706c3b5cd7f962b76fcf43f51d310dea847236661a",
+  "0x7bf202e6b237b84fc04ecedeb20339a5fefbd212274a21c6dd8a1c6a203c8eba",
+  "0xc8cc9f78296f660eb2eee3bbda2e2502453633a1e85d9a15f2f25584ad2025ec",
+]
+bitmap = "0"
+
+[[instructions.makina-flashloan.flashloan_request."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 0
+name = "flash_loan_token"
+type = "Address"
+
+[[instructions.makina-flashloan.flashloan_request."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 1
+name = "flash_loan_amount"
+type = "Uint"
+
+[[instructions.makina-flashloan.flashloan_request."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 2
+name = "flash_loan_data"
+type = "Bytes"
+
+[[instructions.makina-flashloan.flashloan_request."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 3
+name = "flash_loan_venue"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.account_loop."PT-mHYPER/USDC Morpho Loop"]
+position_id = "12380192487758324910982301"
+description = "PT-mHYPER/USDC Morpho Loop"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578106ff000000008bbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018b02ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018b05ff0000000c6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018b08ff0000000d6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018b07ff0000000e6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018b03ff0000000b6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x151c1ade01020c0d0e0bffffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x93c52062810604ff00000084bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018408ff0000000b6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018405ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8106ff0000000086bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018607ff000000076e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018608ff000000066e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201040607ff000006836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xa035b1fe01ff0000000000078ad7d0e0523555ceb9ba9ac4d3c90df211f959bf",
+  "0xaa9a091201090a0aff00000a836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xaa9a0912010b070aff00000a836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xb67d77c501060aff00000000836c9007dbd73fcfc473190304c72b7e39babb91",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x1ca75949a91c157183f53282d73c37191e7cd84002310f6632047d874aad4a0f",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000c097ce7bc90715b34b9f1000000000",
+  "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "0x",
+  "0x",
+  "0x",
+  "0x",
+]
+bitmap = "169975029960996117247574327833349062656"
+inputs_slots = []
+
+[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop"]
+position_id = "12380192487758324910982301"
+description = "PT-mHYPER/USDC Morpho Loop"
+is_debt = false
+group_id = "0"
+instruction_type = 3
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x095ea7b3010502ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0xc92cf3c1410000000000000788f6ff4d868044b4b79bd4164d6e5959b0985b95",
+  "0xfc008106070203fbff0000000000000000000000000000000000000000000000",
+  "0x095ea7b3010807ff000000ffe4d30ccf87cb3e5e637b64a2ee21bd5d3901839a",
+  "0x2c3c91578109ff0000000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901890fff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e901890aff0000000a6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e901890bff0000000b6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e901890cff0000000c6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e901890dff000000096e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x238d657941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080a0b0c0907108eff0000000000000000000000000000000000000000000000",
+  "0x50d8cd4b41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080a0b0c09040f1010ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x6965ac7325d0f8f96b0d5150bf7fbb3f43e75e4261264f211d09bfc4d947b258",
+  "0x41b04f34164ff5391e9c238aa7b0c56aeddd0ad16982d0ca332e761b88247448",
+  "0xbce6ca879ced90a42ff302d234d8dc529b96930ad621c3c2abc4b580c0880ae9",
+  "0x29328aee110e1fde6bb83c0c3e2c19ceb849970a28c9e1febbfbb1fc52df1f95",
+  "0xc6281954458230e603513a706c3b5cd7f962b76fcf43f51d310dea847236661a",
+  "0x00000000000000000000000088f6ff4d868044b4b79bd4164d6e5959b0985b95",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x000000000000000000000000e4d30ccf87cb3e5e637b64a2ee21bd5d3901839a",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x1ca75949a91c157183f53282d73c37191e7cd84002310f6632047d874aad4a0f",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+]
+bitmap = "10631227817850059569416191234078146560"
+
+[[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 0
+name = "swap_data.swapperId"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "swapperId"
+
+[[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 1
+name = "swap_data.data"
+type = "Bytes"
+
+[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "data"
+
+[[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 2
+name = "swap_data.inputAmount"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "inputAmount"
+
+[[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 3
+name = "swap_data.minOutputAmount"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "minOutputAmount"
+
+[[instructions.morpho-pendle-pt-loop.loop_in."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 4
+name = "flash_loan_amount"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop"]
+position_id = "12380192487758324910982301"
+description = "PT-mHYPER/USDC Morpho Loop"
+is_debt = false
+group_id = "0"
+instruction_type = 3
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+commands = [
+  "0x2c3c91578107ff0000000091bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901910bff000000126e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9019109ff000000136e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9019108ff000000146e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9019105ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9019106ff000000116e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x93c5206281070dff00000087bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018708ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018709ff000000076e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x095ea7b3010a00ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x20b76e8141000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x12131405110b070d8cff00000000000000000000000000000000000000000000",
+  "0x8720316d41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x1213140511080d0dff0000000000000000000000000000000000000000000000",
+  "0x095ea7b3010e03ff000000ffe4d30ccf87cb3e5e637b64a2ee21bd5d3901839a",
+  "0xc92cf3c141000000000000ff88f6ff4d868044b4b79bd4164d6e5959b0985b95",
+  "0xfc01820f100304fbff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc6281954458230e603513a706c3b5cd7f962b76fcf43f51d310dea847236661a",
+  "0x6965ac7325d0f8f96b0d5150bf7fbb3f43e75e4261264f211d09bfc4d947b258",
+  "0x41b04f34164ff5391e9c238aa7b0c56aeddd0ad16982d0ca332e761b88247448",
+  "0xbce6ca879ced90a42ff302d234d8dc529b96930ad621c3c2abc4b580c0880ae9",
+  "0x29328aee110e1fde6bb83c0c3e2c19ceb849970a28c9e1febbfbb1fc52df1f95",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x1ca75949a91c157183f53282d73c37191e7cd84002310f6632047d874aad4a0f",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000f8e88d73636b29bddec82d71da805dc3abe55936",
+  "0x00000000000000000000000088f6ff4d868044b4b79bd4164d6e5959b0985b95",
+  "0x000000000000000000000000e4d30ccf87cb3e5e637b64a2ee21bd5d3901839a",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x",
+  "0x",
+  "0x",
+  "0x",
+]
+bitmap = "10631227817850059569416191234078146560"
+
+[[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 0
+name = "flash_loan_amount"
+type = "Uint"
+
+[[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 1
+name = "swap_data.swapperId"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "swapperId"
+
+[[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 2
+name = "swap_data.data"
+type = "Bytes"
+
+[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "data"
+
+[[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 3
+name = "swap_data.inputAmount"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "inputAmount"
+
+[[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots]]
+index = 4
+name = "swap_data.minOutputAmount"
+type = "Uint"
+
+[instructions.morpho-pendle-pt-loop.loop_out."PT-mHYPER/USDC Morpho Loop".inputs_slots.meta_type]
+type = "SwapData"
+name = "swap_data"
+field = "minOutputAmount"

@@ -41,3 +41,48 @@
       caliber_helper_address:
         type: "address"
         value: "${config.caliber_helper_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:request_redeem"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x085780639CC2cACd35E474e71f4d000e2405d8f6" # fxUSD
+    - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:claim"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"

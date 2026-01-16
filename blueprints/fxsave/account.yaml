@@ -9,6 +9,8 @@ inputs:
     type: "address"
   caliber_helper_address:
     type: "address"
+  unsigned_math_helper:
+    type: "address"
 
 actions:
   account:
@@ -30,7 +32,29 @@ actions:
           - type: "uint256"
             value: "${returns.fx_save_balance}"
         return:
-          name: "fx_sp_balance"
+          name: "fx_sp_from_fx_save"
+          type: "uint256"
+
+      - description: "Get fxSP held directly in caliber (after redeeming fxSAVE but before requesting SP redemption)"
+        target: "${inputs.fx_sp_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_in_caliber"
+          type: "uint256"
+
+      - description: "Calculate total fxSP balance (from fxSAVE + in caliber)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_from_fx_save}"
+          - type: "uint256"
+            value: "${returns.fx_sp_in_caliber}"
+        return:
+          name: "total_fx_sp_balance"
           type: "uint256"
 
       - description: "Preview redeem fxSP from fxSP contract, for (fxUSD, USDC)"
@@ -38,7 +62,7 @@ actions:
         selector: "previewRedeem(uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.fx_sp_balance}"
+            value: "${returns.total_fx_sp_balance}"
         return:
           name: "tokens_balances"
           type: "(uint256,uint256)"
