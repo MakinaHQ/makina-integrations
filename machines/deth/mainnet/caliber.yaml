@@ -36,14 +36,6 @@ positions:
     instructions: !include "./instructions/king-harvest.yaml"
 
   # Positions
-  - id: "147403525593287433774057570606136062652"
-    group_id: "0"
-    description: "Convex f(x) - Curve - USDC/fxUSD"
-    instructions: !include "./instructions/convex-fx-curve-usdc-fxusd.yaml"
-  - id: "72711783954023964506691756459537554589"
-    group_id: "0"
-    description: "StakeDAO - Curve - ETH+/WETH"
-    instructions: !include "./instructions/stakedao-curve-eth+-weth.yaml"
   - id: "94863143728566985956902386915891910693"
     group_id: "0"
     description: "Morpho Vault WETH Gauntlet"
