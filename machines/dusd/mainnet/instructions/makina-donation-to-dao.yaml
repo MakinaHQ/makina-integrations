@@ -1,0 +1,19 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "Donation of 104'491 USDC to Makina DAO"
+    path: "../../../blueprints/makina/donation-to-dao.yaml:donate-usdc-to-dao"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      donation_amount:
+        type: "uint256"
+        value: "104491000000" # 104491 USDC with 6 decimals
+      kv_store_key:
+        type: "bytes32"
+        value: "0x4218545ae204f2b2f79565cca2caea363797213eef9f26c27084be21dbd61a3d" # keccak256("makina.dusd.usdc.donation.done")

@@ -1,0 +1,60 @@
+protocol: "makina"
+
+constants:
+  makina_dao_address:
+    type: "address"
+    value: "0x62244C74e1d09b3D86EF7342d354b5D7770bDE10"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  kv_store_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+  donation_amount:
+    type: "uint256"
+  kv_store_key:
+    type: "bytes32"
+
+actions:
+  donate-usdc-to-dao:
+    calls:
+      # check if the donation has already been made
+      - description: "Check if donation has already been made"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+        return:
+          name: "donation_done"
+          type: "bool"
+
+      - description: "Revert if donation has already been made"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.donation_done}"
+
+      # perform the donation
+      - description: "Donate USDC to Makina DAO"
+        target: "${constants.usdc_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.makina_dao_address}"
+          - type: "uint256"
+            value: "${inputs.donation_amount}"
+
+      # mark the donation as done in the kv store
+      - description: "Mark donation as done in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+          - type: "bool"
+            value: "true"
