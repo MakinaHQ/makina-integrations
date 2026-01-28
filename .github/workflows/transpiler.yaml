@@ -46,20 +46,43 @@ jobs:
         env:
           ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
         run: |
+          # Note: when multiple rootfiles are added in the same directory (e.g. an older "empty"
+          # and a newer actionable rootfile), it's impossible for *every* added rootfile
+          # to be the most recent. Instead, enforce that for each touched directory,
+          # the most recent rootfile (lexicographically greatest) is part of the PR.
+
+          declare -A dir_top=()
+
+          # Compute the most recent filename per rootfiles directory.
           for file in ${ADDED_ROOTFILES}; do
             dir=$(cd -- "$(dirname -- "$file")" && pwd)
-            base=$(basename -- "$file")
 
-            # Get the lexicographically smallest regular file name in the directory (ascending order)
-            top=$(
-              cd -- "$dir"
-              LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r | head -n 1
-            )
+            if [[ -z "${dir_top[$dir]:-}" ]]; then
+              top=$(
+                cd -- "$dir"
+                LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r | head -n 1
+              )
+              dir_top["$dir"]="$top"
+            fi
+          done
 
-            if [[ "$base" == "$top" ]]; then
-              exit 0
-            else
-              echo "Error: The name of the new rootfile '$base' should start with the most recent timestamp in '$dir'. First is '$top'." >&2
+          # Ensure that the most recent file in each directory is among the added files.
+          for dir in "${!dir_top[@]}"; do
+            top="${dir_top[$dir]}"
+            found=0
+
+            for file in ${ADDED_ROOTFILES}; do
+              file_dir=$(cd -- "$(dirname -- "$file")" && pwd)
+              base=$(basename -- "$file")
+
+              if [[ "$file_dir" == "$dir" && "$base" == "$top" ]]; then
+                found=1
+                break
+              fi
+            done
+
+            if [[ "$found" -ne 1 ]]; then
+              echo "Error: New rootfiles were added in '$dir', but none is the most recent rootfile ('$top')." >&2
               exit 1
             fi
           done
