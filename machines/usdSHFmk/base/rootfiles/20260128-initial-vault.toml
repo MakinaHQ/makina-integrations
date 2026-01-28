@@ -1,0 +1,104 @@
+# this is a generated file - do not edit manually
+# root: 0x7e5b6b7007739020c1dc72e65d3060b3517f639c2771fa849ab3bf4e5e0d7248
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.morpho.account_vault."Steakhouse Prime USDC"]
+position_id = "14523639472016899474685040679031268882804262248966173777422878776615686949418"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+  "0x4cdad5060102ff0000000000beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.deposit_vault."Steakhouse Prime USDC"]
+position_id = "14523639472016899474685040679031268882804262248966173777422878776615686949418"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x6e553f65010001ff000000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse Prime USDC"]
+position_id = "14523639472016899474685040679031268882804262248966173777422878776615686949418"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDC"]
+position_id = "14523639472016899474685040679031268882804262248966173777422878776615686949418"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"

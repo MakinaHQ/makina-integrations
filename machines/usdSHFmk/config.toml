@@ -1,0 +1,14 @@
+name = "repousdSHFmk"
+chain = "mainnet"
+address = ""
+
+[calibers.mainnet]
+address = ""
+swapper = ""
+rootfiles = "github:MakinaHQ/makina-integrations/machines/repousdSHFmk/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"

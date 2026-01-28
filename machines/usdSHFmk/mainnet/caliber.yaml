@@ -1,0 +1,22 @@
+config:
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+
+positions:
+
+  # Morpho Vaults
+  - id: "17455191626566958960615956298200606301213897619571667687447494014454514813808" # keccak256("1.1.vault.0xbeef01735c132ada46aa9aa4c54623caa92a64cb")
+    group_id: "0"
+    description: "Morpho Vault Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "Steakhouse USDC"
+      token_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"
