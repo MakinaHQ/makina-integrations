@@ -1,11 +1,11 @@
-name = "repousdSHFmk"
+name = "usdSHFmk"
 chain = "mainnet"
-address = ""
+address = "0x733aBb32544f4D3053a58eD747538c060f559108"
 
 [calibers.mainnet]
-address = ""
-swapper = ""
-rootfiles = "github:MakinaHQ/makina-integrations/machines/repousdSHFmk/mainnet/rootfiles"
+address = "0xbeef112D4F6402502467242278b870bbf292f304"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/usdSHFmk/mainnet/rootfiles"
 
 [calibers.mainnet.accounting_token]
 address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
