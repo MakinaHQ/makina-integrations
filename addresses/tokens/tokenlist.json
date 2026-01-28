@@ -1,0 +1,131 @@
+{
+  "$schema": "tokenlist.schema.json",
+  "name": "Makina Token List",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "timestamp": "2026-01-28T10:00:00.000Z",
+  "tokens": [
+    {
+      "chainId": 1,
+      "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+      "name": "Wrapped BTC",
+      "decimals": 8,
+      "symbol": "WBTC"
+    },
+    {
+      "chainId": 1,
+      "address": "0x443df5eee3196e9b2dd77cabd3ea76c3dee8f9b2",
+      "name": "Gauntlet WBTC Core",
+      "decimals": 18,
+      "symbol": "gtWBTCc"
+    },
+    {
+      "chainId": 1,
+      "address": "0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf",
+      "name": "Coinbase Wrapped BTC",
+      "decimals": 8,
+      "symbol": "cbBTC"
+    },
+    {
+      "chainId": 1,
+      "address": "0x18084fba666a33d37592fa2633fd49a74dd93a88",
+      "name": "tBTC v2",
+      "decimals": 18,
+      "symbol": "tBTC"
+    },
+    {
+      "chainId": 1,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "name": "USD Coin",
+      "decimals": 6,
+      "symbol": "USDC"
+    },
+    {
+      "chainId": 42161,
+      "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "name": "USD Coin",
+      "decimals": 6,
+      "symbol": "USDC"
+    },
+    {
+      "chainId": 8453,
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "name": "USD Coin",
+      "decimals": 6,
+      "symbol": "USDC"
+    },
+    {
+      "chainId": 1,
+      "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "name": "Tether USD",
+      "decimals": 6,
+      "symbol": "USDT"
+    },
+    {
+      "chainId": 42161,
+      "address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "name": "USD₮0",
+      "decimals": 6,
+      "symbol": "USD₮0"
+    },
+    {
+      "chainId": 1,
+      "address": "0x8292bb45bf1ee4d140127049757c2e0ff06317ed",
+      "name": "RLUSD",
+      "decimals": 18,
+      "symbol": "RLUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+      "name": "PayPal USD",
+      "decimals": 6,
+      "symbol": "PYUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e",
+      "name": "Curve.Fi USD Stablecoin",
+      "decimals": 18,
+      "symbol": "crvUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+      "name": "USDe",
+      "decimals": 18,
+      "symbol": "USDe"
+    },
+    {
+      "chainId": 1,
+      "address": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+      "name": "Staked USDe",
+      "decimals": 18,
+      "symbol": "sUSDe"
+    },
+    {
+      "chainId": 1,
+      "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+      "name": "Wrapped liquid staked Ether 2.0",
+      "decimals": 18,
+      "symbol": "wstETH"
+    },
+    {
+      "chainId": 1,
+      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "name": "Wrapped Ether",
+      "decimals": 18,
+      "symbol": "WETH"
+    },
+    {
+      "chainId": 1,
+      "address": "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F",
+      "name": "Electronic Dollar",
+      "decimals": 18,
+      "symbol": "eUSD"
+    }
+  ]
+}

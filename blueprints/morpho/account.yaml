@@ -7,16 +7,24 @@ inputs:
     type: "address"
   unsigned_math_helper:
     type: "address"
+  context_helper_address:
+    type: "address"
   market_id:
     type: "bytes32"
-  subject:
-    type: "address"
   vault_address:
     type: "address"
 
 actions:
   account_collateral:
     calls:
+      - description: "Get caliber's address"
+        target: "${inputs.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Get user position in the market"
         target: "${inputs.morpho}"
         selector: "position(bytes32,address)"
@@ -24,7 +32,7 @@ actions:
           - type: "bytes32"
             value: "${inputs.market_id}"
           - type: "address"
-            value: "${inputs.subject}"
+            value: "${returns.caliber_address}"
         return:
           name: "position_data"
           type: "(uint256,uint128,uint128)"
@@ -49,6 +57,14 @@ actions:
 
   account_debt:
     calls:
+      - description: "Get caliber's address"
+        target: "${inputs.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Get user position in the market"
         target: "${inputs.morpho}"
         selector: "position(bytes32,address)"
@@ -56,7 +72,7 @@ actions:
           - type: "bytes32"
             value: "${inputs.market_id}"
           - type: "address"
-            value: "${inputs.subject}"
+            value: "${returns.caliber_address}"
         return:
           name: "position_data"
           type: "(uint256,uint128,uint128)"
@@ -129,6 +145,14 @@ actions:
 
   account_loan:
     calls:
+      - description: "Get caliber's address"
+        target: "${inputs.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Get user position in the market"
         target: "${inputs.morpho}"
         selector: "position(bytes32,address)"
@@ -136,7 +160,7 @@ actions:
           - type: "bytes32"
             value: "${inputs.market_id}"
           - type: "address"
-            value: "${inputs.subject}"
+            value: "${returns.caliber_address}"
         return:
           name: "position_data"
           type: "(uint256,uint128,uint128)"
@@ -209,15 +233,24 @@ actions:
 
   account_vault:
     calls:
+      - description: "Get caliber's address"
+        target: "${inputs.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Query caliber balance of vault tokens"
         target: "${inputs.vault_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
-            value: "${inputs.subject}"
+            value: "${returns.caliber_address}"
         return:
           name: "vault_balance"
           type: "uint256"
+
       - description: "Preview redeem shares from the vault, to get our assets out"
         target: "${inputs.vault_address}"
         selector: "previewRedeem(uint256)"

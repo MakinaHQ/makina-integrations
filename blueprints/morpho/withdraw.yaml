@@ -7,7 +7,7 @@ inputs:
     type: "address"
   market_id:
     type: "bytes32"
-  receiver_address:
+  context_helper_address:
     type: "address"
   vault_address:
     type: "address"
@@ -87,6 +87,14 @@ actions:
           name: "lltv"
           type: "uint256"
 
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Withdraw collateral from Morpho market"
         target: "${inputs.morpho}"
         selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
@@ -106,9 +114,9 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_withdraw}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
 
     input_slots:
       amount_to_withdraw:
@@ -117,6 +125,14 @@ actions:
 
   redeem_vault:
     calls:
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Redeem shares from the vault, from input number of shares"
         target: "${inputs.vault_address}"
         selector: "redeem(uint256,address,address)"
@@ -124,9 +140,9 @@ actions:
           - type: "uint256"
             value: "${input_slots.shares_to_redeem}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
     input_slots:
       shares_to_redeem:
         type: "uint256"
@@ -134,15 +150,24 @@ actions:
 
   redeem_vault_relative:
     calls:
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Query our balance of shares in the vault"
         target: "${inputs.vault_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
         return:
           name: "shares_balance"
           type: "uint256"
+
       - description: "Compute the amount of shares to redeem based on the input percentage"
         target: "${inputs.unsigned_math_helper}"
         selector: "mulDiv(uint256,uint256,uint256)"
@@ -163,9 +188,9 @@ actions:
           - type: "uint256"
             value: "${returns.shares_to_redeem}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
           - type: "address"
-            value: "${inputs.receiver_address}"
+            value: "${returns.caliber_address}"
     input_slots:
       bps_to_redeem:
         type: "uint256"

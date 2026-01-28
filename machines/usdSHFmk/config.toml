@@ -1,0 +1,14 @@
+name = "usdSHFmk"
+chain = "mainnet"
+address = "0x733aBb32544f4D3053a58eD747538c060f559108"
+
+[calibers.mainnet]
+address = "0xbeef123217647014429B7670329782e210884E89"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/usdSHFmk/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
