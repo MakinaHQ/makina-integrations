@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://makina.finance/helpers.schema.json",
+  "title": "Makina Integration Helpers List",
+  "description": "Schema for lists of integration helpers for Makina",
+  "definitions": {
+    "Version": {
+      "type": "object",
+      "description": "The version of the list, used in change detection",
+      "examples": [
+        {
+          "major": 1,
+          "minor": 0,
+          "patch": 0
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "major": {
+          "type": "integer",
+          "description": "The major version of the list. Must be incremented when helpers are removed from the list or helper addresses are changed.",
+          "minimum": 0,
+          "examples": [1, 2]
+        },
+        "minor": {
+          "type": "integer",
+          "description": "The minor version of the list. Must be incremented when helpers are added to the list.",
+          "minimum": 0,
+          "examples": [0, 1]
+        },
+        "patch": {
+          "type": "integer",
+          "description": "The patch version of the list. Must be incremented for any changes to the list.",
+          "minimum": 0,
+          "examples": [0, 1]
+        }
+      },
+      "required": ["major", "minor", "patch"]
+    },
+    "HelperInfo": {
+      "type": "object",
+      "description": "Metadata for a single helper in a helpers list",
+      "additionalProperties": false,
+      "properties": {
+        "chainId": {
+          "type": "integer",
+          "description": "The chain ID of the EVM network where this helper is deployed",
+          "minimum": 1,
+          "examples": [1, 42]
+        },
+        "address": {
+          "type": "string",
+          "description": "The checksummed address of the helper on the specified chain ID",
+          "pattern": "^(0x[a-fA-F0-9]{40}|[1-9A-HJ-NP-Za-km-z]{32,44})$",
+          "examples": [
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          ]
+        },
+
+        "name": {
+          "type": "string",
+          "description": "The name of the helper",
+          "minLength": 0,
+          "maxLength": 60,
+          "anyOf": [
+            {
+              "const": ""
+            },
+            {
+              "pattern": "^[ \\S+]+$"
+            }
+          ],
+          "examples": ["MathHelper"]
+        }
+      },
+      "required": ["chainId", "address", "name"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the helpers list",
+      "minLength": 1,
+      "maxLength": 30,
+      "pattern": "^[\\w ]+$",
+      "examples": ["My Helpers List"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp of this list version; i.e. when this immutable version of the list was created"
+    },
+    "version": {
+      "$ref": "#/definitions/Version"
+    },
+    "helpers": {
+      "type": "array",
+      "description": "The list of helpers included in the list",
+      "items": {
+        "$ref": "#/definitions/HelperInfo"
+      },
+      "minItems": 1,
+      "maxItems": 10000,
+      "uniqueItems": true
+    }
+  },
+  "required": ["name", "timestamp", "version", "helpers"]
+}
