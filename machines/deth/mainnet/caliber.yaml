@@ -40,42 +40,51 @@ positions:
     group_id: "0"
     description: "Morpho Vault WETH Gauntlet"
     instructions: !include "./instructions/morpho-vault-weth-gauntlet.yaml"
+    position_tokens: ["0x2371e134e3455e0593363cBF89d3b6cf53740618"]
   - id: "205295664156465280560294343765044329943"
     group_id: "0"
     description: "Morpho Vault WETH Steakhouse"
     instructions: !include "./instructions/morpho-vault-weth-steakhouse.yaml"
+    position_tokens: ["0xBEEf050ecd6a16c4e7bfFbB52Ebba7846C4b8cD4"]
   - id: "170715880202946670315163698633126718068"
     group_id: "0"
     description: "Morpho Vault WETH Vault Bridge"
     instructions: !include "./instructions/morpho-vault-weth-vault-bridge.yaml"
+    position_tokens: ["0x31A5684983EeE865d943A696AAC155363bA024f9"]
   - id: "46073922549441983303808590388878370744"
     group_id: "0"
     description: "Morpho Vault WETH Yearn OG"
     instructions: !include "./instructions/morpho-vault-weth-yearn-og.yaml"
+    position_tokens: ["0xE89371eAaAC6D46d4C3ED23453241987916224FC"]
   - id: "94131231672247278449408134973807954755"
     group_id: "0"
     description: "Fluid Lite stETH (deposit wstETH)"
     instructions: !include "./instructions/fluid-lite-steth.yaml"
+    position_tokens: ["0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78"]
     tags:
       - "225616:redeem_full"
   - id: "3523756351941927223895267305661455553"
     group_id: "0"
     description: "Aave Umbrella WETH"
     instructions: !include "./instructions/aave-umbrella-weth.yaml"
+    position_tokens: ["0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce"]
 
   # AaveV3 positions
   - id: "132834842824704009878878367726033477050"
     group_id: "1"
     description: "AaveV3 WETH collateral"
     instructions: !include "./instructions/aavev3-supply-weth.yaml"
+    position_tokens: ["0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"]
   - id: "187700311405102813120959141419172413799"
     group_id: "1"
     description: "AaveV3 weETH collateral"
     instructions: !include "./instructions/aavev3-supply-weeth.yaml"
+    position_tokens: ["0xBdfa7b7893081B35Fb54027489e2Bc7A38275129"]
   - id: "168833951435768327164903999099923269368"
     group_id: "1"
     description: "AaveV3 WETH debt"
     instructions: !include "./instructions/aavev3-borrow-weth.yaml"
+    position_tokens: ["0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE"]
 
   # Morpho debt positions
   - id: "102085800190891488320502506258850684527"

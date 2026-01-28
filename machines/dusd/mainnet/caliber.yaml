@@ -25,12 +25,6 @@ config:
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
 
 positions:
-  # DONATION
-  - id: "1"
-    group_id: "0"
-    description: "Makina DUSD USDC Donation to DAO"
-    instructions: !include "./instructions/makina-donation-to-dao.yaml"
-
   # Harvests
   - id: "777"
     group_id: "0"
@@ -42,48 +36,55 @@ positions:
     group_id: "0"
     description: "Morpho Vault PYUSD Steakhouse"
     instructions: !include "./instructions/morpho-vault-pyusd-steakhouse.yaml"
+    position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
   - id: "30651621090656837837542443694366525060"
     group_id: "0"
     description: "Morpho Vault USDC MEV Capital"
     instructions: !include "./instructions/morpho-vault-usdc-mev-capital.yaml"
+    position_tokens: ["0xd63070114470f685b75B74D60EEc7c1113d33a3D"]
   - id: "287972541400220405479010366660803291000"
     group_id: "0"
     description: "Morpho Vault eUSD Gauntlet Core"
     instructions: !include "./instructions/morpho-vault-eusd-gauntlet-core.yaml"
+    position_tokens: ["0xc080f56504e0278828A403269DB945F6c6D6E014"]
   - id: "77590748279218246310796884579338401703"
     group_id: "0"
     description: "Morpho Vault USDC Smokehouse"
     instructions: !include "./instructions/morpho-vault-usdc-smokehouse.yaml"
+    position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
   - id: "11232424494326814282538250204373920286"
     group_id: "0"
     description: "Morpho Vault USDC Gauntlet Frontier"
     instructions: !include "./instructions/morpho-vault-usdc-gauntlet-frontier.yaml"
+    position_tokens: ["0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"]
   - id: "188442457890402398659043284211703237226"
     group_id: "0"
     description: "Morpho Vault USDC Gauntlet Core"
     instructions: !include "./instructions/morpho-vault-usdc-gauntlet-core.yaml"
+    position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
 
   - id: "176021688445186810403025048632929053161"
     group_id: "0"
     description: "Aave Umbrella USDC"
     instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
   - id: "293691712937964969352275672791079139559"
     group_id: "0"
     description: "Aave Umbrella USDT"
     instructions: !include "./instructions/aave-umbrella-usdt.yaml"
+    position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
   - id: "229457643934747132111107431329088218367"
     group_id: "0"
     description: "Aave Umbrella GHO"
     instructions: !include "./instructions/aave-umbrella-gho.yaml"
+    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
   - id: "332697612920998824307877708016163852818"
     group_id: "1"
     description: "AaveV3 Supply USDC"
     instructions: !include "./instructions/aavev3-supply-usdc.yaml"
-  - id: "197579030795807492721453381697137005771"
-    group_id: "0"
-    description: "Autopool autoUSD"
-    instructions: !include "./instructions/auto-autousd.yaml"
+    position_tokens: ["0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"]
   - id: "187487145492373933671944618718033568251"
     group_id: "0"
     description: "Fluid GHO Vault position"
     instructions: !include "./instructions/fluid-gho.yaml"
+    position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]

@@ -23,6 +23,7 @@ positions:
     group_id: "0"
     description: "Across V2 WBTC"
     instructions: !include "./instructions/across-v2-wbtc.yaml"
+    position_tokens: ["0x59c1427c658e97a7d568541dac780b2e5c8affb4"]
   - id: "777"
     group_id: "0"
     description: "Merkl Harvest"
@@ -39,14 +40,12 @@ positions:
     group_id: "0"
     description: "Morpho Vault PYUSD Steakhouse"
     instructions: !include "./instructions/morpho-vault-pyusd-steakhouse.yaml"
+    position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
   - id: "77590748279218246310796884579338401703"
     group_id: "0"
     description: "Morpho Vault USDC Smokehouse"
     instructions: !include "./instructions/morpho-vault-usdc-smokehouse.yaml"
-  - id: "200870818351729304671013241928856211068"
-    group_id: "0"
-    description: "Superform superUSDC"
-    instructions: !include "./instructions/superform-super-usdc.yaml"
+    position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
   - id: "71113914840865297411820908650005851500"
     group_id: "0"
     description: "Morpho USDC loan (market: 0xe1b6...9f33)"
