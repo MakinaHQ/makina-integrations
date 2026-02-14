@@ -1,0 +1,82 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+      stake_token_address:
+        type: "address"
+        value: "0x4f827A63755855cDf3e8f3bcD20265C833f15033" # stkGHO
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/account.yaml:account-gho"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x4f827A63755855cDf3e8f3bcD20265C833f15033" # stkGHO
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:start_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x4f827A63755855cDf3e8f3bcD20265C833f15033" # stkGHO
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x4f827A63755855cDf3e8f3bcD20265C833f15033" # stkGHO
+      asset_address:
+        type: "address"
+        value: "0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f" # GHO
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/harvest.yaml:harvest"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x4f827A63755855cDf3e8f3bcD20265C833f15033" # stkGHO
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      rewards_controller_address:
+        type: "address"
+        value: "0x4655Ce3D625a63d30bA704087E52B4C31E38188B" # Aave Umbrella Rewards Controller

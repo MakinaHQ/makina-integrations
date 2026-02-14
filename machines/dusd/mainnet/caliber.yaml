@@ -25,13 +25,33 @@ config:
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
 
 positions:
-  # Harvests
+  # ── Harvest-only ──────────────────────────────────────────────────
   - id: "777"
     group_id: "0"
     description: "Merkl Harvest"
     instructions: !include "./instructions/merkl.yaml"
+  - id: "778"
+    group_id: "0"
+    description: "StakeDAO USDC/crvUSD Harvest"
+    instructions: !include "./instructions/stakedao-curve-usdc-crvusd-harvest.yaml"
+  - id: "779"
+    group_id: "0"
+    description: "StakeDAO USDT/crvUSD Harvest"
+    instructions: !include "./instructions/stakedao-curve-usdt-crvusd-harvest.yaml"
+  - id: "780"
+    group_id: "0"
+    description: "Convex USDC/crvUSD Harvest"
+    instructions: !include "./instructions/convex-curve-usdc-crvusd-harvest.yaml"
+  - id: "781"
+    group_id: "0"
+    description: "Convex USDT/crvUSD Harvest"
+    instructions: !include "./instructions/convex-curve-usdt-crvusd-harvest.yaml"
+  - id: "782"
+    group_id: "0"
+    description: "Fluid Rewards Harvest"
+    instructions: !include "./instructions/fluid-harvest.yaml"
 
-  # Morpho Vaults
+  # ── Morpho Vaults ─────────────────────────────────────────────────
   - id: "276843631519342658565251846836976075217"
     group_id: "0"
     description: "Morpho Vault PYUSD Steakhouse"
@@ -63,6 +83,7 @@ positions:
     instructions: !include "./instructions/morpho-vault-usdc-gauntlet-core.yaml"
     position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
 
+  # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"
     group_id: "0"
     description: "Aave Umbrella USDC"
@@ -78,11 +99,20 @@ positions:
     description: "Aave Umbrella GHO"
     instructions: !include "./instructions/aave-umbrella-gho.yaml"
     position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+
+  # ── AaveV3 Supply (group_id: 1) ────────────────────────────────────
   - id: "332697612920998824307877708016163852818"
     group_id: "1"
     description: "AaveV3 Supply USDC"
     instructions: !include "./instructions/aavev3-supply-usdc.yaml"
     position_tokens: ["0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"]
+  - id: "232678016241942897729445069841802885622"
+    group_id: "1"
+    description: "AaveV3 Supply USDT"
+    instructions: !include "./instructions/aavev3-supply-usdt.yaml"
+    position_tokens: ["0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"]
+
+  # ── Fluid ─────────────────────────────────────────────────────────
   - id: "187487145492373933671944618718033568251"
     group_id: "0"
     description: "Fluid GHO Vault position"

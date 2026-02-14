@@ -1,0 +1,13 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "tBTC/cbBTC"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0xB683a3D855D016A1c78c3e7887812A7CAB3989B0"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

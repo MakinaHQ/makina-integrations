@@ -13,6 +13,10 @@ config:
     value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
 
 positions:
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
   - id: "59690312341088102818345637935930600458"
     group_id: "0"
     description: "Morpho USDC loan (market: 0x9103...1836)"

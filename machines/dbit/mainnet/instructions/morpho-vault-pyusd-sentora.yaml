@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "Sentora PYUSD Main"
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      vault_address:
+        type: "address"
+        value: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "Sentora PYUSD Main"
+    path: "../../../blueprints/morpho/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "Sentora PYUSD Main"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "Sentora PYUSD Main"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

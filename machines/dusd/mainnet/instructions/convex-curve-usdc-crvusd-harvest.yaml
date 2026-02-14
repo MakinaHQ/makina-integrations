@@ -1,0 +1,13 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDC/crvUSD"
+    path: "../../../blueprints/convex-curve/harvest.yaml:harvest"
+    inputs:
+      convex_reward_contract_address:
+        type: "address"
+        value: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
