@@ -1,3 +1,71 @@
+# this is a generated file - do not edit manually
+# root: 0xcf1219d9f6a0ce441d7759ca3187afc176d17bc1d1b3f1819a5c11d426feffd8
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
 [instructions.morpho.account_loan."cbBTC/USDC (0x9103...1836)"]
 position_id = "59690312341088102818345637935930600458"
 description = "Morpho USDC loan (market: 0x9103...1836)"
@@ -5,6 +73,7 @@ is_debt = false
 group_id = "0"
 instruction_type = 1
 affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
 commands = [
   "0x93c52062810302ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
   "0x62de91e9018205ff00000002c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
@@ -31,6 +100,7 @@ is_debt = false
 group_id = "0"
 instruction_type = 0
 affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
 commands = [
   "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
   "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
@@ -68,6 +138,7 @@ is_debt = false
 group_id = "0"
 instruction_type = 0
 affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
 commands = [
   "0x93c52062810208ff00000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
   "0x62de91e9018907ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
@@ -107,6 +178,7 @@ is_debt = false
 group_id = "0"
 instruction_type = 0
 affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
 commands = [
   "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
   "0x62de91e9018106ff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
