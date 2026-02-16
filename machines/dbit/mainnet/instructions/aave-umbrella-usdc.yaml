@@ -1,0 +1,85 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      stake_token_address:
+        type: "address"
+        value: "0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6" # stkwaUSDC
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/aave-umbrella/account.yaml:account"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6" # stkwaUSDC
+      wrapped_a_token_address:
+        type: "address"
+        value: "0xD4fa2D31b7968E448877f69A96DE69f5de8cD23E" # waUSDC
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:start_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6" # stkwaUSDC
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6" # stkwaUSDC
+      asset_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "USDC"
+    path: "../../../blueprints/aave-umbrella/harvest.yaml:harvest"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6" # stkwaUSDC
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      rewards_controller_address:
+        type: "address"
+        value: "0x4655Ce3D625a63d30bA704087E52B4C31E38188B" # Aave Umbrella Rewards Controller
