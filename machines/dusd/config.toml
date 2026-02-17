@@ -34,3 +34,17 @@ address = "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
 decimals = 6
 name = "USD Coin"
 symbol = "USDC"
+
+[ntt.mainnet]
+token = "0x1e33e98af620f1d563fcd3cfd3c75ace841204ef"
+manager = "0xaBa79e9b4238e85B75A5812CeD64B4f6527E9ADB"
+
+[ntt.mainnet.transceivers]
+wormhole = "0x5BBE375969712252A75C5762Af85455B79FCBf08"
+
+[ntt.ink]
+token = "0xa95C8ff7Be2A1C898fe01B90Fdc9621E8ea5c9FC"
+manager = "0xaBa79e9b4238e85B75A5812CeD64B4f6527E9ADB"
+
+[ntt.ink.transceivers]
+wormhole = "0x5BBE375969712252A75C5762Af85455B79FCBf08"
