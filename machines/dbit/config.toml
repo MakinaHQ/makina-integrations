@@ -34,3 +34,17 @@ address = "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f"
 decimals = 8
 name = "Wrapped BTC"
 symbol = "WBTC"
+
+[ntt.mainnet]
+token = "0x972966bCC17f7d818De4F27Dc146Ef539c231BdF"
+manager = "0x41D5f04B5a2D466e1c377048c16DA963B7684808"
+
+[ntt.mainnet.transceivers]
+wormhole = "0x519a63Ceb4928465217077CDf453a34779FC38D2"
+
+[ntt.ink]
+token = "0x95e7f4cDA55Afe83B031304fF2d5a396eFb81591"
+manager = "0x41D5f04B5a2D466e1c377048c16DA963B7684808"
+
+[ntt.ink.transceivers]
+wormhole = "0x519a63Ceb4928465217077CDf453a34779FC38D2"
