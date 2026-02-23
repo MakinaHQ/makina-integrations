@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "Gauntlet USDT Frontier"
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+      vault_address:
+        type: "address"
+        value: "0x79FD640000F8563A866322483524a4b48f1Ed702"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "Gauntlet USDT Frontier"
+    path: "../../../blueprints/morpho/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x79FD640000F8563A866322483524a4b48f1Ed702"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "Gauntlet USDT Frontier"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x79FD640000F8563A866322483524a4b48f1Ed702"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "Gauntlet USDT Frontier"
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x79FD640000F8563A866322483524a4b48f1Ed702"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
