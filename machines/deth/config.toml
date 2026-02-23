@@ -34,3 +34,17 @@ address = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"
 decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
+
+[ntt.mainnet]
+token = "0x871aB8E36CaE9AF35c6A3488B049965233DeB7ed"
+manager = "0x02eCA64b489847183Ccd4952e424314EF798Af5d"
+
+[ntt.mainnet.transceivers]
+wormhole = "0x7463f4d691e843e4Ab58C7e0A3f9c16c857091c0"
+
+[ntt.ink]
+token = "0x6Cfc4D189C2E7D7891c2E5934B7d3978bC70D1FE"
+manager = "0x02eCA64b489847183Ccd4952e424314EF798Af5d"
+
+[ntt.ink.transceivers]
+wormhole = "0x7463f4d691e843e4Ab58C7e0A3f9c16c857091c0"
