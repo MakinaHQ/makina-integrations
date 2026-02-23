@@ -77,6 +77,16 @@ positions:
     description: "Morpho Vault USDC Smokehouse"
     instructions: !include "./instructions/morpho-vault-usdc-smokehouse.yaml"
     position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
+  - id: "17061035571148818108247152255835793366"
+    group_id: "0"
+    description: "Morpho Vault USDT Gauntlet Frontier"
+    instructions: !include "./instructions/morpho-vault-usdt-gauntlet-frontier.yaml"
+    position_tokens: ["0x79FD640000F8563A866322483524a4b48f1Ed702"]
+  - id: "154947354046260442958384373569470359355"
+    group_id: "0"
+    description: "Morpho Vault USDT Steakhouse High Yield Instant"
+    instructions: !include "./instructions/morpho-vault-usdt-steakhouse-hyi.yaml"
+    position_tokens: ["0xbeeff07d991C04CD640DE9F15C08ba59c4FEDEb7"]
 
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "71113914840865297411820908650005851500"
