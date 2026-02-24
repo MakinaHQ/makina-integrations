@@ -9,11 +9,11 @@ inputs:
     type: "bytes32"
   collateral_token:
     type: "address"
-  caliber_address:
-    type: "address"
   vault_address:
     type: "address"
   asset_address:
+    type: "address"
+  context_helper_address:
     type: "address"
 
 actions:
@@ -98,6 +98,14 @@ actions:
           name: "lltv"
           type: "uint256"
 
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Supply collateral to Morpho"
         target: "${inputs.morpho}"
         selector: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
@@ -117,7 +125,7 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_deposit}"
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
           - type: "bytes"
             value: "0x"
 
@@ -137,6 +145,14 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_deposit}"
 
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Deposit asset into the vault"
         target: "${inputs.vault_address}"
         selector: "deposit(uint256,address)"
@@ -144,7 +160,7 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_deposit}"
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
 
     input_slots:
       amount_to_deposit:

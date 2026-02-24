@@ -1,0 +1,65 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.vault_label}
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: ${position.token_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      context_helper_address:
+        type: "address"
+        value: ${config.context_helper_address}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.vault_label}
+    path: "../../../blueprints/morpho/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      context_helper_address:
+        type: "address"
+        value: ${config.context_helper_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.vault_label}
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      context_helper_address:
+        type: "address"
+        value: ${config.context_helper_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.vault_label}
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      context_helper_address:
+        type: "address"
+        value: ${config.context_helper_address}
+      unsigned_math_helper:
+        type: "address"
+        value: ${config.unsigned_math_helper_address}

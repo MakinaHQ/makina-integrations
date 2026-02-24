@@ -5,11 +5,11 @@ inputs:
     type: "address"
   executor_helper:
     type: "address"
-  caliber_address:
-    type: "address"
   market_id:
     type: "bytes32"
   loan_token:
+    type: "address"
+  context_helper_address:
     type: "address"
 
 actions:
@@ -94,6 +94,14 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_repay}"
 
+      - description: "Get caliber's address"
+        target: ${inputs.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
       - description: "Repay loan on Morpho"
         target: "${inputs.morpho}"
         selector: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
@@ -115,7 +123,7 @@ actions:
           - type: "uint256"
             value: "0"
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
           - type: "bytes"
             value: "0x"
 

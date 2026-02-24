@@ -41,19 +41,28 @@ jobs:
       # Rootfiles filename format: YYYYMMDDHHMMSS-<name>.toml
       # New rootfiles should start with the most recent timestamp in the directory
       # [naive alphabetical order - not checking YYYYMMDD format]
+      # Skip -empty.toml files as they are placeholder files
       - name: Verify new rootfiles filename format
         if: steps.changed-rootfiles.outputs.added_files_count > 0
         env:
           ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
         run: |
           for file in ${ADDED_ROOTFILES}; do
-            dir=$(cd -- "$(dirname -- "$file")" && pwd)
             base=$(basename -- "$file")
 
+            # Skip -empty.toml files
+            if [[ "$base" == *-empty.toml ]]; then
+              echo "Skipping empty rootfile: $base"
+              continue
+            fi
+
+            dir=$(cd -- "$(dirname -- "$file")" && pwd)
+
             # Get the lexicographically smallest regular file name in the directory (ascending order)
+            # Exclude -empty.toml files from consideration
             top=$(
               cd -- "$dir"
-              LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r | head -n 1
+              LC_ALL=C ls -1Ap | grep -v '/$' | grep -v '\-empty\.toml$' | LC_ALL=C sort -r | head -n 1
             )
 
             if [[ "$base" == "$top" ]]; then
@@ -62,6 +71,33 @@ jobs:
               echo "Error: The name of the new rootfile '$base' should start with the most recent timestamp in '$dir'. First is '$top'." >&2
               exit 1
             fi
+          done
+
+      # Verify that -empty.toml files only contain "[instructions]"
+      - name: Verify empty rootfiles content
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+        run: |
+          for file in ${ADDED_ROOTFILES}; do
+            base=$(basename -- "$file")
+
+            # Only check -empty.toml files
+            if [[ "$base" != *-empty.toml ]]; then
+              continue
+            fi
+
+            expected_content="[instructions]"
+            actual_content=$(cat "$file")
+
+            if [[ "$actual_content" != "$expected_content" ]]; then
+              echo "Error: Empty rootfile '$file' should only contain '[instructions]'." >&2
+              echo "Expected: $expected_content" >&2
+              echo "Actual: $actual_content" >&2
+              exit 1
+            fi
+
+            echo "Empty rootfile '$base' has valid content."
           done
 
       - name: Checkout transpiler repository
@@ -88,10 +124,19 @@ jobs:
           ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
         run: |
           for file in ${ADDED_ROOTFILES}; do
+            base=$(basename -- "$file")
+
+            # Skip -empty.toml files as they are placeholder files
+            if [[ "$base" == *-empty.toml ]]; then
+              echo "Skipping transpiler verification for empty rootfile: $base"
+              continue
+            fi
+
             caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
             new_file="../$(dirname "$file")/generated.toml"
-            echo "Running transpiler for $caliber - to verify $file rootfile)"
-            cargo run -r -- -i "$caliber" -o "$new_file"
+            tokenlist="../addresses/tokens/tokenlist.json"
+            echo "Running transpiler for $caliber - to verify $file rootfile"
+            cargo run -r -- -i "$caliber" -o "$new_file" -t "$tokenlist"
             diff "../$file" "$new_file" || exit 1
             rm "$new_file"
           done
