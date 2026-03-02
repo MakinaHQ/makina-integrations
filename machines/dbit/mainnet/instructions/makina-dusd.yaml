@@ -30,9 +30,6 @@
       machine_address:
         type: "address"
         value: "0x6b006870C83b1Cd49E766Ac9209f8d68763Df721" # Machine
-      redeemer_address:
-        type: "address"
-        value: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c" # Redeemer
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
