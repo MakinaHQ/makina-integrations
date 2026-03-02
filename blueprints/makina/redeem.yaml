@@ -1,0 +1,251 @@
+protocol: "makina"
+
+inputs:
+  machine_token_address:
+    type: "address"
+  redeemer_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  redemption_request_id_storage_key:
+    type: "bytes32"
+  pending_redemption_share_amount_storage_key:
+    type: "bytes32"
+
+actions:
+  request_redeem:
+    calls:
+      # Step 1: Guard against overwriting an existing pending request
+      - description: "Read existing request ID from KV store to check no pending request exists"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+        return:
+          name: "existing_request_id"
+          type: "uint256"
+
+      - description: "Check that existing request ID is zero (no pending request)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_request_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "existing_request_id_is_zero"
+          type: "bool"
+
+      - description: "Revert if there is already a pending request (would overwrite requestId)"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.existing_request_id_is_zero}"
+
+      # Step 2: Approve and request redemption
+      - description: "Approve MT shares to the Redeemer contract"
+        target: "${inputs.machine_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.redeemer_address}"
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+      - description: "Request redemption of MT shares via the Redeemer"
+        target: "${inputs.redeemer_address}"
+        selector: "requestRedeem(uint256,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.min_assets}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      # Step 3: Persist request ID and share amount in KV store for claim_assets and accounting
+      - description: "Store the request ID in the KV store for later claim"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+      - description: "Store the redeemed share amount in the KV store for accounting"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_redemption_share_amount_storage_key}"
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of MT shares to redeem (18 decimals)"
+      min_assets:
+        type: "uint256"
+        description: "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+
+  request_redeem_relative:
+    calls:
+      # Step 0: Compute shares to redeem from balance and bps
+      - description: "Query caliber's MT share balance"
+        target: "${inputs.machine_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      # Step 1: Guard against overwriting an existing pending request
+      - description: "Read existing request ID from KV store to check no pending request exists"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+        return:
+          name: "existing_request_id"
+          type: "uint256"
+
+      - description: "Check that existing request ID is zero (no pending request)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_request_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "existing_request_id_is_zero"
+          type: "bool"
+
+      - description: "Revert if there is already a pending request (would overwrite requestId)"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.existing_request_id_is_zero}"
+
+      # Step 2: Approve and request redemption
+      - description: "Approve MT shares to the Redeemer contract"
+        target: "${inputs.machine_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.redeemer_address}"
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+
+      - description: "Request redemption of MT shares via the Redeemer"
+        target: "${inputs.redeemer_address}"
+        selector: "requestRedeem(uint256,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.min_assets}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      # Step 3: Persist request ID and share amount in KV store for claim_assets and accounting
+      - description: "Store the request ID in the KV store for later claim"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+      - description: "Store the redeemed share amount in the KV store for accounting"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_redemption_share_amount_storage_key}"
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Percentage of MT shares to redeem, in basis points (bps), 10000 bps = 100%"
+      min_assets:
+        type: "uint256"
+        description: "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+
+  claim_assets:
+    calls:
+      # Step 1: Retrieve request ID and claim the finalized assets
+      - description: "Retrieve the stored request ID from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      - description: "Claim AT from the finalized redeem request"
+        target: "${inputs.redeemer_address}"
+        selector: "claimAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_id}"
+        return:
+          name: "assets_received"
+          type: "uint256"
+
+      # Step 2: Clear both KV store slots so accounting no longer counts these shares
+      - description: "Clear the request ID from the KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+
+      - description: "Clear the redeemed share amount from the KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_redemption_share_amount_storage_key}"

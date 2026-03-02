@@ -82,6 +82,21 @@ positions:
     description: "Morpho Vault USDC Gauntlet Core"
     instructions: !include "./instructions/morpho-vault-usdc-gauntlet-core.yaml"
     position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
+  - id: "128264429154381135287798106504544985667"
+    group_id: "0"
+    description: "Morpho Vault USDC Steakhouse Reservoir"
+    instructions: !include "./instructions/morpho-vault-usdc-steakhouse-reservoir.yaml"
+    position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
+
+  # ── Morpho Lending ────────────────────────────────────────────────
+  - id: "198365794357713121663437391781507015468"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0xe83d...f52)"
+    instructions: !include "./instructions/morpho-lend-usdc-0xe83d-f52.yaml"
+  - id: "61488265486560026813568195581261673654"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x8d8a...a73)"
+    instructions: !include "./instructions/morpho-lend-usdc-0x8d8a-a73.yaml"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"

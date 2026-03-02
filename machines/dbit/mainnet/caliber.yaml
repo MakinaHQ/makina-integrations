@@ -23,6 +23,9 @@ config:
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  key_value_store_address:
+    type: "address"
+    value: "0x7CB36b14244c7a68C4fE291C88f75Bc915aaC262"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -87,6 +90,11 @@ positions:
     description: "Morpho Vault USDT Steakhouse High Yield Instant"
     instructions: !include "./instructions/morpho-vault-usdt-steakhouse-hyi.yaml"
     position_tokens: ["0xbeeff07d991C04CD640DE9F15C08ba59c4FEDEb7"]
+  - id: "128264429154381135287798106504544985667"
+    group_id: "0"
+    description: "Morpho Vault USDC Steakhouse Reservoir"
+    instructions: !include "./instructions/morpho-vault-usdc-steakhouse-reservoir.yaml"
+    position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
 
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "71113914840865297411820908650005851500"
@@ -109,6 +117,10 @@ positions:
     group_id: "0"
     description: "Morpho USDT loan (market: 0xfb83...6e28)"
     instructions: !include "./instructions/morpho-lend-usdt-0xfb83-6e28.yaml"
+  - id: "61488265486560026813568195581261673654"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x8d8a...a73)"
+    instructions: !include "./instructions/morpho-lend-usdc-0x8d8a-a73.yaml"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "214758391026483752910384756102938475610"
@@ -152,3 +164,10 @@ positions:
     description: "Across V2 WBTC"
     instructions: !include "./instructions/across-v2-wbtc.yaml"
     position_tokens: ["0x59c1427c658e97a7d568541dac780b2e5c8affb4"]
+
+  # ── Makina ───────────────────────────────────────────────────────
+  - id: "257907866263469253975271928750178105060"
+    group_id: "0"
+    description: "Makina DUSD"
+    instructions: !include "./instructions/makina-dusd.yaml"
+    position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"]

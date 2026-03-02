@@ -1,0 +1,69 @@
+protocol: "makina"
+
+inputs:
+  machine_token_address:
+    type: "address"
+  machine_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  pending_redemption_share_amount_storage_key:
+    type: "bytes32"
+
+actions:
+  account:
+    calls:
+      # Step 1: Get MT shares held by the caliber
+      - description: "Get MT share balance of the caliber"
+        target: "${inputs.machine_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_share_balance"
+          type: "uint256"
+
+      # Step 2: Get pending redemption share amount from KV store
+      - description: "Read the pending redemption share amount from KV store (0 if no pending request)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_redemption_share_amount_storage_key}"
+        return:
+          name: "pending_redemption_share_balance"
+          type: "uint256"
+
+      # Step 3: Sum all shares and convert to AT
+      - description: "Sum caliber balance and pending redemption shares"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.caliber_share_balance}"
+          - type: "uint256"
+            value: "${returns.pending_redemption_share_balance}"
+        return:
+          name: "total_shares"
+          type: "uint256"
+
+      - description: "Convert total MT shares to AT value via Machine"
+        target: "${inputs.machine_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_shares}"
+        return:
+          name: "accounting_token_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.accounting_token_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

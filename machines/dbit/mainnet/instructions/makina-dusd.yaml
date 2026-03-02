@@ -1,0 +1,141 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "DUSD"
+    path: "../../../blueprints/makina/deposit.yaml:deposit"
+    inputs:
+      accounting_token_address:
+        type: "address"
+        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+      depositor_address:
+        type: "address"
+        value: "0x94B1828F91c150C5E6776198e170aCa4304903d7" # Depositor
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "DUSD"
+    path: "../../../blueprints/makina/account.yaml:account"
+    inputs:
+      machine_token_address:
+        type: "address"
+        value: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef" # DUSD
+      machine_address:
+        type: "address"
+        value: "0x6b006870C83b1Cd49E766Ac9209f8d68763Df721" # Machine
+      redeemer_address:
+        type: "address"
+        value: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c" # Redeemer
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      pending_redemption_share_amount_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.pending_redemption_share_amount)}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "DUSD"
+    path: "../../../blueprints/makina/redeem.yaml:request_redeem"
+    inputs:
+      machine_token_address:
+        type: "address"
+        value: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef" # DUSD
+      redeemer_address:
+        type: "address"
+        value: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c" # Redeemer
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.redemption_request_id)}"
+      pending_redemption_share_amount_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.pending_redemption_share_amount)}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "DUSD"
+    path: "../../../blueprints/makina/redeem.yaml:request_redeem_relative"
+    inputs:
+      machine_token_address:
+        type: "address"
+        value: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef" # DUSD
+      redeemer_address:
+        type: "address"
+        value: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c" # Redeemer
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.redemption_request_id)}"
+      pending_redemption_share_amount_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.pending_redemption_share_amount)}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "DUSD"
+    path: "../../../blueprints/makina/redeem.yaml:claim_assets"
+    inputs:
+      redeemer_address:
+        type: "address"
+        value: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c" # Redeemer
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.redemption_request_id)}"
+      pending_redemption_share_amount_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.dusd.pending_redemption_share_amount)}"
