@@ -18,7 +18,7 @@
     label: "syrupUSDT/USDT Morpho Loop"
     path: "../../../blueprints/morpho-loop/deposit.yaml:loop_in"
     inputs:
-      syrup_pool:
+      collateral_vault:
         type: "address"
         value: "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
       flash_loan_token:

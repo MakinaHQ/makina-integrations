@@ -1,7 +1,7 @@
 protocol: "morpho-loop"
 
 inputs:
-  syrup_pool:
+  collateral_vault:
     type: "address"
   flash_loan_token:
     type: "address"
@@ -17,23 +17,23 @@ inputs:
 actions:
   loop_in:
     # 1. We have on the wallet, after the flash loan, the equity + flash loaned amount
-    # 2. Approve the syrup pool (ERC4626) to spend our flash loan token
-    # 3. Deposit into syrup pool to mint collateral token (e.g. syrupUSDC)
+    # 2. Approve the collateral vault (ERC4626) to spend our flash loan token
+    # 3. Deposit into collateral vault to mint collateral token
     # 4. Approve Morpho to spend the collateral token
     # 5. Supply collateral to Morpho
     # 6. Borrow the flash loan amount from Morpho to repay the flash loan
     calls:
-      - description: "Approve the syrup pool to spend our flash loan token"
+      - description: "Approve the collateral vault to spend our flash loan token"
         target: ${inputs.flash_loan_token}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.syrup_pool}"
+            value: "${inputs.collateral_vault}"
           - type: "uint256"
             value: "${input_slots.deposit_amount}"
 
-      - description: "Deposit into the syrup pool (ERC4626) to mint collateral token"
-        target: ${inputs.syrup_pool}
+      - description: "Deposit into the collateral vault (ERC4626) to mint collateral token"
+        target: ${inputs.collateral_vault}
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"
@@ -45,7 +45,7 @@ actions:
           name: "collateral_shares"
 
       - description: "Approve Morpho to transfer the collateral"
-        target: ${inputs.syrup_pool}
+        target: ${inputs.collateral_vault}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
@@ -174,7 +174,7 @@ actions:
     input_slots:
       deposit_amount:
         type: "uint256"
-        description: "The total amount to deposit into the syrup pool (equity + flash_loan_amount)."
+        description: "The total amount to deposit into the collateral vault (equity + flash_loan_amount)."
       flash_loan_amount:
         type: "uint256"
         description: "The amount of the flash loan."
