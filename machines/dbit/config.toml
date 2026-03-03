@@ -35,6 +35,17 @@ decimals = 8
 name = "Wrapped BTC"
 symbol = "WBTC"
 
+[calibers.monad]
+address = "0xd1a3c20488899c038b7daae1ede0c6da6c36c326"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/config/machines/dbit/monad/rootfiles"
+
+[calibers.monad.accounting_token]
+address = "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c"
+decimals = 8
+name = "Wrapped BTC"
+symbol = "WBTC"
+
 [ntt.mainnet]
 token = "0x972966bCC17f7d818De4F27Dc146Ef539c231BdF"
 manager = "0x41D5f04B5a2D466e1c377048c16DA963B7684808"
