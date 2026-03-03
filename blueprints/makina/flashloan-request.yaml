@@ -9,7 +9,7 @@ actions:
     calls:
       - description: "Request a flash loan for the specified token"
         target: "${inputs.flash_loan_aggregator}"
-        selector: "requestFlashloan((uint8,(uint256,bool,uint256,uint8,address[],bytes32[],bytes[],uint128,bytes32[]),address,uint256))"
+        selector: "requestFlashloan((uint8,(uint256,bool,uint256,uint8,address[],address[],bytes32[],bytes[],uint128,bytes32[]),address,uint256))"
         parameters:
           - type: "(uint8,bytes,address,uint256)"
             value:

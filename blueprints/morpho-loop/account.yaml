@@ -1,0 +1,135 @@
+protocol: "morpho-loop"
+
+inputs:
+  morpho_address:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_helper:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  collateral_token:
+    type: "address"
+
+actions:
+  account_loop:
+    # 1. Read our Morpho position to get collateral amount and borrow shares
+    # 2. Read market state to get total borrow assets and total borrow shares
+    # 3. Compute debt = borrow_shares * total_borrow_assets / total_borrow_shares
+    # 4. Convert collateral shares to underlying value via ERC4626 convertToAssets
+    # 5. Equity = collateral_in_loan_token - debt
+    calls:
+      - description: "Get our position data"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho_address}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total borrow shares (index 3)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "total_borrow_shares"
+          type: "uint256"
+
+      - description: "Extract total borrow assets (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "total_borrow_assets"
+          type: "uint256"
+
+      - description: "Calculate debt amount: borrow_shares * total_borrow_assets / total_borrow_shares"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "uint256"
+            value: "${returns.total_borrow_assets}"
+          - type: "uint256"
+            value: "${returns.total_borrow_shares}"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+      - description: "Convert collateral shares to underlying asset value via ERC4626"
+        target: "${inputs.collateral_token}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+        return:
+          name: "collateral_in_loan_token"
+          type: "uint256"
+
+      - description: "Equity = collateral_in_loan_token - debt_amount. sub(a, b) = b - a"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.debt_amount}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "equity_in_loan_token"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.equity_in_loan_token}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
