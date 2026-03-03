@@ -23,6 +23,9 @@ config:
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -133,3 +136,13 @@ positions:
     description: "Fluid GHO Vault position"
     instructions: !include "./instructions/fluid-gho.yaml"
     position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
+
+  # ── Morpho Loops ─────────────────────────────────────────────────
+  - id: "219384756102938475610293847561029384756"
+    group_id: "0"
+    description: "syrupUSDC/USDC Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdc-usdc.yaml"
+  - id: "318274659201837465920183746592018374659"
+    group_id: "0"
+    description: "syrupUSDT/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdt-usdt.yaml"

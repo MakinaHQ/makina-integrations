@@ -26,6 +26,9 @@ config:
   key_value_store_address:
     type: "address"
     value: "0x7CB36b14244c7a68C4fE291C88f75Bc915aaC262"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -171,3 +174,13 @@ positions:
     description: "Makina DUSD"
     instructions: !include "./instructions/makina-dusd.yaml"
     position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"]
+
+  # ── Morpho Loops ─────────────────────────────────────────────────
+  - id: "219384756102938475610293847561029384756"
+    group_id: "0"
+    description: "syrupUSDC/USDC Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdc-usdc.yaml"
+  - id: "318274659201837465920183746592018374659"
+    group_id: "0"
+    description: "syrupUSDT/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdt-usdt.yaml"
