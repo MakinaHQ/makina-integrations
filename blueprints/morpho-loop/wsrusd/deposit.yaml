@@ -1,0 +1,216 @@
+protocol: "morpho"
+
+constants:
+  usdc:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  psm:
+    type: "address"
+  credit_enforcer:
+    type: "address"
+  rusd_token:
+    type: "address"
+  wsrusd:
+    type: "address"
+  morpho_address:
+    type: "address"
+  caliber_helper:
+    type: "address"
+  math_helper:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+
+# Top up collateral flow (always from USDC):
+# 1. Approve PSM to spend our USDC
+# 2. Get rUSD balance before mint
+# 3. CreditEnforcer.mintStablecoin(usdc_amount) (return value is just input amount, NOT actual minted)
+# 4. Get rUSD balance after mint
+# 5. Compute rusd_minted = balance_after - balance_before
+# 6. Approve wsrUSD to spend rUSD
+# 7. wsrUSD.deposit(rusd_amount, caliber) -> receive wsrUSD shares
+# 8. Approve Morpho to spend wsrUSD
+# 9. Supply wsrUSD collateral to Morpho
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve PSM to spend our USDC"
+        target: ${constants.usdc}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.psm}"
+          - type: "uint256"
+            value: "${input_slots.deposit_amount}"
+
+      - description: "Get rUSD balance before mint"
+        target: ${inputs.rusd_token}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "rusd_balance_before"
+
+      - description: "Mint rUSD from USDC via CreditEnforcer (permissionless, amount in USDC terms)"
+        target: ${inputs.credit_enforcer}
+        selector: "mintStablecoin(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.deposit_amount}"
+
+      - description: "Get rUSD balance after mint"
+        target: ${inputs.rusd_token}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "rusd_balance_after"
+
+      - description: "Compute actual rUSD minted (balance_after - balance_before)"
+        target: ${inputs.math_helper}
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.rusd_balance_before}"
+          - type: "uint256"
+            value: "${returns.rusd_balance_after}"
+        return:
+          type: "uint256"
+          name: "rusd_minted"
+
+      - description: "Approve wsrUSD vault to spend rUSD"
+        target: ${inputs.rusd_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.wsrusd}"
+          - type: "uint256"
+            value: "${returns.rusd_minted}"
+
+      - description: "Deposit rUSD into wsrUSD vault (ERC4626)"
+        target: ${inputs.wsrusd}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.rusd_minted}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "collateral_shares"
+
+      - description: "Approve Morpho to transfer wsrUSD collateral"
+        target: ${inputs.wsrusd}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${returns.collateral_shares}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Supply wsrUSD collateral to Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+    input_slots:
+      deposit_amount:
+        type: "uint256"
+        description: "The USDC amount to convert to wsrUSD and deposit as collateral."
