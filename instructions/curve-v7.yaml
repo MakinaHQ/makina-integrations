@@ -1,0 +1,117 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/deposit.yaml:deposit"
+    inputs:
+      tokena_address:
+        type: "address"
+        value: ${position.tokena_address}
+      tokenb_address:
+        type: "address"
+        value: ${position.tokenb_address}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      lp_token_address:
+        type: "address"
+        value: ${position.pool_address}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.tokena_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/account-in-coin0.yaml:account_in_coin0"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      coin0_scale_factor:
+        type: "uint256"
+        value: ${position.coin0_scale_factor}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/withdraw.yaml:withdraw_balanced"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/withdraw.yaml:withdraw_balanced_relative"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/harvest.yaml:harvest"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/harvest.yaml:harvest_from_minter"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      token_minter_address:
+        type: "address"
+        value: "0xd061D61a4d941c39E5453435B6345Dc261C2fcE0"

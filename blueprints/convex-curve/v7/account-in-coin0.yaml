@@ -1,0 +1,128 @@
+# Convex-Curve Stable Pool LP accounting in coin0 terms.
+#
+# Only valid for 2-coin stable pools where price_oracle(uint256) takes an index argument (v7 pools).
+# For v6 pools where price_oracle() takes no argument, use the v6 blueprint.
+#
+# LP balance is read from the Convex BaseRewardPool (where staked LP tokens are tracked),
+# not from a Curve gauge.
+#
+# Implements the same pricing logic as Curve's LPOracleStable:
+#   lp_price_in_coin0 = min(1e18, price_oracle(0)) * get_virtual_price() / 1e18
+# Reference: https://github.com/curvefi/curve-stablecoin/blob/master/curve_stablecoin/price_oracles/lp-oracles/LPOracleStable.vy
+
+protocol: "convex-curve"
+
+constants:
+  WAD:
+    type: "uint256"
+    value: "1000000000000000000"
+
+inputs:
+  convex_reward_pool:
+    type: "address"
+  pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+  coin0_scale_factor: # 1e(decimals)
+    type: "uint256"
+
+actions:
+  account_in_coin0:
+    # reference: https://github.com/curvefi/curve-stablecoin/blob/master/curve_stablecoin/price_oracles/lp-oracles/LPOracleStable.vy
+    # @notice Price oracle for Curve Stable Pool LPs. First, the oracle gets LP token price in terms of the first coin (coin0) of the pool.
+    # @dev 1. Get the min(1, price_coin1_in_coin0) 2. Get the pool virtual price 3. Scale everything to decimals of coin0 4. Multiply by LP token balance
+    calls:
+      # 1. Get LP token balance from Convex reward pool
+      - description: "Get the user's staked LP balance in the Convex reward pool"
+        target: "${inputs.convex_reward_pool}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "staked_balance"
+          type: "uint256"
+
+      # 2. Estimate price of LP token in terms of coin0
+      - description: "Get the price of coin1 in terms of coin0 from the pool's price oracle (18 decimals)"
+        target: "${inputs.pool_address}"
+        selector: "price_oracle(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "coin1_price_in_coin0"
+          type: "uint256"
+
+      - description: "Get min(1e18, coin1_price_in_coin0)"
+        target: ${inputs.unsigned_math_helper}
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.coin1_price_in_coin0}"
+          - type: "uint256"
+            value: "${constants.WAD}"
+        return:
+          name: "min_price"
+          type: "uint256"
+
+      - description: "Get the pool's virtual price (18 decimals)"
+        target: "${inputs.pool_address}"
+        selector: "get_virtual_price()"
+        parameters: []
+        return:
+          name: "virtual_price"
+          type: "uint256"
+
+      - description: "Calculate the price of the LP token in terms of coin0 (18 decimals)"
+        target: ${inputs.unsigned_math_helper}
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.min_price}"
+          - type: "uint256"
+            value: "${returns.virtual_price}"
+          - type: "uint256"
+            value: "${constants.WAD}"
+        return:
+          name: "lp_price_in_coin0"
+          type: "uint256"
+
+      # 3. Calculate total user LP value in terms of coin0
+      - description: "Calculate the user's total LP token value in terms of coin0 (18 decimals)"
+        target: ${inputs.unsigned_math_helper}
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.staked_balance}"
+          - type: "uint256"
+            value: "${returns.lp_price_in_coin0}"
+          - type: "uint256"
+            value: "${constants.WAD}"
+        return:
+          name: "lp_value_in_coin0"
+          type: "uint256"
+
+      # 4. Scale from 18 decimals to coin0 decimals
+      - description: "Scale the user's total LP token value from 18 decimals to coin0 decimals"
+        target: ${inputs.unsigned_math_helper}
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.lp_value_in_coin0}"
+          - type: "uint256"
+            value: "${inputs.coin0_scale_factor}"
+          - type: "uint256"
+            value: "${constants.WAD}"
+        return:
+          name: "scaled_lp_value_in_coin0"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.scaled_lp_value_in_coin0}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}
