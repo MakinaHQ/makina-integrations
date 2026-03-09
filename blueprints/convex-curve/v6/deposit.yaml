@@ -1,9 +1,9 @@
 protocol: "convex-curve"
 
 inputs:
-  asset_a_address:
+  tokena_address:
     type: "address"
-  asset_b_address:
+  tokenb_address:
     type: "address"
   curve_pool_address:
     type: "address"
@@ -15,25 +15,25 @@ inputs:
     type: "address"
 
 actions:
-  deposit_balanced:
+  deposit:
     calls:
       - description: "Approve token A to be spent by Curve pool"
-        target: "${inputs.asset_a_address}"
+        target: "${inputs.tokena_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
             value: "${inputs.curve_pool_address}"
           - type: "uint256"
-            value: "${input_slots.amount_asset_a}"
+            value: "${input_slots.amount_tokena}"
 
       - description: "Approve token B to be spent by Curve pool"
-        target: "${inputs.asset_b_address}"
+        target: "${inputs.tokenb_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
             value: "${inputs.curve_pool_address}"
           - type: "uint256"
-            value: "${input_slots.amount_asset_b}"
+            value: "${input_slots.amount_tokenb}"
 
       - description: "Add liquidity to Curve pool"
         target: "${inputs.curve_pool_address}"
@@ -42,11 +42,11 @@ actions:
           - type: "uint256[2]"
             value:
               - type: "uint256"
-                value: "${input_slots.amount_asset_a}"
+                value: "${input_slots.amount_tokena}"
               - type: "uint256"
-                value: "${input_slots.amount_asset_b}"
+                value: "${input_slots.amount_tokenb}"
           - type: "uint256"
-            value: "${input_slots.min_lp_amount}"
+            value: "${input_slots.min_mint_amount}"
         return:
           name: "lp_tokens_received"
           type: "uint256"
@@ -72,12 +72,12 @@ actions:
             value: "true"
 
     input_slots:
-      amount_asset_a:
+      amount_tokena:
         type: "uint256"
         description: "The amount of asset A to deposit in the Curve pool"
-      amount_asset_b:
+      amount_tokenb:
         type: "uint256"
         description: "The amount of asset B to deposit in the Curve pool"
-      min_lp_amount:
+      min_mint_amount:
         type: "uint256"
         description: "The minimum amount of LP tokens to receive from Curve"

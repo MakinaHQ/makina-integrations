@@ -1,4 +1,4 @@
-# implem: https://etherscan.io/address/0x67fe41A94e779CcFa22cff02cc2957DC9C0e4286#code
+# implem: https://etherscan.io/address/0xDCc91f930b42619377C200BA05b7513f2958b202#code
 protocol: "curve"
 
 inputs:
@@ -14,7 +14,7 @@ inputs:
     type: "address"
 
 actions:
-  deposit_balanced:
+  deposit:
     calls:
       - description: "Approve token A to the pool"
         target: "${inputs.tokena_address}"
@@ -36,9 +36,9 @@ actions:
 
       - description: "Add liquidity to the pool"
         target: "${inputs.pool_address}"
-        selector: "add_liquidity(uint256[2],uint256)"
+        selector: "add_liquidity(uint256[],uint256)"
         parameters:
-          - type: "uint256[2]"
+          - type: "uint256[]"
             value:
               - type: "uint256"
                 value: "${input_slots.amount_tokena}"

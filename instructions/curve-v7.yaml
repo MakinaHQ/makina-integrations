@@ -1,49 +1,67 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
-    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
   instruction:
-    label: "PYUSD/crvUSD"
-    path: "../../../blueprints/curve/deposit-v7.yaml:deposit_balanced"
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/deposit.yaml:deposit"
     inputs:
       tokena_address:
         type: "address"
-        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+        value: ${position.tokena_address}
       tokenb_address:
         type: "address"
-        value: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+        value: ${position.tokenb_address}
       pool_address:
         type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+        value: ${position.pool_address}
       gauge_address:
         type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+        value: ${position.gauge_address}
       lp_token_address:
         type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
-      caliber_address:
-        type: "address"
-        value: "${config.caliber_address}"
+        value: ${position.pool_address}
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
-    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+    - ${position.tokena_address}
   instruction:
-    label: "PYUSD/crvUSD"
-    path: "../../../blueprints/curve/account.yaml:account_balanced"
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/account-in-coin0.yaml:account_in_coin0"
     inputs:
       gauge_address:
         type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
-      lp_token_address:
-        type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+        value: ${position.gauge_address}
       pool_address:
         type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+        value: ${position.pool_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      coin0_scale_factor:
+        type: "uint256"
+        value: ${position.coin0_scale_factor}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/withdraw.yaml:withdraw_balanced"
+    inputs:
+      gauge_address:
+        type: "address"
+        value: ${position.gauge_address}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -54,40 +72,18 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
-    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
+    - ${position.tokena_address}
+    - ${position.tokenb_address}
   instruction:
-    label: "PYUSD/crvUSD"
-    path: "../../../blueprints/curve/withdraw-v7.yaml:withdraw_balanced"
+    label: ${position.label}
+    path: "../../../blueprints/curve/v7/withdraw.yaml:withdraw_balanced_relative"
     inputs:
       gauge_address:
         type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+        value: ${position.gauge_address}
       pool_address:
         type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
-      caliber_address:
-        type: "address"
-        value: "${config.caliber_address}"
-      unsigned_math_helper:
-        type: "address"
-        value: "${config.unsigned_math_helper_address}"
-
-- is_debt: false
-  instruction_type: "MANAGEMENT"
-  affected_tokens:
-    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
-    - "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E" # crvUSD
-  instruction:
-    label: "PYUSD/crvUSD"
-    path: "../../../blueprints/curve/withdraw-v7.yaml:withdraw_balanced_relative"
-    inputs:
-      gauge_address:
-        type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
-      pool_address:
-        type: "address"
-        value: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+        value: ${position.pool_address}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -99,23 +95,23 @@
   instruction_type: "HARVEST"
   affected_tokens: []
   instruction:
-    label: "PYUSD/crvUSD"
+    label: ${position.label}
     path: "../../../blueprints/curve/harvest.yaml:harvest"
     inputs:
       gauge_address:
         type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+        value: ${position.gauge_address}
 
 - is_debt: false
   instruction_type: "HARVEST"
   affected_tokens: []
   instruction:
-    label: "PYUSD/crvUSD"
+    label: ${position.label}
     path: "../../../blueprints/curve/harvest.yaml:harvest_from_minter"
     inputs:
       gauge_address:
         type: "address"
-        value: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+        value: ${position.gauge_address}
       token_minter_address:
         type: "address"
         value: "0xd061D61a4d941c39E5453435B6345Dc261C2fcE0"

@@ -41,18 +41,64 @@ positions:
     group_id: "0"
     description: "StakeDAO USDT/crvUSD Harvest"
     instructions: !include "./instructions/stakedao-curve-usdt-crvusd-harvest.yaml"
-  - id: "780"
-    group_id: "0"
-    description: "Convex USDC/crvUSD Harvest"
-    instructions: !include "./instructions/convex-curve-usdc-crvusd-harvest.yaml"
-  - id: "781"
-    group_id: "0"
-    description: "Convex USDT/crvUSD Harvest"
-    instructions: !include "./instructions/convex-curve-usdt-crvusd-harvest.yaml"
   - id: "782"
     group_id: "0"
     description: "Fluid Rewards Harvest"
     instructions: !include "./instructions/fluid-harvest.yaml"
+
+  # ── Curve ────────────────────────────────────────────────────────
+  - id: "82192343698835691382596586281665913315"
+    group_id: "0"
+    description: "Curve PYUSD/crvUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0x625E92624Bc2D88619ACCc1788365A69767f6200"]
+    vars:
+      label: "PYUSD/crvUSD"
+      tokena_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      pool_address: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+      gauge_address: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+      coin0_scale_factor: "1000000"
+  - id: "54562872644924688465793884662053422151"
+    group_id: "0"
+    description: "Curve USDC/RLUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0xd001ae433f254283fece51d4acce8c53263aa186"]
+    vars:
+      label: "USDC/RLUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      pool_address: "0xd001ae433f254283fece51d4acce8c53263aa186"
+      gauge_address: "0xfc3212bd9ad9a28da6b2bd50a2918969c126894f"
+      coin0_scale_factor: "1000000"
+
+  # ── Convex-Curve ─────────────────────────────────────────────────
+  - id: "325002806383600319439358862074549790880"
+    group_id: "0"
+    description: "Convex USDC/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"]
+    vars:
+      label: "USDC/crvUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"
+      convex_pool_id: "182"
+      convex_reward_pool: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      coin0_scale_factor: "1000000"
+  - id: "222242215405885945120043212563500173272"
+    group_id: "0"
+    description: "Convex USDT/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"]
+    vars:
+      label: "USDT/crvUSD"
+      tokena_address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      convex_pool_id: "179"
+      convex_reward_pool: "0xD1DdB0a0815fD28932fBb194C84003683AF8a824"
+      coin0_scale_factor: "1000000"
 
   # ── Morpho Vaults ─────────────────────────────────────────────────
   - id: "276843631519342658565251846836976075217"

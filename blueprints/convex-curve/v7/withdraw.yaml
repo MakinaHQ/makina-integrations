@@ -18,7 +18,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -27,21 +27,21 @@ actions:
         selector: "remove_liquidity(uint256,uint256[])"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "uint256[]"
             value:
               - type: "uint256"
-                value: "${input_slots.min_amount_token_a}"
+                value: "${input_slots.min_token_a}"
               - type: "uint256"
-                value: "${input_slots.min_amount_token_b}"
+                value: "${input_slots.min_token_b}"
     input_slots:
-      lp_amount_to_withdraw:
+      amount_to_withdraw:
         type: "uint256"
         description: "The amount of LP tokens to withdraw from Convex"
-      min_amount_token_a:
+      min_token_a:
         type: "uint256"
         description: "Minimum amount of token A to receive"
-      min_amount_token_b:
+      min_token_b:
         type: "uint256"
         description: "Minimum amount of token B to receive"
 
@@ -68,7 +68,7 @@ actions:
           - type: "uint256"
             value: "10000"
         return:
-          name: "lp_amount_to_withdraw"
+          name: "amount_to_withdraw"
           type: "uint256"
 
       - description: "Withdraw LP tokens from Convex and unwrap"
@@ -76,7 +76,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -85,22 +85,22 @@ actions:
         selector: "remove_liquidity(uint256,uint256[])"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "uint256[]"
             value:
               - type: "uint256"
-                value: "${input_slots.min_amount_token_a}"
+                value: "${input_slots.min_token_a}"
               - type: "uint256"
-                value: "${input_slots.min_amount_token_b}"
+                value: "${input_slots.min_token_b}"
 
     input_slots:
       bps_to_withdraw:
         type: "uint256"
         description: "The percentage of LP tokens to withdraw from Convex, in basis points (bps), 10000 bps = 100%"
-      min_amount_token_a:
+      min_token_a:
         type: "uint256"
         description: "Minimum amount of token A to receive (slippage protection)"
-      min_amount_token_b:
+      min_token_b:
         type: "uint256"
         description: "Minimum amount of token B to receive (slippage protection)"
 
@@ -111,7 +111,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -120,17 +120,17 @@ actions:
         selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "int128"
             value: "1"
           - type: "uint256"
-            value: "${input_slots.min_amount_token_b}"
+            value: "${input_slots.min_token_b}"
 
     input_slots:
-      lp_amount_to_withdraw:
+      amount_to_withdraw:
         type: "uint256"
         description: "The amount of LP tokens to withdraw from Convex"
-      min_amount_token_b:
+      min_token_b:
         type: "uint256"
         description: "Minimum amount of token B to receive (slippage protection)"
 
@@ -157,7 +157,7 @@ actions:
           - type: "uint256"
             value: "10000"
         return:
-          name: "lp_amount_to_withdraw"
+          name: "amount_to_withdraw"
           type: "uint256"
 
       - description: "Withdraw LP tokens from Convex and unwrap"
@@ -165,7 +165,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -174,17 +174,17 @@ actions:
         selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "int128"
             value: "1"
           - type: "uint256"
-            value: "${input_slots.min_amount_token_b}"
+            value: "${input_slots.min_token_b}"
 
     input_slots:
       bps_to_withdraw:
         type: "uint256"
         description: "The percentage of LP tokens to withdraw from Convex, in basis points (bps), 10000 bps = 100%"
-      min_amount_token_b:
+      min_token_b:
         type: "uint256"
         description: "Minimum amount of token B to receive (slippage protection)"
 
@@ -195,7 +195,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -204,17 +204,17 @@ actions:
         selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.lp_amount_to_withdraw}"
+            value: "${input_slots.amount_to_withdraw}"
           - type: "int128"
             value: "0"
           - type: "uint256"
-            value: "${input_slots.min_amount_token_a}"
+            value: "${input_slots.min_token_a}"
 
     input_slots:
-      lp_amount_to_withdraw:
+      amount_to_withdraw:
         type: "uint256"
         description: "The amount of LP tokens to withdraw from Convex"
-      min_amount_token_a:
+      min_token_a:
         type: "uint256"
         description: "Minimum amount of token A to receive (slippage protection)"
 
@@ -241,7 +241,7 @@ actions:
           - type: "uint256"
             value: "10000"
         return:
-          name: "lp_amount_to_withdraw"
+          name: "amount_to_withdraw"
           type: "uint256"
 
       - description: "Withdraw LP tokens from Convex and unwrap"
@@ -249,7 +249,7 @@ actions:
         selector: "withdrawAndUnwrap(uint256,bool)"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "bool"
             value: "false"
 
@@ -258,16 +258,16 @@ actions:
         selector: "remove_liquidity_one_coin(uint256,int128,uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.lp_amount_to_withdraw}"
+            value: "${returns.amount_to_withdraw}"
           - type: "int128"
             value: "0"
           - type: "uint256"
-            value: "${input_slots.min_amount_token_a}"
+            value: "${input_slots.min_token_a}"
 
     input_slots:
       bps_to_withdraw:
         type: "uint256"
         description: "The percentage of LP tokens to withdraw from Convex, in basis points (bps), 10000 bps = 100%"
-      min_amount_token_a:
+      min_token_a:
         type: "uint256"
         description: "Minimum amount of token A to receive (slippage protection)"
