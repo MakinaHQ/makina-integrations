@@ -20,21 +20,21 @@ spellcaster --machine <MACHINE> --caliber <CHAIN> <COMMAND>
 
 ## Common Commands
 
-| Command | Description |
-|---------|-------------|
-| `display-positions` | Show all positions |
-| `display-balances` | Show token balances |
-| `manage-position` | Execute instruction |
-| `dev-update-root` | Update root on testnet |
+| Command             | Description            |
+| ------------------- | ---------------------- |
+| `display-positions` | Show all positions     |
+| `display-balances`  | Show token balances    |
+| `manage-position`   | Execute instruction    |
+| `dev-update-root`   | Update root on testnet |
 
 ## Documentation
 
 For detailed documentation, read these files when needed:
 
-- **CLI Reference**: `.claude/skills/makina-cli/docs/cli-reference.md`
-- **Root Updates**: `.claude/skills/makina-cli/docs/root-updates.md`
-- **Blueprint System**: `.claude/skills/makina-cli/docs/blueprints.md`
-- **Testing Workflows**: `.claude/skills/makina-cli/docs/testing.md`
+- **CLI Reference**: `.Codex/skills/makina-cli/docs/cli-reference.md`
+- **Root Updates**: `.Codex/skills/makina-cli/docs/root-updates.md`
+- **Blueprint System**: `.Codex/skills/makina-cli/docs/blueprints.md`
+- **Testing Workflows**: `.Codex/skills/makina-cli/docs/testing.md`
 
 ## Local Config
 

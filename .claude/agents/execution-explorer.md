@@ -5,19 +5,26 @@ model: opus
 color: red
 ---
 
+## IMPORTANT: Reference Documentation
+
+**Read `/.claude/blueprint-helpers.md` before designing execution flows.** It documents all available weiroll helper contracts (MathHelper, BooleanHelper, CastHelper, Bytes32Helper, ContextHelper, KeyValueStore, etc.) with their deployed addresses, function signatures, and usage patterns. These helpers are essential for building blueprint call sequences.
+
 ## Tools
 
-| Tool                                    | Purpose                    |
-| --------------------------------------- | -------------------------- |
-| `tenderly:create_tenderly_testnet`      | Create forked testnets     |
-| `tenderly:execute_code`                 | Run Python/web3 code       |
-| `tenderly:fund_address`                 | Fund test accounts         |
-| `tenderly:debug_tx`                     | Debug failed transactions  |
-| `Etherscan MCP:get_contract_abi`        | Fetch contract ABIs        |
-| `Etherscan MCP:get_contract_code`       | Get contract source        |
-| `Etherscan MCP:get_function_code`       | Extract specific functions |
-| `Etherscan MCP:get_latest_transactions` | Find example transactions  |
-| `web_search` / `web_fetch`              | Protocol documentation     |
+| Tool                                    | Purpose                                         |
+| --------------------------------------- | ------------------------------------------------|
+| `tenderly:create_tenderly_testnet`      | Create forked testnets                          |
+| `tenderly:execute_code`                 | Run Python/web3 code                            |
+| `tenderly:fund_address`                 | Fund test accounts                              |
+| `tenderly:debug_tx`                     | Debug failed transactions                       |
+| `Etherscan MCP:get_contract_abi`        | Fetch contract ABIs                             |
+| `Etherscan MCP:get_contract_code`       | Get contract source                             |
+| `Etherscan MCP:get_function_code`       | Extract specific functions                      |
+| `Etherscan MCP:get_latest_transactions` | Find example transactions                       |
+| `cast`                                  | Encode calldata, send transactions, query state |
+| `curl`                                  | Direct API/RPC calls                            |
+| `web_search` / `web_fetch`              | Protocol documentation                          |
+
 
 ---
 
@@ -28,7 +35,7 @@ color: red
 Extract from provided context:
 
 - Chain (ethereum, arbitrum, base, polygon, optimism)
-- Contract addresses (pool, vault, gauge, rewards)
+- Contract addresses (pool, vault, gauge, rewards etc)
 - Token addresses and decimals
 - Any protocol-specific parameters
 
@@ -204,6 +211,62 @@ result = (input_amount * rate) // 10**18
 | ------------- | ------ | ----- |
 | Token Balance | 1000   | 0     |
 | LP Balance    | 0      | 998   |
+
+## Testing Multi-Step / Time-Locked Operations
+
+Some protocols (e.g., InfiniFi) require multi-step operations with waiting periods between steps. When exploring these flows:
+
+### Time Warping on Tenderly
+
+**CRITICAL**: `evm_increaseTime` does NOT permanently shift time on Tenderly Virtual Testnets. Only the immediately next block is affected.
+
+**Correct approach**: Use `tenderly_setNextBlockTimestamp` immediately before the time-dependent transaction:
+
+```python
+# 1. Set the next block's timestamp
+web3.provider.make_request("tenderly_setNextBlockTimestamp", [hex(target_timestamp)])
+
+# 2. IMMEDIATELY send the time-dependent transaction (no intermediate blocks!)
+tx_hash = web3.eth.send_transaction(tx)
+receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+
+# 3. Verify the block timestamp is correct
+block = web3.eth.get_block(receipt['blockNumber'])
+assert block['timestamp'] >= target_timestamp
+```
+
+### Oracle Staleness After Time Warp
+
+After warping time forward, Chainlink oracle feeds become stale. Fix by calling `setFeedRoute` on the OracleRegistry with an extended staleness threshold (e.g., 315360000 = 10 years) before executing the time-warped transaction. This requires role 1 on the AccessManager.
+
+### Storage Override Alternative (`tenderly_setStorageAt`)
+
+When timestamp manipulation isn't sufficient (e.g., protocols with epoch-by-epoch extrapolation loops that underflow when jumped too far), use `tenderly_setStorageAt` to override the protocol's timing state directly:
+
+```python
+# Override a storage slot on Tenderly
+web3.provider.make_request("tenderly_setStorageAt", [
+    contract_address,   # Address of the contract
+    storage_slot_hex,   # Hex-encoded storage slot
+    new_value_hex       # Hex-encoded 32-byte value
+])
+```
+
+This is useful for:
+- **Epoch-based protocols** (e.g., InfiniFi) where `_getLastGlobalPoint()` underflows during epoch extrapolation
+- **Multi-step operations** where the waiting period check is a simple storage comparison
+- **Any protocol** where time manipulation causes cascading arithmetic failures
+
+**Finding storage slots**: Use `cast storage CONTRACT SLOT --rpc-url RPC` to read, and `cast index TYPE KEY SLOT` to compute mapping keys. For packed struct fields (uint32, uint64), remember Solidity packs right-to-left within a 32-byte slot.
+
+### Transaction Receipt Verification
+
+Always verify receipt status after sending transactions. A tx hash being returned does NOT mean the transaction succeeded:
+
+```python
+receipt = web3.eth.wait_for_transaction_receipt(tx_hash)
+assert receipt['status'] == 1, f"Transaction reverted: {tx_hash.hex()}"
+```
 
 ## Session Management
 

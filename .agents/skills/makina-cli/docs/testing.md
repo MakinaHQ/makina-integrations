@@ -42,6 +42,7 @@ spellcaster -- \
 ## Step 4: Fund Caliber
 
 ### Native ETH
+
 ```
 mcp__tenderly__fund_address(
   admin_rpc="{admin_rpc}",
@@ -52,6 +53,7 @@ mcp__tenderly__fund_address(
 ```
 
 ### ERC20 Tokens
+
 ```
 mcp__tenderly__fund_address(
   admin_rpc="{admin_rpc}",
@@ -63,15 +65,16 @@ mcp__tenderly__fund_address(
 
 ### Common Tokens (mainnet)
 
-| Token | Address | Decimals |
-|-------|---------|----------|
-| USDC | 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 | 6 |
-| WETH | 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 | 18 |
-| wstETH | 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 | 18 |
+| Token  | Address                                    | Decimals |
+| ------ | ------------------------------------------ | -------- |
+| USDC   | 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 | 6        |
+| WETH   | 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 | 18       |
+| wstETH | 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0 | 18       |
 
 ## Step 5: Execute Instruction
 
 ### Check input slots
+
 ```bash
 grep -A 5 'inputs_slots' /path/to/test-output.toml
 ```
@@ -92,6 +95,7 @@ cast abi-encode "f(uint256)" 0                     # -> input 2
 ### Run manage-position
 
 Single input:
+
 ```bash
 DEV_MAINNET_RPC_URL="{admin_rpc}" \
 spellcaster -- \
@@ -105,6 +109,7 @@ spellcaster -- \
 ```
 
 Multiple inputs (e.g., amount + min_shares):
+
 ```bash
 DEV_MAINNET_RPC_URL="{admin_rpc}" \
 spellcaster -- \
@@ -130,11 +135,11 @@ spellcaster -- \
 
 ## Troubleshooting
 
-| Error | Solution |
-|-------|----------|
+| Error                                 | Solution                                          |
+| ------------------------------------- | ------------------------------------------------- |
 | "incorrect number of inputs supplied" | Use separate `--inputs` flags for each input slot |
-| "no matching rootfile" | Re-run `dev-update-root` |
-| "could not find instruction" | Check --protocol, --action, --token |
-| "transaction reverted" | Fund caliber with ETH and tokens |
+| "no matching rootfile"                | Re-run `dev-update-root`                          |
+| "could not find instruction"          | Check --protocol, --action, --token               |
+| "transaction reverted"                | Fund caliber with ETH and tokens                  |
 
 Debug: `mcp__tenderly__debug_tx(testnet_id="{id}", tx_hash="{hash}")`

@@ -20,6 +20,13 @@ Given a pool identifier (smart contract, web url or dialectic ID) and optionally
 
 - Always use Tenderly MCP for executing Python code (mcp__tenderly__execute_code) - NEVER use the Bash tool for Python execution !
 
+## Other Tools
+
+| Tool | Purpose |
+|------|---------|
+| `cast` | Encode calldata, query on-chain data |
+
+
 ## Workflow
 
 ### Step 1: Retrieve Base Pool Data
@@ -35,7 +42,7 @@ Use the Pool MCP to fetch fundamental pool information:
 
 ### Step 2: Enrich with On-Chain Data
 
-Use Etherscan MCP and Tenderly MCP to gather:
+Use the `etherscan` and `tenderly` skills to gather:
 
 - Verified contract ABIs
 - Contract implementation addresses (for proxies)

@@ -43,7 +43,7 @@ positions:
 ## Step 3: Run Transpiler
 
 ```bash
-cd $TRANSPILER_PATH && cargo run -p transpiler -- \
+transpiler -- \
   --input-file=machines/{fund}/{network}/caliber-test.yaml \
   --output-file=machines/{fund}/{network}/rootfiles/compile-output.toml
 ```

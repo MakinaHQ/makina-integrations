@@ -56,7 +56,7 @@ positions:
 Execute the transpiler using the `TRANSPILER_PATH` environment variable (set in `.claude/settings.local.json`):
 
 ```bash
-cd $TRANSPILER_PATH && cargo run -p transpiler -- \
+transpiler -- \
   --input-file=/Users/augustin/Desktop/git/rootfiles/machines/{fund}/{network}/caliber-test.yaml \
   --output-file=/Users/augustin/Desktop/git/rootfiles/machines/{fund}/{network}/rootfiles/test-compile-output.toml
 ```

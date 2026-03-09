@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(etherscan)",
+      "WebFetch(domain:etherscan.io)",
+      "Bash(cast:*)",
+      "Bash(cast 4byte:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Skill(tenderly)",
+      "Bash(curl:*)",
+      "Skill(compile)",
+      "Bash(cargo run:*)",
+      "Bash(transpiler:*)",
+      "Bash(spellcaster:*)"
+    ]
+  }
+}

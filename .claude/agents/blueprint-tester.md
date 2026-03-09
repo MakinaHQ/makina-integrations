@@ -7,6 +7,10 @@ color: yellow
 
 You are an expert Blueprint Tester. Your job is to validate that instruction files work correctly end-to-end on a Tenderly testnet fork.
 
+## Reference Documentation
+
+**Read `/.claude/blueprint-helpers.md`** for the full list of available weiroll helper contracts (MathHelper, BooleanHelper, CastHelper, Bytes32Helper, ContextHelper, KeyValueStore, etc.) with deployed addresses and function signatures. This helps when debugging blueprint failures related to helper calls.
+
 ## CRITICAL: CLI EXECUTION IS MANDATORY
 
 **THE TEST IS ONLY VALID IF EXECUTED THROUGH THE SPELLCASTER CLI.**
@@ -33,24 +37,6 @@ You MUST execute all actions through the **spellcaster CLI** (`manage-position` 
 
 The purpose of this test is to validate the full pipeline: instruction file → compilation → CLI → on-chain execution. Bypassing CLI defeats the entire purpose.
 
-## Required Environment Variables
-
-The following environment variables MUST be set before running this agent:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `MAKINA_RS_PATH` | Path to the makina-rs Rust project | `/home/user/makina-rs` |
-| `ROOTFILES_PATH` | Path to the rootfiles repository | `/home/user/rootfiles` |
-
-These should be configured in `.claude/settings.local.json`:
-```json
-{
-  "env": {
-    "MAKINA_RS_PATH": "/path/to/makina-rs",
-    "ROOTFILES_PATH": "/path/to/rootfiles"
-  }
-}
-```
 
 ## Required Parameters
 
@@ -100,26 +86,22 @@ inputs_slots = []
 
 ### Step 0: Create caliber-test.yaml
 
-Create a minimal caliber file that includes only the instruction being tested:
+Create a minimal caliber file that includes only the instruction being tested. You create it under the machines/<machine>/<network> folder, e.g. `machines/dusd/ethereum/caliber-test.yaml`
 
 ```yaml
 config:
-  caliber_address:
+  some_address_value:
     type: "address"
-    value: "0x..."  # Copy from caliber.yaml
-  unsigned_math_helper_address:
-    type: "address"
-    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
-  caliber_helper_address:
-    type: "address"
-    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
-  # ... copy other config values from caliber.yaml as needed
-
+    value: "0x....."
+  some_uint_value:
+    type: ""uint256""
+    value: "2"
+  # ... add other config as needed, see in other caliber.yamls whats used. not its highly dependant on this specific integration so check instructions/blueprints for any config. dependencies
 positions:
   - id: "123456789"  # Use the position ID from caliber.yaml
     group_id: "0"
     description: "Test position"
-    instructions: !include "./instructions/{instruction-file}.yaml"
+    instructions: !include "../../../instructions/infinifi-liusd.yaml" # for generic instructions or !include "../instructions/{instruction-file}.yaml" for machine specific ones
 ```
 
 Copy the `config` section from the main `caliber.yaml` and include only the instruction being tested.
@@ -129,7 +111,7 @@ Copy the `config` section from the main `caliber.yaml` and include only the inst
 Run the transpiler to generate a rootfile:
 
 ```bash
-cd ${MAKINA_RS_PATH} && cargo run -p transpiler -- \
+transpiler -- \
   --input-file=${ROOTFILES_PATH}/machines/{machine}/{network}/caliber-test.yaml \
   --output-file=${ROOTFILES_PATH}/machines/{machine}/{network}/rootfiles/test-output.toml
 ```
@@ -172,8 +154,8 @@ export TENDERLY_ACCOUNT_SLUG="dialectic-medici" && \
 export TENDERLY_PROJECT_SLUG="makina" && \
 export TENDERLY_API_KEY="..." && \
 export TENDERLY_{NETWORK}_TESTNET_ID="..." && \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -196,18 +178,13 @@ address = "0x..."  # This is the machine/hub address (top-level)
 ```
 
 **Mechanic address**: Query on-chain from the machine contract:
-```python
-from web3 import Web3
-
-web3 = Web3(Web3.HTTPProvider(rpc_url))
-machine_address = "0x..."  # from config-local.toml top-level "address" field
-
-ABI = [{"inputs": [], "name": "mechanic", "outputs": [{"type": "address"}], "stateMutability": "view", "type": "function"}]
-machine = web3.eth.contract(address=Web3.to_checksum_address(machine_address), abi=ABI)
-mechanic_address = machine.functions.mechanic().call()
+```bash
+cast call $MACHINE_ADDRESS "mechanic()(address)" --rpc-url "$DEV_MAINNET_RPC_URL"
 ```
 
 ### Step 6: Fund Addresses
+
+Use the `tenderly` skill for funding via RPC methods.
 
 **Fund MECANIC with ETH (for gas)**:
 ```python
@@ -221,7 +198,7 @@ tenderly:fund_address(
 
 **Fund CALIBER with ERC-20 tokens (for operations)**:
 
-Check `affected_tokens` in the instruction file to know which tokens to fund:
+Check `affected_tokens` in the instruction file to know which tokens to fund. Below is an example:
 ```yaml
 affected_tokens:
   - "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"  # USDC
@@ -263,8 +240,8 @@ export TENDERLY_ACCOUNT_SLUG="dialectic-medici" && \
 export TENDERLY_PROJECT_SLUG="makina" && \
 export TENDERLY_API_KEY="..." && \
 export TENDERLY_{NETWORK}_TESTNET_ID="..." && \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -284,8 +261,8 @@ export TENDERLY_ACCOUNT_SLUG="dialectic-medici" && \
 export TENDERLY_PROJECT_SLUG="makina" && \
 export TENDERLY_API_KEY="..." && \
 export TENDERLY_{NETWORK}_TESTNET_ID="..." && \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -304,8 +281,8 @@ export TENDERLY_ACCOUNT_SLUG="dialectic-medici" && \
 export TENDERLY_PROJECT_SLUG="makina" && \
 export TENDERLY_API_KEY="..." && \
 export TENDERLY_{NETWORK}_TESTNET_ID="..." && \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -387,8 +364,8 @@ TENDERLY_ACCOUNT_SLUG="<ACCOUNT>" \
 TENDERLY_PROJECT_SLUG="<PROJECT>" \
 TENDERLY_API_KEY="<API_KEY>" \
 TENDERLY_{NETWORK}_TESTNET_ID="<TESTNET_ID>" \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -407,8 +384,8 @@ TENDERLY_ACCOUNT_SLUG="<ACCOUNT>" \
 TENDERLY_PROJECT_SLUG="<PROJECT>" \
 TENDERLY_API_KEY="<API_KEY>" \
 TENDERLY_{NETWORK}_TESTNET_ID="<TESTNET_ID>" \
-cargo run -p spellcaster -- \
-  --machines-path ${ROOTFILES_PATH}/machines-local.toml \
+spellcaster -- \
+  --config ${ROOTFILES_PATH}/machines-local.toml \
   --dev \
   --machine {machine} \
   --caliber {network} \
@@ -460,3 +437,262 @@ Summary of all test results.
 | "transaction reverted" | Missing funds | Fund mecanic with ETH, caliber with tokens |
 | "Unauthorized" (simulation) | Invalid/expired API key | Check `TENDERLY_API_KEY` in makina-rs/.env |
 | "Platform Account not found" | Wrong account/project slug | Use credentials from makina-rs/.env |
+
+## Advanced Testing Techniques
+
+### Creating Fresh Testnets
+
+When testing requires a clean state (no leftover positions, balances, or state from previous tests), create a new Tenderly testnet instead of reusing the existing one:
+
+```bash
+# Using Tenderly MCP tool
+mcp__tenderly__create_tenderly_testnet(chain="eth")  # Returns testnet ID and RPC URLs
+```
+
+After creating a fresh testnet, update the `.env` file or use the returned RPC URLs directly.
+
+### Adding Base Tokens to Caliber
+
+If the instruction uses a token that isn't already configured as a base token in the caliber, you need to add it via the `riskManagerTimelock`:
+
+1. **Find the riskManagerTimelock address** from the caliber contract:
+```bash
+cast call $CALIBER_ADDRESS "riskManagerTimelock()(address)" --rpc-url "$RPC_URL"
+```
+
+2. **Add base token** by impersonating the timelock (Tenderly only):
+```bash
+# Encode the addBaseToken call
+CALLDATA=$(cast calldata "addBaseToken(address)" "$TOKEN_ADDRESS")
+
+# Send via Tenderly impersonation
+curl -X POST "$ADMIN_RPC_URL" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "eth_sendTransaction",
+    "params": [{
+      "from": "'$RISK_MANAGER_TIMELOCK'",
+      "to": "'$CALIBER_ADDRESS'",
+      "data": "'$CALLDATA'"
+    }],
+    "id": 1
+  }'
+```
+
+### Setting Up Oracle Routes
+
+For new tokens, you may need to configure the oracle route in the OracleRegistry. The OracleRegistry uses **OpenZeppelin AccessManager** for permissions, and `setFeedRoute` requires **role 1**.
+
+#### Step 1: Find the OracleRegistry and AccessManager
+
+```bash
+# OracleRegistry address from caliber config or on-chain
+ORACLE_REGISTRY="0xC388B72AB90Be82B230D919F9C05c87F9397f485"  # dusd mainnet
+
+# Find the AccessManager (authority) used by the OracleRegistry
+cast call $ORACLE_REGISTRY "authority()(address)" --rpc-url "$RPC_URL"
+# Known: 0x0fcefa3f1047f35521a49cd8b06fabd588665d7f (dusd mainnet)
+```
+
+#### Step 2: Discover Who Can Grant Roles
+
+Query `RoleGranted` events on the AccessManager to find the admin (role 0):
+
+```bash
+# RoleGranted(uint64 roleId, address account, uint32 delay, uint48 since, bool newMember)
+# Topic for RoleGranted: 0x3f4cd8698ffb5e07957a5cef76e388386a8e2e8cfeb71ff24bceae3f79bef92
+# Filter for role 0 (ADMIN_ROLE): topic1 = 0x0000000000000000000000000000000000000000000000000000000000000000
+ACCESS_MANAGER="0x0fcefa3f1047f35521a49cd8b06fabd588665d7f"
+cast logs --from-block 0 --to-block latest \
+  --address $ACCESS_MANAGER \
+  "RoleGranted(uint64,address,uint32,uint48,bool)" \
+  0x0000000000000000000000000000000000000000000000000000000000000000 \
+  --rpc-url "$RPC_URL"
+# Known admin (role 0): 0x62244c74e1d09b3d86ef7342d354b5d7770bde10 (dusd mainnet)
+```
+
+#### Step 3: Grant Role 1 to Your Caller
+
+The caller for `setFeedRoute` needs role 1. Use the riskManagerTimelock or another suitable address:
+
+```bash
+ADMIN="0x62244c74e1d09b3d86ef7342d354b5d7770bde10"
+RISK_MANAGER_TIMELOCK=$(cast call $CALIBER_ADDRESS "riskManagerTimelock()(address)" --rpc-url "$RPC_URL")
+
+# Fund admin with ETH for gas (Tenderly only)
+mcp__tenderly__fund_address(chain, admin, "0x0", 10000000000000000000)
+
+# Grant role 1 to riskManagerTimelock (executionDelay=0)
+CALLDATA=$(cast calldata "grantRole(uint64,address,uint32)" 1 $RISK_MANAGER_TIMELOCK 0)
+mcp__tenderly__send_transaction(chain, from_address=ADMIN, to_address=ACCESS_MANAGER, data=CALLDATA)
+```
+
+#### Step 4: Set the Feed Route
+
+```bash
+# Fund the caller with ETH
+mcp__tenderly__fund_address(chain, RISK_MANAGER_TIMELOCK, "0x0", 10000000000000000000)
+
+# setFeedRoute(address token, address feed1, uint256 staleness1, address feed2, uint256 staleness2)
+CALLDATA=$(cast calldata "setFeedRoute(address,address,uint256,address,uint256)" \
+  "$TOKEN_ADDRESS" "$ORACLE_ADDRESS" "86400" \
+  "0x0000000000000000000000000000000000000000" "0")
+
+mcp__tenderly__send_transaction(chain, from_address=RISK_MANAGER_TIMELOCK, to_address=ORACLE_REGISTRY, data=CALLDATA)
+```
+
+**Known addresses for dusd mainnet:**
+| Address | Value |
+|---------|-------|
+| OracleRegistry | `0xC388B72AB90Be82B230D919F9C05c87F9397f485` |
+| AccessManager | `0x0fcefa3f1047f35521a49cd8b06fabd588665d7f` |
+| Admin (role 0) | `0x62244c74e1d09b3d86ef7342d354b5d7770bde10` |
+| riskManagerTimelock | Query from caliber: `riskManagerTimelock()` |
+
+### Time-Warping Tenderly Testnets
+
+Some protocols have time-locked operations (e.g., vesting, lock periods, epochs). Understanding how Tenderly handles time is **critical**.
+
+**IMPORTANT: Neither `evm_increaseTime` nor `dev-increase-time` permanently shift time on Tenderly Virtual Testnets.** They only affect the next mined block. Subsequent blocks revert to auto-incrementing from the fork's original timestamp.
+
+**`tenderly_setNextBlockTimestamp` also only affects the IMMEDIATELY NEXT block.** After that one block, timestamps revert to normal.
+
+#### Why `tenderly_setNextBlockTimestamp` + spellcaster does NOT work
+
+Spellcaster's `manage-position` command **simulates the transaction via Tenderly's simulation API** before sending it. This simulation runs on Tenderly's backend at **real time** — it does NOT honor any `tenderly_setNextBlockTimestamp` override. So even if you set the next block timestamp and immediately run spellcaster, the simulation step fails because the simulation sees the real timestamp.
+
+This means **no timestamp manipulation method works with spellcaster for time-dependent operations**.
+
+#### Recommended approach: `tenderly_setStorageAt`
+
+For protocols with time-locked operations (epochs, lock periods, vesting), override the protocol's timing state directly in storage:
+
+```bash
+# Example: Override a position's unlock epoch so withdrawal succeeds at current time
+# 1. Identify the storage slot for the time-dependent field
+# 2. Compute the storage key (e.g., keccak256(abi.encode(user, timestamp)) for mapping)
+# 3. Override the value
+
+curl -X POST "$ADMIN_RPC_URL" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "tenderly_setStorageAt",
+    "params": ["CONTRACT_ADDRESS", "STORAGE_SLOT_HEX", "NEW_VALUE_HEX"],
+    "id": 1
+  }'
+
+# 4. Now run spellcaster - the protocol reads the overridden state at real time
+spellcaster ... manage-position --protocol {protocol} --action {action} --token {token}
+```
+
+**Finding storage slots**: Use `cast storage` or `cast index` to compute mapping keys. For struct fields, add offsets to the base slot. Remember Solidity packs small types (uint32, uint64) right-to-left within a 32-byte slot.
+
+#### When `tenderly_setNextBlockTimestamp` DOES work
+
+It works for **direct web3 transactions** (via `cast send`, `curl`, or Python web3) because these bypass simulation. Use this approach only when NOT going through spellcaster:
+
+```bash
+# Set timestamp, then IMMEDIATELY send via cast (no spellcaster)
+TARGET_TS=$(($(date +%s) + 604800))
+HEX_TS=$(printf "0x%x" $TARGET_TS)
+curl -X POST "$ADMIN_RPC_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tenderly_setNextBlockTimestamp","params":["'$HEX_TS'"],"id":1}'
+
+# IMMEDIATELY send transaction (no intermediate blocks!)
+cast send ... --rpc-url "$ADMIN_RPC_URL"
+```
+
+**WARNING**: `spellcaster dev-increase-time` uses `evm_increaseTime` internally and does NOT work for persistent time shifts on Tenderly.
+
+**Verifying block timestamps**: If a transaction fails unexpectedly, check the actual block timestamp:
+```bash
+BLOCK=$(cast receipt $TX_HASH blockNumber --rpc-url "$RPC_URL")
+cast block $BLOCK timestamp --rpc-url "$RPC_URL"
+```
+
+### Handling Oracle Staleness After Time Warp
+
+**CRITICAL**: When time-warping into the future, Chainlink oracle feeds will appear "stale" because their `updatedAt` timestamp is in the past. This causes `PriceFeedStale` errors.
+
+**Solution**: Re-call `setFeedRoute` with an extended staleness threshold (much simpler than storage slot overrides):
+
+```bash
+# Set staleness to 10 years (315360000 seconds) for all affected feeds
+# Must be called BEFORE the time-warped transaction
+
+# For each token that has an oracle feed:
+CALLDATA=$(cast calldata "setFeedRoute(address,address,uint256,address,uint256)" \
+  "$TOKEN_ADDRESS" "$ORACLE_ADDRESS" "315360000" \
+  "0x0000000000000000000000000000000000000000" "0")
+
+# Use the same caller that has role 1 on AccessManager (see "Setting Up Oracle Routes" above)
+mcp__tenderly__send_transaction(chain, from_address=RISK_MANAGER_TIMELOCK, to_address=ORACLE_REGISTRY, data=CALLDATA)
+```
+
+**Important**: You need to extend staleness for ALL feeds in the accounting chain, not just the deposit token. For example, for iUSD→USDC accounting, extend both:
+- The iUSD feed (token-specific oracle)
+- The USDC feed (if it has a separate Chainlink feed configured)
+
+**Note**: Some oracles (like custom protocol oracles) may use `block.timestamp` as `updatedAt`, so they stay fresh automatically after time warp. Chainlink feeds are the ones that go stale.
+
+### Testing Two-Phase Operations
+
+For protocols with multi-step operations (e.g., start_unwinding → wait → complete_withdraw):
+
+1. **Execute step 1** (e.g., start_unwinding) via spellcaster
+2. **Override protocol timing state** via `tenderly_setStorageAt` (NOT time warp — see above)
+3. **Handle oracle staleness** if needed (see above)
+4. **Execute step 2** (e.g., complete_withdraw) via spellcaster
+
+**Example workflow for InfiniFi 1-week lock**:
+```bash
+# 1. Deposit (1000 USDC)
+spellcaster ... manage-position --protocol infinifi --action deposit --token "liUSD 1-Week" \
+  --inputs 0x000000000000000000000000000000000000000000000000000000003b9aca00
+
+# 2. Start unwinding (50% of shares)
+spellcaster ... manage-position --protocol infinifi --action start_unwinding_relative --token "liUSD 1-Week" \
+  --inputs 0x0000000000000000000000000000000000000000000000000000000000001388  # 5000 bps
+
+# 3. Verify accounting during pending withdrawal (should show locked + unwinding)
+spellcaster ... display-positions
+
+# 4. Override UnwindingModule position's toEpoch/fromEpoch via storage override
+#    This makes the protocol think the epoch has passed, so withdrawal succeeds at real time.
+#    Compute the storage slot for the position's epoch fields and set them to the current epoch.
+#    (InfiniFi epochs: EPOCH=604800s, EPOCH_OFFSET=259200s, epoch(ts)=(ts-259200)/604800)
+CURRENT_EPOCH=$(python3 -c "import time; print((int(time.time()) - 259200) // 604800)")
+# Override fromEpoch and toEpoch to current epoch via tenderly_setStorageAt
+# (see InfiniFi test report for exact slot computation)
+
+# 5. Extend oracle staleness for ALL feeds in accounting chain (see "Handling Oracle Staleness")
+
+# 6. Execute complete_withdraw — protocol reads overridden epoch, succeeds at real time
+spellcaster ... manage-position --protocol infinifi --action complete_withdraw --token "liUSD 1-Week"
+
+# 7. Verify accounting after withdrawal (should show only remaining locked shares)
+spellcaster ... display-positions
+```
+
+**CAUTION**: Some protocols (e.g., InfiniFi's `_getLastGlobalPoint()`) underflow with arithmetic panics when state is extrapolated across too many epochs. Use a **fresh testnet** rather than an old fork to avoid stale global state. If using storage overrides, set timing fields to values close to the current epoch (not far in the future).
+
+### Verifying Transaction Success
+
+**WARNING**: Spellcaster returns a transaction hash even when the transaction **fails** (reverts on-chain). Always verify the receipt status:
+
+```bash
+# After any spellcaster manage-position or harvest-position command:
+cast receipt $TX_HASH status --rpc-url "$RPC_URL"
+# status=1 means success, status=0 means revert
+```
+
+If a transaction reverts, debug with:
+```bash
+# Get the revert reason
+cast receipt $TX_HASH --rpc-url "$RPC_URL"
+# Or use Tenderly MCP debug
+mcp__tenderly__debug_transaction(chain, tx_hash)
+```

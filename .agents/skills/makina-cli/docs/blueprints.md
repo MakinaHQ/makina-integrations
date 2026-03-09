@@ -19,7 +19,7 @@ rootfiles/
 └── machines/
     └── mteth/
         └── mainnet/
-            ├── instructions/     # References blueprints
+            ├── instructions/     # Machine specific (non generic) instructions
             └── rootfiles/        # Generated TOML
 ```
 
@@ -74,7 +74,7 @@ actions:
   is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"  # WETH
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
   instruction:
     label: "weth"
     path: "../../../blueprints/aave/deposit.yaml:add_collateral"
@@ -92,21 +92,21 @@ actions:
 
 ## Blueprint to CLI Mapping
 
-| Blueprint | CLI Argument |
-|-----------|--------------|
-| `protocol:` | `--protocol` |
-| action name | `--action` |
-| `instruction.label:` | `--token` |
-| `input_slots:` | `--inputs` (ABI-encoded) |
+| Blueprint            | CLI Argument             |
+| -------------------- | ------------------------ |
+| `protocol:`          | `--protocol`             |
+| action name          | `--action`               |
+| `instruction.label:` | `--token`                |
+| `input_slots:`       | `--inputs` (ABI-encoded) |
 
 ## Instruction Types
 
-| Type | Value | Description |
-|------|-------|-------------|
-| MANAGEMENT | 0 | Position changes (deposit, withdraw) |
-| ACCOUNTING | 1 | Balance updates |
-| HARVEST | 2 | Yield collection |
-| FLASHLOAN_MANAGEMENT | 3 | Flashloan operations |
+| Type                 | Value | Description                          |
+| -------------------- | ----- | ------------------------------------ |
+| MANAGEMENT           | 0     | Position changes (deposit, withdraw) |
+| ACCOUNTING           | 1     | Balance updates                      |
+| HARVEST              | 2     | Yield collection                     |
+| FLASHLOAN_MANAGEMENT | 3     | Flashloan operations                 |
 
 ## Compiling Instructions
 
@@ -115,6 +115,7 @@ transpiler -- -i <caliber.yaml> -o <output.toml>
 ```
 
 Example:
+
 ```bash
 transpiler -- \
   -i /path/to/machines/deth/mainnet/caliber-test.yaml \

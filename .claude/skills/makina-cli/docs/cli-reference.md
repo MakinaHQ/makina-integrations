@@ -4,12 +4,12 @@
 
 ### Interactive Mode
 ```bash
-cargo run -- --dev
+spellcaster --dev
 ```
 
 ### Non-Interactive Mode
 ```bash
-cargo run -- --machine <MACHINE> --caliber <CHAIN> <COMMAND> [OPTIONS]
+spellcaster --machine <MACHINE> --caliber <CHAIN> <COMMAND> [OPTIONS]
 ```
 
 ## Configuration
@@ -21,7 +21,7 @@ Update machines.toml to point to local config files:
 config = "local:/path/to/machines/deth/config-local.toml"
 ```
 
-Or use: `--machines-path /path/to/machines-local.toml`
+Or use: `--config /path/to/machines-local.toml`
 
 ## Environment
 
@@ -33,10 +33,9 @@ Or use: `--machines-path /path/to/machines-local.toml`
 | Flag | Description |
 |------|-------------|
 | `--dev` | Use Tenderly testnet RPCs |
-| `--force-execute` | Execute transaction even if simulation fails. Useful for debugging on Tenderly |
 | `--machine <MACHINE>` | Specify the machine in non-interactive mode |
 | `--caliber <CALIBER>` | Specify the caliber/chain in non-interactive mode |
-| `--machines-path <PATH>` | Path to machines.toml file |
+| `--config <PATH>` | Path to machines.toml file |
 | `--signer <SIGNER>` | Signing method: `gcp`, `private-key`, `ledger`, `trezor`, `unsigned` |
 | `--safe <SAFE>` | Safe address for multisig transactions |
 
@@ -108,8 +107,8 @@ The CLI collects each `--inputs` flag into a vector and validates that the count
 
 ### Example (single input)
 ```bash
-cargo run -- \
-  --machines-path machines-local.toml --dev \
+spellcaster \
+  --config machines-local.toml --dev \
   --machine mteth --caliber mainnet \
   manage-position \
     --protocol aavev3 \
@@ -121,8 +120,8 @@ cargo run -- \
 ### Example (multiple inputs)
 ```bash
 # Fluid deposit requires: asset_amount + min_vault_shares
-cargo run -- \
-  --machines-path machines-local.toml --dev \
+spellcaster \
+  --config machines-local.toml --dev \
   --machine dusd --caliber mainnet \
   manage-position \
     --protocol fluid \
