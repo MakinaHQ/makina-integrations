@@ -150,6 +150,15 @@ positions:
       label: "Gauntlet USDC Core"
       asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
       vault_address: "0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"
+  - id: "128264429154381135287798106504544985667"
+    group_id: "0"
+    description: "Morpho Vault USDC Steakhouse Reservoir"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
+    vars:
+      label: "Smokehouse Reservoir USDC"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0xbeEF346d7099865208Ff331e4f648f4154DDAa05"
   - id: "101479911391298992514073662718338576961"
     group_id: "0"
     description: "Morpho Vault RLUSD Sentora"
