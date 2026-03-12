@@ -38,18 +38,18 @@ positions:
     instructions: !include "./instructions/morpho-market-wbtc-usdt0-debt.yaml"
 
   # ── Morpho Vaults ─────────────────────────────────────────────────
-  - id: "281595395958690679718086294165943048531"
-    group_id: "0"
-    description: "Morpho Vault USDT0 Steakhouse HY"
-    instructions: !include "./instructions/morpho-vault-usdt0-steakhouse-hy.yaml"
-    position_tokens: ["0x961a59Fe249b9795FAE7fA35f9E89629689D5278"]
-  - id: "279695748144015565204434818128346487014"
-    group_id: "0"
-    description: "Morpho Vault AUSD Steakhouse HY"
-    instructions: !include "./instructions/morpho-vault-ausd-steakhouse-hy.yaml"
-    position_tokens: ["0xbeeffeA75cFC4128ebe10C8D7aE22016D215060D"]
-  - id: "273603320317238684265048200890149135186"
-    group_id: "0"
-    description: "Morpho Vault USDC Steakhouse HY"
-    instructions: !include "./instructions/morpho-vault-usdc-steakhouse-hy.yaml"
-    position_tokens: ["0xbeEFf443C3CbA3E369DA795002243BeaC311aB83"]
+  # - id: "281595395958690679718086294165943048531"
+  #   group_id: "0"
+  #   description: "Morpho Vault USDT0 Steakhouse HY"
+  #   instructions: !include "./instructions/morpho-vault-usdt0-steakhouse-hy.yaml"
+  #   position_tokens: ["0x961a59Fe249b9795FAE7fA35f9E89629689D5278"]
+  # - id: "279695748144015565204434818128346487014"
+  #   group_id: "0"
+  #   description: "Morpho Vault AUSD Steakhouse HY"
+  #   instructions: !include "./instructions/morpho-vault-ausd-steakhouse-hy.yaml"
+  #   position_tokens: ["0xbeeffeA75cFC4128ebe10C8D7aE22016D215060D"]
+  # - id: "273603320317238684265048200890149135186"
+  #   group_id: "0"
+  #   description: "Morpho Vault USDC Steakhouse HY"
+  #   instructions: !include "./instructions/morpho-vault-usdc-steakhouse-hy.yaml"
+  #   position_tokens: ["0xbeEFf443C3CbA3E369DA795002243BeaC311aB83"]
