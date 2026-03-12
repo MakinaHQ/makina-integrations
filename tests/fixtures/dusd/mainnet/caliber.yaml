@@ -1,0 +1,233 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  aave_umbrella_batch_helper:
+    type: "address"
+    value: "0xCe6Ced23118EDEb23054E06118a702797b13fc2F"
+  key_value_store_address:
+    type: "address"
+    value: "0xa81fC382489F9560211AB15aD87f001b98C92E91"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  swap_module:
+    type: "address"
+    value: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
+
+positions:
+  # ── Harvest-only ──────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+  - id: "782"
+    group_id: "0"
+    description: "Fluid Rewards Harvest"
+    instructions: !include "./instructions/fluid-harvest.yaml"
+
+  # ── Curve ────────────────────────────────────────────────────────
+  - id: "82192343698835691382596586281665913315"
+    group_id: "0"
+    description: "Curve PYUSD/crvUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0x625E92624Bc2D88619ACCc1788365A69767f6200"]
+    vars:
+      label: "PYUSD/crvUSD"
+      tokena_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      pool_address: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+      gauge_address: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+      coin0_scale_factor: "1000000"
+  - id: "54562872644924688465793884662053422151"
+    group_id: "0"
+    description: "Curve USDC/RLUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0xd001ae433f254283fece51d4acce8c53263aa186"]
+    vars:
+      label: "USDC/RLUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      pool_address: "0xd001ae433f254283fece51d4acce8c53263aa186"
+      gauge_address: "0xfc3212bd9ad9a28da6b2bd50a2918969c126894f"
+      coin0_scale_factor: "1000000"
+
+  # ── Convex-Curve ─────────────────────────────────────────────────
+  - id: "325002806383600319439358862074549790880"
+    group_id: "0"
+    description: "Convex USDC/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"]
+    vars:
+      label: "USDC/crvUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"
+      convex_pool_id: "182"
+      convex_reward_pool: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      coin0_scale_factor: "1000000"
+  - id: "222242215405885945120043212563500173272"
+    group_id: "0"
+    description: "Convex USDT/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"]
+    vars:
+      label: "USDT/crvUSD"
+      tokena_address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      convex_pool_id: "179"
+      convex_reward_pool: "0xD1DdB0a0815fD28932fBb194C84003683AF8a824"
+      coin0_scale_factor: "1000000"
+
+  # ── Morpho Vaults ─────────────────────────────────────────────────
+  - id: "276843631519342658565251846836976075217"
+    group_id: "0"
+    description: "Morpho Vault PYUSD Steakhouse"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
+    vars:
+      label: "Steakhouse PYUSD"
+      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      vault_address: "0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"
+  - id: "30651621090656837837542443694366525060"
+    group_id: "0"
+    description: "Morpho Vault USDC MEV Capital"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xd63070114470f685b75B74D60EEc7c1113d33a3D"]
+    vars:
+      label: "MEV Capital USDC"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0xd63070114470f685b75B74D60EEc7c1113d33a3D"
+  - id: "287972541400220405479010366660803291000"
+    group_id: "0"
+    description: "Morpho Vault eUSD Gauntlet Core"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xc080f56504e0278828A403269DB945F6c6D6E014"]
+    vars:
+      label: "Gauntlet eUSD Core"
+      asset_address: "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F"
+      vault_address: "0xc080f56504e0278828A403269DB945F6c6D6E014"
+  - id: "77590748279218246310796884579338401703"
+    group_id: "0"
+    description: "Morpho Vault USDC Smokehouse"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
+    vars:
+      label: "Smokehouse USDC"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
+  - id: "11232424494326814282538250204373920286"
+    group_id: "0"
+    description: "Morpho Vault USDC Gauntlet Frontier"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"]
+    vars:
+      label: "Gauntlet USDC Frontier"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"
+  - id: "188442457890402398659043284211703237226"
+    group_id: "0"
+    description: "Morpho Vault USDC Gauntlet Core"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
+    vars:
+      label: "Gauntlet USDC Core"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"
+  - id: "128264429154381135287798106504544985667"
+    group_id: "0"
+    description: "Morpho Vault USDC Steakhouse Reservoir"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
+    vars:
+      label: "Smokehouse Reservoir USDC"
+      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      vault_address: "0xbeEF346d7099865208Ff331e4f648f4154DDAa05"
+  - id: "101479911391298992514073662718338576961"
+    group_id: "0"
+    description: "Morpho Vault RLUSD Sentora"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
+    vars:
+      label: "Sentora RLUSD"
+      asset_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
+  - id: "273739676753663843967743313854543738189"
+    group_id: "0"
+    description: "Morpho Vault PYUSD Sentora"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xb576765fB15505433aF24FEe2c0325895C559FB2"]
+    vars:
+      label: "Sentora PYUSD"
+      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+
+  # ── Aave Umbrella ─────────────────────────────────────────────────
+  - id: "176021688445186810403025048632929053161"
+    group_id: "0"
+    description: "Aave Umbrella USDC"
+    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
+  - id: "293691712937964969352275672791079139559"
+    group_id: "0"
+    description: "Aave Umbrella USDT"
+    instructions: !include "./instructions/aave-umbrella-usdt.yaml"
+    position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
+  - id: "229457643934747132111107431329088218367"
+    group_id: "0"
+    description: "Aave Umbrella GHO"
+    instructions: !include "./instructions/aave-umbrella-gho.yaml"
+    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+
+  # ── AaveV3 Supply (group_id: 1) ────────────────────────────────────
+  - id: "332697612920998824307877708016163852818"
+    group_id: "1"
+    description: "AaveV3 Supply USDC"
+    instructions: !include "./instructions/aavev3-supply-usdc.yaml"
+    position_tokens: ["0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"]
+  - id: "232678016241942897729445069841802885622"
+    group_id: "1"
+    description: "AaveV3 Supply USDT"
+    instructions: !include "./instructions/aavev3-supply-usdt.yaml"
+    position_tokens: ["0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"]
+
+  # ── Fluid ─────────────────────────────────────────────────────────
+  - id: "187487145492373933671944618718033568251"
+    group_id: "0"
+    description: "Fluid GHO Vault position"
+    instructions: !include "./instructions/fluid-gho.yaml"
+    position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
+
+  # ── Morpho Loops ─────────────────────────────────────────────────
+  - id: "219384756102938475610293847561029384756"
+    group_id: "0"
+    description: "syrupUSDC/USDC Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdc-usdc.yaml"
+  - id: "318274659201837465920183746592018374659"
+    group_id: "0"
+    description: "syrupUSDT/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-syrupusdt-usdt.yaml"
+  - id: "417385760312948576721304958672130495867"
+    group_id: "0"
+    description: "wsrUSD/USDC Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-wsrusd-usdc.yaml"
+  - id: "516496871423059687832415069783241506978"
+    group_id: "0"
+    description: "wsrUSD/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"

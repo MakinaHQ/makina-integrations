@@ -1,0 +1,76 @@
+# Validates that every open on-chain Caliber position has a matching accounting
+# instruction in the latest added rootfile. Runs on PRs that add new rootfiles.
+#
+# Required repo secrets (per chain):
+#   - ETHEREUM_MAINNET_RPC_URL
+#   - BASE_RPC_URL, ARBITRUM_RPC_URL, MONAD_RPC_URL
+
+name: Open Positions
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-open-positions:
+    name: Validate open positions coverage in latest added rootfiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # full history needed to diff against base branch
+
+      # Detect which rootfile TOMLs were added (not modified) in this PR
+      # using git diff instead of a third-party action to reduce attack surface.
+      - name: Get added rootfiles
+        id: changed-rootfiles
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            ADDED_FILES=$(git diff --name-only --diff-filter=A "origin/$BASE_REF" -- 'machines/*/*/rootfiles/*.toml')
+          else
+            ADDED_FILES=""
+          fi
+          if [ -z "$ADDED_FILES" ]; then
+            echo "added_files=" >> "$GITHUB_OUTPUT"
+            echo "added_files_count=0" >> "$GITHUB_OUTPUT"
+          else
+            # Use heredoc delimiter syntax for multiline output (multiple rootfiles).
+            {
+              echo "added_files<<ROOTFILES_EOF"
+              echo "$ADDED_FILES"
+              echo "ROOTFILES_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "added_files_count=$(echo "$ADDED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install uv
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        uses: astral-sh/setup-uv@v7
+
+      # Run unit tests first to catch regressions in the validator itself.
+      - name: Run validator unit tests
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ETHEREUM_MAINNET_RPC_URL: ${{ secrets.ETHEREUM_MAINNET_RPC_URL }}
+        run: uv run --with 'web3==7.14.1' --with pyyaml python -m unittest tests.test_validate_open_positions
+
+      # Validate that the latest added rootfile for each (machine, chain) pair
+      # accounts for every position that is currently open on-chain.
+      - name: Validate latest added rootfiles against live Caliber positions
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+          ETHEREUM_MAINNET_RPC_URL: ${{ secrets.ETHEREUM_MAINNET_RPC_URL }}
+          BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
+          ARBITRUM_RPC_URL: ${{ secrets.ARBITRUM_RPC_URL }}
+          MONAD_RPC_URL: ${{ secrets.MONAD_RPC_URL }}
+        run: uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_open_positions.py ${ADDED_ROOTFILES}
+
+      - name: Skip when no rootfiles were added
+        if: steps.changed-rootfiles.outputs.added_files_count == 0
+        run: echo "No added rootfiles to validate."
