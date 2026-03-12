@@ -18,18 +18,39 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout config repo
-        uses: actions/checkout@v5
-
-      # Detect which rootfile TOMLs were added (not modified) in this PR.
-      - name: Get changed rootfiles files
-        id: changed-rootfiles
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
+        uses: actions/checkout@v6
         with:
-          files: machines/**/rootfiles/**.toml
+          fetch-depth: 0 # full history needed to diff against base branch
+
+      # Detect which rootfile TOMLs were added (not modified) in this PR
+      # using git diff instead of a third-party action to reduce attack surface.
+      - name: Get added rootfiles
+        id: changed-rootfiles
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            ADDED_FILES=$(git diff --name-only --diff-filter=A "origin/$BASE_REF" -- 'machines/*/*/rootfiles/*.toml')
+          else
+            ADDED_FILES=""
+          fi
+          if [ -z "$ADDED_FILES" ]; then
+            echo "added_files=" >> "$GITHUB_OUTPUT"
+            echo "added_files_count=0" >> "$GITHUB_OUTPUT"
+          else
+            # Use heredoc delimiter syntax for multiline output (multiple rootfiles).
+            {
+              echo "added_files<<ROOTFILES_EOF"
+              echo "$ADDED_FILES"
+              echo "ROOTFILES_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "added_files_count=$(echo "$ADDED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install uv
         if: steps.changed-rootfiles.outputs.added_files_count > 0
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       # Run unit tests first to catch regressions in the validator itself.
       - name: Run validator unit tests

@@ -111,21 +111,20 @@ class ValidationResult:
 
 class RpcCaliberReader:
     def __init__(self, chain: str, block_number: int | None = None):
-        self.chain = chain
-        self.block_number = block_number
-        self.rpc_url = resolve_rpc_url(chain)
-
-    def get_open_position_ids(self, caliber_address: str) -> list[str]:
-        """Query the on-chain Caliber contract and return ids of positions
-        whose value is > 0 (i.e. currently open / non-zero balance)."""
         try:
             from web3 import Web3  # deferred import — only needed for live RPC
         except ImportError as exc:
             raise RuntimeError("web3 is required to query live Caliber positions") from exc
 
-        web3 = Web3(Web3.HTTPProvider(self.rpc_url))
-        checksum_address = web3.to_checksum_address(caliber_address)
-        contract = web3.eth.contract(address=checksum_address, abi=ICaliber_ABI)
+        self.chain = chain
+        self.block_number = block_number
+        self.web3 = Web3(Web3.HTTPProvider(resolve_rpc_url(chain)))
+
+    def get_open_position_ids(self, caliber_address: str) -> list[str]:
+        """Query the on-chain Caliber contract and return ids of positions
+        whose value is > 0 (i.e. currently open / non-zero balance)."""
+        checksum_address = self.web3.to_checksum_address(caliber_address)
+        contract = self.web3.eth.contract(address=checksum_address, abi=ICaliber_ABI)
         positions_length = self._call(contract.functions.getPositionsLength())
 
         # Enumerate all positions by index, then filter to open ones.
@@ -213,15 +212,16 @@ def extract_accounting_counts(rootfile_path: Path) -> Counter[str]:
 def walk_instruction_tree(root: object, accounting_counts: Counter[str]) -> None:
     """Walk the nested TOML instruction tree iteratively, counting nodes
     that have both position_id and instruction_type == 1 (accounting)."""
-    stack = [root]
+    stack: list[object] = [root]
     while stack:
         node = stack.pop()
-        if not isinstance(node, dict):
-            continue
-        if {"position_id", "instruction_type"} <= node.keys():
-            if int(node["instruction_type"]) == 1:
-                accounting_counts[str(node["position_id"])] += 1
-        stack.extend(node.values())
+        if isinstance(node, dict):
+            if {"position_id", "instruction_type"} <= node.keys():
+                if int(node["instruction_type"]) == 1:
+                    accounting_counts[str(node["position_id"])] += 1
+            stack.extend(node.values())
+        elif isinstance(node, list):
+            stack.extend(node)
 
 
 def validate_target(target: RootfileTarget, reader: CaliberReader) -> ValidationResult:
