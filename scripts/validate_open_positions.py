@@ -21,17 +21,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Protocol
 
+import yaml
+
 
 # Extracts (machine, chain, filename) from a rootfile path like
 # "machines/dusd/mainnet/rootfiles/20260311-batch.toml"
 ROOTFILE_PATH_RE = re.compile(r"^machines/([^/]+)/([^/]+)/rootfiles/([^/]+\.toml)$")
-
-# Matches the caliber_address block in caliber.yaml. The address sits on a
-# separate `value:` line below the `caliber_address:` key due to YAML structure.
-CALIBER_ADDRESS_RE = re.compile(r"^\s*caliber_address:\s*$.*?^\s*value:\s*\"(0x[a-fA-F0-9]{40})\"\s*$", re.M | re.S)
-
-# Matches position id declarations like `- id: "12345"` in caliber.yaml.
-POSITION_ID_RE = re.compile(r'^\s*-\s+id:\s*"(\d+)"\s*$', re.M)
 
 # Each chain must declare its own RPC env var(s). The first set var wins.
 CHAIN_RPC_ENV_VARS = {
@@ -183,17 +178,28 @@ def select_latest_rootfiles(rootfiles: Iterable[str]) -> list[RootfileTarget]:
     return sorted(latest_by_pair.values(), key=lambda target: (target.machine, target.chain))
 
 
-def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
-    """Parse caliber.yaml with regexes to extract the caliber contract address
-    and the set of declared position ids. Uses regexes instead of a YAML parser
-    to avoid a pyyaml dependency (web3 is already heavy enough)."""
-    content = caliber_path.read_text()
-    caliber_address_match = CALIBER_ADDRESS_RE.search(content)
-    if caliber_address_match is None:
-        raise ValueError(f"could not find caliber_address in {caliber_path}")
+class _PermissiveLoader(yaml.SafeLoader):
+    """YAML loader that ignores custom tags like !include so we can parse
+    caliber.yaml without resolving file references."""
 
-    caliber_address = caliber_address_match.group(1)
-    position_ids = set(POSITION_ID_RE.findall(content))
+_PermissiveLoader.add_multi_constructor("!", lambda _loader, _suffix, _node: None)
+
+
+def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
+    """Parse caliber.yaml to extract the caliber contract address and the
+    set of declared position ids."""
+    data = yaml.load(caliber_path.read_text(), Loader=_PermissiveLoader)
+
+    try:
+        caliber_address = data["config"]["caliber_address"]["value"]
+    except (KeyError, TypeError) as exc:
+        raise ValueError(f"could not find config.caliber_address.value in {caliber_path}") from exc
+
+    positions = data.get("positions", [])
+    if not positions:
+        raise ValueError(f"could not find any positions in {caliber_path}")
+
+    position_ids = {str(p["id"]) for p in positions if "id" in p}
     if not position_ids:
         raise ValueError(f"could not find any position ids in {caliber_path}")
 
