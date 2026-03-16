@@ -91,7 +91,7 @@ jobs:
             caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
             new_file="../$(dirname "$file")/generated.toml"
             echo "Running transpiler for $caliber - to verify $file rootfile)"
-            cargo run -r -- -i "$caliber" -o "$new_file"
+            cargo run -r -- -i "$caliber" -o "$new_file" -t "../token-lists/prod-token-list.json"
             diff "../$file" "$new_file" || exit 1
             rm "$new_file"
           done

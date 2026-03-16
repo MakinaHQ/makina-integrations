@@ -1,0 +1,795 @@
+# this is a generated file - do not edit manually
+# root: 0x5a7c608ecfa6197316304b2026c73896f44260ab8aaa6172a15228fd10254742
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.mainnet.USDT}"]
+chainId = 1
+address = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+name = "Tether USD"
+decimals = 6
+symbol = "USDT"
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
+[instructions.morpho.account_vault."USDC High Yield Instant"]
+position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+description = "Morpho - USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0x4cdad5060102ff0000000000beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC Prime Instant"]
+position_id = "39797660953457105374830423398253205285669897754924558730787238398196430495798"
+description = "Morpho - USDC Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beef088055857739c12cd3765f20b7679def0f51",
+  "0x4cdad5060102ff0000000000beef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC Term"]
+position_id = "33042316902257038600902710305038603376636411589149405534493305034327944556012"
+description = "Morpho - USDC Term"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beefffc57a26fd8d3b693ba025ead597dbecebfe",
+  "0x4cdad5060102ff0000000000beefffc57a26fd8d3b693ba025ead597dbecebfe",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC Turbo"]
+position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+description = "Morpho - USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beefff4716a49418d69c251cab8759bb107e57c8",
+  "0x4cdad5060102ff0000000000beefff4716a49418d69c251cab8759bb107e57c8",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDT High Yield Instant"]
+position_id = "90111934107120764488215438782625523227744095689206306783616705859046510364843"
+description = "Morpho - USDT High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0x4cdad5060102ff0000000000beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDT Prime Instant"]
+position_id = "32430103287337956626058479770497091037110946852707663070116500586042339587768"
+description = "Morpho - USDT Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000002beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0x4cdad5060102ff0000000000beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.morpho.deposit_vault."USDC High Yield Instant"]
+position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+description = "Morpho - USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Prime Instant"]
+position_id = "39797660953457105374830423398253205285669897754924558730787238398196430495798"
+description = "Morpho - USDC Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef088055857739c12cd3765f20b7679def0f51",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Term"]
+position_id = "33042316902257038600902710305038603376636411589149405534493305034327944556012"
+description = "Morpho - USDC Term"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeefffc57a26fd8d3b693ba025ead597dbecebfe",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beefffc57a26fd8d3b693ba025ead597dbecebfe",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDC Term".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Turbo"]
+position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+description = "Morpho - USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeefff4716a49418d69c251cab8759bb107e57c8",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beefff4716a49418d69c251cab8759bb107e57c8",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDT High Yield Instant"]
+position_id = "90111934107120764488215438782625523227744095689206306783616705859046510364843"
+description = "Morpho - USDT High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x6e553f65010002ff000000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDT High Yield Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDT Prime Instant"]
+position_id = "32430103287337956626058479770497091037110946852707663070116500586042339587768"
+description = "Morpho - USDT Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x6e553f65010002ff000000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.deposit_vault."USDT Prime Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC High Yield Instant"]
+position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+description = "Morpho - USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Prime Instant"]
+position_id = "39797660953457105374830423398253205285669897754924558730787238398196430495798"
+description = "Morpho - USDC Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Term"]
+position_id = "33042316902257038600902710305038603376636411589149405534493305034327944556012"
+description = "Morpho - USDC Term"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeefffc57a26fd8d3b693ba025ead597dbecebfe",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDC Term".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Turbo"]
+position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+description = "Morpho - USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeefff4716a49418d69c251cab8759bb107e57c8",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDT High Yield Instant"]
+position_id = "90111934107120764488215438782625523227744095689206306783616705859046510364843"
+description = "Morpho - USDT High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDT High Yield Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDT Prime Instant"]
+position_id = "32430103287337956626058479770497091037110946852707663070116500586042339587768"
+description = "Morpho - USDT Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xba08765201000101ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.redeem_vault."USDT Prime Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC High Yield Instant"]
+position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+description = "Morpho - USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC Prime Instant"]
+position_id = "39797660953457105374830423398253205285669897754924558730787238398196430495798"
+description = "Morpho - USDC Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beef088055857739c12cd3765f20b7679def0f51",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC Term"]
+position_id = "33042316902257038600902710305038603376636411589149405534493305034327944556012"
+description = "Morpho - USDC Term"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beefffc57a26fd8d3b693ba025ead597dbecebfe",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeefffc57a26fd8d3b693ba025ead597dbecebfe",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDC Term".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC Turbo"]
+position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+description = "Morpho - USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beefff4716a49418d69c251cab8759bb107e57c8",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeefff4716a49418d69c251cab8759bb107e57c8",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDC Turbo".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDT High Yield Instant"]
+position_id = "90111934107120764488215438782625523227744095689206306783616705859046510364843"
+description = "Morpho - USDT High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDT High Yield Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDT Prime Instant"]
+position_id = "32430103287337956626058479770497091037110946852707663070116500586042339587768"
+description = "Morpho - USDT Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff0000000003beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault_relative."USDT Prime Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC High Yield Instant"]
+position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+description = "Morpho - USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC Prime Instant"]
+position_id = "39797660953457105374830423398253205285669897754924558730787238398196430495798"
+description = "Morpho - USDC Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC Term"]
+position_id = "33042316902257038600902710305038603376636411589149405534493305034327944556012"
+description = "Morpho - USDC Term"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeefffc57a26fd8d3b693ba025ead597dbecebfe",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDC Term".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC Turbo"]
+position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+description = "Morpho - USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeefff4716a49418d69c251cab8759bb107e57c8",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDT High Yield Instant"]
+position_id = "90111934107120764488215438782625523227744095689206306783616705859046510364843"
+description = "Morpho - USDT High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDT High Yield Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDT Prime Instant"]
+position_id = "32430103287337956626058479770497091037110946852707663070116500586042339587768"
+description = "Morpho - USDT Prime Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000010f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xb460af9401000101ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho.withdraw_vault."USDT Prime Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
