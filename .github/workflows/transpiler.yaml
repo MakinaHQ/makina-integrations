@@ -90,7 +90,7 @@ jobs:
             newest_preexisting=""
             for candidate in $(cd -- "$dir" && LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r); do
               candidate_rel="$(dirname -- "$file")/$candidate"
-              if ! echo " ${ADDED_ROOTFILES} " | grep -qF " ${candidate_rel} "; then
+              if ! printf '%s\n' ${ADDED_ROOTFILES} | grep -qxF "${candidate_rel}"; then
                 newest_preexisting="$candidate"
                 break
               fi

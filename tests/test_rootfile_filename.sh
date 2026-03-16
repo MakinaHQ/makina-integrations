@@ -25,7 +25,7 @@ run_check() {
     for candidate in $(cd -- "$dir" && LC_ALL=C ls -1Ap | grep -v '/$' | LC_ALL=C sort -r); do
       local cand_rel
       cand_rel="$(dirname -- "$file")/$candidate"
-      if ! echo " ${added_rootfiles} " | grep -qF " ${cand_rel} "; then
+      if ! printf '%s\n' ${added_rootfiles} | grep -qxF "${cand_rel}"; then
         newest_preexisting="$candidate"
         break
       fi
