@@ -190,10 +190,27 @@ def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
     set of declared position ids."""
     data = yaml.load(caliber_path.read_text(), Loader=_PermissiveLoader)
 
+    caliber_address: str | None = None
+
+    # Prefer reading from caliber.yaml directly. This matches the structure used
+    # in our test fixtures (and is generally the most local source of truth).
     try:
         caliber_address = data["config"]["caliber_address"]["value"]
-    except (KeyError, TypeError) as exc:
-        raise ValueError(f"could not find config.caliber_address.value in {caliber_path}") from exc
+    except Exception:
+        caliber_address = None
+
+    # Fallback to machine-level config.toml for the repo layout:
+    # machines/<machine>/<chain>/caliber.yaml and machines/<machine>/config.toml
+    if not caliber_address:
+        config_toml_path = caliber_path.parents[1] / "config.toml"
+        try:
+            config_data = tomllib.loads(config_toml_path.read_text())
+            chain = caliber_path.parent.name
+            caliber_address = config_data["calibers"][chain]["address"]
+        except Exception as exc:
+            raise ValueError(
+                f"could not find Caliber address in `[calibers.{caliber_path.parent.name}].address` within {config_toml_path}"
+            ) from exc
 
     positions = data.get("positions", [])
     if not positions:
@@ -203,7 +220,10 @@ def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
     if not position_ids:
         raise ValueError(f"could not find any position ids in {caliber_path}")
 
-    return caliber_address, position_ids
+    if not caliber_address:
+        raise ValueError(f"could not find Caliber address in {caliber_path}")
+
+    return str(caliber_address), position_ids
 
 
 def extract_accounting_counts(rootfile_path: Path) -> Counter[str]:

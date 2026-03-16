@@ -1,0 +1,94 @@
+config:
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  caliber_address:
+    type: "address"
+    value: "0xbeef123217647014429B7670329782e210884E89"
+
+positions:
+
+  # Morpho Vaults
+  - id: "113381721232607674663021988927911303225850827259126640828557600167613363278037"
+    group_id: "0"
+    description: "Morpho - USDC High Yield Instant"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDC High Yield Instant"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeeff2C5bF38f90e3482a8b19F12E5a6D2FCa757"
+
+  - id: "92913126632701618168692101400696791611252150486759189953517405985285166360833"
+    group_id: "0"
+    description: "Morpho - USDC Prime Instant"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDC Prime Instant"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeef088055857739C12CD3765F20b7679Def0f51"
+
+  - id: "62637211969224093105524059488197642861679330667763208449264095370504718130145" #
+    group_id: "0"
+    description: "Morpho - USDT High Yield Instant"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDT High Yield Instant"
+      asset_address: ${token_list.mainnet.USDT}
+      vault_address: "0xbeeff07d991C04CD640DE9F15C08ba59c4FEDEb7"
+
+  - id: "4006181232054141208147454663884125496812341165091287999287630871414616434294"
+    group_id: "0"
+    description: "Morpho - USDT Prime Instant"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDT Prime Instant"
+      asset_address: ${token_list.mainnet.USDT}
+      vault_address: "0xbeef003C68896c7D2c3c60d363e8d71a49Ab2bf9"
+
+  - id: "83590566332089234788126563161359194710771879875955496717246010493571215713520"
+    group_id: "0"
+    description: "Morpho - USDC High Yield Term"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDC High Yield Term"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEEFFFC57A26fD8D3b693Ba025ead597DbECEBfe"
+
+  - id: "90921336893967830107325790067136229287057003113729923288594188276183277958283"
+    group_id: "0"
+    description: "Morpho - USDC Turbo"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDC Turbo"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEEFFF4716a49418D69c251cab8759bB107e57C8"
+
+  - id: "59240718622654600712413168424615621118428849033569937066928751029814600930804"
+    group_id: "0"
+    description: "Morpho - AUSD Turbo"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "AUSD Turbo"
+      asset_address: ${token_list.mainnet.AUSD}
+      vault_address: "0xBEEFFF7e4EedD83A4a4aB53A68D03eC77C9a57a8"
+
+  - id: "83497740258054099744938802050405228295126607095228098589710251173730378877153"
+    group_id: "0"
+    description: "Morpho - AUSD High Yield Term"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "AUSD High Yield Term"
+      asset_address: ${token_list.mainnet.AUSD}
+      vault_address: "0xBEEFF0DeaC1aBa71EF0D88C4291354eb92ef4589"
+
+  # Harvesting
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "../../../instructions/merkl.yaml"
