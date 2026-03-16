@@ -170,3 +170,20 @@ actions:
       bps_to_redeem:
         type: "uint256"
         description: "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+
+  withdraw_vault:
+    calls:
+      - description: "Withdraw assets from the vault"
+        target: "${inputs.vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.assets_to_withdraw}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+    input_slots:
+      assets_to_withdraw:
+        type: "uint256"
+        description: "The number of assets to withdraw from the vault"

@@ -8,6 +8,9 @@ config:
   morpho_address:
     type: "address"
     value: "0x6c247b1F6182318877311737BaC0844bAa518F5e"
+  caliber_address:
+    type: "address"
+    value: "0xbeef123217647014429B7670329782e210884E89"
 
 positions:
 
@@ -17,8 +20,8 @@ positions:
     description: "Morpho - Steakhouse USDC High Yield Instant"
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
-      vault_label: "USDC High Yield Instant"
-      token_address: ${token_list.arbitrum.USDC}
+      label: "USDC High Yield Instant"
+      asset_address: ${token_list.arbitrum.USDC}
       vault_address: "0xbeeff1D5dE8F79ff37a151681100B039661da518"
 
   - id: "65101519582625100308971227204339941766009742229890293368316091459210147605419"
@@ -26,8 +29,8 @@ positions:
     description: "Morpho - Steakhouse USDT0 High Yield Instant"
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
-      vault_label: "USDT0 High Yield Instant"
-      token_address: ${token_list.arbitrum.USDT0}
+      label: "USDT0 High Yield Instant"
+      asset_address: ${token_list.arbitrum.USDT0}
       vault_address: "0xbeeff77CE5C059445714E6A3490E273fE7F2492F"
 
   # Harvest

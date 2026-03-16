@@ -8,17 +8,20 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  caliber_address:
+    type: "address"
+    value: "0xbeef123217647014429B7670329782e210884E89"
 
 positions:
 
   # Morpho Vaults
   - id: "107748699282353890608450452296395923511697059219688206203817978138856427849492"
     group_id: "0"
-    description: "Morpho - Steakhouse Prime USDC"
+    description: "Morpho - Steakhouse Prime USDC Instant"
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
-      vault_label: "USDC Prime Instant"
-      token_address: ${token_list.base.USDC}
+      label: "USDC Prime Instant"
+      asset_address: ${token_list.base.USDC}
       vault_address: "0xBEEFE94c8aD530842bfE7d8B397938fFc1cb83b2"
 
   - id: "112518405458259504721404525495674933003959058649730723355561134056878651038998"
@@ -26,8 +29,8 @@ positions:
     description: "Morpho - Steakhouse USDC High Yield Instant"
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
-      vault_label: "USDC High Yield Instant"
-      token_address: ${token_list.base.USDC}
+      label: "USDC High Yield Instant"
+      asset_address: ${token_list.base.USDC}
       vault_address: "0xbeeff7aE5E00Aae3Db302e4B0d8C883810a58100"
 
   # Harvesting
