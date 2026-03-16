@@ -1,10 +1,11 @@
 # Verifies that new rootfiles are correctly transpiled from their caliber.
-# For each added rootfile, re-runs the transpiler and diffs the output.
+# For the latest added rootfile per (machine, chain), re-runs the transpiler
+# and diffs the output.
 #
 # Rules enforced:
 #   1. Existing rootfiles must not be modified (append-only history).
 #   2. Every added rootfile must be newer than all pre-existing files in its directory.
-#   3. Every added rootfile must match the transpiler output for its caliber.
+#   3. The latest added rootfile per directory must match the transpiler output.
 
 name: Transpiler
 
@@ -105,6 +106,28 @@ jobs:
             fi
           done
 
+      # From all added rootfiles, keep only the latest (by name) per directory.
+      # Only the latest can be verified against the current caliber.
+      - name: Compute latest added rootfile per directory
+        id: latest-rootfiles
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+        run: |
+          export LC_ALL=C
+          # Sort added files by directory then filename descending, keep first per dir
+          LATEST=$(printf '%s\n' ${ADDED_ROOTFILES} | sort -t/ -k1,4 -k5,5r | awk -F/ '!seen[$1"/"$2"/"$3"/"$4]++')
+
+          if [ -z "$LATEST" ]; then
+            echo "latest_files=" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "latest_files<<ROOTFILES_EOF"
+              echo "$LATEST"
+              echo "ROOTFILES_EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout transpiler repository
         if: steps.changed-rootfiles.outputs.added_files_count > 0
         uses: actions/checkout@v6
@@ -131,9 +154,9 @@ jobs:
         if: steps.changed-rootfiles.outputs.added_files_count > 0
         working-directory: transpiler
         env:
-          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+          LATEST_ROOTFILES: ${{ steps.latest-rootfiles.outputs.latest_files }}
         run: |
-          for file in ${ADDED_ROOTFILES}; do
+          for file in ${LATEST_ROOTFILES}; do
             caliber="../$(dirname "$(dirname "$file")")/caliber.yaml"
             generated="../$(dirname "$file")/generated.toml"
             echo "::group::Verifying $file"

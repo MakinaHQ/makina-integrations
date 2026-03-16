@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Tests for the rootfile filename validation logic in .github/workflows/transpiler.yaml
-# (step: "Verify added rootfiles are newer than existing").
-# Keep run_check() in sync with that workflow step.
+# Tests for the rootfile validation logic in .github/workflows/transpiler.yaml.
+# Covers two steps:
+#   - "Verify added rootfiles are newer than existing"  → run_check()
+#   - "Compute latest added rootfile per directory"      → latest_per_dir()
+# Keep both functions in sync with their workflow counterparts.
 #
 # Usage: bash tests/test_rootfile_filename.sh
 set -euo pipefail
@@ -10,7 +12,7 @@ export LC_ALL=C
 PASS=0
 FAIL=0
 
-# Mirrors the workflow logic. Takes space-separated list of added rootfile paths.
+# Mirrors the ordering check. Takes space-separated list of added rootfile paths.
 # Returns 0 if all pass, 1 if any fail.
 run_check() {
   local added_rootfiles="$1"
@@ -116,6 +118,58 @@ echo "Test 8: two added files, one older than pre-existing"
 d="$TEST_TMPDIR/t8/rootfiles"; mkdir -p "$d"
 touch "$d/20260201-preexisting.toml" "$d/20260101-backdated.toml" "$d/20260313-new.toml"
 assert_fail "one added older than existing" "$d/20260101-backdated.toml $d/20260313-new.toml"
+
+# ═══════════════════════════════════════════════════════════════════════
+# latest_per_dir: mirrors "Compute latest added rootfile per directory"
+# ═══════════════════════════════════════════════════════════════════════
+
+# Takes a newline-separated list of paths shaped like a/b/c/d/file.toml,
+# returns the latest (by filename) per directory (first 4 path components).
+latest_per_dir() {
+  printf '%s\n' $1 | sort -t/ -k1,4 -k5,5r | awk -F/ '!seen[$1"/"$2"/"$3"/"$4]++'
+}
+
+assert_latest_eq() {
+  local name="$1" input="$2" expected="$3"
+  local got
+  got=$(latest_per_dir "$input")
+  if [ "$got" = "$expected" ]; then
+    echo "  PASS: $name"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL: $name"
+    echo "    expected: $expected"
+    echo "    got:      $got"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
+# ── Test 9: single file passes through unchanged ────────────────────
+echo "Test 9: latest_per_dir — single file"
+assert_latest_eq "single file" \
+  "m/x/arb/rootfiles/20260313-a.toml" \
+  "m/x/arb/rootfiles/20260313-a.toml"
+
+# ── Test 10: two files same dir → keep latest ───────────────────────
+echo "Test 10: latest_per_dir — two files same dir"
+assert_latest_eq "same dir keeps latest" \
+  "m/x/arb/rootfiles/20260217-current.toml m/x/arb/rootfiles/20260313-merkl.toml" \
+  "m/x/arb/rootfiles/20260313-merkl.toml"
+
+# ── Test 11: three dirs, two files each → one per dir ───────────────
+echo "Test 11: latest_per_dir — three dirs two files each"
+assert_latest_eq "three dirs" \
+  "m/x/arb/rootfiles/20260217-a.toml m/x/arb/rootfiles/20260313-b.toml m/x/base/rootfiles/20260217-a.toml m/x/base/rootfiles/20260313-b.toml m/x/main/rootfiles/20260217-a.toml m/x/main/rootfiles/20260316-c.toml" \
+  "m/x/arb/rootfiles/20260313-b.toml
+m/x/base/rootfiles/20260313-b.toml
+m/x/main/rootfiles/20260316-c.toml"
+
+# ── Test 12: files already latest (one per dir) → unchanged ─────────
+echo "Test 12: latest_per_dir — already one per dir"
+assert_latest_eq "already unique" \
+  "m/a/x/rootfiles/20260313-a.toml m/b/y/rootfiles/20260314-b.toml" \
+  "m/a/x/rootfiles/20260313-a.toml
+m/b/y/rootfiles/20260314-b.toml"
 
 # ── Summary ──────────────────────────────────────────────────────────
 echo ""
