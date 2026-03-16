@@ -190,10 +190,19 @@ def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
     set of declared position ids."""
     data = yaml.load(caliber_path.read_text(), Loader=_PermissiveLoader)
 
+    caliber_address: str | None = None
+
+    # Expected layout: machines/<machine>/<chain>/caliber.yaml
+    # and machines/<machine>/config.toml
+    config_toml_path = caliber_path.parents[1] / "config.toml"
     try:
-        caliber_address = data["config"]["caliber_address"]["value"]
-    except (KeyError, TypeError) as exc:
-        raise ValueError(f"could not find config.caliber_address.value in {caliber_path}") from exc
+        config_data = tomllib.loads(config_toml_path.read_text())
+        chain = caliber_path.parent.name
+        caliber_address = config_data["calibers"][chain]["address"]
+    except Exception as exc:
+        raise ValueError(
+            f"could not find Caliber address in `[calibers.{caliber_path.parent.name}].address` within {config_toml_path}"
+        ) from exc
 
     positions = data.get("positions", [])
     if not positions:
