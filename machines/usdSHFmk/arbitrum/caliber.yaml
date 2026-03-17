@@ -26,11 +26,11 @@ positions:
 
   - id: "65101519582625100308971227204339941766009742229890293368316091459210147605419"
     group_id: "0"
-    description: "Morpho - Steakhouse USDT0 High Yield Instant"
+    description: "Morpho - Steakhouse USD₮0 High Yield Instant"
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
-      label: "USDT0 High Yield Instant"
-      asset_address: ${token_list.arbitrum.USDT0}
+      label: "USD₮0 High Yield Instant"
+      asset_address: ${token_list.arbitrum.USD₮0}
       vault_address: "0xbeeff77CE5C059445714E6A3490E273fE7F2492F"
 
   # Harvest

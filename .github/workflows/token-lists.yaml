@@ -1,0 +1,61 @@
+name: Token Lists
+
+on:
+  pull_request:
+    paths:
+      - "token-lists/*.json"
+  workflow_dispatch:
+
+jobs:
+  validate-token-lists:
+    name: Validate changed token lists
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get changed token list files
+        id: changed-token-lists
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only --diff-filter=AM "origin/$BASE_REF" -- 'token-lists/*.json')
+          else
+            CHANGED_FILES=$(find token-lists -maxdepth 1 -type f -name '*.json' | sort)
+          fi
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "changed_files=" >> "$GITHUB_OUTPUT"
+            echo "changed_files_count=0" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "changed_files<<TOKEN_LISTS_EOF"
+              echo "$CHANGED_FILES"
+              echo "TOKEN_LISTS_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "changed_files_count=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install uv
+        if: steps.changed-token-lists.outputs.changed_files_count > 0
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run validator unit tests
+        if: steps.changed-token-lists.outputs.changed_files_count > 0
+        run: uv run python -m unittest tests.test_validate_token_lists
+
+      - name: Validate token lists against live ERC-20 metadata
+        if: steps.changed-token-lists.outputs.changed_files_count > 0
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          CHANGED_TOKEN_LISTS: ${{ steps.changed-token-lists.outputs.changed_files }}
+        run: uv run python scripts/validate_token_lists.py ${CHANGED_TOKEN_LISTS}
+
+      - name: Skip when no token lists changed
+        if: steps.changed-token-lists.outputs.changed_files_count == 0
+        run: echo "No token list files to validate."
