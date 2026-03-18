@@ -33,6 +33,15 @@ positions:
       asset_address: ${token_list.base.USDC}
       vault_address: "0xbeeff7aE5E00Aae3Db302e4B0d8C883810a58100"
 
+  - id: "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+    group_id: "0"
+    description: "Morpho - Steakhouse USDC Turbo"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "USDC Turbo"
+      asset_address: ${token_list.base.USDC}
+      vault_address: "0xBEEFFFe68dFc2D3BD1ABdAd37c70634973b16478"
+
   # Harvesting
   - id: "777"
     group_id: "0"
