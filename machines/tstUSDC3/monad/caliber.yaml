@@ -1,0 +1,24 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xAc9c5477Dd6f2e9D55D408Efe7dE826B8Cd30E67"
+  morpho_address:
+    type: "address"
+    value: "0xD5D960E8C380B724a48AC59E2DfF1b2CB4a1eAee"
+  caliber_helper_address:
+    type: "address"
+    value: "0x99AdE465D454404f8537f0ad159623fc5c0560a6"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x88cD4CAf33a89c528C79d808Cd8465655E68FB42"
+
+positions:
+  # ── Morpho Borrow (group_id: 1) ──────────────────────────────────
+  - id: "252396629863426700433351170882300824529"
+    group_id: "1"
+    description: "Morpho WBTC collateral (market: 0x0ce0...0955)"
+    instructions: !include "./instructions/morpho-market-wbtc-ausd-collateral.yaml"
+  - id: "333773735664093951125921792491272579956"
+    group_id: "1"
+    description: "Morpho AUSD debt (market: 0x0ce0...0955)"
+    instructions: !include "./instructions/morpho-market-wbtc-ausd-debt.yaml"

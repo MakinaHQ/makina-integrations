@@ -1,0 +1,172 @@
+# ============================================================================
+# wsrUSD/USDT Morpho Loop Position
+# ============================================================================
+#
+# Morpho market: wsrUSD (collateral) / USDT (loan)
+# Market ID: 0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e
+#
+# This is a ONE-LEGGED position: accounting reports equity = collateral - debt
+# as a single value, so all entries use is_debt: false.
+#
+# Flow overview:
+#   - Add collateral: USDC -> approve PSM -> CreditEnforcer.mintStablecoin -> rUSD
+#                     -> deposit into wsrUSD vault (ERC4626) -> supply to Morpho
+#                     NOTE: deposit always uses USDC (via PSM), not USDT.
+#                     To increase collateral, user must swap USDT -> USDC first.
+#   - Borrow:         Borrow USDT from Morpho against wsrUSD collateral
+#   - Repay:          Repay USDT debt to Morpho
+#   - Withdraw:       Withdraw wsrUSD from Morpho -> swap wsrUSD to USDT via DEX aggregator
+#   - Accounting:     equity = (wsrUSD collateral * oracle price / 1e36) - debt
+#                     Oracle: Steakhouse wsrUSD/USDT (0x03dfCa9A..., hardcodes rUSD == USDT)
+#
+# Key addresses:
+#   PSM:              0x4809010926aec940b550D34a46A52739f996D75D (USDC approval target)
+#   CreditEnforcer:   0x04716DB62C085D9e08050fcF6F7D775A03d07720 (mintStablecoin target)
+#   rUSD:             0x09D4214C03D01F49544C0448DBe3A27f768F2b34
+#   wsrUSD:           0xd3fD63209FA2D55B07A0f6db36C2f43900be3094 (ERC4626 over rUSD)
+# ============================================================================
+
+# 1/5 - Add collateral: USDC -> rUSD (PSM + CreditEnforcer) -> wsrUSD -> Morpho
+#   affected_tokens is USDC because CreditEnforcer only accepts USDC
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "wsrUSD/USDT Morpho Loop - Add Collateral"
+    path: "../../../blueprints/morpho-loop/wsrusd/deposit.yaml:add_collateral"
+    inputs:
+      psm:
+        type: "address"
+        value: "0x4809010926aec940b550D34a46A52739f996D75D"
+      credit_enforcer:
+        type: "address"
+        value: "0x04716DB62C085D9e08050fcF6F7D775A03d07720"
+      rusd_token:
+        type: "address"
+        value: "0x09D4214C03D01F49544C0448DBe3A27f768F2b34"
+      wsrusd:
+        type: "address"
+        value: "0xd3fD63209FA2D55B07A0f6db36C2f43900be3094"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 2/5 - Borrow USDT from Morpho (generic morpho borrow blueprint)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "wsrUSD/USDT Morpho Loop - Borrow"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 3/5 - Repay USDT to Morpho (generic morpho repay blueprint)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "wsrUSD/USDT Morpho Loop - Repay"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      market_id:
+        type: "bytes32"
+        value: "0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e"
+      loan_token:
+        type: "address"
+        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+
+# 4/5 - Withdraw collateral: Morpho -> wsrUSD -> swap to USDC via DEX aggregator
+#   Swap output is always USDC (hardcoded in blueprint). Operator swaps USDC -> USDT separately if needed.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "wsrUSD/USDT Morpho Loop - Withdraw Collateral"
+    path: "../../../blueprints/morpho-loop/wsrusd/withdraw.yaml:withdraw_collateral"
+    inputs:
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      wsrusd:
+        type: "address"
+        value: "0xd3fD63209FA2D55B07A0f6db36C2f43900be3094"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 5/5 - Accounting: equity = collateral_value_in_usdt - debt
+#   Uses Steakhouse oracle price() to convert wsrUSD collateral to USDT terms.
+#   This oracle hardcodes rUSD == USDT (1:1 peg assumption).
+#   Formula: equity = (collateral_amount * oracle_price / 1e36) - debt_amount
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+  instruction:
+    label: "wsrUSD/USDT Morpho Loop"
+    path: "../../../blueprints/morpho-loop/account.yaml:account_equity"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0xa9f70093360419b4544f17a4553ac5847d896be23f020295bd95c24af4df700e"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      oracle_address:
+        type: "address"
+        value: "0x03dfCa9A320ca88fA6a0A132F34822e4B13d6fa0"

@@ -1,0 +1,262 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xAc9c5477Dd6f2e9D55D408Efe7dE826B8Cd30E67"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  context_helper_address:
+    type: "address"
+    value: "0x8590DECe61A3Feb53E87c499E0b30307684ED627"
+  flash_loan_aggregator:
+    type: "address"
+    value: "0x394f791198d9B1085ea5a5aEDb0ec928CB4bB0E1"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  aave_core_address:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  aave_horizon_address:
+    type: "address"
+    value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+  swap_module:
+    type: "address"
+    value: "0xe403614F41554fC0f7A3dD581878D0024Dc978E9"
+  key_value_store_address:
+    type: "address"
+    value: "0x7f49f751dc90e54199def7098f9e7d491a1df41c"
+
+positions:
+  # Morpho Vault Positions
+  - id: "77590748279218246310796884579338401703"
+    group_id: "0"
+    description: "Morpho Vault Smokehouse USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Smokehouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
+  - id: "11232424494326814282538250204373920286"
+    group_id: "0"
+    description: "Morpho Vault Gauntlet Frontier USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Gauntlet USDC Frontier"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"
+  - id: "317674047022373827182618653676880817492"
+    group_id: "0"
+    description: "Morpho Vault Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Steakhouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"
+  - id: "30651621090656837837542443694366525060"
+    group_id: "0"
+    description: "Morpho Vault MEV Capital USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "MEV Capital USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xd63070114470f685b75B74D60EEc7c1113d33a3D"
+  - id: "239709107284824071718045124985443453227"
+    group_id: "0"
+    description: "Morpho Vault Alpha USDC Core"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Alpha USDC Core"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xb0f05E4De970A1aaf77f8C2F823953a367504BA9"
+  - id: "65156809519399163794989907631687589959"
+    group_id: "0"
+    description: "Morpho Vault Clearstar USDC Reactor"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Clearstar USDC Reactor"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x62fE596d59fB077c2Df736dF212E0AFfb522dC78"
+  - id: "32341175561873583173143000180086943391"
+    group_id: "0"
+    description: "Morpho Vault Clearstar High Yield USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Clearstar High Yield USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x9B5E92fd227876b4C07a8c02367E2CB23c639DfA"
+  - id: "13197255701825927186251474242994749188"
+    group_id: "0"
+    description: "Morpho Vault MEV Capital PTS USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "MEV Capital PTS USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xd41830d88dfD08678b0B886E0122193d54b02Acc"
+  - id: "235947668492631263653814281790289094700"
+    group_id: "0"
+    description: "Morpho Vault KPK USDC Prime"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "KPK USDC Prime"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xe108fbc04852B5df72f9E44d7C29F47e7A993aDd"
+  - id: "145181456680648690506099136127005140305"
+    group_id: "0"
+    description: "Morpho Vault Hyperithm Degen USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Hyperithm Degen USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x777791c4d6dc2ce140d00d2828a7c93503c67777"
+  - id: "273739676753663843967743313854543738189"
+    group_id: "0"
+    description: "Morpho Vault Sentora Main PYUSD"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Sentora Main PYUSD"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0xb576765fb15505433af24fee2c0325895c559fb2"
+  - id: "145068745331462917611735104537565685879"
+    group_id: "0"
+    description: "Morpho Vault Hyperithm Midcurve USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Hyperithm Midcurve USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xCdaea3dde6cE5969aA1414A82A3A681cEd51Ce72"
+  - id: "339036024154882929384800789080752706274"
+    group_id: "0"
+    description: "Morpho Vault August  V2 USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "August V2 USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x7ceB0f01Cb7187a2EBED5661eCC4d5701d8F2350"
+  - id: "287972541400220405479010366660803291000"
+    group_id: "0"
+    description: "Morpho Vault Gauntlet Core eUSD"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      label: "Gauntlet Core eUSD"
+      asset_address: ${token_list.mainnet.eUSD}
+      vault_address: "0xc080f56504e0278828a403269db945f6c6d6e014"
+
+  # ── InfiniFi Lockers ──────────────────────────────────────────────
+  - id: "2013457072841808719642938411712424809"
+    group_id: "0"
+    description: "InfiniFi liUSD 1-Week Lock"
+    instructions: !include "../../../instructions/infinifi-liusd.yaml"
+    position_tokens: ["0x12b004719fb632f1E7c010c6F5D6009Fb4258442"] # liUSD-1w
+    vars:
+      label: "liUSD 1-Week"
+      weeks: "1"
+      share_token_address: "0x12b004719fb632f1E7c010c6F5D6009Fb4258442" # liUSD-1w
+      kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-1w)}"
+
+  - id: "326610073814749020074569224194987031604"
+    group_id: "0"
+    description: "InfiniFi liUSD 4-Week Lock"
+    instructions: !include "../../../instructions/infinifi-liusd.yaml"
+    position_tokens: ["0x66bCF6151D5558AfB47c38B20663589843156078"] # liUSD-4w
+    vars:
+      label: "liUSD 4-Week"
+      weeks: "4"
+      share_token_address: "0x66bCF6151D5558AfB47c38B20663589843156078" # liUSD-4w
+      kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-4w)}"
+
+  # Curve Positions
+  - id: "82192343698835691382596586281665913315"
+    group_id: "0"
+    description: "Curve PYUSD/crvUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0x625E92624Bc2D88619ACCc1788365A69767f6200"]
+    vars:
+      label: "PYUSD/crvUSD"
+      tokena_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      pool_address: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
+      gauge_address: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
+      coin0_scale_factor: "1000000"
+  - id: "54562872644924688465793884662053422151"
+    group_id: "0"
+    description: "Curve USDC/RLUSD"
+    instructions: !include "../../../instructions/curve-v7.yaml"
+    position_tokens: ["0xd001ae433f254283fece51d4acce8c53263aa186"]
+    vars:
+      label: "USDC/RLUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      pool_address: "0xd001ae433f254283fece51d4acce8c53263aa186"
+      gauge_address: "0xfc3212bd9ad9a28da6b2bd50a2918969c126894f"
+      coin0_scale_factor: "1000000"
+
+  # Convex-Curve Positions
+  - id: "325002806383600319439358862074549790880"
+    group_id: "0"
+    description: "Convex USDC/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"]
+    vars:
+      label: "USDC/crvUSD"
+      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"
+      convex_pool_id: "182"
+      convex_reward_pool: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
+      coin0_scale_factor: "1000000"
+  - id: "222242215405885945120043212563500173272"
+    group_id: "0"
+    description: "Convex USDT/crvUSD"
+    instructions: !include "../../../instructions/convex-curve-v6.yaml"
+    position_tokens: ["0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"]
+    vars:
+      label: "USDT/crvUSD"
+      tokena_address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      curve_pool_address: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
+      convex_pool_id: "179"
+      convex_reward_pool: "0xD1DdB0a0815fD28932fBb194C84003683AF8a824"
+      coin0_scale_factor: "1000000"
+
+  # Morpho Loop Positions
+  - id: "198437562018374659201837465920183746592"
+    group_id: "0"
+    description: "wsrUSD/USDC Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-wsrusd-usdc.yaml"
+  - id: "274918365027491836502749183650274918365"
+    group_id: "0"
+    description: "wsrUSD/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
+  # Morpho Loop - sUSDS/USDT
+  - id: "318472956031847295603184729560"
+    group_id: "0"
+    description: "sUSDS/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-susds-usdt.yaml"
+
+  # Royco Positions
+  # - id: "189274653018274650381927465038"
+  #   group_id: "0"
+  #   description: "Royco Senior Tranche AutoUSD"
+  #   instructions: !include "../../../instructions/royco-st-autousd.yaml"
+  #   position_tokens: ["0xa7569A44f348d3D70d8ad5889e50F78E33d80D35", "0x0725475f51340f1b228be7cb253bc7c2e3a3610b"] # autoUSD, ST-autoUSD
+  # - id: "274019385620184739562018473956"
+  #   group_id: "0"
+  #   description: "Royco DSV srRoyUSDC"
+  #   instructions: !include "../../../instructions/royco-vault.yaml"
+  #   position_tokens: ["0xcd9f5907f92818bc06c9ad70217f089e190d2a32"] # srRoyUSDC
+  #   vars:
+  #     vault_address: "0xcd9f5907f92818bc06c9ad70217f089e190d2a32"
+  #     asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  #     label: "srRoyUSDC"
+  #     kv_storage_key: "${keccak256(makina.mainnet.royco.srRoyUSDC)}"
+  #     kv_pending_shares_key: "${keccak256(makina.mainnet.royco.srRoyUSDC.pending_shares)}"
+
+  # Other Positions
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"

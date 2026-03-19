@@ -1,0 +1,827 @@
+# this is a generated file - do not edit manually
+# root: 0x87afd616240f846f0ac675a419eb40326723dd7d23ef0e354909dbc80c72266f
+
+[instructions.hyperliquid.account_cash."HyperCore USDC Cash"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0x3812fa43010402ff00000002694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0xaa9a091201020503ff0000028853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x32cc6ae60104ff0000000004694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x771602f7010204ff000000048853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x6d5433e6010405ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000064",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.hyperliquid.account_perp_position."HyperCore BTC-PERP Position"]
+position_id = "100000000000000000000000000000000000002"
+description = "HyperCore BTC-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0xbe719473010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010304ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.hyperliquid.account_perp_position."HyperCore HYPE-PERP Position"]
+position_id = "100000000000000000000000000000000000007"
+description = "HyperCore HYPE-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0xbe719473010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010304ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x000000000000000000000000000000000000000000000000000000000000009f",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.hyperliquid.account_spot_token."HyperCore HYPE Spot"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0x3812fa43010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x8be025a60104ff0000000004694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0xaa9a091201030405ff0000048853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x6d5433e6010406ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x0000000000000000000000000000000000000000000000000000000000000096",
+  "0x000000000000000000000000000000000000000000000000000000000000009f",
+  "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "167482727468899399985879689595323416576"
+inputs_slots = []
+
+[instructions.hyperliquid.account_staking_account."HyperCore HYPE Staking Account"]
+position_id = "100000000000000000000000000000000000003"
+description = "HyperCore HYPE Staking Account"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x5555555555555555555555555555555555555555"]
+position_tokens = []
+commands = [
+  "0xd3ff5dcf0102ff0000000002694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010203ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.hyperliquid.account_validator_delegation."HyperCore HYPE Delegation - CMI"]
+position_id = "100000000000000000000000000000000000008"
+description = "HyperCore HYPE Delegation (CMI)"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x5555555555555555555555555555555555555555"]
+position_tokens = []
+commands = [
+  "0x58a28753010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010304ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x0000000000000000000000004e256d24da830290d10f425b44f3e9439394385a",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.hyperliquid.account_vault_equity."Hyperliquid HLP Vault"]
+position_id = "100000000000000000000000000000000000004"
+description = "Hyperliquid HLP Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0x0f06c056010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010304ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x000000000000000000000000dfc24b077bc1425ad1dea75bcb6f8158e10df303",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.hyperliquid.account_vault_equity."SystemicStratHL Vault"]
+position_id = "100000000000000000000000000000000000006"
+description = "SystemicStratHL Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb88339cb7199b77e23db6e890353e22632ba630f"]
+position_tokens = []
+commands = [
+  "0x0f06c056010203ff00000003694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x6d5433e6010304ff000000008853b15faa49e90bb755ddb15bc5cf36a8312004",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000ac9c5477dd6f2e9d55d408efe7de826b8cd30e67",
+  "0x000000000000000000000000d6e56265890b76413d1d527eb9b75e334c0c5b42",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.hyperliquid.add_api_wallet."HyperCore - Add API Wallet"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x33dc3f54010081ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x000000000000000000000000780ecb689a6d35771e7765f771a3ce5d457b3a70",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.hyperliquid.cancel_order."HyperCore BTC-PERP - Cancel Order"]
+position_id = "100000000000000000000000000000000000002"
+description = "HyperCore BTC-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xeacf9ba6010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order."HyperCore BTC-PERP - Cancel Order".inputs_slots]]
+index = 0
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order."HyperCore HYPE Spot - Cancel Order"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xeacf9ba6010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order."HyperCore HYPE Spot - Cancel Order".inputs_slots]]
+index = 0
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order."HyperCore HYPE-PERP - Cancel Order"]
+position_id = "100000000000000000000000000000000000007"
+description = "HyperCore HYPE-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xeacf9ba6010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x000000000000000000000000000000000000000000000000000000000000009f",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order."HyperCore HYPE-PERP - Cancel Order".inputs_slots]]
+index = 0
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order_by_oid."HyperCore BTC-PERP - Cancel Order by OID"]
+position_id = "100000000000000000000000000000000000002"
+description = "HyperCore BTC-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xc711e15c010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x426385aa83d5b9e968f38b4a98789c805c7b15c56c5421858102db92112835bb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order_by_oid."HyperCore BTC-PERP - Cancel Order by OID".inputs_slots]]
+index = 0
+name = "oid"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE Spot - Cancel Order by OID"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xc711e15c010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x426385aa83d5b9e968f38b4a98789c805c7b15c56c5421858102db92112835bb",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE Spot - Cancel Order by OID".inputs_slots]]
+index = 0
+name = "oid"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE-PERP - Cancel Order by OID"]
+position_id = "100000000000000000000000000000000000007"
+description = "HyperCore HYPE-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xc711e15c010100ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x426385aa83d5b9e968f38b4a98789c805c7b15c56c5421858102db92112835bb",
+  "0x000000000000000000000000000000000000000000000000000000000000009f",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE-PERP - Cancel Order by OID".inputs_slots]]
+index = 0
+name = "oid"
+type = "Uint"
+
+[instructions.hyperliquid.delegate_hype."HyperCore HYPE - Delegate to CMI"]
+position_id = "100000000000000000000000000000000000008"
+description = "HyperCore HYPE Delegation (CMI)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5211c05601010002ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x623db973b1ab68cc80aa4eba4d41329819fddbcc7cb6b537f51c10f368487519",
+  "0x0000000000000000000000004e256d24da830290d10f425b44f3e9439394385a",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.delegate_hype."HyperCore HYPE - Delegate to CMI".inputs_slots]]
+index = 0
+name = "amount_wei"
+type = "Uint"
+
+[instructions.hyperliquid.deposit_usdc_to_perp."HyperCore USDC - Deposit to Perp"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffb88339cb7199b77e23db6e890353e22632ba630f",
+  "0x2b2dfd2c010002ff000000ff6b9e773128f453f5c2c60935ee2de2cbc5390a24",
+]
+state = [
+  "0xaaff9c2948d4833a16ba1854c6c9372f2439e1255f67ee0e7d86d8783c760dd6",
+  "0x0000000000000000000000006b9e773128f453f5c2c60935ee2de2cbc5390a24",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.deposit_usdc_to_perp."HyperCore USDC - Deposit to Perp".inputs_slots]]
+index = 0
+name = "usdc_amount"
+type = "Uint"
+
+[instructions.hyperliquid.deposit_usdc_to_spot."HyperCore USDC - Deposit to Spot"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffb88339cb7199b77e23db6e890353e22632ba630f",
+  "0x2b2dfd2c010002ff000000ff6b9e773128f453f5c2c60935ee2de2cbc5390a24",
+]
+state = [
+  "0xaaff9c2948d4833a16ba1854c6c9372f2439e1255f67ee0e7d86d8783c760dd6",
+  "0x0000000000000000000000006b9e773128f453f5c2c60935ee2de2cbc5390a24",
+  "0x00000000000000000000000000000000000000000000000000000000ffffffff",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.deposit_usdc_to_spot."HyperCore USDC - Deposit to Spot".inputs_slots]]
+index = 0
+name = "usdc_amount"
+type = "Uint"
+
+[instructions.hyperliquid.deposit_usdc_to_vault."Hyperliquid HLP - Deposit"]
+position_id = "100000000000000000000000000000000000004"
+description = "Hyperliquid HLP Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x2317205001010200ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf4dfa663e2aff6fb4b7737e38788d12ec9b8c78bf3002437d9f4175aa0a3bfce",
+  "0x000000000000000000000000dfc24b077bc1425ad1dea75bcb6f8158e10df303",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.deposit_usdc_to_vault."Hyperliquid HLP - Deposit".inputs_slots]]
+index = 0
+name = "usd_amount"
+type = "Uint"
+
+[instructions.hyperliquid.deposit_usdc_to_vault."SystemicStratHL - Deposit"]
+position_id = "100000000000000000000000000000000000006"
+description = "SystemicStratHL Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x2317205001010200ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf4dfa663e2aff6fb4b7737e38788d12ec9b8c78bf3002437d9f4175aa0a3bfce",
+  "0x000000000000000000000000d6e56265890b76413d1d527eb9b75e334c0c5b42",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.deposit_usdc_to_vault."SystemicStratHL - Deposit".inputs_slots]]
+index = 0
+name = "usd_amount"
+type = "Uint"
+
+[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order"]
+position_id = "100000000000000000000000000000000000002"
+description = "HyperCore BTC-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xaa9a091201010608ff0000068853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0xaa9a091201020708ff0000088853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x5c02513a4100000000000088694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x09000608030405ff000000000000000000000000000000000000000000000000",
+  "0x17938e130188ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf3b582a6fcd545f7270917e7c3d714e59464ec101a5c32bf2ee2ceb48091893f",
+  "0x8f11ca4aaad3eed2a14925f3308a197306ad60f32971d01d91b1dc3f23ddd247",
+  "0xde8c1c7221ac9a62381f5e91582ea21c8affeda219826fbc12ed97ce13baf081",
+  "0x5e9d1e7e3e45797c435885ce847de2aef4066322c81b36cf5db093f89fb53f71",
+  "0x1d9d0043fc99bc4186fb4a1690ce6321d21952cab5738491505962e54b08503a",
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x0000000000000000000000000000000000000000000000000000000000000064",
+  "0x00000000000000000000000000000000000000000000000000000000000003e8",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "4984604984193434523389276476051292160"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 0
+name = "is_buy"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 1
+name = "limit_px"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 2
+name = "sz"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 3
+name = "reduce_only"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 4
+name = "tif"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore BTC-PERP - Place Limit Order".inputs_slots]]
+index = 5
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xaa9a091201010608ff0000068853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0xaa9a091201020708ff0000088853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x5c02513a4100000000000088694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x09000608030405ff000000000000000000000000000000000000000000000000",
+  "0x17938e130188ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf3b582a6fcd545f7270917e7c3d714e59464ec101a5c32bf2ee2ceb48091893f",
+  "0x8f11ca4aaad3eed2a14925f3308a197306ad60f32971d01d91b1dc3f23ddd247",
+  "0xde8c1c7221ac9a62381f5e91582ea21c8affeda219826fbc12ed97ce13baf081",
+  "0x5e9d1e7e3e45797c435885ce847de2aef4066322c81b36cf5db093f89fb53f71",
+  "0x1d9d0043fc99bc4186fb4a1690ce6321d21952cab5738491505962e54b08503a",
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x0000000000000000000000000000000000000000000000000000000000000064",
+  "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "4984604984193434523389276476051292160"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 0
+name = "is_buy"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 1
+name = "limit_px"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 2
+name = "sz"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 3
+name = "reduce_only"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 4
+name = "tif"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
+index = 5
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order"]
+position_id = "100000000000000000000000000000000000007"
+description = "HyperCore HYPE-PERP"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xaa9a091201010608ff0000068853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0xaa9a091201020708ff0000088853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x5c02513a4100000000000088694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x09000608030405ff000000000000000000000000000000000000000000000000",
+  "0x17938e130188ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf3b582a6fcd545f7270917e7c3d714e59464ec101a5c32bf2ee2ceb48091893f",
+  "0x8f11ca4aaad3eed2a14925f3308a197306ad60f32971d01d91b1dc3f23ddd247",
+  "0xde8c1c7221ac9a62381f5e91582ea21c8affeda219826fbc12ed97ce13baf081",
+  "0x5e9d1e7e3e45797c435885ce847de2aef4066322c81b36cf5db093f89fb53f71",
+  "0x1d9d0043fc99bc4186fb4a1690ce6321d21952cab5738491505962e54b08503a",
+  "0x8db286b53365f5ab351e48395351b18b2a0f10195109ca91fe49d850a855cfe7",
+  "0x0000000000000000000000000000000000000000000000000000000000000064",
+  "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000000000000000000000000000000000000000009f",
+]
+bitmap = "4984604984193434523389276476051292160"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 0
+name = "is_buy"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 1
+name = "limit_px"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 2
+name = "sz"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 3
+name = "reduce_only"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 4
+name = "tif"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 5
+name = "slot"
+type = "Uint"
+
+[instructions.hyperliquid.transfer_hype_spot_to_staking."HyperCore HYPE - Spot to Staking"]
+position_id = "100000000000000000000000000000000000003"
+description = "HyperCore HYPE Staking Account"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x654e5e820100ff0000000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x623db973b1ab68cc80aa4eba4d41329819fddbcc7cb6b537f51c10f368487519",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.hyperliquid.transfer_hype_spot_to_staking."HyperCore HYPE - Spot to Staking".inputs_slots]]
+index = 0
+name = "amount_wei"
+type = "Uint"
+
+[instructions.hyperliquid.transfer_hype_staking_to_spot."HyperCore HYPE - Staking to Spot"]
+position_id = "100000000000000000000000000000000000003"
+description = "HyperCore HYPE Staking Account"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xaf23941b0100ff0000000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x623db973b1ab68cc80aa4eba4d41329819fddbcc7cb6b537f51c10f368487519",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.hyperliquid.transfer_hype_staking_to_spot."HyperCore HYPE - Staking to Spot".inputs_slots]]
+index = 0
+name = "amount_wei"
+type = "Uint"
+
+[instructions.hyperliquid.transfer_usdc_perp_to_spot."HyperCore USDC - Perp to Spot Transfer"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x92911cc8010001ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x2e61fce48c283048995487f65ce336e782c762d70b8b711a5187feb9c02bd73f",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.transfer_usdc_perp_to_spot."HyperCore USDC - Perp to Spot Transfer".inputs_slots]]
+index = 0
+name = "transfer_amount"
+type = "Uint"
+
+[instructions.hyperliquid.transfer_usdc_spot_to_perp."HyperCore USDC - Spot to Perp Transfer"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x92911cc8010001ff00000081694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x2e61fce48c283048995487f65ce336e782c762d70b8b711a5187feb9c02bd73f",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.transfer_usdc_spot_to_perp."HyperCore USDC - Spot to Perp Transfer".inputs_slots]]
+index = 0
+name = "transfer_amount"
+type = "Uint"
+
+[instructions.hyperliquid.undelegate_hype."HyperCore HYPE - Undelegate from CMI"]
+position_id = "100000000000000000000000000000000000008"
+description = "HyperCore HYPE Delegation (CMI)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5211c05601010002ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x623db973b1ab68cc80aa4eba4d41329819fddbcc7cb6b537f51c10f368487519",
+  "0x0000000000000000000000004e256d24da830290d10f425b44f3e9439394385a",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.undelegate_hype."HyperCore HYPE - Undelegate from CMI".inputs_slots]]
+index = 0
+name = "amount_wei"
+type = "Uint"
+
+[instructions.hyperliquid.withdraw_usdc_from_vault."Hyperliquid HLP - Withdraw"]
+position_id = "100000000000000000000000000000000000004"
+description = "Hyperliquid HLP Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x2317205001010200ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf4dfa663e2aff6fb4b7737e38788d12ec9b8c78bf3002437d9f4175aa0a3bfce",
+  "0x000000000000000000000000dfc24b077bc1425ad1dea75bcb6f8158e10df303",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.withdraw_usdc_from_vault."Hyperliquid HLP - Withdraw".inputs_slots]]
+index = 0
+name = "usd_amount"
+type = "Uint"
+
+[instructions.hyperliquid.withdraw_usdc_from_vault."SystemicStratHL - Withdraw"]
+position_id = "100000000000000000000000000000000000006"
+description = "SystemicStratHL Vault"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x2317205001010200ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf4dfa663e2aff6fb4b7737e38788d12ec9b8c78bf3002437d9f4175aa0a3bfce",
+  "0x000000000000000000000000d6e56265890b76413d1d527eb9b75e334c0c5b42",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.withdraw_usdc_from_vault."SystemicStratHL - Withdraw".inputs_slots]]
+index = 0
+name = "usd_amount"
+type = "Uint"
+
+[instructions.hyperliquid.withdraw_usdc_to_evm."HyperCore USDC - Withdraw to HyperEVM"]
+position_id = "100000000000000000000000000000000000001"
+description = "HyperCore USDC (deposit/transfer/withdraw)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x90a3f62901010200ff000082694b33ec7ae7f9f402f2b5fc17063c03222f5809",
+  "0x17938e130182ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xe13ce203f067628624bdbea3767b716963440de8a2ab5233079dcd86fe297e91",
+  "0x0000000000000000000000002000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.hyperliquid.withdraw_usdc_to_evm."HyperCore USDC - Withdraw to HyperEVM".inputs_slots]]
+index = 0
+name = "withdraw_amount_wei"
+type = "Uint"

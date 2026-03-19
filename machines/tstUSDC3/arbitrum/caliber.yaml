@@ -1,0 +1,50 @@
+config:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+positions:
+  # Morpho Vault Positions
+  - id: "225919034311554859614117379052402566520"
+    group_id: "0"
+    description: "Morpho Vault Steakhouse High Yield"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "Steakhouse High Yield"
+      token_address: ${token_list.arbitrum.USDC}
+      vault_address: "0xbeeff1d5de8f79ff37a151681100b039661da518"
+  - id: "71468695781592263857408046912715450492"
+    group_id: "0"
+    description: "Morpho Vault Clearstar USDC Reactor"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "Clearstar USDC Reactor"
+      token_address: ${token_list.arbitrum.USDC}
+      vault_address: "0xa53cf822fe93002aeae16d395cd823ece161a6ac"
+  - id: "222373581378271374640912175777392407527"
+    group_id: "0"
+    description: "Morpho Vault kpk USDC Yield"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "kpk USDC Yield"
+      token_address: ${token_list.arbitrum.USDC}
+      vault_address: "0x2c609d9cfc9dda2db5c128b2a665d921ec53579d"
+  - id: "101713165790861857821926700839246075716"
+    group_id: "0"
+    description: "Morpho Vault Clearstar High Yield USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "Clearstar High Yield USDC"
+      token_address: ${token_list.arbitrum.USDC}
+      vault_address: "0x64ca76e2525fc6ab2179300c15e343d73e42f958"
+  - id: "236938787749183114180580308124846321709"
+    group_id: "0"
+    description: "Morpho Vault Hyperithm USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    vars:
+      vault_label: "Hyperithm USDC"
+      token_address: ${token_list.arbitrum.USDC}
+      vault_address: "0x4b6f1c9e5d470b97181786b26da0d0945a7cf027"
