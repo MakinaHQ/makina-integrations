@@ -1,0 +1,93 @@
+protocol: "infinifi"
+
+# Infinifi Deposit (and lock) Blueprint
+# The lock duration (unwinding_epochs) determines which bucket is used
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  iusd_address:
+    type: "address"
+    value: "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  gateway_address:
+    type: "address"
+    value: "0x3f04b65Ddbd87f9CE0A2e7Eb24d80e7fb87625b5"
+
+inputs:
+  unwinding_epochs:
+    type: "uint32"
+
+actions:
+  deposit_usdc:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Approve USDC spending by the Gateway"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.gateway_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount}"
+
+      - description: "Mint and lock"
+        target: "${constants.gateway_address}"
+        selector: "mintAndLock(address,uint256,uint32)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount}"
+          - type: "uint32"
+            value: "${inputs.unwinding_epochs}"
+
+    input_slots:
+      usdc_amount:
+        type: "uint256"
+        description: "USDC amount to deposit"
+
+  deposit_iusd:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Approve iUSD spending by the Gateway"
+        target: "${constants.iusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.gateway_address}"
+          - type: "uint256"
+            value: "${input_slots.iusd_amount}"
+
+      - description: "Mint and lock"
+        target: "${constants.gateway_address}"
+        selector: "createPosition(uint256,uint32,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.iusd_amount}"
+          - type: "uint32"
+            value: "${inputs.unwinding_epochs}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      iusd_amount:
+        type: "uint256"
+        description: "iUSD amount to deposit"

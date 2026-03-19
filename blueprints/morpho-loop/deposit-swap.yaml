@@ -1,17 +1,19 @@
 protocol: "morpho"
 
-# ERC4626-based deposit for Morpho loop positions.
-# Use when loan_token IS the collateral vault underlying (e.g. syrupUSDC/USDC,
-# syrupUSDT/USDT). Deposits loan token directly into the ERC4626 vault to mint
-# collateral shares, then supplies them to Morpho.
+# Swap-based deposit for Morpho loop positions.
+# Use when a swap is needed to convert between loan and collateral tokens
+# (e.g. sUSDS/USDT, where sUSDS underlying is USDS, not USDT).
+# The DEX aggregator handles routing.
 #
-# For markets where a swap is needed (loan_token != collateral underlying),
-# use deposit-swap.yaml instead.
+# For markets where loan_token IS the collateral vault underlying
+# (e.g. syrupUSDC/USDC), use deposit.yaml instead (direct ERC4626 deposit).
 
 inputs:
   collateral_token:
     type: "address"
   loan_token:
+    type: "address"
+  swap_module:
     type: "address"
   morpho_address:
     type: "address"
@@ -27,39 +29,49 @@ actions:
   # loop_in: Enter a leveraged loop position via flash loan callback.
   # Must be used as a FLASHLOAN_MANAGEMENT instruction. The caliber wallet
   # holds equity + flash loaned loan_token at the start of execution.
-  # Flow: deposit loan_token into ERC4626 vault, supply collateral, borrow to repay FL
+  # Flow: swap loan_token to collateral_token, supply collateral, borrow to repay FL
   # ==========================================================================
   loop_in:
     calls:
-      - description: "Approve the collateral vault to spend our loan token"
+      - description: "Approve swap module to spend loan token"
         target: ${inputs.loan_token}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.collateral_token}"
+            value: "${inputs.swap_module}"
           - type: "uint256"
-            value: "${input_slots.deposit_amount}"
+            value: "${input_slots.swap_data.inputAmount}"
 
-      - description: "Deposit into the collateral vault (ERC4626) to mint collateral token"
-        target: ${inputs.collateral_token}
-        selector: "deposit(uint256,address)"
+      - description: "Swap loan token to collateral token via DEX aggregator"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
         parameters:
-          - type: "uint256"
-            value: "${input_slots.deposit_amount}"
-          - type: "address"
-            value: "${inputs.caliber_address}"
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data.data}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "address"
+                value: "${inputs.collateral_token}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.minOutputAmount}"
         return:
           type: "uint256"
-          name: "collateral_shares"
+          name: "collateral_amount"
 
-      - description: "Approve Morpho to transfer the collateral"
+      - description: "Approve Morpho to transfer collateral"
         target: ${inputs.collateral_token}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
             value: "${inputs.morpho_address}"
           - type: "uint256"
-            value: "${returns.collateral_shares}"
+            value: "${returns.collateral_amount}"
 
       - description: "Get market parameters from ID"
         target: "${inputs.morpho_address}"
@@ -148,7 +160,7 @@ actions:
               - type: "uint256"
                 value: "${returns.lltv}"
           - type: "uint256"
-            value: "${returns.collateral_shares}"
+            value: "${returns.collateral_amount}"
           - type: "address"
             value: "${inputs.caliber_address}"
           - type: "bytes"
@@ -180,50 +192,60 @@ actions:
             value: "${inputs.caliber_address}"
 
     input_slots:
-      deposit_amount:
-        type: "uint256"
-        description: "The total amount to deposit into the collateral vault (equity + flash_loan_amount)."
+      swap_data:
+        type: "SwapData"
+        description: "Swap data for loan token -> collateral token conversion."
       flash_loan_amount:
         type: "uint256"
-        description: "The amount of the flash loan."
+        description: "The amount of the flash loan to borrow from Morpho to repay."
 
   # ==========================================================================
   # add_collateral: Top up collateral on an existing Morpho loop position.
   # Standalone MANAGEMENT instruction — no flash loan involved.
-  # Deposits loan token into ERC4626 vault, then supplies the resulting
-  # shares as additional collateral on Morpho.
+  # Swaps loan token to collateral token via DEX aggregator, then supplies
+  # as additional collateral on Morpho.
   # ==========================================================================
   add_collateral:
     calls:
-      - description: "Approve the collateral vault to spend our loan token"
+      - description: "Approve swap module to spend loan token"
         target: ${inputs.loan_token}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.collateral_token}"
+            value: "${inputs.swap_module}"
           - type: "uint256"
-            value: "${input_slots.collateral_amount}"
+            value: "${input_slots.swap_data.inputAmount}"
 
-      - description: "Deposit into the collateral vault (ERC4626) to mint collateral token"
-        target: ${inputs.collateral_token}
-        selector: "deposit(uint256,address)"
+      - description: "Swap loan token to collateral token via DEX aggregator"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
         parameters:
-          - type: "uint256"
-            value: "${input_slots.collateral_amount}"
-          - type: "address"
-            value: "${inputs.caliber_address}"
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data.data}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "address"
+                value: "${inputs.collateral_token}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.minOutputAmount}"
         return:
           type: "uint256"
-          name: "collateral_shares"
+          name: "collateral_amount"
 
-      - description: "Approve Morpho to transfer the collateral"
+      - description: "Approve Morpho to transfer collateral"
         target: ${inputs.collateral_token}
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
             value: "${inputs.morpho_address}"
           - type: "uint256"
-            value: "${returns.collateral_shares}"
+            value: "${returns.collateral_amount}"
 
       - description: "Get market parameters from ID"
         target: "${inputs.morpho_address}"
@@ -312,13 +334,13 @@ actions:
               - type: "uint256"
                 value: "${returns.lltv}"
           - type: "uint256"
-            value: "${returns.collateral_shares}"
+            value: "${returns.collateral_amount}"
           - type: "address"
             value: "${inputs.caliber_address}"
           - type: "bytes"
             value: "0x"
 
     input_slots:
-      collateral_amount:
-        type: "uint256"
-        description: "The amount of loan token to deposit as additional collateral into the ERC4626 vault."
+      swap_data:
+        type: "SwapData"
+        description: "Swap data for loan token -> collateral token conversion."

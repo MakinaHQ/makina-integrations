@@ -1,0 +1,6 @@
+# this is a generated file - do not edit manually
+# root: 0xdeadbeef
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
