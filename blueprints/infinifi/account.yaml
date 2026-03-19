@@ -1,0 +1,134 @@
+protocol: "infinifi"
+
+# Infinifi Account Blueprint
+# Query total position value for a SINGLE lock bucket
+#
+# Position value = Locked balance (share tokens * exchange rate) + Unwinding balance
+#
+# This blueprint is bucket-specific:
+# - Each lock duration (1-13 weeks) should have its own position
+# - No double counting between buckets
+# - Uses KV store to track unwinding timestamp
+#
+# State machine per bucket:
+# 1. LOCKED: User has share tokens, unwinding_timestamp = 0 in KV store
+# 2. UNWINDING: Share tokens burned, unwinding_timestamp > 0 in KV store
+
+# The KV store key should be unique per bucket, e.g., keccak256("infinifi_unwinding_2w") for 2-week
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  locking_controller_address:
+    type: "address"
+    value: "0x1d95cC100D6Cd9C7BbDbD7Cb328d99b3D6037fF7"
+  unwinding_module_address:
+    type: "address"
+    value: "0x7092A43aE5407666C78dBEA657a1891f42b3dFcc"
+
+inputs:
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+  unwinding_epochs:
+    type: "uint32"
+
+actions:
+  # Account for total position value in a single bucket (locked + unwinding)
+  account:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get shares in this specific bucket
+      - description: "Get share token balance in this bucket"
+        target: "${constants.locking_controller_address}"
+        selector: "shares(address,uint32)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint32"
+            value: "${inputs.unwinding_epochs}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+
+      # Get exchange rate for this bucket
+      - description: "Get exchange rate (iUSD per share) for this bucket"
+        target: "${constants.locking_controller_address}"
+        selector: "exchangeRate(uint32)"
+        parameters:
+          - type: "uint32"
+            value: "${inputs.unwinding_epochs}"
+        return:
+          name: "exchange_rate"
+          type: "uint256"
+
+      # Calculate locked balance: shares * exchangeRate / 1e18
+      - description: "Calculate locked balance in iUSD terms"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${returns.exchange_rate}"
+          - type: "uint256"
+            value: "1000000000000000000"
+        return:
+          name: "locked_balance"
+          type: "uint256"
+
+      # Get unwinding timestamp from KV store (0 if not unwinding)
+      - description: "Get unwinding timestamp from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "unwinding_timestamp"
+          type: "uint256"
+
+      # Query unwinding balance (returns 0 if timestamp is 0 or no position)
+      # This returns the iUSD value of the unwinding position
+      - description: "Get unwinding position balance in iUSD terms"
+        target: "${constants.unwinding_module_address}"
+        selector: "balanceOf(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint256"
+            value: "${returns.unwinding_timestamp}"
+        return:
+          name: "unwinding_balance"
+          type: "uint256"
+
+      # Calculate total position value (locked + unwinding)
+      - description: "Calculate total locked and unwinding value"
+        target: "${constants.math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.locked_balance}"
+          - type: "uint256"
+            value: "${returns.unwinding_balance}"
+        return:
+          name: "total_locked_and_unwinding_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_locked_and_unwinding_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
