@@ -2,7 +2,7 @@
 
 Unit tests use a FakeReader to avoid RPC calls. The integration test at the
 bottom (test_dusd_mainnet_fixed_block_rootfile_outcomes) hits a real RPC and
-is skipped unless ETHEREUM_MAINNET_RPC_URL and DUSD_MAINNET_TEST_BLOCK are set.
+is skipped unless ALCHEMY_API_KEY is set.
 
 Fixtures live in tests/fixtures/dusd/mainnet/ — a caliber.yaml and two rootfiles
 that represent a known scenario: the older rootfile is missing accounting for
@@ -122,9 +122,9 @@ class ValidateOpenPositionsTests(unittest.TestCase):
         """Integration test: hits a real RPC at a pinned block to verify that
         the older rootfile fails validation (missing accounting) while the
         newer one passes. Skipped without RPC env vars."""
-        rpc_url = os.getenv("ETHEREUM_MAINNET_RPC_URL")
-        if not rpc_url:
-            self.skipTest("ETHEREUM_MAINNET_RPC_URL is required")
+        api_key = os.getenv("ALCHEMY_API_KEY")
+        if not api_key:
+            self.skipTest("ALCHEMY_API_KEY is required")
         block_number = 24635682
 
         old_target = validate_open_positions.RootfileTarget(
