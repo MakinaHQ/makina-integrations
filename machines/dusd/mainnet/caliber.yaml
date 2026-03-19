@@ -231,3 +231,30 @@ positions:
     group_id: "0"
     description: "wsrUSD/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
+  - id: "615507982534160798943526170894352617089"
+    group_id: "0"
+    description: "sUSDS/USDT Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-susds-usdt.yaml"
+
+  # ── InfiniFi Lockers ──────────────────────────────────────────────
+  - id: "2013457072841808719642938411712424809"
+    group_id: "0"
+    description: "InfiniFi liUSD 1-Week Lock"
+    instructions: !include "../../../instructions/infinifi-liusd.yaml"
+    position_tokens: ["0x12b004719fb632f1E7c010c6F5D6009Fb4258442"] # liUSD-1w
+    vars:
+      label: "liUSD 1-Week"
+      weeks: "1"
+      share_token_address: "0x12b004719fb632f1E7c010c6F5D6009Fb4258442" # liUSD-1w
+      kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-1w)}"
+
+  - id: "326610073814749020074569224194987031604"
+    group_id: "0"
+    description: "InfiniFi liUSD 4-Week Lock"
+    instructions: !include "../../../instructions/infinifi-liusd.yaml"
+    position_tokens: ["0x66bCF6151D5558AfB47c38B20663589843156078"] # liUSD-4w
+    vars:
+      label: "liUSD 4-Week"
+      weeks: "4"
+      share_token_address: "0x66bCF6151D5558AfB47c38B20663589843156078" # liUSD-4w
+      kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-4w)}"
