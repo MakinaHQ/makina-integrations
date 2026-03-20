@@ -10,3 +10,4 @@ actions:
       - description: "Claim accrued reward tokens from StakingRewards"
         target: "${inputs.staking_contract_address}"
         selector: "getReward()"
+        parameters: []

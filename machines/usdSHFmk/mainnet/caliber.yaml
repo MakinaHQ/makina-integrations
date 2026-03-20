@@ -87,6 +87,16 @@ positions:
       asset_address: ${token_list.mainnet.AUSD}
       vault_address: "0xBEEFF0DeaC1aBa71EF0D88C4291354eb92ef4589"
 
+  # Grove
+  - id: "92407834921349093201686868411404863822331731626374400060155600152279197405795"
+    group_id: "0"
+    description: "Grove - USDS Staking"
+    instructions: !include "../../../instructions/grove-staking.yaml"
+    vars:
+      label: "USDS Staking"
+      staking_token_address: ${token_list.mainnet.USDS}
+      staking_contract_address: "0x3bD276885c070Fe3D9bafdc5e699E85D2d776A15"
+
   # Harvesting
   - id: "777"
     group_id: "0"
