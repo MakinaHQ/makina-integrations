@@ -4,7 +4,7 @@
     - ${position.staking_token_address}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/grove-staking/deposit.yaml:stake"
+    path: "../../../blueprints/grove/staking/deposit.yaml:stake"
     inputs:
       staking_token_address:
         type: "address"
@@ -22,7 +22,7 @@
     - ${position.staking_token_address}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/grove-staking/account.yaml:account"
+    path: "../../../blueprints/grove/staking/account.yaml:account"
     inputs:
       staking_contract_address:
         type: "address"
@@ -37,7 +37,7 @@
     - ${position.staking_token_address}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/grove-staking/withdraw.yaml:withdraw"
+    path: "../../../blueprints/grove/staking/withdraw.yaml:withdraw"
     inputs:
       staking_contract_address:
         type: "address"
@@ -52,7 +52,7 @@
     - ${position.staking_token_address}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/grove-staking/withdraw.yaml:withdraw_relative"
+    path: "../../../blueprints/grove/staking/withdraw.yaml:withdraw_relative"
     inputs:
       staking_contract_address:
         type: "address"
@@ -69,7 +69,7 @@
   affected_tokens: []
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/grove-staking/harvest.yaml:harvest"
+    path: "../../../blueprints/grove/staking/harvest.yaml:harvest"
     inputs:
       staking_contract_address:
         type: "address"
