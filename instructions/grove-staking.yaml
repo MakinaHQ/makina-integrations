@@ -1,0 +1,76 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.staking_token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/grove/staking/deposit.yaml:stake"
+    inputs:
+      staking_token_address:
+        type: "address"
+        value: ${position.staking_token_address}
+      staking_contract_address:
+        type: "address"
+        value: ${position.staking_contract_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.staking_token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/grove/staking/account.yaml:account"
+    inputs:
+      staking_contract_address:
+        type: "address"
+        value: ${position.staking_contract_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.staking_token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/grove/staking/withdraw.yaml:withdraw"
+    inputs:
+      staking_contract_address:
+        type: "address"
+        value: ${position.staking_contract_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.staking_token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/grove/staking/withdraw.yaml:withdraw_relative"
+    inputs:
+      staking_contract_address:
+        type: "address"
+        value: ${position.staking_contract_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/grove/staking/harvest.yaml:harvest"
+    inputs:
+      staking_contract_address:
+        type: "address"
+        value: ${position.staking_contract_address}

@@ -1,0 +1,26 @@
+protocol: "grove-staking"
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get caliber staked balance in StakingRewards"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "staked_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.staked_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

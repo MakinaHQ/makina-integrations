@@ -1,0 +1,62 @@
+protocol: "grove-staking"
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  withdraw:
+    calls:
+      - description: "Withdraw staked tokens from StakingRewards"
+        target: "${inputs.staking_contract_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_withdraw}"
+
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "Amount of staking tokens to withdraw"
+
+  withdraw_relative:
+    calls:
+      - description: "Query caliber staked balance"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "staked_balance"
+          type: "uint256"
+
+      - description: "Compute amount to withdraw from basis points"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.staked_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_withdraw}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_withdraw"
+          type: "uint256"
+
+      - description: "Withdraw computed amount from StakingRewards"
+        target: "${inputs.staking_contract_address}"
+        selector: "withdraw(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_withdraw}"
+
+    input_slots:
+      bps_to_withdraw:
+        type: "uint256"
+        description: "Percentage of staked balance to withdraw in basis points (10000 = 100%)"
