@@ -41,10 +41,7 @@ stages:
     artifacts:
       - blueprints/fluid/harvest.yaml
       - machines/dusd/mainnet/instructions/fluid-gho.yaml
-  4_test: {
-    status: pending,
-    note: "Requires FluidClaimData metatype implementation in makina-rs",
-  }
+  4_test: { status: pending, note: "Requires FluidClaimData metatype implementation in makina-rs" }
 
 # Shared resources
 testnets:

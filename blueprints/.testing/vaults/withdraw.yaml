@@ -1,0 +1,278 @@
+protocol: "royco"
+
+# Royco DSV Withdraw Blueprint
+# Async epoch-based withdrawal with KV store for epochID and pending shares tracking:
+#
+# 1. start_redeem_relative - Queues a percentage of shares for redemption, stores epochID and
+#    pending shares in KV store. Supports multiple redeems within the same epoch
+#    by accumulating the pending share count.
+#    Naturally rounding-safe: accounting uses convertToAssets(active + pending) which
+#    produces the same result as convertToAssets(total_before) since the share sum is unchanged.
+# 2. complete_withdraw - Claims USDC after epoch is processed by admin, clears KV store
+#
+# The epoch lifecycle is admin-controlled (~14-day cycles):
+#   redeem() -> admin closeEpoch() -> admin processEpoch() -> claimWithdrawal()
+#
+# Two KV keys per position:
+#   kv_storage_key: stores the epochID for claimWithdrawal
+#   kv_pending_shares_key: stores accumulated pending share count (for accounting)
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+
+inputs:
+  vault_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+  kv_pending_shares_key:
+    type: "bytes32"
+
+actions:
+  # Step 1 (relative): Queue redemption for a percentage of share balance
+  # Allows multiple calls within the same epoch - accumulates pending shares
+  start_redeem_relative:
+    calls:
+      # Guard: vault must have async queue active
+      - description: "Check if withdrawal queue is active"
+        target: "${inputs.vault_address}"
+        selector: "isQueueActive()"
+        parameters: []
+        return:
+          name: "queue_active"
+          type: "bool"
+
+      - description: "Revert if queue is not active (vault must be in async mode)"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.queue_active}"
+
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Calculate shares to redeem from bps of current balance
+      - description: "Get share token balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "share_balance"
+          type: "uint256"
+
+      - description: "Calculate shares to redeem based on percentage"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.share_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      # Get the current epoch ID (this is the epoch our request goes into)
+      - description: "Get current epoch ID"
+        target: "${inputs.vault_address}"
+        selector: "latestEpochID()"
+        parameters: []
+        return:
+          name: "current_epoch_id"
+          type: "uint256"
+
+      # Check existing state - allow same epoch accumulation, block different epoch
+      - description: "Get existing epoch ID from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "existing_epoch_id"
+          type: "uint256"
+
+      - description: "Check if this is a fresh redeem (no existing epoch)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_epoch_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "is_fresh"
+          type: "bool"
+
+      - description: "Check if existing epoch matches current (same epoch accumulation)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_epoch_id}"
+          - type: "uint256"
+            value: "${returns.current_epoch_id}"
+        return:
+          name: "is_same_epoch"
+          type: "bool"
+
+      - description: "Allow if fresh OR same epoch"
+        target: "${constants.boolean_helper_address}"
+        selector: "or(bool,bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_fresh}"
+          - type: "bool"
+            value: "${returns.is_same_epoch}"
+        return:
+          name: "can_proceed"
+          type: "bool"
+
+      - description: "Revert if there is a pending redemption from a different epoch"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.can_proceed}"
+
+      # Queue the redemption request
+      - description: "Queue shares for redemption (transfers shares to vault)"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      # Store the epoch ID in KV store for later claim
+      - description: "Store epoch ID in KV store for claim step"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.current_epoch_id}"
+
+      # Accumulate pending shares: existing + new
+      - description: "Get existing pending shares from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_pending_shares_key}"
+        return:
+          name: "existing_pending_shares"
+          type: "uint256"
+
+      - description: "Calculate total pending shares (existing + newly redeemed)"
+        target: "${constants.math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_pending_shares}"
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+        return:
+          name: "total_pending_shares"
+          type: "uint256"
+
+      - description: "Store accumulated pending shares in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_pending_shares_key}"
+          - type: "uint256"
+            value: "${returns.total_pending_shares}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of share balance to redeem (10000 = 100%)"
+
+  # Step 2: Claim USDC after epoch is processed
+  complete_withdraw:
+    calls:
+      # Get epoch ID from KV store
+      - description: "Get pending epoch ID from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "pending_epoch_id"
+          type: "uint256"
+
+      # Verify there is a pending redemption
+      - description: "Check if there is a pending redemption (epoch ID > 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_epoch_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_pending"
+          type: "bool"
+
+      - description: "Revert if no pending redemption exists"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_pending}"
+
+      # Claim USDC for the processed epoch
+      - description: "Claim USDC for the processed epoch"
+        target: "${inputs.vault_address}"
+        selector: "claimWithdrawal(uint256[])"
+        parameters:
+          - type: "uint256[]"
+            value:
+              - type: "uint256"
+                value: "${returns.pending_epoch_id}"
+
+      # Clear the KV store entries
+      - description: "Clear epoch ID from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Clear pending shares from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_pending_shares_key}"
+          - type: "uint256"
+            value: "0"

@@ -72,9 +72,7 @@ stages:
   0_intent: { status: completed, timestamp: "2026-01-06T00:00:00Z" }
   1_specs: { status: completed }
   1b_enrich: { status: completed }
-  1c_offchain: {
-    status: completed,
-  } # conditional - skipped if no offchain patterns
+  1c_offchain: { status: completed } # conditional - skipped if no offchain patterns
   2_deposit: { status: in_progress }
   2_withdraw: { status: pending }
   2_account: { status: pending }

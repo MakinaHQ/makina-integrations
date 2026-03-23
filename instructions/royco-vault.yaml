@@ -1,0 +1,93 @@
+# Royco DSV (ConcreteAsyncVaultImpl)
+# Generic instruction - parameterized via position vars:
+#   vault_address:          Vault proxy address (also the share token)
+#   asset_address:          Underlying token address (e.g. USDC)
+#   label:                  Share token label (e.g. srRoyUSDC)
+#   kv_storage_key:         keccak256("makina.{network}.royco.{id}") for epoch ID
+#   kv_pending_shares_key:  keccak256("makina.{network}.royco.{id}.pending_shares") for pending shares
+#
+# Withdrawal: Async epoch-based (~14-day admin-controlled cycles)
+# Accounting: Hybrid - tracks live share price during open/closed, locked price after processEpoch
+# Note: Vault may have whitelist hook - caliber must be whitelisted before deposits
+
+# DEPOSIT: Deposit underlying into vault to receive share tokens
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/royco/vaults/deposit.yaml:deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+
+# ACCOUNTING: Hybrid pricing (live share price for open/closed, settled for processed)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/royco/vaults/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+      kv_pending_shares_key:
+        type: "bytes32"
+        value: ${position.kv_pending_shares_key}
+
+# WITHDRAW (Step 1): Queue shares for redemption (relative %)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/royco/vaults/withdraw.yaml:start_redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+      kv_pending_shares_key:
+        type: "bytes32"
+        value: ${position.kv_pending_shares_key}
+
+# WITHDRAW (Step 2): Claim underlying after epoch is processed
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/royco/vaults/withdraw.yaml:complete_withdraw"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+      kv_pending_shares_key:
+        type: "bytes32"
+        value: ${position.kv_pending_shares_key}

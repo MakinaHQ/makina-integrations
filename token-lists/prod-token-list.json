@@ -25,6 +25,20 @@
       "symbol": "AUSD"
     },
     {
+      "chainId": 1,
+      "address": "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+      "name": "PYUSD",
+      "decimals": 6,
+      "symbol": "PYUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F",
+      "name": "Electronic Dollar",
+      "decimals": 18,
+      "symbol": "eUSD"
+    },
+    {
       "chainId": 42161,
       "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       "name": "USD Coin",
