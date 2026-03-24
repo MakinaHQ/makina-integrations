@@ -1,0 +1,33 @@
+protocol: "grove-staking"
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  staking_token_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  stake:
+    calls:
+      - description: "Approve staking token to the StakingRewards contract"
+        target: "${inputs.staking_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.staking_contract_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+      - description: "Stake tokens into StakingRewards"
+        target: "${inputs.staking_contract_address}"
+        selector: "stake(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+    input_slots:
+      amount_to_stake:
+        type: "uint256"
+        description: "Amount of staking token to stake"

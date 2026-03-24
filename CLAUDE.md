@@ -9,6 +9,8 @@ Automated DeFi pool integration pipeline using Claude agents.
 | `/integrate [--resume] [--context "..."] <pool>` | Full pipeline with checkpoint system |
 | `/add-instructions <pool> <machine>` | Generate instruction from existing blueprint |
 | `/compile [--keep] <path>` | Compile instruction file (cleanup by default) |
+| `/add-tokens --chain <chain> <addr...>` | Add ERC20 tokens to the token list (on-chain fetch) |
+| `/scan-tokens` | Find frequently used addresses missing from the token list |
 
 ## Pipeline
 
@@ -151,7 +153,16 @@ machines/
     └── rootfiles/           # Compiled TOML files
 ```
 
+## LLM Minimalism Principle
+
+Only use the LLM for work that requires judgment. If a task is deterministic — arithmetic, formatting, table construction, data transcription, template rendering — do it in code. Before adding any feature that touches the LLM pipeline (new prompts, tool descriptions, agent instructions), ask: "Can this be done without the LLM?" If yes, write a function or tool instead. Every token the LLM spends on mechanical work is a token not spent on analysis, and a chance for hallucination.
+
 ## Rules
+
+### Python Scripts
+- **Use `uv` for dependency management.** Run scripts with `uv run`, add dependencies with inline script metadata or `pyproject.toml`. Never use `pip install` globally or `--break-system-packages`.
+- **Pin all dependencies** with exact versions (e.g., `web3==7.6.0` not `web3`).
+- **Prefer deterministic tools over LLM**: If a Python script can do it, don't use the LLM. Scripts in `scripts/` are the first choice for mechanical tasks.
 
 ### Instruction Files
 - **Protocol-specific addresses should NOT be in config**: Addresses specific to a protocol (like `aavev3_core_instance`) should be hardcoded directly in the instruction files, not added to caliber.yaml config. Only fund-wide addresses (like `caliber_address`, `morpho_address`, helpers) belong in config.

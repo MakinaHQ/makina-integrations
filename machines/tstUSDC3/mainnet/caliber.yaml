@@ -249,6 +249,16 @@ positions:
     instructions: !include "../../../instructions/royco-st-snusd.yaml"
     position_tokens: ["0x3B2df77f0eaA0CA98aAabFFa96B03eaF08ec6c8e"] # ST-sNUSD
 
+  # Grove Staking
+  - id: "184729365018472936501847293650"
+    group_id: "0"
+    description: "Grove USDS Staking"
+    instructions: !include "../../../instructions/grove-staking.yaml"
+    vars:
+      label: "Grove USDS Staking"
+      staking_token_address: ${token_list.mainnet.USDS}
+      staking_contract_address: "0x3bD276885c070Fe3D9bafdc5e699E85D2d776A15"
+
   # Other Positions
   - id: "777"
     group_id: "0"
