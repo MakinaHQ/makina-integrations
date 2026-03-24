@@ -47,7 +47,7 @@ actions:
           - type: "address"
             value: "${constants.nusd_router_address}"
           - type: "uint256"
-            value: "${input_slots.amount_to_deposit}"
+            value: "${input_slots.usdc_amount_to_deposit}"
 
       # Get NUSD balance before mint
       - description: "Get NUSD balance before mint"
@@ -70,9 +70,9 @@ actions:
           - type: "address"
             value: "${constants.usdc_address}"
           - type: "uint256"
-            value: "${input_slots.amount_to_deposit}"
+            value: "${input_slots.usdc_amount_to_deposit}"
           - type: "uint256"
-            value: "0"
+            value: "${input_slots.min_nusd_amount_to_mint}"
           - type: "bytes"
             value: "0x"
 
@@ -144,6 +144,9 @@ actions:
             value: "${returns.caliber_address}"
 
     input_slots:
-      amount_to_deposit:
+      usdc_amount_to_deposit:
         type: "uint256"
         description: "Amount of USDC to deposit (6 decimals)"
+      min_nusd_amount_to_mint:
+        type: "uint256"
+        description: "Minimum amount of NUSD to mint (18 decimals)"

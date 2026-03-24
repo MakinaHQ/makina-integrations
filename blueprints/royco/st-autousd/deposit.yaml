@@ -43,7 +43,7 @@ actions:
           - type: "address"
             value: "${constants.autousd_address}"
           - type: "uint256"
-            value: "${input_slots.amount_to_deposit}"
+            value: "${input_slots.usdc_amount_to_deposit}"
 
       # Step 2: Deposit USDC into autoUSD (ERC4626) -> returns shares
       - description: "Deposit USDC into autoUSD vault to receive autoUSD shares"
@@ -51,7 +51,7 @@ actions:
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"
-            value: "${input_slots.amount_to_deposit}"
+            value: "${input_slots.usdc_amount_to_deposit}"
           - type: "address"
             value: "${returns.caliber_address}"
         return:
@@ -80,6 +80,6 @@ actions:
             value: "${returns.caliber_address}"
 
     input_slots:
-      amount_to_deposit:
+      usdc_amount_to_deposit:
         type: "uint256"
         description: "Amount of USDC to deposit (6 decimals)"
