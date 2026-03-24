@@ -2,6 +2,9 @@
 # Multi-step deposit: USDC -> autoUSD (Tokemak IAutoPool) -> Senior Tranche shares
 # Single-step withdraw: redeem ST -> autoUSD -> USDC (no cooldown)
 # Accounting: tracks ST shares + transient autoUSD, converts to USDC
+#
+# Prerequisites:
+#   - AccessManager role 15192588971413990205 on 0xd567ccbb336eb71ec2537057e2bcf6db840bb71d
 
 # DEPOSIT: USDC -> autoUSD -> Senior Tranche shares
 - is_debt: false
@@ -10,7 +13,7 @@
     - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
-    path: "../../../blueprints/royco/st-autousd/deposit.yaml:deposit"
+    path: "../../../blueprints/royco-v1/st-autousd/deposit.yaml:deposit"
     inputs: {}
 
 # ACCOUNTING: Track position value (ST shares + transient autoUSD), convert to USDC
@@ -20,7 +23,7 @@
     - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
-    path: "../../../blueprints/royco/st-autousd/account.yaml:account"
+    path: "../../../blueprints/royco-v1/st-autousd/account.yaml:account"
     inputs: {}
 
 # WITHDRAW: Redeem ST shares -> autoUSD -> USDC (single transaction, no cooldown)
@@ -30,5 +33,5 @@
     - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
-    path: "../../../blueprints/royco/st-autousd/withdraw.yaml:withdraw"
+    path: "../../../blueprints/royco-v1/st-autousd/withdraw.yaml:withdraw"
     inputs: {}

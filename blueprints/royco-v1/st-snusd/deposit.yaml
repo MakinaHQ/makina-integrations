@@ -1,4 +1,4 @@
-protocol: "royco-st-snusd"
+protocol: "royco-st-snusd-v1"
 
 # Royco Senior Tranche sNUSD Deposit Blueprint
 # Multi-step deposit: USDC -> NUSD (Router.mint) -> sNUSD (ERC4626) -> Senior Tranche shares
@@ -21,7 +21,7 @@ constants:
     value: "0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313"
   senior_tranche_address:
     type: "address"
-    value: "0x2070Af1C865f5d764F673Baf5654822947e71243"
+    value: "0x3B2df77f0eaA0CA98aAabFFa96B03eaF08ec6c8e"
 
 inputs: {}
 
@@ -109,10 +109,12 @@ actions:
       # Deposit sNUSD into Senior Tranche
       - description: "Deposit sNUSD into Senior Tranche to receive ST shares"
         target: "${constants.senior_tranche_address}"
-        selector: "deposit(uint256,address)"
+        selector: "deposit(uint256,address,address)"
         parameters:
           - type: "uint256"
             value: "${returns.snusd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
           - type: "address"
             value: "${returns.caliber_address}"
 

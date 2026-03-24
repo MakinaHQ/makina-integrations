@@ -11,6 +11,9 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  key_value_store_address:
+    type: "address"
+    value: "0x1b52c5d62458675597ce9b25e81af89fdd8c4029"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -67,3 +70,15 @@ positions:
       label: "USDC"
       asset_address: ${token_list.mainnet.USDC}
       aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
+
+  # ── Royco Positions V2 (group_id: 0) ─────────────────────────────
+  - id: "330465051322128162217677944512864209642"
+    group_id: "0"
+    description: "Royco Senior Tranche AutoUSD V2"
+    instructions: !include "../../../instructions/royco-st-autousd.yaml"
+    position_tokens: ["0xa7569A44f348d3D70d8ad5889e50F78E33d80D35", "0x73C641fe41EB0270C7f473f3c3E4A40eb97fd8dE"] # autoUSD, ST-autoUSD
+  - id: "317090420331050517457781837275109534073"
+    group_id: "0"
+    description: "Royco Senior Tranche sNUSD V2"
+    instructions: !include "../../../instructions/royco-st-snusd.yaml"
+    position_tokens: ["0x2070Af1C865f5d764F673Baf5654822947e71243"] # ST-sNUSD

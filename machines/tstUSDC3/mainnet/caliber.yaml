@@ -237,17 +237,29 @@ positions:
     description: "sUSDS/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-susds-usdt.yaml"
 
-  # Royco Positions
+  # Royco Positions V1
   - id: "189274653018274650381927465038"
     group_id: "0"
     description: "Royco Senior Tranche AutoUSD"
-    instructions: !include "../../../instructions/royco-st-autousd.yaml"
+    instructions: !include "../../../instructions/royco-st-autousd-v1.yaml"
     position_tokens: ["0xa7569A44f348d3D70d8ad5889e50F78E33d80D35", "0x0725475f51340f1b228be7cb253bc7c2e3a3610b"] # autoUSD, ST-autoUSD
   - id: "291746583029174658302917465830"
     group_id: "0"
     description: "Royco Senior Tranche sNUSD"
-    instructions: !include "../../../instructions/royco-st-snusd.yaml"
+    instructions: !include "../../../instructions/royco-st-snusd-v1.yaml"
     position_tokens: ["0x3B2df77f0eaA0CA98aAabFFa96B03eaF08ec6c8e"] # ST-sNUSD
+
+  # Royco Positions V2
+  - id: "330465051322128162217677944512864209642"
+    group_id: "0"
+    description: "Royco Senior Tranche AutoUSD V2"
+    instructions: !include "../../../instructions/royco-st-autousd.yaml"
+    position_tokens: ["0x73C641fe41EB0270C7f473f3c3E4A40eb97fd8dE"] # autoUSD, ST-autoUSD
+  - id: "317090420331050517457781837275109534073"
+    group_id: "0"
+    description: "Royco Senior Tranche sNUSD V2"
+    instructions: !include "../../../instructions/royco-st-snusd.yaml"
+    position_tokens: ["0x2070Af1C865f5d764F673Baf5654822947e71243"] # ST-sNUSD
 
   # Grove Staking
   - id: "184729365018472936501847293650"
