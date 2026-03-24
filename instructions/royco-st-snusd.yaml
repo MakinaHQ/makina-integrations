@@ -1,0 +1,48 @@
+# Royco Senior Tranche sNUSD
+# Multi-step deposit: USDC -> NUSD (Router) -> sNUSD (ERC4626) -> Senior Tranche shares
+# Multi-step withdraw: redeem ST -> cooldown sNUSD (10 days) -> unstake
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/deposit.yaml:deposit"
+    inputs: {}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/account.yaml:account"
+    inputs:
+      key_value_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_flag_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.royco-st-snusd.pending_flag)}"
+      request_id_key:
+        type: "bytes32"
+        value: "${keccak256(makina.mainnet.royco-st-snusd.pending_request_id)}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/withdraw.yaml:redeem_st_and_cooldown_snusd"
+    inputs: {}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/withdraw.yaml:unstake_nusd"
+    inputs: {}
