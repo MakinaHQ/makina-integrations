@@ -71,7 +71,7 @@ positions:
       asset_address: ${token_list.mainnet.USDC}
       aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
 
-  # Royco Positions V2
+  # ── Royco Positions V2 (group_id: 0) ─────────────────────────────
   - id: "330465051322128162217677944512864209642"
     group_id: "0"
     description: "Royco Senior Tranche AutoUSD V2"
