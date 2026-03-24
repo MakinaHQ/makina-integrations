@@ -1,0 +1,116 @@
+# InfiniFi liUSD Lock Pool
+# Lock iUSD for unwinding epoch (e.g. 1 week or 3 weeks) to receive liUSD-<lock period in weeks> tokens (e.g. liUSD-1w, liUSD-2w etc) with yield multiplier
+# Withdrawal requires a n-week unwinding period depending on the lock period (2-step process)
+
+# Example positions for caliber.yaml:
+# positions:
+#   - id: "1"
+#     group_id: "0"
+#     description: "InfiniFi liUSD 1-Week Lock"
+#     instructions: !include "../../../instructions/infinifi-liusd.yaml"
+#     vars:
+#       label: "liUSD 1-Week"
+#       weeks: "1"
+#       share_token_address: "0x12b004719fb632f1E7c010c6F5D6009Fb4258442" # liUSD-1w
+#       kv_storage_key: "0xbbfbcd1a973261ae31499f08369f9c5dd4f21c359a61562bcdde45e3e03b5d12" # ${keccak256(makina.mainnet.infinifi.liusd-1w)}
+#   - id: "2"
+#     group_id: "0"
+#     description: "InfiniFi liUSD 4-Week Lock"
+#     instructions: !include "../../../instructions/infinifi-liusd.yaml"
+#     vars:
+#       label: "liUSD 4-Week"
+#       weeks: "4"
+#       share_token_address: "0x66bCF6151D5558AfB47c38B20663589843156078" # liUSD-4w
+#       kv_storage_key: "0x7a6ea5e1b398a04ea2f654f234f38e37ae428d1afc355abab0ac0a198e8df3ef" # ${keccak256(makina.mainnet.infinifi.liusd-4w)}
+
+# DEPOSIT: Lock iUSD to create locked position and receive liUSD-xw shares (e.g. liUSD-1w)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/infinifi/deposit.yaml:deposit_iusd"
+    inputs:
+      unwinding_epochs:
+        type: "uint32"
+        value: ${position.weeks}
+
+# DEPOSIT: Use USDC create locked position and receive liUSD-xw shares (e.g. liUSD-1w)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/infinifi/deposit.yaml:deposit_usdc"
+    inputs:
+      unwinding_epochs:
+        type: "uint32"
+        value: ${position.weeks}
+
+# Account - Query total position value (locked + unwinding)
+# Uses KV store to track unwinding timestamp automatically
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/infinifi/account.yaml:account"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+      unwinding_epochs:
+        type: "uint32"
+        value: ${position.weeks}
+
+# WITHDRAW (Step 1 - Relative): Start unwinding with percentage of shares
+# Start Unwinding Relative - Unwind a percentage of share tokens
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/infinifi/withdraw.yaml:start_unwinding_relative"
+    inputs:
+      share_token_address:
+        type: "address"
+        value: ${position.share_token_address}
+      unwinding_epochs:
+        type: "uint32"
+        value: ${position.weeks}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# COMPLETE WITHDRAW (Step 2) - Claim iUSD after the lock period has elapsed
+# Reads timestamp from KV store and clears it after withdrawal
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x48f9e38f3070AD8945DFEae3FA70987722E3D89c" # iUSD
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/infinifi/withdraw.yaml:complete_withdraw"
+    inputs:
+      share_token_address:
+        type: "address"
+        value: ${position.share_token_address}
+      unwinding_epochs:
+        type: "uint32"
+        value: ${position.weeks}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}

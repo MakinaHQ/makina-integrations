@@ -1,7 +1,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}"
   instruction:
     label: "syrupUSDC/USDC Morpho Loop"
     path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
@@ -13,17 +13,17 @@
 - is_debt: false
   instruction_type: "FLASHLOAN_MANAGEMENT"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}"
   instruction:
     label: "syrupUSDC/USDC Morpho Loop"
     path: "../../../blueprints/morpho-loop/deposit.yaml:loop_in"
     inputs:
-      collateral_vault:
+      collateral_token:
         type: "address"
         value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
-      flash_loan_token:
+      loan_token:
         type: "address"
-        value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+        value: "${token_list.mainnet.USDC}"
       morpho_address:
         type: "address"
         value: "${config.morpho_address}"
@@ -40,7 +40,7 @@
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}"
   instruction:
     label: "syrupUSDC/USDC Morpho Loop"
     path: "../../../blueprints/morpho-loop/account.yaml:account_loop"
@@ -63,3 +63,104 @@
       collateral_token:
         type: "address"
         value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+
+# ── Loop Management ──────────────────────────────────────────────────
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "syrupUSDC/USDC Morpho Loop - Add Collateral"
+    path: "../../../blueprints/morpho-loop/deposit.yaml:add_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+      loan_token:
+        type: "address"
+        value: "${token_list.mainnet.USDC}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "syrupUSDC/USDC Morpho Loop - Borrow"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "syrupUSDC/USDC Morpho Loop - Repay"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44"
+      loan_token:
+        type: "address"
+        value: "${token_list.mainnet.USDC}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "syrupUSDC/USDC Morpho Loop - Withdraw Collateral"
+    path: "../../../blueprints/morpho-loop/withdraw.yaml:withdraw_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"

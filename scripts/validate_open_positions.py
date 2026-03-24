@@ -28,12 +28,13 @@ import yaml
 # "machines/dusd/mainnet/rootfiles/20260311-batch.toml"
 ROOTFILE_PATH_RE = re.compile(r"^machines/([^/]+)/([^/]+)/rootfiles/([^/]+\.toml)$")
 
-# Each chain must declare its own RPC env var(s). The first set var wins.
-CHAIN_RPC_ENV_VARS = {
-    "mainnet": ("ETHEREUM_MAINNET_RPC_URL",),
-    "base": ("BASE_RPC_URL",),
-    "arbitrum": ("ARBITRUM_RPC_URL",),
-    "monad": ("MONAD_RPC_URL",),
+# Alchemy kebabCaseId per chain — used to build the RPC URL from a single
+# ALCHEMY_API_KEY secret: https://{slug}.g.alchemy.com/v2/{key}
+CHAIN_ALCHEMY_SLUG = {
+    "mainnet": "eth-mainnet",
+    "base": "base-mainnet",
+    "arbitrum": "arb-mainnet",
+    "monad": "monad-mainnet",
 }
 
 # Minimal ABI for the Caliber contract — only the functions needed to
@@ -278,17 +279,15 @@ def validate_target(target: RootfileTarget, reader: CaliberReader) -> Validation
 
 
 def resolve_rpc_url(chain: str) -> str:
-    env_var_names = CHAIN_RPC_ENV_VARS.get(chain)
-    if env_var_names is None:
-        raise RuntimeError(f"unsupported chain '{chain}'. Supported: {', '.join(CHAIN_RPC_ENV_VARS)}")
+    slug = CHAIN_ALCHEMY_SLUG.get(chain)
+    if slug is None:
+        raise RuntimeError(f"unsupported chain '{chain}'. Supported: {', '.join(CHAIN_ALCHEMY_SLUG)}")
 
-    for env_var_name in env_var_names:
-        value = os.getenv(env_var_name)
-        if value:
-            return value
+    api_key = os.getenv("ALCHEMY_API_KEY")
+    if not api_key:
+        raise RuntimeError("missing ALCHEMY_API_KEY environment variable")
 
-    env_var_list = ", ".join(env_var_names)
-    raise RuntimeError(f"missing RPC URL for chain '{chain}'. Set one of: {env_var_list}")
+    return f"https://{slug}.g.alchemy.com/v2/{api_key}"
 
 
 def print_result(result: ValidationResult) -> None:

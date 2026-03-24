@@ -1,0 +1,20 @@
+# this is a generated file - do not edit manually
+# root: 0xdeadbeef
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.mainnet.USDT}"]
+chainId = 1
+address = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+name = "Tether USD"
+decimals = 6
+symbol = "USDT"
+
+[instructions.morpho.deposit_vault."USDC Vault"]
+position_id = "123"
+description = "Test"
