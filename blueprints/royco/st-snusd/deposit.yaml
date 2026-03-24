@@ -7,6 +7,9 @@ constants:
   context_helper_address:
     type: "address"
     value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
   usdc_address:
     type: "address"
     value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
@@ -46,6 +49,17 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_to_deposit}"
 
+      # Get NUSD balance before mint
+      - description: "Get NUSD balance before mint"
+        target: "${constants.nusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "nusd_before"
+          type: "uint256"
+
       # Mint NUSD from USDC via Router
       - description: "Mint NUSD from USDC via Neutrl Router"
         target: "${constants.nusd_router_address}"
@@ -62,13 +76,26 @@ actions:
           - type: "bytes"
             value: "0x"
 
-      # Get NUSD balance received from mint
+      # Get NUSD balance after mint
       - description: "Get NUSD balance after mint"
         target: "${constants.nusd_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
             value: "${returns.caliber_address}"
+        return:
+          name: "nusd_after"
+          type: "uint256"
+
+      # Calculate NUSD received from redeem (after - before)
+      - description: "Calculate NUSD received via mint"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.nusd_after}"
+          - type: "uint256"
+            value: "${returns.nusd_before}"
         return:
           name: "nusd_balance"
           type: "uint256"

@@ -15,12 +15,6 @@ constants:
   caliber_helper_address:
     type: "address"
     value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
-  usdc_address:
-    type: "address"
-    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-  nusd_router_address:
-    type: "address"
-    value: "0xa052883ebEe7354FC2Aa0f9c727E657FdeCa744a"
   snusd_address:
     type: "address"
     value: "0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313"
@@ -28,13 +22,7 @@ constants:
     type: "address"
     value: "0x2070Af1C865f5d764F673Baf5654822947e71243"
 
-inputs:
-  key_value_store_address:
-    type: "address"
-  pending_flag_key:
-    type: "bytes32"
-  request_id_key:
-    type: "bytes32"
+inputs: {}
 
 actions:
   account:
