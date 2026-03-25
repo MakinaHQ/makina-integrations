@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x3b34232ef8a5fd58c1b8b278ef7c0e18adc43fe6df0aa1392d4b18c2cab6d48a
+# root: 0x234fbc35f5e9373cc3219b1799f75e90579e756597b6992b1278e197163f2981
 
 [tokens."${token_list.mainnet.AUSD}"]
 chainId = 1
@@ -1086,7 +1086,7 @@ affected_tokens = ["0xdc035d45d973e3ec169d2276ddab16f1e407384f"]
 position_tokens = ["0xa3931d71877c0e7a3148cb7eb4463524fec27fbd"]
 commands = [
   "0x70a082310102ff0000000002a3931d71877c0e7a3148cb7eb4463524fec27fbd",
-  "0x4cdad5060102ff0000000000a3931d71877c0e7a3148cb7eb4463524fec27fbd",
+  "0x07a2d13a0102ff0000000000a3931d71877c0e7a3148cb7eb4463524fec27fbd",
 ]
 state = [
   "0x",

@@ -19,9 +19,9 @@ actions:
           name: "vault_balance"
           type: "uint256"
 
-      - description: "Preview redeem to get USDS value of sUSDS position"
+      - description: "Get USDS value of sUSDS position"
         target: "${inputs.vault_address}"
-        selector: "previewRedeem(uint256)"
+        selector: "convertToAssets(uint256)"
         parameters:
           - type: "uint256"
             value: "${returns.vault_balance}"
