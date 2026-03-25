@@ -1,0 +1,39 @@
+protocol: "sky-susds"
+
+constants:
+  susds_address:
+    type: "address"
+    value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+
+inputs:
+  subject:
+    type: "address"
+
+actions:
+  account_vault:
+    calls:
+      - description: "Query caliber balance of sUSDS shares"
+        target: "${constants.susds_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "vault_balance"
+          type: "uint256"
+
+      - description: "Convert sUSDS shares to USDS value"
+        target: "${constants.susds_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_balance}"
+        return:
+          name: "usds_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usds_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

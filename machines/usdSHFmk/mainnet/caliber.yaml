@@ -87,6 +87,16 @@ positions:
       asset_address: ${token_list.mainnet.AUSD}
       vault_address: "0xBEEFF0DeaC1aBa71EF0D88C4291354eb92ef4589"
 
+  # Sky sUSDS
+  - id: "58188995019498269351990998811241544400028025897498018048504265407011379025921"
+    group_id: "0"
+    description: "Sky - sUSDS Savings Vault"
+    instructions: !include "../../../instructions/susds-vault.yaml"
+    position_tokens: ["0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"]
+    vars:
+      label: "sUSDS Savings"
+      referral_code: "2222"
+
   # Grove
   - id: "92407834921349093201686868411404863822331731626374400060155600152279197405795"
     group_id: "0"

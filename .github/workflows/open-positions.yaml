@@ -3,22 +3,32 @@
 #
 # Required repo secret:
 #   - ALCHEMY_API_KEY
+#
+# Fork PRs require the "safe-to-test" label before this workflow will run.
+# Same-repo PRs run automatically. Adding the label to a fork PR (re-)triggers
+# the workflow via the `labeled` activity type.
 
 name: Open Positions
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 jobs:
   validate-open-positions:
     name: Validate open positions coverage in latest added rootfiles
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(github.event.pull_request.labels.*.name, 'safe-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout config repo
+      - name: Checkout PR head
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0 # full history needed to diff against base branch
 
       # Detect which rootfile TOMLs were added (not modified) in this PR
@@ -29,7 +39,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
         run: |
-          if [ "$EVENT_NAME" = "pull_request" ]; then
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
             ADDED_FILES=$(git diff --name-only --diff-filter=A "origin/$BASE_REF" -- 'machines/*/*/rootfiles/*.toml')
           else
             ADDED_FILES=""

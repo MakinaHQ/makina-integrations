@@ -1,0 +1,62 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/deposit.yaml:deposit_vault"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: ${config.caliber_address}
+      referral_code:
+        type: "uint16"
+        value: ${position.referral_code}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.USDS}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/account.yaml:account_vault"
+    inputs:
+      subject:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:redeem_vault"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:withdraw_vault"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: ${config.caliber_address}
