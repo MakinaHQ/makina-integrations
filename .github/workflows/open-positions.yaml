@@ -4,33 +4,24 @@
 # Required repo secret:
 #   - ALCHEMY_API_KEY
 #
-# Required repo configuration:
-#   - A "pr-validation" environment with required reviewers (Settings > Environments).
-#     Fork PRs are gated behind this environment's approval rules. Same-repo PRs
-#     skip the gate and run immediately.
+# Fork PRs require the "safe-to-test" label before this workflow will run.
+# Same-repo PRs run automatically. Adding the label to a fork PR (re-)triggers
+# the workflow via the `labeled` activity type.
 
 name: Open Positions
 
 on:
   pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 jobs:
-  # Approval gate that only activates for fork PRs. Same-repo PRs and
-  # workflow_dispatch runs skip this job entirely.
-  approve-fork:
-    if: >-
-      github.event_name == 'pull_request_target' &&
-      github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: ubuntu-latest
-    environment: pr-validation
-    steps:
-      - run: echo "Fork PR approved for validation."
-
   validate-open-positions:
     name: Validate open positions coverage in latest added rootfiles
-    needs: [approve-fork]
-    if: ${{ !cancelled() && (needs.approve-fork.result == 'success' || needs.approve-fork.result == 'skipped') }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(github.event.pull_request.labels.*.name, 'safe-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
