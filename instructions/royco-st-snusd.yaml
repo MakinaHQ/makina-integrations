@@ -5,7 +5,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}" # USDC
   instruction:
     label: "ROY-ST-sNUSD"
     path: "../../../blueprints/royco/st-snusd/deposit.yaml:deposit"
@@ -14,25 +14,27 @@
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+    - "${token_list.mainnet.NUSD}" # NUSD
   instruction:
     label: "ROY-ST-sNUSD"
     path: "../../../blueprints/royco/st-snusd/account.yaml:account"
-    inputs:
-      key_value_store_address:
-        type: "address"
-        value: "${config.key_value_store_address}"
-      pending_flag_key:
-        type: "bytes32"
-        value: "${keccak256(makina.mainnet.royco-st-snusd.pending_flag)}"
-      request_id_key:
-        type: "bytes32"
-        value: "${keccak256(makina.mainnet.royco-st-snusd.pending_request_id)}"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + use NAV field for USDC value + cooldown NUSD
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+    - "${token_list.mainnet.NUSD}" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD-NAV"
+    path: "../../../blueprints/royco/st-snusd/account-nav.yaml:account_nav"
+    inputs: {}
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+    - "${token_list.mainnet.NUSD}" # NUSD
   instruction:
     label: "ROY-ST-sNUSD"
     path: "../../../blueprints/royco/st-snusd/withdraw.yaml:redeem_st_and_cooldown_snusd"
@@ -41,7 +43,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE" # NUSD
+    - "${token_list.mainnet.NUSD}" # NUSD
   instruction:
     label: "ROY-ST-sNUSD"
     path: "../../../blueprints/royco/st-snusd/withdraw.yaml:unstake_nusd"

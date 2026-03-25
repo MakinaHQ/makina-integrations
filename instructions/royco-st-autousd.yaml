@@ -7,7 +7,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
     path: "../../../blueprints/royco/st-autousd/deposit.yaml:deposit"
@@ -17,17 +17,27 @@
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
     path: "../../../blueprints/royco/st-autousd/account.yaml:account"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + use NAV field for accurate USDC valuation
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-autoUSD-NAV"
+    path: "../../../blueprints/royco/st-autousd/account-nav.yaml:account_nav"
     inputs: {}
 
 # WITHDRAW: Redeem ST shares -> autoUSD -> USDC (single transaction, no cooldown)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    - "${token_list.mainnet.USDC}" # USDC
   instruction:
     label: "ROY-ST-autoUSD"
     path: "../../../blueprints/royco/st-autousd/withdraw.yaml:withdraw"
