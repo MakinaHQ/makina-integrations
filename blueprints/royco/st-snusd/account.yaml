@@ -12,9 +12,9 @@ constants:
   unsigned_math_helper_address:
     type: "address"
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
-  caliber_helper_address:
+  bytes32_helper_address:
     type: "address"
-    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
   snusd_address:
     type: "address"
     value: "0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313"
@@ -60,8 +60,8 @@ actions:
 
       # Extract stAssets (index 0) from the tuple
       - description: "Extract stAssets (sNUSD amount) from asset claims tuple"
-        target: "${constants.caliber_helper_address}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
         parameters:
           - type: "(uint256,uint256,uint256)"
             value: "${returns.asset_claims}"
@@ -69,6 +69,32 @@ actions:
             value: "0"
         return:
           name: "st_assets"
+          type: "uint256"
+
+      # Extract jtAssets (index 1) from the tuple (amount is zero in loss-less case but can be non-zero in loss-making case as st gets jt assets)
+      - description: "Extract jtAssets (sNUSD amount) from asset claims tuple"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "jt_assets"
+          type: "uint256"
+
+      # Calculate total tranche assets (stAssets + jtAssets)
+      - description: "Calculate total tranche assets (stAssets + jtAssets)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_assets}"
+          - type: "uint256"
+            value: "${returns.jt_assets}"
+        return:
+          name: "total_tranche_assets"
           type: "uint256"
 
       # Get cooldown state tuple (cooldownEnd, underlyingAmount)
@@ -84,8 +110,8 @@ actions:
 
       # Extract underlyingAmount (index 1) from cooldown tuple
       - description: "Extract NUSD amount locked in cooldown"
-        target: "${constants.caliber_helper_address}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
         parameters:
           - type: "(uint256,uint256)"
             value: "${returns.cooldown_data}"
@@ -95,13 +121,13 @@ actions:
           name: "cooldown_nusd"
           type: "uint256"
 
-      # Convert ST's sNUSD claim (stAssets) to NUSD value
+      # Convert ST's sNUSD claim to NUSD value
       - description: "Convert stAssets (sNUSD) to NUSD value"
         target: "${constants.snusd_address}"
         selector: "convertToAssets(uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.st_assets}"
+            value: "${returns.total_tranche_assets}"
         return:
           name: "nusd_from_st"
           type: "uint256"
