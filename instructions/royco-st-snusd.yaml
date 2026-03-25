@@ -11,15 +11,6 @@
     path: "../../../blueprints/royco/st-snusd/deposit.yaml:deposit"
     inputs: {}
 
-- is_debt: false
-  instruction_type: "ACCOUNTING"
-  affected_tokens:
-    - "${token_list.mainnet.NUSD}" # NUSD
-  instruction:
-    label: "ROY-ST-sNUSD"
-    path: "../../../blueprints/royco/st-snusd/account.yaml:account"
-    inputs: {}
-
 # NAV-BASED ACCOUNTING: Sync tranche + use NAV field for USDC value + cooldown NUSD
 - is_debt: false
   instruction_type: "ACCOUNTING"

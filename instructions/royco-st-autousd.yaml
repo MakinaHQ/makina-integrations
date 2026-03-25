@@ -13,16 +13,6 @@
     path: "../../../blueprints/royco/st-autousd/deposit.yaml:deposit"
     inputs: {}
 
-# ACCOUNTING: Track position value (ST shares + transient autoUSD), convert to USDC
-- is_debt: false
-  instruction_type: "ACCOUNTING"
-  affected_tokens:
-    - "${token_list.mainnet.USDC}" # USDC
-  instruction:
-    label: "ROY-ST-autoUSD"
-    path: "../../../blueprints/royco/st-autousd/account.yaml:account"
-    inputs: {}
-
 # NAV-BASED ACCOUNTING: Sync tranche + use NAV field for accurate USDC valuation
 - is_debt: false
   instruction_type: "ACCOUNTING"
