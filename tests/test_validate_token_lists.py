@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -240,7 +241,10 @@ class ValidateTokenListsTests(unittest.TestCase):
             }
         )
 
-        with mock.patch.dict("os.environ", {"ALCHEMY_API_KEY": "key"}, clear=False):
+        env_patch = {"ALCHEMY_API_KEY": "key"}
+        if "GITHUB_STEP_SUMMARY" in os.environ:
+            env_patch["GITHUB_STEP_SUMMARY"] = ""
+        with mock.patch.dict("os.environ", env_patch, clear=False):
             with mock.patch.object(
                 validate_token_lists,
                 "fetch_network_config",
