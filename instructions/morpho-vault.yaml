@@ -63,3 +63,18 @@
       unsigned_math_helper:
         type: "address"
         value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"

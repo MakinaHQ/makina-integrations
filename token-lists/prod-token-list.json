@@ -61,6 +61,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xe343167631d89B6Ffc58B88d6b7fB0228795491D",
+      "name": "Global Dollar",
+      "decimals": 6,
+      "symbol": "USDG"
+    },
+    {
+      "chainId": 1,
       "address": "0xdC035D45d973E3EC169d2276DDab16f1e407384F",
       "name": "USDS Stablecoin",
       "decimals": 18,
