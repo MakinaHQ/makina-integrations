@@ -1,0 +1,71 @@
+# Validates token list entries against on-chain ERC-20 metadata.
+# Catches copy-paste bugs where an address from one chain ends up in another,
+# or where name/symbol/decimals are stale or incorrect.
+
+name: Token List
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-token-list:
+    name: Validate token list entries against on-chain data
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only --diff-filter=AM "origin/$BASE_REF" -- 'token-lists/*.json')
+            SCRIPT_CHANGED=$(git diff --name-only "origin/$BASE_REF" -- 'scripts/validate_token_list.py' 'tests/test_validate_token_list.py')
+          else
+            CHANGED_FILES=""
+            SCRIPT_CHANGED=""
+          fi
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "changed_files=" >> "$GITHUB_OUTPUT"
+            echo "changed_files_count=0" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "changed_files<<TOKEN_LIST_EOF"
+              echo "$CHANGED_FILES"
+              echo "TOKEN_LIST_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "changed_files_count=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -n "$SCRIPT_CHANGED" ]; then
+            echo "script_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "script_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install uv
+        if: steps.changes.outputs.changed_files_count > 0 || steps.changes.outputs.script_changed == 'true'
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run unit tests
+        if: steps.changes.outputs.changed_files_count > 0 || steps.changes.outputs.script_changed == 'true'
+        run: uv run --with 'web3==7.14.1' python -m unittest tests.test_validate_token_list -v
+
+      - name: Validate token list entries
+        if: steps.changes.outputs.changed_files_count > 0
+        env:
+          CHANGED_TOKEN_LISTS: ${{ steps.changes.outputs.changed_files }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        run: uv run --with 'web3==7.14.1' python scripts/validate_token_list.py ${CHANGED_TOKEN_LISTS}
+
+      - name: Skip when no token lists changed
+        if: steps.changes.outputs.changed_files_count == 0 && steps.changes.outputs.script_changed == 'false'
+        run: echo "No added/modified token lists to validate."
