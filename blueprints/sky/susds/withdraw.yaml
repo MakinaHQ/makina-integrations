@@ -1,0 +1,194 @@
+protocol: "sky-susds"
+
+inputs:
+  usds_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  psm_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper:
+    type: "address"
+
+actions:
+  redeem_vault:
+    calls:
+      - description: "Redeem sUSDS shares for USDS"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "usds_received"
+          type: "uint256"
+
+      - description: "Approve USDS to PSM wrapper"
+        target: "${inputs.usds_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.psm_address}"
+          - type: "uint256"
+            value: "${returns.usds_received}"
+
+      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usds_received}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "1000000000000"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+      - description: "Swap USDS to USDC via PSM (buyGem)"
+        target: "${inputs.psm_address}"
+        selector: "buyGem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "The number of sUSDS shares to redeem (redeemed to USDS, then swapped to USDC via PSM)"
+
+  redeem_vault_relative:
+    calls:
+      - description: "Query caliber balance of sUSDS shares"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+
+      - description: "Compute the amount of shares to redeem based on the input percentage"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem computed sUSDS shares for USDS"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "usds_received"
+          type: "uint256"
+
+      - description: "Approve USDS to PSM wrapper"
+        target: "${inputs.usds_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.psm_address}"
+          - type: "uint256"
+            value: "${returns.usds_received}"
+
+      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usds_received}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "1000000000000"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+      - description: "Swap USDS to USDC via PSM (buyGem)"
+        target: "${inputs.psm_address}"
+        selector: "buyGem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "The percentage of sUSDS shares to redeem, in basis points (10000 bps = 100%). Redeemed to USDS, then swapped to USDC via PSM."
+
+  withdraw_vault:
+    calls:
+      - description: "Withdraw USDS assets from the sUSDS vault"
+        target: "${inputs.vault_address}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usds_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Approve USDS to PSM wrapper"
+        target: "${inputs.usds_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.psm_address}"
+          - type: "uint256"
+            value: "${input_slots.usds_to_withdraw}"
+
+      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
+        target: "${inputs.unsigned_math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usds_to_withdraw}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "1000000000000"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+      - description: "Swap USDS to USDC via PSM (buyGem)"
+        target: "${inputs.psm_address}"
+        selector: "buyGem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+    input_slots:
+      usds_to_withdraw:
+        type: "uint256"
+        description: "The amount of USDS assets to withdraw from the sUSDS vault (then swapped to USDC via PSM)"

@@ -1,0 +1,69 @@
+protocol: "sky-susds"
+
+inputs:
+  usdc_address:
+    type: "address"
+  usds_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  psm_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit_vault:
+    calls:
+      - description: "Approve USDC to PSM wrapper"
+        target: "${inputs.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.psm_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Swap USDC to USDS via PSM (sellGem)"
+        target: "${inputs.psm_address}"
+        selector: "sellGem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Query USDS balance received by caliber"
+        target: "${inputs.usds_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "usds_balance"
+          type: "uint256"
+
+      - description: "Approve USDS to sUSDS vault"
+        target: "${inputs.usds_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${returns.usds_balance}"
+
+      - description: "Deposit USDS into sUSDS vault with referral code 2222"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address,uint16)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usds_balance}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint16"
+            value: "2222"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (converted to USDS via PSM, then staked to sUSDS)"

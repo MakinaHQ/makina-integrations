@@ -32,6 +32,13 @@
       "symbol": "USDS"
     },
     {
+      "chainId": 1,
+      "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+      "name": "Savings USDS",
+      "decimals": 18,
+      "symbol": "sUSDS"
+    },
+    {
       "chainId": 42161,
       "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       "name": "USD Coin",

@@ -1,0 +1,113 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.usdc_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/deposit.yaml:deposit_vault"
+    inputs:
+      usdc_address:
+        type: "address"
+        value: ${position.usdc_address}
+      usds_address:
+        type: "address"
+        value: ${position.usds_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      psm_address:
+        type: "address"
+        value: ${position.psm_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.usdc_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/account.yaml:account_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.usdc_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:redeem_vault"
+    inputs:
+      usds_address:
+        type: "address"
+        value: ${position.usds_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      psm_address:
+        type: "address"
+        value: ${position.psm_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.usdc_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      usds_address:
+        type: "address"
+        value: ${position.usds_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      psm_address:
+        type: "address"
+        value: ${position.psm_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.usdc_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/sky/susds/withdraw.yaml:withdraw_vault"
+    inputs:
+      usds_address:
+        type: "address"
+        value: ${position.usds_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      psm_address:
+        type: "address"
+        value: ${position.psm_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
