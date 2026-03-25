@@ -5,8 +5,6 @@ inputs:
     type: "address"
   subject:
     type: "address"
-  unsigned_math_helper:
-    type: "address"
 
 actions:
   account_vault:

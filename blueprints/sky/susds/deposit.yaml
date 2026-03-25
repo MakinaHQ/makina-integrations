@@ -22,16 +22,6 @@ inputs:
 actions:
   deposit_vault:
     calls:
-      - description: "Query USDS balance held by caliber before swap"
-        target: "${inputs.usds_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-        return:
-          name: "usds_balance_before"
-          type: "uint256"
-
       - description: "Approve USDC to PSM wrapper"
         target: "${inputs.usdc_address}"
         selector: "approve(address,uint256)"
@@ -49,25 +39,6 @@ actions:
             value: "${inputs.caliber_address}"
           - type: "uint256"
             value: "${input_slots.amount_to_deposit}"
-
-      - description: "Query USDS balance held by caliber after swap"
-        target: "${inputs.usds_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-        return:
-          name: "usds_balance_after"
-          type: "uint256"
-
-      - description: "Compute USDS received from swap"
-        target: "${constants.math_helper_address}"
-        selector: "sub(uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.usds_balance_after}"
-          - type: "uint256"
-            value: "${returns.usds_balance_before}"
         return:
           name: "usds_received"
           type: "uint256"
