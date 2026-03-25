@@ -3,22 +3,41 @@
 #
 # Required repo secret:
 #   - ALCHEMY_API_KEY
+#
+# Required repo configuration:
+#   - A "pr-validation" environment with required reviewers (Settings > Environments).
+#     Fork PRs are gated behind this environment's approval rules. Same-repo PRs
+#     skip the gate and run immediately.
 
 name: Open Positions
 
 on:
-  pull_request:
+  pull_request_target:
   workflow_dispatch:
 
 jobs:
+  # Approval gate that only activates for fork PRs. Same-repo PRs and
+  # workflow_dispatch runs skip this job entirely.
+  approve-fork:
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    environment: pr-validation
+    steps:
+      - run: echo "Fork PR approved for validation."
+
   validate-open-positions:
     name: Validate open positions coverage in latest added rootfiles
+    needs: [approve-fork]
+    if: ${{ !cancelled() && (needs.approve-fork.result == 'success' || needs.approve-fork.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout config repo
+      - name: Checkout PR head
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0 # full history needed to diff against base branch
 
       # Detect which rootfile TOMLs were added (not modified) in this PR
@@ -29,7 +48,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
         run: |
-          if [ "$EVENT_NAME" = "pull_request" ]; then
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
             ADDED_FILES=$(git diff --name-only --diff-filter=A "origin/$BASE_REF" -- 'machines/*/*/rootfiles/*.toml')
           else
             ADDED_FILES=""
