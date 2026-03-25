@@ -1,8 +1,11 @@
 protocol: "sky-susds"
 
-inputs:
-  vault_address:
+constants:
+  susds_address:
     type: "address"
+    value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+
+inputs:
   subject:
     type: "address"
 
@@ -10,7 +13,7 @@ actions:
   account_vault:
     calls:
       - description: "Query caliber balance of sUSDS shares"
-        target: "${inputs.vault_address}"
+        target: "${constants.susds_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
@@ -19,8 +22,8 @@ actions:
           name: "vault_balance"
           type: "uint256"
 
-      - description: "Get USDS value of sUSDS position"
-        target: "${inputs.vault_address}"
+      - description: "Convert sUSDS shares to USDS value"
+        target: "${constants.susds_address}"
         selector: "convertToAssets(uint256)"
         parameters:
           - type: "uint256"

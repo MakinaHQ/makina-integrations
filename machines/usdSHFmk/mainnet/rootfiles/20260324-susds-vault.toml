@@ -29,13 +29,6 @@ name = "Tether USD"
 decimals = 6
 symbol = "USDT"
 
-[tokens."${token_list.mainnet.sUSDS}"]
-chainId = 1
-address = "0xa3931d71877c0e7a3148cb7eb4463524fec27fbd"
-name = "Savings USDS"
-decimals = 18
-symbol = "sUSDS"
-
 [instructions.grove-staking.account."USDS Staking"]
 position_id = "92407834921349093201686868411404863822331731626374400060155600152279197405795"
 description = "Grove - USDS Staking"

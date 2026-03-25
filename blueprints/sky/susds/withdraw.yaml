@@ -4,14 +4,17 @@ constants:
   math_helper_address:
     type: "address"
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
-
-inputs:
   usds_address:
     type: "address"
-  vault_address:
+    value: "0xdC035D45d973E3EC169d2276DDab16f1e407384F"
+  susds_address:
     type: "address"
+    value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
   psm_address:
     type: "address"
+    value: "0xA188EEC8F81263234dA3622A406892F3D630f98c"
+
+inputs:
   caliber_address:
     type: "address"
 
@@ -19,7 +22,7 @@ actions:
   redeem_vault:
     calls:
       - description: "Redeem sUSDS shares for USDS"
-        target: "${inputs.vault_address}"
+        target: "${constants.susds_address}"
         selector: "redeem(uint256,address,address)"
         parameters:
           - type: "uint256"
@@ -33,11 +36,11 @@ actions:
           type: "uint256"
 
       - description: "Approve USDS to PSM wrapper"
-        target: "${inputs.usds_address}"
+        target: "${constants.usds_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.psm_address}"
+            value: "${constants.psm_address}"
           - type: "uint256"
             value: "${returns.usds_received}"
 
@@ -56,7 +59,7 @@ actions:
           type: "uint256"
 
       - description: "Swap USDS to USDC via PSM (buyGem)"
-        target: "${inputs.psm_address}"
+        target: "${constants.psm_address}"
         selector: "buyGem(address,uint256)"
         parameters:
           - type: "address"
@@ -72,7 +75,7 @@ actions:
   redeem_vault_relative:
     calls:
       - description: "Query caliber balance of sUSDS shares"
-        target: "${inputs.vault_address}"
+        target: "${constants.susds_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
@@ -96,7 +99,7 @@ actions:
           type: "uint256"
 
       - description: "Redeem computed sUSDS shares for USDS"
-        target: "${inputs.vault_address}"
+        target: "${constants.susds_address}"
         selector: "redeem(uint256,address,address)"
         parameters:
           - type: "uint256"
@@ -110,11 +113,11 @@ actions:
           type: "uint256"
 
       - description: "Approve USDS to PSM wrapper"
-        target: "${inputs.usds_address}"
+        target: "${constants.usds_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.psm_address}"
+            value: "${constants.psm_address}"
           - type: "uint256"
             value: "${returns.usds_received}"
 
@@ -133,7 +136,7 @@ actions:
           type: "uint256"
 
       - description: "Swap USDS to USDC via PSM (buyGem)"
-        target: "${inputs.psm_address}"
+        target: "${constants.psm_address}"
         selector: "buyGem(address,uint256)"
         parameters:
           - type: "address"
@@ -149,7 +152,7 @@ actions:
   withdraw_vault:
     calls:
       - description: "Withdraw USDS assets from the sUSDS vault"
-        target: "${inputs.vault_address}"
+        target: "${constants.susds_address}"
         selector: "withdraw(uint256,address,address)"
         parameters:
           - type: "uint256"
@@ -160,11 +163,11 @@ actions:
             value: "${inputs.caliber_address}"
 
       - description: "Approve USDS to PSM wrapper"
-        target: "${inputs.usds_address}"
+        target: "${constants.usds_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.psm_address}"
+            value: "${constants.psm_address}"
           - type: "uint256"
             value: "${input_slots.usds_to_withdraw}"
 
@@ -183,7 +186,7 @@ actions:
           type: "uint256"
 
       - description: "Swap USDS to USDC via PSM (buyGem)"
-        target: "${inputs.psm_address}"
+        target: "${constants.psm_address}"
         selector: "buyGem(address,uint256)"
         parameters:
           - type: "address"
