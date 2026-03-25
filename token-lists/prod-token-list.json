@@ -75,6 +75,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+      "name": "Savings USDS",
+      "decimals": 18,
+      "symbol": "sUSDS"
+    },
+    {
+      "chainId": 1,
       "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "name": "Tether USD",
       "decimals": 6,

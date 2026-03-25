@@ -4,22 +4,31 @@
 #
 # Required repo secret:
 #   - ALCHEMY_API_KEY
+#
+# Fork PRs require the "safe-to-test" label before this workflow will run.
+# Same-repo PRs run automatically.
 
 name: Token Lists
 
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
 jobs:
   validate-token-lists:
     name: Validate changed token lists
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository ||
+      contains(github.event.pull_request.labels.*.name, 'safe-to-test')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout
+      - name: Checkout PR head
         uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
       - name: Detect changes
@@ -28,7 +37,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
         run: |
-          if [ "$EVENT_NAME" = "pull_request" ]; then
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
             CHANGED_FILES=$(git diff --name-only --diff-filter=AM "origin/$BASE_REF" -- 'token-lists/*.json')
             SCRIPT_CHANGED=$(git diff --name-only "origin/$BASE_REF" -- 'scripts/validate_token_lists.py' 'tests/test_validate_token_lists.py')
           else
