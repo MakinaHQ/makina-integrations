@@ -31,22 +31,8 @@ actions:
           name: "usds_value"
           type: "uint256"
 
-      - description: "Convert USDS value (18 decimals) to USDC value (6 decimals)"
-        target: "${inputs.unsigned_math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.usds_value}"
-          - type: "uint256"
-            value: "1"
-          - type: "uint256"
-            value: "1000000000000"
-        return:
-          name: "usdc_value"
-          type: "uint256"
-
     reserved_slots:
       - type: "uint256"
-        value: "${returns.usdc_value}"
+        value: "${returns.usds_value}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"

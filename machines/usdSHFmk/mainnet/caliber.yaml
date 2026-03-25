@@ -95,10 +95,9 @@ positions:
     position_tokens: ["0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"]
     vars:
       label: "sUSDS Savings"
-      usdc_address: ${token_list.mainnet.USDC}
-      usds_address: ${token_list.mainnet.USDS}
       vault_address: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
       psm_address: "0xA188EEC8F81263234dA3622A406892F3D630f98c"
+      referral_code: "2222"
 
   # Grove
   - id: "92407834921349093201686868411404863822331731626374400060155600152279197405795"

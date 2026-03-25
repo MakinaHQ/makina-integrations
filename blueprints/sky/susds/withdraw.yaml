@@ -38,20 +38,6 @@ actions:
           - type: "uint256"
             value: "${returns.usds_received}"
 
-      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
-        target: "${inputs.unsigned_math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.usds_received}"
-          - type: "uint256"
-            value: "1"
-          - type: "uint256"
-            value: "1000000000000"
-        return:
-          name: "usdc_amount"
-          type: "uint256"
-
       - description: "Swap USDS to USDC via PSM (buyGem)"
         target: "${inputs.psm_address}"
         selector: "buyGem(address,uint256)"
@@ -59,12 +45,15 @@ actions:
           - type: "address"
             value: "${inputs.caliber_address}"
           - type: "uint256"
-            value: "${returns.usdc_amount}"
+            value: "${input_slots.min_usdc_amount_to_receive}"
 
     input_slots:
       shares_to_redeem:
         type: "uint256"
         description: "The number of sUSDS shares to redeem (redeemed to USDS, then swapped to USDC via PSM)"
+      min_usdc_amount_to_receive:
+        type: "uint256"
+        description: "Minimum amount of USDC to receive (6 decimals, slippage protection)"
 
   redeem_vault_relative:
     calls:
@@ -115,20 +104,6 @@ actions:
           - type: "uint256"
             value: "${returns.usds_received}"
 
-      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
-        target: "${inputs.unsigned_math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.usds_received}"
-          - type: "uint256"
-            value: "1"
-          - type: "uint256"
-            value: "1000000000000"
-        return:
-          name: "usdc_amount"
-          type: "uint256"
-
       - description: "Swap USDS to USDC via PSM (buyGem)"
         target: "${inputs.psm_address}"
         selector: "buyGem(address,uint256)"
@@ -136,12 +111,15 @@ actions:
           - type: "address"
             value: "${inputs.caliber_address}"
           - type: "uint256"
-            value: "${returns.usdc_amount}"
+            value: "${input_slots.min_usdc_amount_to_receive}"
 
     input_slots:
       bps_to_redeem:
         type: "uint256"
         description: "The percentage of sUSDS shares to redeem, in basis points (10000 bps = 100%). Redeemed to USDS, then swapped to USDC via PSM."
+      min_usdc_amount_to_receive:
+        type: "uint256"
+        description: "Minimum amount of USDC to receive (6 decimals, slippage protection)"
 
   withdraw_vault:
     calls:
@@ -165,20 +143,6 @@ actions:
           - type: "uint256"
             value: "${input_slots.usds_to_withdraw}"
 
-      - description: "Convert USDS amount to USDC (18 decimals to 6 decimals)"
-        target: "${inputs.unsigned_math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${input_slots.usds_to_withdraw}"
-          - type: "uint256"
-            value: "1"
-          - type: "uint256"
-            value: "1000000000000"
-        return:
-          name: "usdc_amount"
-          type: "uint256"
-
       - description: "Swap USDS to USDC via PSM (buyGem)"
         target: "${inputs.psm_address}"
         selector: "buyGem(address,uint256)"
@@ -186,9 +150,12 @@ actions:
           - type: "address"
             value: "${inputs.caliber_address}"
           - type: "uint256"
-            value: "${returns.usdc_amount}"
+            value: "${input_slots.min_usdc_amount_to_receive}"
 
     input_slots:
       usds_to_withdraw:
         type: "uint256"
         description: "The amount of USDS assets to withdraw from the sUSDS vault (then swapped to USDC via PSM)"
+      min_usdc_amount_to_receive:
+        type: "uint256"
+        description: "Minimum amount of USDC to receive (6 decimals, slippage protection)"
