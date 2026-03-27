@@ -1,0 +1,43 @@
+protocol: "makina"
+
+inputs:
+  accounting_token_address:
+    type: "address"
+  depositor_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      # Step 1: Approve and deposit AT into the machine
+      - description: "Approve AT to the Depositor contract"
+        target: "${inputs.accounting_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.depositor_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit AT into the Makina machine via the Depositor"
+        target: "${inputs.depositor_address}"
+        selector: "deposit(uint256,address,uint256,bytes32)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.min_shares}"
+          - type: "bytes32"
+            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of AT to deposit (in AT decimals)"
+      min_shares:
+        type: "uint256"
+        description: "Minimum MT shares to receive (slippage protection, 18 decimals)"
