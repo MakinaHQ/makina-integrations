@@ -1,0 +1,152 @@
+protocol: "royco-st-snusd"
+
+# Royco Senior Tranche sNUSD Deposit Blueprint
+# Multi-step deposit: USDC -> NUSD (Router.mint) -> sNUSD (ERC4626) -> Senior Tranche shares
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  nusd_address:
+    type: "address"
+    value: "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE"
+  nusd_router_address:
+    type: "address"
+    value: "0xa052883ebEe7354FC2Aa0f9c727E657FdeCa744a"
+  snusd_address:
+    type: "address"
+    value: "0x08EFCC2F3e61185D0EA7F8830B3FEc9Bfa2EE313"
+  senior_tranche_address:
+    type: "address"
+    value: "0x2070Af1C865f5d764F673Baf5654822947e71243"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Approve USDC to NUSD Router
+      - description: "Approve USDC spending by NUSD Router"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.nusd_router_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      # Get NUSD balance before mint
+      - description: "Get NUSD balance before mint"
+        target: "${constants.nusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "nusd_before"
+          type: "uint256"
+
+      # Mint NUSD from USDC via Router
+      - description: "Mint NUSD from USDC via Neutrl Router"
+        target: "${constants.nusd_router_address}"
+        selector: "mint(address,address,uint256,uint256,bytes)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${constants.usdc_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+          - type: "uint256"
+            value: "${input_slots.min_nusd_amount_to_mint}"
+          - type: "bytes"
+            value: "0x"
+
+      # Get NUSD balance after mint
+      - description: "Get NUSD balance after mint"
+        target: "${constants.nusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "nusd_after"
+          type: "uint256"
+
+      # Calculate NUSD received from redeem (after - before)
+      - description: "Calculate NUSD received via mint"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.nusd_after}"
+          - type: "uint256"
+            value: "${returns.nusd_before}"
+        return:
+          name: "nusd_balance"
+          type: "uint256"
+
+      # Approve NUSD to sNUSD
+      - description: "Approve NUSD spending by sNUSD vault"
+        target: "${constants.nusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.snusd_address}"
+          - type: "uint256"
+            value: "${returns.nusd_balance}"
+
+      # Deposit NUSD into sNUSD (ERC4626)
+      - description: "Deposit NUSD into sNUSD vault to receive sNUSD shares"
+        target: "${constants.snusd_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.nusd_balance}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "snusd_shares"
+          type: "uint256"
+
+      # Approve sNUSD to Senior Tranche
+      - description: "Approve sNUSD spending by Senior Tranche"
+        target: "${constants.snusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.snusd_shares}"
+
+      # Deposit sNUSD into Senior Tranche
+      - description: "Deposit sNUSD into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.snusd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"
+      min_nusd_amount_to_mint:
+        type: "uint256"
+        description: "Minimum amount of NUSD to mint (18 decimals)"

@@ -1,0 +1,113 @@
+protocol: "royco-st-autousd"
+
+# Royco Senior Tranche AutoUSD Account Blueprint
+# Tracks ST shares in Senior Tranche -> stAssets (autoUSD) -> USDC
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+  autousd_address:
+    type: "address"
+    value: "0xa7569A44f348d3D70d8ad5889e50F78E33d80D35"
+  senior_tranche_address:
+    type: "address"
+    value: "0x73C641fe41EB0270C7f473f3c3E4A40eb97fd8dE"
+
+inputs: {}
+
+actions:
+  account:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get ST share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Convert ST shares to asset claims tuple (stAssets, jtAssets, nav)
+      - description: "Convert ST shares to autoUSD asset claims"
+        target: "${constants.senior_tranche_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+        return:
+          name: "asset_claims"
+          type: "(uint256,uint256,uint256)"
+
+      # Extract stAssets (index 0) from the tuple
+      - description: "Extract stAssets (autoUSD amount) from asset claims tuple"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "st_assets"
+          type: "uint256"
+
+      # Extract jtAssets (index 1) from the tuple (amount is zero in loss-less case but can be non-zero in loss-making case as st gets jt assets)
+      - description: "Extract jtAssets (autoUSD amount) from asset claims tuple"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "jt_assets"
+          type: "uint256"
+
+      # Calculate total tranche assets (stAssets + jtAssets)
+      - description: "Calculate total tranche assets (stAssets + jtAssets)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_assets}"
+          - type: "uint256"
+            value: "${returns.jt_assets}"
+        return:
+          name: "total_tranche_assets"
+          type: "uint256"
+
+      # Convert tranche assets to USDC
+      - description: "Convert ST autoUSD position to USDC value"
+        target: "${constants.autousd_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_tranche_assets}"
+        return:
+          name: "usdc_from_st"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usdc_from_st}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

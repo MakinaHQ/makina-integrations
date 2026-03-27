@@ -1,0 +1,41 @@
+# Royco Senior Tranche sNUSD
+# Multi-step deposit: USDC -> NUSD (Router) -> sNUSD (ERC4626) -> Senior Tranche shares
+# Multi-step withdraw: redeem ST -> cooldown sNUSD (10 days) -> unstake
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/deposit.yaml:deposit"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + use NAV field for USDC value + cooldown NUSD
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+    - "${token_list.mainnet.NUSD}" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD-NAV"
+    path: "../../../blueprints/royco/st-snusd/account-nav.yaml:account_nav"
+    inputs: {}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.NUSD}" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/withdraw.yaml:redeem_st_and_cooldown_snusd"
+    inputs: {}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.NUSD}" # NUSD
+  instruction:
+    label: "ROY-ST-sNUSD"
+    path: "../../../blueprints/royco/st-snusd/withdraw.yaml:unstake_nusd"
+    inputs: {}

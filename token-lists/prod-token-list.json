@@ -75,6 +75,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xE556ABa6fe6036275Ec1f87eda296BE72C811BCE",
+      "name": "Neutrl USD",
+      "decimals": 18,
+      "symbol": "NUSD"
+    },
+    {
+      "chainId": 1,
       "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
       "name": "Savings USDS",
       "decimals": 18,

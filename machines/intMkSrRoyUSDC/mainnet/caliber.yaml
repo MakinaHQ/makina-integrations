@@ -1,0 +1,85 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0x5476F4E23dAA093Ce6700e1026013c55F7AF9083"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  key_value_store_address:
+    type: "address"
+    value: "0x1b52c5d62458675597ce9b25e81af89fdd8c4029"
+
+positions:
+  # ── Harvest-only ──────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+
+  # ── Morpho Vaults (group_id: 0) ──────────────────────────────────
+  - id: "317674047022373827182618653676880817492"
+    group_id: "0"
+    description: "Morpho Vault Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"]
+    vars:
+      label: "Steakhouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"
+  - id: "77590748279218246310796884579338401703"
+    group_id: "0"
+    description: "Morpho Vault Smokehouse USDC"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
+    vars:
+      label: "Smokehouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
+  - id: "279192229524461441353685379268733582188"
+    group_id: "0"
+    description: "Morpho Vault Gauntlet USDC Prime (V2)"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0x8c106EEDAd96553e64287A5A6839c3Cc78afA3D0"]
+    vars:
+      label: "Gauntlet USDC Prime"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x8c106EEDAd96553e64287A5A6839c3Cc78afA3D0"
+  - id: "67354911689693310534889349623854270587"
+    group_id: "0"
+    description: "Morpho Vault Gauntlet USDC Frontier (V2)"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
+    position_tokens: ["0x9a1D6bd5b8642C41F25e0958129B85f8E1176F3e"]
+    vars:
+      label: "Gauntlet USDC Frontier"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x9a1D6bd5b8642C41F25e0958129B85f8E1176F3e"
+
+  # ── AaveV3 Supply (group_id: 1) ──────────────────────────────────
+  - id: "332697612920998824307877708016163852818"
+    group_id: "1"
+    description: "AaveV3 Supply USDC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"]
+    vars:
+      label: "USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
+
+  # ── Royco Positions V2 (group_id: 0) ─────────────────────────────
+  - id: "330465051322128162217677944512864209642"
+    group_id: "0"
+    description: "Royco Senior Tranche AutoUSD V2"
+    instructions: !include "../../../instructions/royco-st-autousd.yaml"
+    position_tokens: ["0xa7569A44f348d3D70d8ad5889e50F78E33d80D35", "0x73C641fe41EB0270C7f473f3c3E4A40eb97fd8dE"] # autoUSD, ST-autoUSD
+
+  - id: "317090420331050517457781837275109534073"
+    group_id: "0"
+    description: "Royco Senior Tranche sNUSD V2"
+    instructions: !include "../../../instructions/royco-st-snusd.yaml"
+    position_tokens: ["0x2070Af1C865f5d764F673Baf5654822947e71243"] # ST-sNUSD

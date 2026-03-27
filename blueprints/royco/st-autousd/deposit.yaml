@@ -1,0 +1,85 @@
+protocol: "royco-st-autousd"
+
+# Royco Senior Tranche AutoUSD Deposit Blueprint
+# Multi-step deposit: USDC -> autoUSD (Tokemak IAutoPool ERC4626) -> Senior Tranche shares
+# 5-step flow: 2 approvals + 2 deposits (autoUSD.deposit returns shares, used for ST deposit)
+#
+# Prerequisites:
+#   - Caliber must have AccessManager role (15192588971413990205) on 0xd567ccbb336eb71ec2537057e2bcf6db840bb71d
+#   - No whitelist required
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  autousd_address:
+    type: "address"
+    value: "0xa7569A44f348d3D70d8ad5889e50F78E33d80D35"
+  senior_tranche_address:
+    type: "address"
+    value: "0x73C641fe41EB0270C7f473f3c3E4A40eb97fd8dE"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Step 1: Approve USDC to autoUSD vault
+      - description: "Approve USDC spending by autoUSD vault"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.autousd_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      # Step 2: Deposit USDC into autoUSD (ERC4626) -> returns shares
+      - description: "Deposit USDC into autoUSD vault to receive autoUSD shares"
+        target: "${constants.autousd_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "autousd_shares"
+          type: "uint256"
+
+      # Step 3: Approve autoUSD to Senior Tranche
+      - description: "Approve autoUSD spending by Senior Tranche"
+        target: "${constants.autousd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.autousd_shares}"
+
+      # Step 4: Deposit autoUSD into Senior Tranche
+      # deposit(uint256,address,address) - autoUSD amount IS the TRANCHE_UNIT amount (both 18 dec)
+      - description: "Deposit autoUSD into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.autousd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"

@@ -1,0 +1,34 @@
+# Royco Senior Tranche AutoUSD
+# Multi-step deposit: USDC -> autoUSD (Tokemak IAutoPool) -> Senior Tranche shares
+# Single-step withdraw: redeem ST -> autoUSD -> USDC (no cooldown)
+# Accounting: tracks ST shares + transient autoUSD, converts to USDC
+
+# DEPOSIT: USDC -> autoUSD -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-autoUSD"
+    path: "../../../blueprints/royco/st-autousd/deposit.yaml:deposit"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + use NAV field for accurate USDC valuation
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-autoUSD-NAV"
+    path: "../../../blueprints/royco/st-autousd/account-nav.yaml:account_nav"
+    inputs: {}
+
+# WITHDRAW: Redeem ST shares -> autoUSD -> USDC (single transaction, no cooldown)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-autoUSD"
+    path: "../../../blueprints/royco/st-autousd/withdraw.yaml:withdraw"
+    inputs: {}
