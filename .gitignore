@@ -2,3 +2,4 @@
 .devcontainer/
 !*.claude
 machines*.toml
+*local*

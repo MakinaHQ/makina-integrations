@@ -1,0 +1,35 @@
+# NOTE: This is a naive emergency withdrawal that redeems our full share balance.
+# It assumes the vault has enough idle liquidity to process the full redemption.
+# Will revert if most assets are allocated to markets and insufficient liquidity is available.
+# A more robust version could use maxRedeem(address) to cap at available liquidity.
+
+protocol: "morpho"
+
+inputs:
+  vault_address:
+    type: "address"
+  receiver_address:
+    type: "address"
+
+actions:
+  emergency_redeem_vault:
+    calls:
+      - description: "Query our balance of shares in the vault"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+      - description: "Redeem all shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"

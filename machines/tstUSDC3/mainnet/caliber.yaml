@@ -36,6 +36,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Smokehouse USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Smokehouse USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -44,6 +46,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Gauntlet Frontier USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Gauntlet USDC Frontier"
       asset_address: ${token_list.mainnet.USDC}
@@ -52,6 +56,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Steakhouse USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Steakhouse USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -60,6 +66,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault MEV Capital USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "MEV Capital USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -68,6 +76,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Alpha USDC Core"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Alpha USDC Core"
       asset_address: ${token_list.mainnet.USDC}
@@ -76,6 +86,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Clearstar USDC Reactor"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Clearstar USDC Reactor"
       asset_address: ${token_list.mainnet.USDC}
@@ -84,6 +96,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Clearstar High Yield USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Clearstar High Yield USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -92,6 +106,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault MEV Capital PTS USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "MEV Capital PTS USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -100,6 +116,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault KPK USDC Prime"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "KPK USDC Prime"
       asset_address: ${token_list.mainnet.USDC}
@@ -108,6 +126,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Hyperithm Degen USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Hyperithm Degen USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -116,6 +136,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Sentora Main PYUSD"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Sentora Main PYUSD"
       asset_address: ${token_list.mainnet.PYUSD}
@@ -124,6 +146,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Hyperithm Midcurve USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Hyperithm Midcurve USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -132,6 +156,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault August  V2 USDC"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "August V2 USDC"
       asset_address: ${token_list.mainnet.USDC}
@@ -140,6 +166,8 @@ positions:
     group_id: "0"
     description: "Morpho Vault Gauntlet Core eUSD"
     instructions: !include "../../../instructions/morpho-vault.yaml"
+    tags:
+      - "223834:emergency_redeem_vault"
     vars:
       label: "Gauntlet Core eUSD"
       asset_address: ${token_list.mainnet.eUSD}
