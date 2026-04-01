@@ -120,10 +120,6 @@ positions:
     group_id: "0"
     description: "Morpho USDT loan (market: 0xfb83...6e28)"
     instructions: !include "./instructions/morpho-lend-usdt-0xfb83-6e28.yaml"
-  - id: "61488265486560026813568195581261673654"
-    group_id: "0"
-    description: "Morpho USDC loan (market: 0x8d8a...a73)"
-    instructions: !include "./instructions/morpho-lend-usdc-0x8d8a-a73.yaml"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "214758391026483752910384756102938475610"
@@ -146,13 +142,68 @@ positions:
   - id: "332697612920998824307877708016163852818"
     group_id: "2"
     description: "AaveV3 Supply USDC"
-    instructions: !include "./instructions/aavev3-supply-usdc.yaml"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
     position_tokens: ["0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"]
+    vars:
+      label: "USDC - Lend"
+      asset_address: ${token_list.mainnet.USDC}
+      aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
   - id: "232678016241942897729445069841802885622"
     group_id: "2"
     description: "AaveV3 Supply USDT"
-    instructions: !include "./instructions/aavev3-supply-usdt.yaml"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
     position_tokens: ["0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"]
+    vars:
+      label: "USDT - Lend"
+      asset_address: ${token_list.mainnet.USDT}
+      aave_token: "0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"
+  - id: "154527051821373524649523573070693712755"
+    group_id: "2"
+    description: "AaveV3 Supply WBTC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x5Ee5bf7ae06D1Be5997A1A72006FE6C607eC6DE8"]
+    vars:
+      label: "WBTC - Lend"
+      asset_address: ${token_list.mainnet.WBTC}
+      aave_token: "0x5Ee5bf7ae06D1Be5997A1A72006FE6C607eC6DE8"
+
+  # ── AaveV3 Borrow (group_id: 2) ──────────────────────────────────
+  - id: "227329230297595858214811008018294296109"
+    group_id: "2"
+    description: "AaveV3 Borrow USDC"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x72E95b8931767C79bA4EeE721354d6E99a61D004"]
+    vars:
+      label: "USDC - Borrow"
+      asset_address: ${token_list.mainnet.USDC}
+      debt_token: "0x72E95b8931767C79bA4EeE721354d6E99a61D004"
+  - id: "117961051486591206861124901427435972709"
+    group_id: "2"
+    description: "AaveV3 Borrow USDT"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"]
+    vars:
+      label: "USDT - Borrow"
+      asset_address: ${token_list.mainnet.USDT}
+      debt_token: "0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"
+  - id: "111436238291175944391949776940670395617"
+    group_id: "2"
+    description: "AaveV3 Borrow USDtb"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xeA85A065f87FE28aA8FBF0D6c7dEC472b106252c"]
+    vars:
+      label: "USDtb - Borrow"
+      asset_address: ${token_list.mainnet.USDtb}
+      debt_token: "0xeA85A065f87FE28aA8FBF0D6c7dEC472b106252c"
+  - id: "14670645297388805224525324151692762826"
+    group_id: "2"
+    description: "AaveV3 Borrow USDe"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x015396E1F286289aE23a762088E863b3ec465145"]
+    vars:
+      label: "USDe - Borrow"
+      asset_address: ${token_list.mainnet.USDe}
+      debt_token: "0x015396E1F286289aE23a762088E863b3ec465145"
 
   # ── Fluid ─────────────────────────────────────────────────────────
   - id: "338141752729787505783999544633498401629"
