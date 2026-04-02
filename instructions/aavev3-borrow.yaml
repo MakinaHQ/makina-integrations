@@ -1,0 +1,64 @@
+# AaveV3 Borrow — borrow, repay, and account for a borrowed (debt) asset.
+#
+# Expected caliber vars:
+#   label:         string   — token name (e.g. "USDC", "WETH")
+#   asset_address: address  — underlying token address
+#   debt_token:    address  — variableDebtToken address (for accounting balanceOf)
+#
+# Expected config:
+#   caliber_address
+#   aavev3_core_instance
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/borrow.yaml:borrow_asset"
+    inputs:
+      token:
+        type: "address"
+        value: ${position.asset_address}
+      interest_rate_mode:
+        type: "uint256"
+        value: "2"
+      referral_code:
+        type: "uint256"
+        value: "0"
+      receiver:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/repay.yaml:repay_asset"
+    inputs:
+      token_address:
+        type: "address"
+        value: ${position.asset_address}
+      pool_address:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: ${position.debt_token}
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
