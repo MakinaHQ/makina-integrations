@@ -1,0 +1,20 @@
+{
+  "name": "Monad Token List",
+  "chain_id": 143,
+  "tokens": [
+    {
+      "address": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 6,
+      "logoURI": "https://assets.coingecko.com/coins/images/6319/large/usdc.png"
+    },
+    {
+      "address": "0xB5a30b0FDc5F8B2a3D017B5C23b78A90C2a2D0c1",
+      "name": "Wrapped Monad",
+      "symbol": "WMON",
+      "decimals": 18,
+      "logoURI": ""
+    }
+  ]
+}
