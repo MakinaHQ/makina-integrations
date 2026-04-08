@@ -232,10 +232,6 @@ positions:
     position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
 
   # ── Morpho Loops ─────────────────────────────────────────────────
-  - id: "219384756102938475610293847561029384756"
-    group_id: "0"
-    description: "syrupUSDC/USDC Morpho Loop"
-    instructions: !include "./instructions/morpho-loop-syrupusdc-usdc.yaml"
   - id: "318274659201837465920183746592018374659"
     group_id: "0"
     description: "syrupUSDT/USDT Morpho Loop"
@@ -251,7 +247,33 @@ positions:
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"
-    instructions: !include "./instructions/morpho-loop-susds-usdt.yaml"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "sUSDS/USDT Morpho Loop"
+      collateral_token: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD" # sUSDS
+      loan_token: ${token_list.mainnet.USDT}
+      morpho_market_id: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+      oracle_address: "0x0C426d174FC88B7A25d59945Ab2F7274Bf7B4C79"
+  - id: "714619093645271809054637281905463728190"
+    group_id: "0"
+    description: "syrupUSDC/PYUSD Morpho Loop"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "syrupUSDC/PYUSD Morpho Loop"
+      collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      loan_token: ${token_list.mainnet.PYUSD}
+      morpho_market_id: "0xc9629945524f3fde56c7e8854a6c3d48e76b9d97236abbe73c750fcc7aeb8501"
+      oracle_address: "0xc8043d248551Ed19B33cbc89dCCd69148c827039"
+  - id: "813730204756382920165748392016574839201"
+    group_id: "0"
+    description: "syrupUSDC/RLUSD Morpho Loop"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "syrupUSDC/RLUSD Morpho Loop"
+      collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      loan_token: ${token_list.mainnet.RLUSD}
+      morpho_market_id: "0xc0ae375fd761ff19b3f04de5534c0f1ec110f80e1c2ede27c42c1c43c3040394"
+      oracle_address: "0xf766F4F1Bcb0CBBF4EEF5E26FF7c7f66a713c1B5"
 
   # ── InfiniFi Lockers ──────────────────────────────────────────────
   - id: "2013457072841808719642938411712424809"

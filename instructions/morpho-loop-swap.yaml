@@ -1,61 +1,77 @@
 # ============================================================================
-# sUSDS/USDT Morpho Loop Position
+# Generic Morpho Loop Position (swap-based)
 # ============================================================================
 #
-# Morpho market: sUSDS (collateral) / USDT (loan)
-# Market ID: 0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b
+# Use this template when collateral underlying != loan token and the DEX
+# aggregator can route between them in a single swap (possibly via an
+# intermediate token like USDC).
 #
-# This is a ONE-LEGGED position: accounting reports equity = collateral - debt
-# as a single value, so all entries use is_debt: false.
+# Examples:
+#   - sUSDS/USDT      (sUSDS underlying = USDS, aggregator routes USDT <-> sUSDS)
+#   - syrupUSDC/PYUSD (syrupUSDC underlying = USDC, aggregator routes PYUSD <-> syrupUSDC via USDC)
+#   - syrupUSDC/RLUSD (same pattern, RLUSD <-> syrupUSDC via USDC)
 #
-# Since sUSDS underlying is USDS (not USDT), all collateral operations use
-# SwapData to convert between USDT and sUSDS via DEX aggregator.
+# DO NOT use this template when:
+#   - loan_token IS the collateral underlying (e.g. syrupUSDC/USDC) — use
+#     deposit.yaml (direct ERC4626) instead of deposit-swap.yaml
+#   - Collateral requires a custom minting path (e.g. wsrUSD needs
+#     PSM + CreditEnforcer) — use protocol-specific blueprints
 #
-# Flow overview:
-#   - Flash loan in:  Flash USDT -> swap USDT to sUSDS -> supply collateral -> borrow USDT to repay FL
-#   - Flash loan out: Flash USDT -> repay debt -> withdraw sUSDS -> swap sUSDS to USDT to repay FL
-#   - Close loop:    Flash USDT -> repay ALL debt (by shares) -> withdraw ALL sUSDS -> swap to USDT to repay FL
-#   - Add collateral: Swap USDT to sUSDS -> supply collateral to Morpho
-#   - Borrow:         Borrow USDT from Morpho against sUSDS collateral
-#   - Repay:          Repay USDT debt to Morpho
-#   - Withdraw:       Withdraw sUSDS from Morpho -> swap sUSDS to USDT via DEX aggregator
-#   - Accounting:     equity = (sUSDS collateral * oracle price / 1e36) - debt
-#                     Oracle: 0x0C426d174FC88B7A25d59945Ab2F7274Bf7B4C79
+# ASSUMPTIONS:
+#   - DEX aggregator can route loan_token <-> collateral_token in a single
+#     swap call (multi-hop via intermediate tokens is fine)
+#   - If aggregator routing fails for a pair, fall back to custom blueprints
+#     with explicit multi-step conversion (see blueprints/morpho-loop/wsrusd/)
 #
-# Key addresses:
-#   USDT:   0xdAC17F958D2ee523a2206206994597C13D831ec7 (6 decimals)
-#   sUSDS:  0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD (18 decimals, ERC4626 over USDS)
-#   LLTV:   96.5%
+# Accounting uses oracle-based valuation (account_equity):
+#   equity = (collateral_amount * oracle.price() / 1e36) - debt
+#
+# Required vars:
+#   label              — Position label, used for all entries (e.g. "sUSDS/USDT Morpho Loop")
+#   collateral_token   — Collateral token address (e.g. syrupUSDC)
+#   loan_token         — Loan token address (e.g. PYUSD)
+#   morpho_market_id   — Morpho market ID (bytes32)
+#   oracle_address     — Morpho oracle address for collateral/loan pricing
+#
+# Available user flows:
+#   - Open / increase leverage:  Flash loan request (1) + Loop in (2)
+#   - Partial deleverage:        Flash loan request (1) + Loop out (3)
+#   - Full close:                Flash loan request (1) + Close loop (4)
+#   - Add collateral (no debt):  Add collateral (5)
+#   - Borrow more:               Borrow (6)
+#   - Repay debt:                Repay (7)
+#   - Withdraw collateral:       Withdraw collateral (8)
+#   - Accounting:                Automatic equity reporting (9)
 # ============================================================================
 
 # 1/9 - Flash loan request (shared by loop_in, loop_out, close_loop callbacks)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop"
+    label: ${position.label}
     path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
     inputs:
       flash_loan_aggregator:
         type: "address"
         value: "${config.flash_loan_aggregator}"
 
-# 2/9 - Loop in: flash loan callback (swap USDT -> sUSDS, supply, borrow to repay FL)
+# 2/9 - Loop in: flash loan callback (swap loan -> collateral, supply, borrow to repay FL)
 - is_debt: false
   instruction_type: "FLASHLOAN_MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/deposit-swap.yaml:loop_in"
     inputs:
       collateral_token:
         type: "address"
-        value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+        value: ${position.collateral_token}
       loan_token:
         type: "address"
-        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+        value: ${position.loan_token}
       swap_module:
         type: "address"
         value: "${config.swap_module}"
@@ -67,26 +83,26 @@
         value: "${config.caliber_helper_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
-# 3/9 - Loop out: flash loan callback (repay debt, withdraw sUSDS, swap to USDT to repay FL)
+# 3/9 - Loop out: flash loan callback (repay debt, withdraw collateral, swap to loan to repay FL)
 - is_debt: false
   instruction_type: "FLASHLOAN_MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:loop_out"
     inputs:
       collateral_token:
         type: "address"
-        value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+        value: ${position.collateral_token}
       loan_token:
         type: "address"
-        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+        value: ${position.loan_token}
       swap_module:
         type: "address"
         value: "${config.swap_module}"
@@ -98,26 +114,26 @@
         value: "${config.caliber_helper_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
-# 4/9 - Close loop: flash loan callback (repay ALL debt by shares, withdraw ALL sUSDS, swap to USDT to repay FL)
+# 4/9 - Close loop: flash loan callback (repay ALL debt by shares, withdraw ALL collateral, swap to loan to repay FL)
 - is_debt: false
   instruction_type: "FLASHLOAN_MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:close_loop"
     inputs:
       collateral_token:
         type: "address"
-        value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+        value: ${position.collateral_token}
       loan_token:
         type: "address"
-        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+        value: ${position.loan_token}
       swap_module:
         type: "address"
         value: "${config.swap_module}"
@@ -129,26 +145,26 @@
         value: "${config.caliber_helper_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
-# 5/9 - Add collateral: standalone swap USDT -> sUSDS -> supply to Morpho
+# 5/9 - Add collateral: standalone swap loan -> collateral -> supply to Morpho
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop - Add Collateral"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/deposit-swap.yaml:add_collateral"
     inputs:
       collateral_token:
         type: "address"
-        value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD"
+        value: ${position.collateral_token}
       loan_token:
         type: "address"
-        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+        value: ${position.loan_token}
       swap_module:
         type: "address"
         value: "${config.swap_module}"
@@ -160,18 +176,18 @@
         value: "${config.caliber_helper_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
-# 6/9 - Borrow USDT from Morpho (generic morpho borrow blueprint)
+# 6/9 - Borrow loan token from Morpho (generic)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop - Borrow"
+    label: ${position.label}
     path: "../../../blueprints/morpho/borrow.yaml:borrow"
     inputs:
       morpho:
@@ -182,18 +198,18 @@
         value: "${config.caliber_helper_address}"
       market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
 
-# 7/9 - Repay USDT to Morpho (generic morpho repay blueprint)
+# 7/9 - Repay loan token to Morpho (generic)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop - Repay"
+    label: ${position.label}
     path: "../../../blueprints/morpho/repay.yaml:repay_asset"
     inputs:
       morpho:
@@ -207,23 +223,23 @@
         value: "${config.caliber_address}"
       market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       loan_token:
         type: "address"
-        value: "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+        value: ${position.loan_token}
 
-# 8/9 - Withdraw collateral: Morpho -> sUSDS -> swap to USDT via DEX aggregator
+# 8/9 - Withdraw collateral: Morpho -> collateral -> swap to loan via DEX aggregator
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop - Withdraw Collateral"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/withdraw.yaml:withdraw_collateral"
     inputs:
       collateral_token:
         type: "address"
-        value: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD" # sUSDS
+        value: ${position.collateral_token}
       morpho_address:
         type: "address"
         value: "${config.morpho_address}"
@@ -232,7 +248,7 @@
         value: "${config.caliber_helper_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -240,15 +256,13 @@
         type: "address"
         value: "${config.swap_module}"
 
-# 9/9 - Accounting: equity = collateral_value_in_usdt - debt
-#   Uses Morpho oracle price() to convert sUSDS collateral to USDT terms.
-#   Formula: equity = (collateral_amount * oracle_price / 1e36) - debt_amount
+# 9/9 - Accounting: equity = (collateral * oracle_price / 1e36) - debt
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0xdAC17F958D2ee523a2206206994597C13D831ec7" # USDT
+    - ${position.loan_token}
   instruction:
-    label: "sUSDS/USDT Morpho Loop"
+    label: ${position.label}
     path: "../../../blueprints/morpho-loop/account.yaml:account_equity"
     inputs:
       morpho_address:
@@ -256,7 +270,7 @@
         value: "${config.morpho_address}"
       morpho_market_id:
         type: "bytes32"
-        value: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+        value: ${position.morpho_market_id}
       caliber_helper:
         type: "address"
         value: "${config.caliber_helper_address}"
@@ -268,4 +282,4 @@
         value: "${config.unsigned_math_helper_address}"
       oracle_address:
         type: "address"
-        value: "0x0C426d174FC88B7A25d59945Ab2F7274Bf7B4C79"
+        value: ${position.oracle_address}
