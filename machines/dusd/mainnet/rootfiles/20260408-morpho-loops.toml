@@ -36,6 +36,27 @@ name = "Tether USD"
 decimals = 6
 symbol = "USDT"
 
+[tokens."${token_list.mainnet.crvUSD}"]
+chainId = 1
+address = "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e"
+name = "Curve.Fi USD Stablecoin"
+decimals = 18
+symbol = "crvUSD"
+
+[tokens."${token_list.mainnet.eUSD}"]
+chainId = 1
+address = "0xa0d69e286b938e21cbf7e51d71f6a4c8918f482f"
+name = "Electronic Dollar"
+decimals = 18
+symbol = "eUSD"
+
+[tokens."${token_list.mainnet.sUSDS}"]
+chainId = 1
+address = "0xa3931d71877c0e7a3148cb7eb4463524fec27fbd"
+name = "Savings USDS"
+decimals = 18
+symbol = "sUSDS"
+
 [instructions."Aave Umbrella".account.USDC]
 position_id = "176021688445186810403025048632929053161"
 description = "Aave Umbrella USDC"
