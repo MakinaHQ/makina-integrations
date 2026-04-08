@@ -49,8 +49,8 @@ positions:
     position_tokens: ["0x625E92624Bc2D88619ACCc1788365A69767f6200"]
     vars:
       label: "PYUSD/crvUSD"
-      tokena_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.PYUSD}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       pool_address: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
       gauge_address: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
       coin0_scale_factor: "1000000"
@@ -61,8 +61,8 @@ positions:
     position_tokens: ["0xd001ae433f254283fece51d4acce8c53263aa186"]
     vars:
       label: "USDC/RLUSD"
-      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-      tokenb_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      tokena_address: ${token_list.mainnet.USDC}
+      tokenb_address: ${token_list.mainnet.RLUSD}
       pool_address: "0xd001ae433f254283fece51d4acce8c53263aa186"
       gauge_address: "0xfc3212bd9ad9a28da6b2bd50a2918969c126894f"
       coin0_scale_factor: "1000000"
@@ -75,8 +75,8 @@ positions:
     position_tokens: ["0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"]
     vars:
       label: "USDC/crvUSD"
-      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.USDC}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       curve_pool_address: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"
       convex_pool_id: "182"
       convex_reward_pool: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
@@ -88,8 +88,8 @@ positions:
     position_tokens: ["0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"]
     vars:
       label: "USDT/crvUSD"
-      tokena_address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.USDT}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       curve_pool_address: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
       convex_pool_id: "179"
       convex_reward_pool: "0xD1DdB0a0815fD28932fBb194C84003683AF8a824"
@@ -103,7 +103,7 @@ positions:
     position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
     vars:
       label: "Steakhouse PYUSD"
-      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"
   - id: "30651621090656837837542443694366525060"
     group_id: "0"
@@ -112,7 +112,7 @@ positions:
     position_tokens: ["0xd63070114470f685b75B74D60EEc7c1113d33a3D"]
     vars:
       label: "MEV Capital USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xd63070114470f685b75B74D60EEc7c1113d33a3D"
   - id: "287972541400220405479010366660803291000"
     group_id: "0"
@@ -121,7 +121,7 @@ positions:
     position_tokens: ["0xc080f56504e0278828A403269DB945F6c6D6E014"]
     vars:
       label: "Gauntlet eUSD Core"
-      asset_address: "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F"
+      asset_address: ${token_list.mainnet.eUSD}
       vault_address: "0xc080f56504e0278828A403269DB945F6c6D6E014"
   - id: "77590748279218246310796884579338401703"
     group_id: "0"
@@ -130,7 +130,7 @@ positions:
     position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
     vars:
       label: "Smokehouse USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
   - id: "11232424494326814282538250204373920286"
     group_id: "0"
@@ -139,7 +139,7 @@ positions:
     position_tokens: ["0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"]
     vars:
       label: "Gauntlet USDC Frontier"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"
   - id: "188442457890402398659043284211703237226"
     group_id: "0"
@@ -148,7 +148,7 @@ positions:
     position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
     vars:
       label: "Gauntlet USDC Core"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"
   - id: "128264429154381135287798106504544985667"
     group_id: "0"
@@ -157,7 +157,7 @@ positions:
     position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
     vars:
       label: "Smokehouse Reservoir USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xbeEF346d7099865208Ff331e4f648f4154DDAa05"
   - id: "101479911391298992514073662718338576961"
     group_id: "0"
@@ -166,7 +166,7 @@ positions:
     position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
     vars:
       label: "Sentora RLUSD"
-      asset_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      asset_address: ${token_list.mainnet.RLUSD}
       vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
@@ -175,7 +175,7 @@ positions:
     position_tokens: ["0xb576765fB15505433aF24FEe2c0325895C559FB2"]
     vars:
       label: "Sentora PYUSD"
-      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
@@ -232,10 +232,6 @@ positions:
     position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
 
   # ── Morpho Loops ─────────────────────────────────────────────────
-  - id: "219384756102938475610293847561029384756"
-    group_id: "0"
-    description: "syrupUSDC/USDC Morpho Loop"
-    instructions: !include "./instructions/morpho-loop-syrupusdc-usdc.yaml"
   - id: "318274659201837465920183746592018374659"
     group_id: "0"
     description: "syrupUSDT/USDT Morpho Loop"
@@ -251,7 +247,33 @@ positions:
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"
-    instructions: !include "./instructions/morpho-loop-susds-usdt.yaml"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "sUSDS/USDT Morpho Loop"
+      collateral_token: ${token_list.mainnet.sUSDS}
+      loan_token: ${token_list.mainnet.USDT}
+      morpho_market_id: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
+      oracle_address: "0x0C426d174FC88B7A25d59945Ab2F7274Bf7B4C79"
+  - id: "714619093645271809054637281905463728190"
+    group_id: "0"
+    description: "syrupUSDC/PYUSD Morpho Loop"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "syrupUSDC/PYUSD Morpho Loop"
+      collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      loan_token: ${token_list.mainnet.PYUSD}
+      morpho_market_id: "0xc9629945524f3fde56c7e8854a6c3d48e76b9d97236abbe73c750fcc7aeb8501"
+      oracle_address: "0xc8043d248551Ed19B33cbc89dCCd69148c827039"
+  - id: "813730204756382920165748392016574839201"
+    group_id: "0"
+    description: "syrupUSDC/RLUSD Morpho Loop"
+    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    vars:
+      label: "syrupUSDC/RLUSD Morpho Loop"
+      collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      loan_token: ${token_list.mainnet.RLUSD}
+      morpho_market_id: "0xc0ae375fd761ff19b3f04de5534c0f1ec110f80e1c2ede27c42c1c43c3040394"
+      oracle_address: "0xf766F4F1Bcb0CBBF4EEF5E26FF7c7f66a713c1B5"
 
   # ── InfiniFi Lockers ──────────────────────────────────────────────
   - id: "2013457072841808719642938411712424809"

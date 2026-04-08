@@ -1,0 +1,285 @@
+# ============================================================================
+# Generic Morpho Loop Position (swap-based)
+# ============================================================================
+#
+# Use this template when collateral underlying != loan token and the DEX
+# aggregator can route between them in a single swap (possibly via an
+# intermediate token like USDC).
+#
+# Examples:
+#   - sUSDS/USDT      (sUSDS underlying = USDS, aggregator routes USDT <-> sUSDS)
+#   - syrupUSDC/PYUSD (syrupUSDC underlying = USDC, aggregator routes PYUSD <-> syrupUSDC via USDC)
+#   - syrupUSDC/RLUSD (same pattern, RLUSD <-> syrupUSDC via USDC)
+#
+# DO NOT use this template when:
+#   - loan_token IS the collateral underlying (e.g. syrupUSDC/USDC) — use
+#     deposit.yaml (direct ERC4626) instead of deposit-swap.yaml
+#   - Collateral requires a custom minting path (e.g. wsrUSD needs
+#     PSM + CreditEnforcer) — use protocol-specific blueprints
+#
+# ASSUMPTIONS:
+#   - DEX aggregator can route loan_token <-> collateral_token in a single
+#     swap call (multi-hop via intermediate tokens is fine)
+#   - If aggregator routing fails for a pair, fall back to custom blueprints
+#     with explicit multi-step conversion (see blueprints/morpho-loop/wsrusd/)
+#
+# Accounting uses oracle-based valuation (account_equity):
+#   equity = (collateral_amount * oracle.price() / 1e36) - debt
+#
+# Required vars:
+#   label              — Position label, used for all entries (e.g. "sUSDS/USDT Morpho Loop")
+#   collateral_token   — Collateral token address (e.g. syrupUSDC)
+#   loan_token         — Loan token address (e.g. PYUSD)
+#   morpho_market_id   — Morpho market ID (bytes32)
+#   oracle_address     — Morpho oracle address for collateral/loan pricing
+#
+# Available user flows:
+#   - Open / increase leverage:  Flash loan request (1) + Loop in (2)
+#   - Partial deleverage:        Flash loan request (1) + Loop out (3)
+#   - Full close:                Flash loan request (1) + Close loop (4)
+#   - Add collateral (no debt):  Add collateral (5)
+#   - Borrow more:               Borrow (6)
+#   - Repay debt:                Repay (7)
+#   - Withdraw collateral:       Withdraw collateral (8)
+#   - Accounting:                Automatic equity reporting (9)
+# ============================================================================
+
+# 1/9 - Flash loan request (shared by loop_in, loop_out, close_loop callbacks)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
+    inputs:
+      flash_loan_aggregator:
+        type: "address"
+        value: "${config.flash_loan_aggregator}"
+
+# 2/9 - Loop in: flash loan callback (swap loan -> collateral, supply, borrow to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/deposit-swap.yaml:loop_in"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 3/9 - Loop out: flash loan callback (repay debt, withdraw collateral, swap to loan to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:loop_out"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 4/9 - Close loop: flash loan callback (repay ALL debt by shares, withdraw ALL collateral, swap to loan to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:close_loop"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 5/9 - Add collateral: standalone swap loan -> collateral -> supply to Morpho
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/deposit-swap.yaml:add_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 6/9 - Borrow loan token from Morpho (generic)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 7/9 - Repay loan token to Morpho (generic)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+
+# 8/9 - Withdraw collateral: Morpho -> collateral -> swap to loan via DEX aggregator
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw.yaml:withdraw_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+
+# 9/9 - Accounting: equity = (collateral * oracle_price / 1e36) - debt
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/account.yaml:account_equity"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      oracle_address:
+        type: "address"
+        value: ${position.oracle_address}
