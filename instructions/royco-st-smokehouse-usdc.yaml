@@ -1,0 +1,34 @@
+# Royco Senior Tranche SmokehouseUSDC
+# Multi-step deposit: USDC -> bbqUSDC (MetaMorpho Morpho vault) -> Senior Tranche shares
+# Single-step withdraw: redeem ST -> bbqUSDC -> USDC (no cooldown)
+# Accounting: NAV-based via syncTrancheAccounting + convertToAssets
+
+# DEPOSIT: USDC -> bbqUSDC -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-SmokehouseUSDC"
+    path: "../../../blueprints/royco/st-smokehouse-usdc/deposit.yaml:deposit"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + use NAV field for accurate USDC valuation
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-SmokehouseUSDC-NAV"
+    path: "../../../blueprints/royco/st-smokehouse-usdc/account-nav.yaml:account_nav"
+    inputs: {}
+
+# WITHDRAW: Redeem ST shares -> bbqUSDC -> USDC (single transaction, no cooldown)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-SmokehouseUSDC"
+    path: "../../../blueprints/royco/st-smokehouse-usdc/withdraw.yaml:withdraw"
+    inputs: {}

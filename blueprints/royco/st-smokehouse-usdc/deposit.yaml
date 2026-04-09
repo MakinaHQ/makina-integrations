@@ -1,0 +1,80 @@
+protocol: "royco-st-smokehouse-usdc"
+
+# Royco Senior Tranche SmokehouseUSDC Deposit Blueprint
+# Multi-step deposit: USDC -> bbqUSDC (MetaMorpho ERC4626) -> Senior Tranche shares
+# 5-step flow: 2 approvals + 2 deposits (bbqUSDC.deposit returns shares, used for ST deposit)
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  bbqusdc_address:
+    type: "address"
+    value: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
+  senior_tranche_address:
+    type: "address"
+    value: "0xa225F24654b8995036606D5Cd0634133a4BE169c"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Step 1: Approve USDC to bbqUSDC vault
+      - description: "Approve USDC spending by bbqUSDC vault"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.bbqusdc_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      # Step 2: Deposit USDC into bbqUSDC (ERC4626 MetaMorpho) -> returns shares
+      - description: "Deposit USDC into bbqUSDC vault to receive bbqUSDC shares"
+        target: "${constants.bbqusdc_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "bbqusdc_shares"
+          type: "uint256"
+
+      # Step 3: Approve bbqUSDC to Senior Tranche
+      - description: "Approve bbqUSDC spending by Senior Tranche"
+        target: "${constants.bbqusdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.bbqusdc_shares}"
+
+      # Step 4: Deposit bbqUSDC into Senior Tranche
+      - description: "Deposit bbqUSDC into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.bbqusdc_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"
