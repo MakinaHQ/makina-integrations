@@ -100,10 +100,3 @@ positions:
     instructions: !include "../../../instructions/royco-st-snusd.yaml"
     position_tokens:
       - "0x2070Af1C865f5d764F673Baf5654822947e71243" # ST-sNUSD
-  - id: "272794084645133069231168011596865429685"
-    group_id: "0"
-    description: "Royco Senior Tranche bbqUSDC V2"
-    instructions: !include "../../../instructions/royco-st-smokehouse-usdc.yaml"
-    position_tokens:
-      - "0xBEeFFF209270748ddd194831b3fa287a5386f5bC" # bbqUSDC
-      - "0xa225F24654b8995036606D5Cd0634133a4BE169c" # ST-SmokehouseUSDC

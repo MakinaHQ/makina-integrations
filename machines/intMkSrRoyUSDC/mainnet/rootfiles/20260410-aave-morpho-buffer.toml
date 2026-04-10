@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0xa152a1c4030de051dedcc2e318ec9e2749feb3d1095326b98ad13ce9a6f9ac6c
+# root: 0xee77aed093c372eea283704f424fcbca045a2d5864b22157dd715810f2557ff7
 
 [tokens."${token_list.mainnet.NUSD}"]
 chainId = 1
@@ -669,95 +669,6 @@ state = [
 bitmap = "85070591730234615865843651857942052864"
 
 [[instructions.royco-st-autousd.withdraw.ROY-ST-autoUSD.inputs_slots]]
-index = 0
-name = "bps_to_redeem"
-type = "Uint"
-
-[instructions.royco-st-smokehouse-usdc.account_nav.ROY-ST-SmokehouseUSDC-NAV]
-position_id = "272794084645133069231168011596865429685"
-description = "Royco Senior Tranche bbqUSDC V2"
-is_debt = false
-group_id = "0"
-instruction_type = 1
-affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
-position_tokens = [
-  "0xbeefff209270748ddd194831b3fa287a5386f5bc",
-  "0xa225f24654b8995036606d5cd0634133a4be169c",
-]
-commands = [
-  "0xd737d0c701ff0000000000050f431322e1ff2500d4c5a4e090a7da7344f953be",
-  "0x9c8e2dc001ff0000000000ff6dbdf6ebdf02f50ec6a7d6f782850996928176f9",
-  "0x70a082310105ff0000000005a225f24654b8995036606d5cd0634133a4be169c",
-  "0x07a2d13a8105ff0000000085a225f24654b8995036606d5cd0634133a4be169c",
-  "0x0f8be3fc018502ff0000000574dc739b8f98ad0f76cd8900695dd8d5083e45d3",
-  "0xaa9a091201050304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
-]
-state = [
-  "0x",
-  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "0x0000000000000000000000000000000000000000000000000000000000000002",
-  "0x0000000000000000000000000000000000000000000000000000000000000001",
-  "0x000000000000000000000000000000000000000000000000000000e8d4a51000",
-  "0x",
-]
-bitmap = "159507359494189904748456847233641349120"
-inputs_slots = []
-
-[instructions.royco-st-smokehouse-usdc.deposit.ROY-ST-SmokehouseUSDC]
-position_id = "272794084645133069231168011596865429685"
-description = "Royco Senior Tranche bbqUSDC V2"
-is_debt = false
-group_id = "0"
-instruction_type = 0
-affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
-position_tokens = []
-commands = [
-  "0xd737d0c701ff0000000000030f431322e1ff2500d4c5a4e090a7da7344f953be",
-  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  "0x6e553f65010003ff00000001beefff209270748ddd194831b3fa287a5386f5bc",
-  "0x095ea7b3010201ff000000ffbeefff209270748ddd194831b3fa287a5386f5bc",
-  "0x6e553f65010103ff000000ffa225f24654b8995036606d5cd0634133a4be169c",
-]
-state = [
-  "0xf15015d145f0dfeb1a7c93238d7b9427ecaddd044e1f499973167041ffaf9f51",
-  "0x000000000000000000000000beefff209270748ddd194831b3fa287a5386f5bc",
-  "0x000000000000000000000000a225f24654b8995036606d5cd0634133a4be169c",
-  "0x",
-]
-bitmap = "127605887595351923798765477786913079296"
-
-[[instructions.royco-st-smokehouse-usdc.deposit.ROY-ST-SmokehouseUSDC.inputs_slots]]
-index = 0
-name = "usdc_amount_to_deposit"
-type = "Uint"
-
-[instructions.royco-st-smokehouse-usdc.withdraw.ROY-ST-SmokehouseUSDC]
-position_id = "272794084645133069231168011596865429685"
-description = "Royco Senior Tranche bbqUSDC V2"
-is_debt = false
-group_id = "0"
-instruction_type = 0
-affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
-position_tokens = []
-commands = [
-  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
-  "0x70a082310102ff0000000003a225f24654b8995036606d5cd0634133a4be169c",
-  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
-  "0x70a082310102ff0000000001beefff209270748ddd194831b3fa287a5386f5bc",
-  "0xba08765201030202ff0000ffa225f24654b8995036606d5cd0634133a4be169c",
-  "0x70a082310102ff0000000003beefff209270748ddd194831b3fa287a5386f5bc",
-  "0xb67d77c5010301ff000000033d623b199e290358416415ea7e05b635e442e3c0",
-  "0xba08765201030202ff0000ffbeefff209270748ddd194831b3fa287a5386f5bc",
-]
-state = [
-  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
-  "0x0000000000000000000000000000000000000000000000000000000000002710",
-  "0x",
-  "0x",
-]
-bitmap = "85070591730234615865843651857942052864"
-
-[[instructions.royco-st-smokehouse-usdc.withdraw.ROY-ST-SmokehouseUSDC.inputs_slots]]
 index = 0
 name = "bps_to_redeem"
 type = "Uint"
