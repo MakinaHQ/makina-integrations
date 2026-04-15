@@ -1,0 +1,23 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xAc9c5477Dd6f2e9D55D408Efe7dE826B8Cd30E67"
+  kv_store_address:
+    type: "address"
+    value: "0x42581012bbc8370996bb8ea35f75b87af30c223f"
+  revertable_caliber_helper: # DEPRECATED: reusing mteth's helper for testing. Production machines require new deployment.
+    type: "address"
+    value: "0xA5b2637997148160F3A878E85A978E8303f863CF"
+  aerodrome_cl_helper: # DEPRECATED: reusing mteth's helper for testing. Production machines require new deployment.
+    type: "address"
+    value: "0x3fE39c78670d1A4D826deb97867d653Ae2F564F1"
+
+positions:
+  - id: "1"
+    group_id: "0"
+    description: "WETH/USDC Aerodrome CL"
+    instructions: !include "./instructions/aero-cl-weth-usdc.yaml"
+  - id: "2"
+    group_id: "0"
+    description: "WETH/USDC Aerodrome CL - Unstaked"
+    instructions: !include "./instructions/aero-cl-weth-usdc-unstaked.yaml"

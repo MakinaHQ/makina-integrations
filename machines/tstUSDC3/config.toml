@@ -45,3 +45,25 @@ address = "0xb88339CB7199b77E23DB6E890353E22632Ba630f"
 decimals = 6
 name = "USD Coin"
 symbol = "USDC"
+
+[calibers.sei]
+address = "0xAc9c5477Dd6f2e9D55D408Efe7dE826B8Cd30E67"
+swapper = "0xe403614F41554fC0f7A3dD581878D0024Dc978E9"
+rootfiles = "github:MakinaHQ/config/machines/tstUSDC3/sei/rootfiles"
+
+[calibers.sei.accounting_token]
+address = "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
+
+[calibers.base]
+address = "0xAc9c5477Dd6f2e9D55D408Efe7dE826B8Cd30E67"
+swapper = "0xe403614F41554fC0f7A3dD581878D0024Dc978E9"
+rootfiles = "github:MakinaHQ/config/machines/tstUSDC3/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
