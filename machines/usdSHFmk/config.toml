@@ -34,3 +34,14 @@ address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 decimals = 6
 name = "USD Coin"
 symbol = "USDC"
+
+[calibers.monad]
+address = "0xbeef123217647014429B7670329782e210884E89"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/usdSHFmk/monad/rootfiles"
+
+[calibers.monad.accounting_token]
+address = "0x754704Bc059F8C67012fEd69BC8A327a5aafb603"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
