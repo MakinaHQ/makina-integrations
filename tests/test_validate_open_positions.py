@@ -13,6 +13,7 @@ from __future__ import annotations
 import importlib.util
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -68,6 +69,56 @@ class ValidateOpenPositionsTests(unittest.TestCase):
         self.assertEqual(caliber_address, "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC")
         self.assertIn("128264429154381135287798106504544985667", position_ids)
         self.assertEqual(len(position_ids), 25)
+
+    def test_extract_caliber_metadata_allows_empty_positions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            machine_dir = Path(tmpdir) / "machines" / "example"
+            chain_dir = machine_dir / "monad"
+            chain_dir.mkdir(parents=True)
+            caliber_path = chain_dir / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  caliber_address:\n"
+                "    value: 0x1111111111111111111111111111111111111111\n"
+                "positions: []\n"
+            )
+
+            caliber_address, position_ids = validate_open_positions.extract_caliber_metadata(caliber_path)
+
+            self.assertEqual(caliber_address, "0x1111111111111111111111111111111111111111")
+            self.assertEqual(position_ids, set())
+
+    def test_validate_target_allows_initial_empty_rootfile_and_empty_positions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            machine_dir = Path(tmpdir) / "machines" / "example"
+            chain_dir = machine_dir / "monad"
+            rootfiles_dir = chain_dir / "rootfiles"
+            rootfiles_dir.mkdir(parents=True)
+
+            caliber_path = chain_dir / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  caliber_address:\n"
+                "    value: 0x1111111111111111111111111111111111111111\n"
+                "positions: []\n"
+            )
+            rootfile_path = rootfiles_dir / "20260101-empty.toml"
+            rootfile_path.write_text("[instructions]\n")
+
+            target = validate_open_positions.RootfileTarget(
+                machine="example",
+                chain="monad",
+                rootfile_path=rootfile_path,
+                caliber_path=caliber_path,
+            )
+            reader = FakeReader([])
+
+            result = validate_open_positions.validate_target(target, reader)
+
+            self.assertTrue(result.ok)
+            self.assertEqual(result.missing_in_caliber, [])
+            self.assertEqual(result.missing_in_rootfile, [])
+            self.assertEqual(result.duplicate_accounting, [])
 
     def test_extract_accounting_counts_detects_reservoir_position(self) -> None:
         working_rootfile = (
