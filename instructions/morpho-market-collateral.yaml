@@ -1,0 +1,80 @@
+# Morpho Market Collateral — add, withdraw, and account for collateral in a Morpho market.
+#
+# Expected caliber vars:
+#   label:            string   — e.g. "cbBTC/USDC (0x64d6...cc64)"
+#   market_id:        bytes32  — Morpho market identifier
+#   collateral_token: address  — collateral token address
+#
+# Expected config:
+#   caliber_address
+#   morpho_address
+#   caliber_helper_address
+
+# add collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# withdraw collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      receiver_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# account for position collateral
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/account.yaml:account_collateral"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"

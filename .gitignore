@@ -1,6 +1,7 @@
 **/.DS_Store
 .devcontainer/
 !*.claude
+.claude/projects/
 machines*.toml
 **__pycache__
 *local*
