@@ -79,7 +79,7 @@ class ValidateOpenPositionsTests(unittest.TestCase):
             caliber_path.write_text(
                 "config:\n"
                 "  caliber_address:\n"
-                "    value: 0x1111111111111111111111111111111111111111\n"
+                "    value: '0x1111111111111111111111111111111111111111'\n"
                 "positions: []\n"
             )
 
@@ -99,7 +99,7 @@ class ValidateOpenPositionsTests(unittest.TestCase):
             caliber_path.write_text(
                 "config:\n"
                 "  caliber_address:\n"
-                "    value: 0x1111111111111111111111111111111111111111\n"
+                "    value: '0x1111111111111111111111111111111111111111'\n"
                 "positions: []\n"
             )
             rootfile_path = rootfiles_dir / "20260101-empty.toml"
