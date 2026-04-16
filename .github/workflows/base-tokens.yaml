@@ -1,0 +1,68 @@
+# Validates that every affected_token in the latest added rootfile is a
+# registered base token on the corresponding Caliber contract.
+# Runs on PRs that add new rootfiles.
+#
+# Required repo secret:
+#   - ALCHEMY_API_KEY
+
+name: Base Tokens
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-base-tokens:
+    name: Validate affected tokens are base tokens on Caliber
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # full history needed to diff against base branch
+
+      # Detect which rootfile TOMLs were added (not modified) in this PR
+      - name: Get added rootfiles
+        id: changed-rootfiles
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            ADDED_FILES=$(git diff --name-only --diff-filter=A "origin/$BASE_REF" -- 'machines/*/*/rootfiles/*.toml')
+          else
+            ADDED_FILES=""
+          fi
+          if [ -z "$ADDED_FILES" ]; then
+            echo "added_files=" >> "$GITHUB_OUTPUT"
+            echo "added_files_count=0" >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "added_files<<ROOTFILES_EOF"
+              echo "$ADDED_FILES"
+              echo "ROOTFILES_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "added_files_count=$(echo "$ADDED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install uv
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        uses: astral-sh/setup-uv@v7
+
+      - name: Run validator unit tests
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        run: uv run --with 'web3==7.14.1' --with pyyaml python -m unittest tests.test_validate_base_tokens
+
+      - name: Validate affected tokens are base tokens
+        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        env:
+          ADDED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.added_files }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+        run: uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_base_tokens.py ${ADDED_ROOTFILES}
+
+      - name: Skip when no rootfiles were added
+        if: steps.changed-rootfiles.outputs.added_files_count == 0
+        run: echo "No added rootfiles to validate."

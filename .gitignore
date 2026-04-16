@@ -2,4 +2,5 @@
 .devcontainer/
 !*.claude
 machines*.toml
+**__pycache__
 *local*
