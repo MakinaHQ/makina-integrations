@@ -326,29 +326,6 @@ index = 0
 name = "cloid"
 type = "Uint"
 
-[instructions.hyperliquid.cancel_order."HyperCore HYPE Spot - Cancel Order"]
-position_id = "100000000000000000000000000000000000005"
-description = "HyperCore HYPE Spot"
-is_debt = false
-group_id = "1"
-instruction_type = 0
-affected_tokens = []
-position_tokens = []
-commands = [
-  "0x3def2d28010100ff0000008131165bee7971e106a52fd3101e07dcc06dd39330",
-  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
-]
-state = [
-  "0x65a51810cfa0450e9187775b738f3f8e1293ef422075270a48fad613c735e7d9",
-  "0x000000000000000000000000000000000000000000000000000000000000277b",
-]
-bitmap = "85070591730234615865843651857942052864"
-
-[[instructions.hyperliquid.cancel_order."HyperCore HYPE Spot - Cancel Order".inputs_slots]]
-index = 0
-name = "cloid"
-type = "Uint"
-
 [instructions.hyperliquid.cancel_order."HyperCore HYPE-PERP - Cancel Order"]
 position_id = "100000000000000000000000000000000000007"
 description = "HyperCore HYPE-PERP"
@@ -368,6 +345,29 @@ state = [
 bitmap = "85070591730234615865843651857942052864"
 
 [[instructions.hyperliquid.cancel_order."HyperCore HYPE-PERP - Cancel Order".inputs_slots]]
+index = 0
+name = "cloid"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order."HyperCore HYPE/USDC Spot - Cancel Order"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x3def2d28010100ff0000008131165bee7971e106a52fd3101e07dcc06dd39330",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x65a51810cfa0450e9187775b738f3f8e1293ef422075270a48fad613c735e7d9",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order."HyperCore HYPE/USDC Spot - Cancel Order".inputs_slots]]
 index = 0
 name = "cloid"
 type = "Uint"
@@ -464,29 +464,6 @@ index = 0
 name = "oid"
 type = "Uint"
 
-[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE Spot - Cancel Order by OID"]
-position_id = "100000000000000000000000000000000000005"
-description = "HyperCore HYPE Spot"
-is_debt = false
-group_id = "1"
-instruction_type = 0
-affected_tokens = []
-position_tokens = []
-commands = [
-  "0xc711e15c010100ff0000008131165bee7971e106a52fd3101e07dcc06dd39330",
-  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
-]
-state = [
-  "0x426385aa83d5b9e968f38b4a98789c805c7b15c56c5421858102db92112835bb",
-  "0x000000000000000000000000000000000000000000000000000000000000277b",
-]
-bitmap = "85070591730234615865843651857942052864"
-
-[[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE Spot - Cancel Order by OID".inputs_slots]]
-index = 0
-name = "oid"
-type = "Uint"
-
 [instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE-PERP - Cancel Order by OID"]
 position_id = "100000000000000000000000000000000000007"
 description = "HyperCore HYPE-PERP"
@@ -506,6 +483,29 @@ state = [
 bitmap = "85070591730234615865843651857942052864"
 
 [[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE-PERP - Cancel Order by OID".inputs_slots]]
+index = 0
+name = "oid"
+type = "Uint"
+
+[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE/USDC Spot - Cancel Order by OID"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xc711e15c010100ff0000008131165bee7971e106a52fd3101e07dcc06dd39330",
+  "0x17938e130181ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0x426385aa83d5b9e968f38b4a98789c805c7b15c56c5421858102db92112835bb",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.hyperliquid.cancel_order_by_oid."HyperCore HYPE/USDC Spot - Cancel Order by OID".inputs_slots]]
 index = 0
 name = "oid"
 type = "Uint"
@@ -833,65 +833,6 @@ index = 5
 name = "cloid"
 type = "Uint"
 
-[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order"]
-position_id = "100000000000000000000000000000000000005"
-description = "HyperCore HYPE Spot"
-is_debt = false
-group_id = "1"
-instruction_type = 0
-affected_tokens = []
-position_tokens = []
-commands = [
-  "0xaa9a091201010608ff0000068853b15faa49e90bb755ddb15bc5cf36a8312004",
-  "0xaa9a091201020708ff0000088853b15faa49e90bb755ddb15bc5cf36a8312004",
-  "0x748e0739410000000000008831165bee7971e106a52fd3101e07dcc06dd39330",
-  "0x09000608030405ff000000000000000000000000000000000000000000000000",
-  "0x17938e130188ff00000000ff3333333333333333333333333333333333333333",
-]
-state = [
-  "0xf3b582a6fcd545f7270917e7c3d714e59464ec101a5c32bf2ee2ceb48091893f",
-  "0x8f11ca4aaad3eed2a14925f3308a197306ad60f32971d01d91b1dc3f23ddd247",
-  "0xde8c1c7221ac9a62381f5e91582ea21c8affeda219826fbc12ed97ce13baf081",
-  "0x5e9d1e7e3e45797c435885ce847de2aef4066322c81b36cf5db093f89fb53f71",
-  "0x1d9d0043fc99bc4186fb4a1690ce6321d21952cab5738491505962e54b08503a",
-  "0x65a51810cfa0450e9187775b738f3f8e1293ef422075270a48fad613c735e7d9",
-  "0x0000000000000000000000000000000000000000000000000000000000000064",
-  "0x00000000000000000000000000000000000000000000000000000000000f4240",
-  "0x0000000000000000000000000000000000000000000000000000000000000001",
-  "0x000000000000000000000000000000000000000000000000000000000000277b",
-]
-bitmap = "4984604984193434523389276476051292160"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 0
-name = "is_buy"
-type = "Bool"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 1
-name = "limit_px"
-type = "Uint"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 2
-name = "sz"
-type = "Uint"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 3
-name = "reduce_only"
-type = "Bool"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 4
-name = "tif"
-type = "Uint"
-
-[[instructions.hyperliquid.place_limit_order."HyperCore HYPE Spot - Place Limit Order".inputs_slots]]
-index = 5
-name = "cloid"
-type = "Uint"
-
 [instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order"]
 position_id = "100000000000000000000000000000000000007"
 description = "HyperCore HYPE-PERP"
@@ -947,6 +888,65 @@ name = "tif"
 type = "Uint"
 
 [[instructions.hyperliquid.place_limit_order."HyperCore HYPE-PERP - Place Limit Order".inputs_slots]]
+index = 5
+name = "cloid"
+type = "Uint"
+
+[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order"]
+position_id = "100000000000000000000000000000000000005"
+description = "HyperCore HYPE Spot"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xaa9a091201010608ff0000068853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0xaa9a091201020708ff0000088853b15faa49e90bb755ddb15bc5cf36a8312004",
+  "0x748e0739410000000000008831165bee7971e106a52fd3101e07dcc06dd39330",
+  "0x09000608030405ff000000000000000000000000000000000000000000000000",
+  "0x17938e130188ff00000000ff3333333333333333333333333333333333333333",
+]
+state = [
+  "0xf3b582a6fcd545f7270917e7c3d714e59464ec101a5c32bf2ee2ceb48091893f",
+  "0x8f11ca4aaad3eed2a14925f3308a197306ad60f32971d01d91b1dc3f23ddd247",
+  "0xde8c1c7221ac9a62381f5e91582ea21c8affeda219826fbc12ed97ce13baf081",
+  "0x5e9d1e7e3e45797c435885ce847de2aef4066322c81b36cf5db093f89fb53f71",
+  "0x1d9d0043fc99bc4186fb4a1690ce6321d21952cab5738491505962e54b08503a",
+  "0x65a51810cfa0450e9187775b738f3f8e1293ef422075270a48fad613c735e7d9",
+  "0x0000000000000000000000000000000000000000000000000000000000000064",
+  "0x00000000000000000000000000000000000000000000000000000000000f4240",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000000000000000000000000000000000000000277b",
+]
+bitmap = "4984604984193434523389276476051292160"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
+index = 0
+name = "is_buy"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
+index = 1
+name = "limit_px"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
+index = 2
+name = "sz"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
+index = 3
+name = "reduce_only"
+type = "Bool"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
+index = 4
+name = "tif"
+type = "Uint"
+
+[[instructions.hyperliquid.place_limit_order."HyperCore HYPE/USDC Spot - Place Limit Order".inputs_slots]]
 index = 5
 name = "cloid"
 type = "Uint"
