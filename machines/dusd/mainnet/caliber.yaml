@@ -258,6 +258,7 @@ positions:
     group_id: "1"
     description: "AaveV3 Borrow USDC (sUSDe E-Mode)"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x72E95b8931767C79bA4EeE721354d6E99a61D004"]
     vars:
       label: "USDC - Borrow"
       asset_address: ${token_list.mainnet.USDC}
@@ -266,6 +267,7 @@ positions:
     group_id: "1"
     description: "AaveV3 Borrow USDT (sUSDe E-Mode)"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"]
     vars:
       label: "USDT - Borrow"
       asset_address: ${token_list.mainnet.USDT}

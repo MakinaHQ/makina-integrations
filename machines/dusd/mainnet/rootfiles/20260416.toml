@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x398d51cb7f3ce7d0a8d7101ca2dddd9bc7708ec27269da4dae4c7052750ef1d4
+# root: 0x7a596a327c58994bb41c9de646a503faa3ac1edf41bde56ee7ec85d72f2d3df1
 
 [tokens."${token_list.mainnet.AUSD}"]
 chainId = 1
@@ -387,7 +387,7 @@ is_debt = true
 group_id = "1"
 instruction_type = 1
 affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
-position_tokens = []
+position_tokens = ["0x72e95b8931767c79ba4eee721354d6e99a61d004"]
 commands = ["0x70a082310102ff000000000072e95b8931767c79ba4eee721354d6e99a61d004"]
 state = [
   "0x",
@@ -438,7 +438,7 @@ is_debt = true
 group_id = "1"
 instruction_type = 1
 affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
-position_tokens = []
+position_tokens = ["0x6df1c1e379bc5a00a7b4c6e67a203333772f45a8"]
 commands = ["0x70a082310102ff00000000006df1c1e379bc5a00a7b4c6e67a203333772f45a8"]
 state = [
   "0x",
