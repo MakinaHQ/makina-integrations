@@ -1,0 +1,84 @@
+# Morpho Market Debt — borrow, repay, and account for debt in a Morpho market.
+#
+# Expected caliber vars:
+#   label:      string   — e.g. "cbBTC/USDC (0x64d6...cc64)"
+#   market_id:  bytes32  — Morpho market identifier
+#   loan_token: address  — loan token address
+#
+# Expected config:
+#   caliber_address
+#   morpho_address
+#   caliber_helper_address
+#   unsigned_math_helper_address
+
+# take debt
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# repay asset
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# account for position debt
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/account.yaml:account_debt"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

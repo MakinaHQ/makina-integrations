@@ -57,15 +57,23 @@ positions:
     description: "Fluid Rewards Harvest"
     instructions: !include "./instructions/fluid-harvest.yaml"
 
-  # ── Morpho Borrow (group_id: 1) ──────────────────────────────────
+  # ── Morpho Borrow WBTC/USDT (group_id: 1) ─────────────────────────
   - id: "267817327015029666442373327908997100870"
     group_id: "1"
     description: "Morpho WBTC collateral (market: 0xa921...df99)"
-    instructions: !include "./instructions/morpho-market-wbtc-usdt-collateral.yaml"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "WBTC/USDT (0xa921...df99)"
+      market_id: "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99"
+      collateral_token: ${token_list.mainnet.WBTC}
   - id: "228481923040099053229178665275904234712"
     group_id: "1"
     description: "Morpho USDT debt (market: 0xa921...df99)"
-    instructions: !include "./instructions/morpho-market-wbtc-usdt-debt.yaml"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "WBTC/USDT (0xa921...df99)"
+      market_id: "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99"
+      loan_token: ${token_list.mainnet.USDT}
 
   # ── Morpho Vaults ─────────────────────────────────────────────────
   - id: "276843631519342658565251846836976075217"
@@ -225,6 +233,60 @@ positions:
     description: "Makina DUSD"
     instructions: !include "./instructions/makina-dusd.yaml"
     position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"]
+
+  # ── Morpho Borrow cbBTC/USDC (group_id: 3) ────────────────────────
+  - id: "332394650277740717569616982865246707996"
+    group_id: "3"
+    description: "Morpho cbBTC collateral (market: 0x64d6...cc64)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "cbBTC/USDC (0x64d6...cc64)"
+      market_id: "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64"
+      collateral_token: ${token_list.mainnet.cbBTC}
+  - id: "312910479406993719554638769242155700507"
+    group_id: "3"
+    description: "Morpho USDC debt (market: 0x64d6...cc64)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "cbBTC/USDC (0x64d6...cc64)"
+      market_id: "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64"
+      loan_token: ${token_list.mainnet.USDC}
+
+  # ── Morpho Borrow cbBTC/PYUSD (group_id: 4) ──────────────────────
+  - id: "76187594814739504457272358549676087055"
+    group_id: "4"
+    description: "Morpho cbBTC collateral (market: 0xd8a8...2323)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "cbBTC/PYUSD (0xd8a8...2323)"
+      market_id: "0xd8a8e6667f58aa9229e8979bd619742b1660ee856c200a93e407dbccb7222323"
+      collateral_token: ${token_list.mainnet.cbBTC}
+  - id: "36256656678408652350444967916537968508"
+    group_id: "4"
+    description: "Morpho PYUSD debt (market: 0xd8a8...2323)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "cbBTC/PYUSD (0xd8a8...2323)"
+      market_id: "0xd8a8e6667f58aa9229e8979bd619742b1660ee856c200a93e407dbccb7222323"
+      loan_token: ${token_list.mainnet.PYUSD}
+
+  # ── Morpho Borrow cbBTC/RLUSD (group_id: 5) ──────────────────────
+  - id: "319451093531069235108309474750479960434"
+    group_id: "5"
+    description: "Morpho cbBTC collateral (market: 0xffd0...39bc)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "cbBTC/RLUSD (0xffd0...39bc)"
+      market_id: "0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc"
+      collateral_token: ${token_list.mainnet.cbBTC}
+  - id: "180259573039435666454981564615824393430"
+    group_id: "5"
+    description: "Morpho RLUSD debt (market: 0xffd0...39bc)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "cbBTC/RLUSD (0xffd0...39bc)"
+      market_id: "0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc"
+      loan_token: ${token_list.mainnet.RLUSD}
 
   # ── Morpho Loops ─────────────────────────────────────────────────
   - id: "219384756102938475610293847561029384756"
