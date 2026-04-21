@@ -1,0 +1,50 @@
+protocol: "royco-vault"
+
+# Royco DSV Deposit Blueprint
+# Standard ERC-4626 deposit: approve USDC, then deposit(assets, receiver)
+# The vault has a whitelist hook - caliber must be whitelisted before deposits
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+
+inputs:
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Approve USDC spending by the vault"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      - description: "Deposit USDC into vault and receive srRoyUSDC shares"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit into the Royco vault (6 decimals)"

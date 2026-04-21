@@ -200,6 +200,13 @@
       "symbol": "USDtb"
     },
     {
+      "chainId": 1,
+      "address": "0xcD9f5907F92818bC06c9Ad70217f089E190d2a32",
+      "name": "Senior Royco USDC",
+      "decimals": 6,
+      "symbol": "srRoyUSDC"
+    },
+    {
       "chainId": 8453,
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
       "name": "EURC",

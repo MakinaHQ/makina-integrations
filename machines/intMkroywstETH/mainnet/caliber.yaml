@@ -1,0 +1,139 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0x3d8E2497497a3e29Ad5391c08dB2a1b3C32598c0"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  key_value_store_address:
+    type: "address"
+    value: "0xe5A198558D132e7479900069647c7Dc62939B5da"
+
+positions:
+  # ── Royco DSV Vaults (group_id: 0) ────────────────────────────────
+  - id: "280338549168961874788548616634684503310"
+    group_id: "0"
+    description: "Royco Senior Royco USDC (srRoyUSDC)"
+    instructions: !include "../../../instructions/royco-vault.yaml"
+    position_tokens:
+      - "0xcD9f5907F92818bC06c9Ad70217f089E190d2a32" # srRoyUSDC
+    vars:
+      label: "srRoyUSDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: ${token_list.mainnet.srRoyUSDC}
+      kv_storage_key: "${keccak256(makina.mainnet.royco.srRoyUSDC)}"
+      kv_pending_shares_key: "${keccak256(makina.mainnet.royco.srRoyUSDC.pending_shares)}"
+
+  # ── Morpho Borrow wstETH/USDT (group_id: 1) ──────────────────────
+  - id: "228752854137756671577525718546471569592"
+    group_id: "1"
+    description: "Morpho wstETH collateral (market: 0xe7e9...87d2)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/USDT (0xe7e9...87d2)"
+      market_id: "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "231865414965890906957476782409120809184"
+    group_id: "1"
+    description: "Morpho USDT debt (market: 0xe7e9...87d2)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/USDT (0xe7e9...87d2)"
+      market_id: "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2"
+      loan_token: ${token_list.mainnet.USDT}
+
+  # ── Morpho Borrow wstETH/USDC (group_id: 2) ──────────────────────
+  - id: "102085800190891488320502506258850684527"
+    group_id: "2"
+    description: "Morpho wstETH collateral (market: 0xb323...86cc)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/USDC (0xb323...86cc)"
+      market_id: "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "91290664943915222943338577479383966617"
+    group_id: "2"
+    description: "Morpho USDC debt (market: 0xb323...86cc)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/USDC (0xb323...86cc)"
+      market_id: "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc"
+      loan_token: ${token_list.mainnet.USDC}
+
+  # ── Morpho Borrow wstETH/PYUSD (group_id: 3) ─────────────────────
+  - id: "163478601671182982890720206633991340782"
+    group_id: "3"
+    description: "Morpho wstETH collateral (market: 0xf5c5...4d27)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/PYUSD (0xf5c5...4d27)"
+      market_id: "0xf5c5df23559b0fb56560a7578ea17d81e245153ba64b8132df026c9358864d27"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "36824776297893515328125497271945688587"
+    group_id: "3"
+    description: "Morpho PYUSD debt (market: 0xf5c5...4d27)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/PYUSD (0xf5c5...4d27)"
+      market_id: "0xf5c5df23559b0fb56560a7578ea17d81e245153ba64b8132df026c9358864d27"
+      loan_token: ${token_list.mainnet.PYUSD}
+
+  # ── Morpho Borrow wstETH/USDC (group_id: 4) ──────────────────────
+  - id: "327342762600167818033133681100900962486"
+    group_id: "4"
+    description: "Morpho wstETH collateral (market: 0x6d2f...31c2)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/USDC (0x6d2f...31c2)"
+      market_id: "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "70667808894144221407616324166664387747"
+    group_id: "4"
+    description: "Morpho USDC debt (market: 0x6d2f...31c2)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/USDC (0x6d2f...31c2)"
+      market_id: "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2"
+      loan_token: ${token_list.mainnet.USDC}
+
+  # ── Morpho Borrow wstETH/AUSD (group_id: 5) ──────────────────────
+  - id: "190927119265135130346160414160740410205"
+    group_id: "5"
+    description: "Morpho wstETH collateral (market: 0xfcd3...d20f)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/AUSD (0xfcd3...d20f)"
+      market_id: "0xfcd3b104b9a592d4377edd68f48ecf60082d787b64ca97a3385f3cc4cb9bd20f"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "240991974569904755752905599636811274552"
+    group_id: "5"
+    description: "Morpho AUSD debt (market: 0xfcd3...d20f)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/AUSD (0xfcd3...d20f)"
+      market_id: "0xfcd3b104b9a592d4377edd68f48ecf60082d787b64ca97a3385f3cc4cb9bd20f"
+      loan_token: ${token_list.mainnet.AUSD}
+
+  # ── Morpho Borrow wstETH/USDS (group_id: 6) ──────────────────────
+  - id: "308707710855887385186022045459610390231"
+    group_id: "6"
+    description: "Morpho wstETH collateral (market: 0xb374...ea5f)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/USDS (0xb374...ea5f)"
+      market_id: "0xb374528d44b6ab6e0cecc87e0481f45d892f38baec90c1d318851969ec14ea5f"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "286085274621524117523589480215411776313"
+    group_id: "6"
+    description: "Morpho USDS debt (market: 0xb374...ea5f)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/USDS (0xb374...ea5f)"
+      market_id: "0xb374528d44b6ab6e0cecc87e0481f45d892f38baec90c1d318851969ec14ea5f"
+      loan_token: ${token_list.mainnet.USDS}

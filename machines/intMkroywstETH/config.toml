@@ -1,0 +1,14 @@
+name = "intMkroywstETH"
+chain = "mainnet"
+address = "0x0FDF9F1920e160ea8Ae267BdE13e725DeF81E5Ee"
+
+[calibers.mainnet]
+address = "0x3d8E2497497a3e29Ad5391c08dB2a1b3C32598c0"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/intMkroywstETH/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+decimals = 18
+name = "Wrapped liquid staked Ether 2.0"
+symbol = "wstETH"
