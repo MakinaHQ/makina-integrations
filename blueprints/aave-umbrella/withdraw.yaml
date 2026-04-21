@@ -9,6 +9,8 @@ inputs:
     type: address
   caliber_address:
     type: address
+  a_token_address:
+    type: address
 
 actions:
   start_cooldown:
@@ -17,6 +19,22 @@ actions:
         target: "${inputs.stake_token_address}"
         selector: "cooldown()"
         parameters: []
+
+  # Empty MANAGEMENT used to resync the Umbrella position's cached accounting
+  # after a side-channel exit (e.g. claim-to-aToken owned by a different
+  # position). Paired with the Umbrella ACCOUNTING in a `managePositionBatch`
+  # right after the exit pair so the stkwaUSDT = 0 state is reflected in the
+  # same transaction.
+  #
+  # How it passes the _managePosition slippage check:
+  #   - pre-mgmt `_accountForPosition(acct, true)` reads stkwaUSDT = 0 while
+  #     lastValue = Y, so the position is closed here (deleted).
+  #   - no-op _execute (empty commands).
+  #   - post-mgmt `_accountForPosition(acct, false)` then sees lastValue = 0,
+  #     currentValue = 0 → change = 0. With change == 0 the
+  #     _checkPositionMaxDelta branch is skipped entirely.
+  resync_position:
+    calls: []
 
   claim_cooldown:
     calls:
@@ -49,5 +67,49 @@ actions:
                 value: "${inputs.stake_token_address}"
               - type: "address"
                 value: "${inputs.asset_address}"
+              - type: "uint256"
+                value: "${returns.max_redeemable}"
+
+  # Redeem stkwaToken directly to aToken — bypasses the Aave pool withdrawal
+  # entirely. Uses the Umbrella batch helper's AToken path (redeemATokens on
+  # the underlying static aToken wrapper), so NO pool liquidity is required.
+  # Used to exit an Umbrella position into the sibling AaveV3 Supply position
+  # when the underlying pool has no free liquidity.
+  #
+  # This MUST be run under the AaveV3 Supply position's mgmt (not the Umbrella
+  # position's), because the caliber's aToken balance increases by ~Y while
+  # the Umbrella position drops by Y — the slippage check on the Umbrella side
+  # would otherwise revert.
+  claim_cooldown_to_atoken:
+    calls:
+      - description: "Get max redeemable stake shares (cooldown window must be active)"
+        target: "${inputs.stake_token_address}"
+        selector: "maxRedeem(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "max_redeemable"
+          type: "uint256"
+
+      - description: "Approve the Umbrella batch helper to spend the stake token"
+        target: "${inputs.stake_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.umbrella_batch_helper_address}"
+          - type: "uint256"
+            value: "${returns.max_redeemable}"
+
+      - description: "Redeem via batch helper with edgeToken=aToken. The helper unwraps stkwaToken -> waToken internally then calls waToken.redeemATokens, transferring aTokens directly to the caliber. No Aave pool withdraw."
+        target: "${inputs.umbrella_batch_helper_address}"
+        selector: "redeem((address,address,uint256))"
+        parameters:
+          - type: "(address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${inputs.stake_token_address}"
+              - type: "address"
+                value: "${inputs.a_token_address}"
               - type: "uint256"
                 value: "${returns.max_redeemable}"
