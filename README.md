@@ -1,6 +1,8 @@
 # Makina Configs
 
-This repo is used to store the public configs used by the `makina-rs CLI` ([spellcaster](https://github.com/MakinaHQ/makina-rs/tree/main/crates/spellcaster)). Please note that if you are a private operator, configs can also live locally, or on another private GitHub repository. Refer to the Makina CLI documentation for more information on how to use local configs (`github:` and `local:`).
+This repo is used to store the private/test configs used by the `makina-rs CLI` ([spellcaster](https://github.com/MakinaHQ/makina-rs/tree/main/crates/spellcaster)). For public configs, refere to [MakinaHQ/makina-integrations](https://github.com/MakinaHQ/makina-integrations).
+
+Please note that if you are a private operator, configs can also live locally, or on another private GitHub repository. Refer to the Makina CLI documentation for more information on how to use local configs (`github:` and `local:`).
 
 It is made of "source files" (instructions, blueprints, calibers) which are then transpiled into rootfiles by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
 
