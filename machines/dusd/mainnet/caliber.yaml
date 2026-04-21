@@ -190,21 +190,21 @@ positions:
       vault_address: "0x32401B9fb79065Bc15949DE0BD43927492f02F0C"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
-  - id: "176021688445186810403025048632929053161"
-    group_id: "0"
-    description: "Aave Umbrella USDC"
-    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
-    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
+  # - id: "176021688445186810403025048632929053161"
+  #   group_id: "0"
+  #   description: "Aave Umbrella USDC"
+  #   instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+  #   position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
   - id: "293691712937964969352275672791079139559"
     group_id: "0"
     description: "Aave Umbrella USDT"
     instructions: !include "./instructions/aave-umbrella-usdt.yaml"
     position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
-  - id: "229457643934747132111107431329088218367"
-    group_id: "0"
-    description: "Aave Umbrella GHO"
-    instructions: !include "./instructions/aave-umbrella-gho.yaml"
-    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+  # - id: "229457643934747132111107431329088218367"
+  #   group_id: "0"
+  #   description: "Aave Umbrella GHO"
+  #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
+  #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
 
   # ── AaveV3 Supply (group_id: 1) ────────────────────────────────────
   - id: "332697612920998824307877708016163852818"
@@ -219,12 +219,8 @@ positions:
   - id: "232678016241942897729445069841802885622"
     group_id: "1"
     description: "AaveV3 Supply USDT"
-    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    instructions: !include "./instructions/aavev3-supply-usdt.yaml"
     position_tokens: ["0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"]
-    vars:
-      label: "USDT"
-      asset_address: ${token_list.mainnet.USDT}
-      aave_token: "0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"
   - id: "198834366791576294957883993689758100677"
     group_id: "1"
     description: "AaveV3 Supply USDG"
