@@ -130,21 +130,21 @@ positions:
     instructions: !include "./instructions/morpho-lend-usdt-0xfb83-6e28.yaml"
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
-  - id: "214758391026483752910384756102938475610"
-    group_id: "0"
-    description: "Aave Umbrella USDC"
-    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
-    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
+  # - id: "214758391026483752910384756102938475610"
+  #   group_id: "0"
+  #   description: "Aave Umbrella USDC"
+  #   instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+  #   position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
   - id: "192837465019283746501928374650192837465"
     group_id: "0"
     description: "Aave Umbrella USDT"
     instructions: !include "./instructions/aave-umbrella-usdt.yaml"
     position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
-  - id: "305917264830591726483059172648305917264"
-    group_id: "0"
-    description: "Aave Umbrella GHO"
-    instructions: !include "./instructions/aave-umbrella-gho.yaml"
-    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+  # - id: "305917264830591726483059172648305917264"
+  #   group_id: "0"
+  #   description: "Aave Umbrella GHO"
+  #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
+  #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
 
   # ── AaveV3 Supply (group_id: 2) ────────────────────────────────────
   - id: "332697612920998824307877708016163852818"
@@ -159,12 +159,8 @@ positions:
   - id: "232678016241942897729445069841802885622"
     group_id: "2"
     description: "AaveV3 Supply USDT"
-    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    instructions: !include "./instructions/aavev3-supply-usdt.yaml"
     position_tokens: ["0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"]
-    vars:
-      label: "USDT - Lend"
-      asset_address: ${token_list.mainnet.USDT}
-      aave_token: "0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a"
   - id: "154527051821373524649523573070693712755"
     group_id: "2"
     description: "AaveV3 Supply WBTC"

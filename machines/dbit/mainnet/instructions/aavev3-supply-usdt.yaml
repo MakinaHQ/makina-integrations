@@ -1,0 +1,101 @@
+# AaveV3 Supply USDT (dbit mainnet) — extends the shared aavev3-supply template
+# with a direct ingress from a stranded Aave Umbrella USDT cooldown.
+#
+# The claim-to-aToken flow below is owned by THIS position (AaveV3 Supply USDT)
+# rather than the Umbrella USDT position because:
+#   - It drains stkwaUSDT (Umbrella value Y -> 0) while crediting ~Y aUSDT to
+#     the caliber via the Umbrella batch helper's AToken path (redeemATokens —
+#     direct aToken transfer, does NOT touch Aave pool liquidity).
+#   - Under the Umbrella position, _checkPositionMaxDelta(Y, 0, loss) would
+#     revert (position drops Y with zero matching USDT inflow on affected
+#     tokens).
+#   - Under AaveV3 Supply USDT, isPositionIncrease=true, isDebt=false, so
+#     `isDebt == isPositionIncrease` is false and the slippage check is
+#     skipped entirely in _managePosition.
+#
+# Operator workflow — ONE transaction via managePositionBatch, two instruction
+# pairs in order:
+#   Pair 0 (this file): claim_cooldown_to_atoken mgmt + aavev3-supply ACCOUNTING
+#     → batch helper's AToken path; aUSDT position Z → Z+Y, no pool liquidity.
+#   Pair 1 (aave-umbrella-usdt.yaml:resync_position):
+#     aave-umbrella/withdraw.yaml:resync_position mgmt + umbrella ACCOUNTING
+#     → pre-mgmt acct observes on-chain stkwaUSDT=0 and closes the Umbrella
+#       position; post-mgmt acct returns change=0 so the slippage check is
+#       skipped. The Umbrella position ends this tx already closed, so no
+#       accounting gap remains.
+
+# ── Standard AaveV3 Supply actions (add_collateral / withdraw_collateral / account) ──
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "USDT - Lend"
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${token_list.mainnet.USDT}
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "USDT - Lend"
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${token_list.mainnet.USDT}
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "USDT - Lend"
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: "0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a" # aEthUSDT
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── Direct claim from Umbrella into AaveV3 Supply USDT ────────────────────
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "USDT - Umbrella Claim To AToken"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown_to_atoken"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31" # stkwaUSDT
+      a_token_address:
+        type: "address"
+        value: "0x23878914EFE38d27C4D67Ab83ed1b93A74D4086a" # aEthUSDT
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
