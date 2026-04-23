@@ -30,24 +30,6 @@ positions:
       kv_storage_key: "${keccak256(makina.mainnet.royco.srRoyUSDC)}"
       kv_pending_shares_key: "${keccak256(makina.mainnet.royco.srRoyUSDC.pending_shares)}"
 
-  # ── Morpho Borrow wstETH/USDT (group_id: 1) ──────────────────────
-  - id: "228752854137756671577525718546471569592"
-    group_id: "1"
-    description: "Morpho wstETH collateral (market: 0xe7e9...87d2)"
-    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
-    vars:
-      label: "wstETH/USDT (0xe7e9...87d2)"
-      market_id: "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2"
-      collateral_token: ${token_list.mainnet.wstETH}
-  - id: "231865414965890906957476782409120809184"
-    group_id: "1"
-    description: "Morpho USDT debt (market: 0xe7e9...87d2)"
-    instructions: !include "../../../instructions/morpho-market-debt.yaml"
-    vars:
-      label: "wstETH/USDT (0xe7e9...87d2)"
-      market_id: "0xe7e9694b754c4d4f7e21faf7223f6fa71abaeb10296a4c43a54a7977149687d2"
-      loan_token: ${token_list.mainnet.USDT}
-
   # ── Morpho Borrow wstETH/USDC (group_id: 2) ──────────────────────
   - id: "102085800190891488320502506258850684527"
     group_id: "2"
