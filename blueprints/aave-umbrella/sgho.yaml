@@ -1,0 +1,102 @@
+protocol: Savings GHO
+
+# Aave Savings GHO — the new "stkGHO" StakedAaveV3-style Safety Module deployed
+# under Aave's Umbrella product line, but with a completely different interface
+# from the waToken-based Umbrella stake tokens (no batch helper, no waToken
+# wrapping). Shares redeem 1:1 with GHO (exchange rate is pinned to 1 and only
+# drifts on slashing), and yield is distributed off-chain via Merkl — so only
+# deposit, account, and redeem actions live here.
+
+inputs:
+  asset_address:
+    type: address
+  stake_token_address:
+    type: address
+  caliber_address:
+    type: address
+
+actions:
+  # Approve GHO to the stake token contract, then stake in a single call.
+  # `stake(to, amount)` is the classic stkAAVE-style entrypoint — GHO is
+  # transferred from the caliber and stkGHO minted directly to the caliber.
+  stake:
+    calls:
+      - description: "Approve the stake token (Savings GHO) to pull GHO from the caliber"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stake_token_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+      - description: "Stake GHO into Savings GHO, minting stkGHO to the caliber"
+        target: "${inputs.stake_token_address}"
+        selector: "stake(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+    input_slots:
+      amount_to_stake:
+        type: uint256
+        description: "The amount of GHO to stake into Savings GHO."
+
+  # stkGHO <> GHO is 1:1 (exchange rate pinned; only slashing can move it).
+  # Yield is distributed off-chain via Merkl, so balanceOf is the right value.
+  account:
+    calls:
+      - description: "Get the caliber's stkGHO balance (== its underlying GHO value at 1:1)"
+        target: "${inputs.stake_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "caliber_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.caliber_balance}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}
+
+  # Single-tx full exit. `COOLDOWN_SECONDS == 0` on Savings GHO and the
+  # `_redeem` guard uses `>=` against `cooldownSnapshot.timestamp`, so
+  # cooldown and redeem can chain in one tx:
+  #
+  #   1. `cooldown()` snapshots (timestamp=block.timestamp, amount=balance)
+  #   2. `balanceOf(caliber)` reads the stkGHO shares
+  #   3. `redeem(caliber, balance)` burns everything and returns GHO
+  #
+  # `balance` is passed (not UINT256_MAX) because `redeem` casts amount to
+  # uint104 via SafeCast, which would revert on MAX. Passing the balance is
+  # safe: `_redeem` caps amount to `cooldownSnapshot.amount` internally.
+  redeem_max:
+    calls:
+      - description: "Start cooldown on the caliber — snapshots the full stkGHO balance as redeemable"
+        target: "${inputs.stake_token_address}"
+        selector: "cooldown()"
+        parameters: []
+
+      - description: "Read the caliber's current stkGHO balance"
+        target: "${inputs.stake_token_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "stk_balance"
+          type: "uint256"
+
+      - description: "Redeem all stkGHO for GHO. Burns the caliber's shares and transfers underlying GHO back."
+        target: "${inputs.stake_token_address}"
+        selector: "redeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.stk_balance}"
