@@ -1,0 +1,55 @@
+# Aave Savings GHO (StakedAaveV3-style stake token deployed at
+# 0x1a88Df1cFe15Af22B3c4c783D4e6F7F9e0C1885d) — deposit, accounting, and
+# single-tx full redeem. Yield is distributed off-chain via Merkl (handled
+# by the existing Merkl position), so no HARVEST instruction lives here.
+#
+# Contract properties driving the blueprint: STAKED_TOKEN = GHO, shares
+# redeem 1:1 with GHO, COOLDOWN_SECONDS = 0, UNSTAKE_WINDOW = 48h.
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.GHO}
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/sgho.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: ${token_list.mainnet.GHO}
+      stake_token_address:
+        type: "address"
+        value: "0x1a88Df1cFe15Af22B3c4c783D4e6F7F9e0C1885d" # Savings GHO (stkGHO)
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.GHO}
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/sgho.yaml:account"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x1a88Df1cFe15Af22B3c4c783D4e6F7F9e0C1885d" # Savings GHO (stkGHO)
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.GHO}
+  instruction:
+    label: "GHO"
+    path: "../../../blueprints/aave-umbrella/sgho.yaml:redeem_max"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0x1a88Df1cFe15Af22B3c4c783D4e6F7F9e0C1885d" # Savings GHO (stkGHO)
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

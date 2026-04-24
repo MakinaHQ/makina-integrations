@@ -205,6 +205,11 @@ positions:
   #   description: "Aave Umbrella GHO"
   #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
   #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+  - id: "107031348711587941411569515464890863894"
+    group_id: "0"
+    description: "Aave Savings GHO"
+    instructions: !include "./instructions/savings-gho.yaml"
+    position_tokens: ["0x1a88Df1cFe15Af22B3c4c783D4e6F7F9e0C1885d"]
 
   # ── AaveV3 Supply (group_id: 1) ────────────────────────────────────
   - id: "332697612920998824307877708016163852818"
