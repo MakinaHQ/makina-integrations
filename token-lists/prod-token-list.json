@@ -117,6 +117,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC",
+      "name": "cap USD",
+      "decimals": 18,
+      "symbol": "cUSD"
+    },
+    {
+      "chainId": 1,
       "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
       "name": "Coinbase Wrapped BTC",
       "decimals": 8,
@@ -163,6 +170,13 @@
       "name": "Liquid staked Ether 2.0",
       "decimals": 18,
       "symbol": "stETH"
+    },
+    {
+      "chainId": 1,
+      "address": "0x88887bE419578051FF9F4eb6C858A951921D8888",
+      "name": "Staked cap USD",
+      "decimals": 18,
+      "symbol": "stcUSD"
     },
     {
       "chainId": 1,

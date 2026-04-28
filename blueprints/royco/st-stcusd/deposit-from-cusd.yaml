@@ -1,0 +1,88 @@
+protocol: "royco-st-stcusd"
+
+# Royco Senior Tranche stcUSD - Deposit from cUSD Blueprint
+# cUSD (already in caliber) -> stcUSD (ERC4626) -> ST-stcUSD shares.
+# Used to re-enter the position from caliber-held cUSD WITHOUT touching the Cap Vault —
+# avoids the burn->mint roundtrip and any Cap fee/whitelist exposure.
+#
+# Typical scenario: operator previously called withdraw-to-cusd.yaml (because Cap Vault
+# was illiquid for cUSD->USDC) and now wants to redeploy that cUSD into ST-stcUSD without
+# first converting back to USDC.
+#
+# No whitelist guard needed — does not touch the Cap Vault.
+# No slippage protection on stcUSD/ST deposits — both are deterministic given current
+# vault state (ERC4626 share-price for stcUSD, Royco kernel NAV-derivation for ST).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  cusd_address:
+    type: "address"
+    value: "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC"
+  stcusd_address:
+    type: "address"
+    value: "0x88887bE419578051FF9F4eb6C858A951921D8888"
+  senior_tranche_address:
+    type: "address"
+    value: "0xa7Da92685ea436276B2e87aE12E5eE6DABaD5bB5"
+
+inputs: {}
+
+actions:
+  deposit_from_cusd:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Step 1: cUSD -> stcUSD via ERC4626 deposit
+      - description: "Approve cUSD spending by stcUSD vault"
+        target: "${constants.cusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.stcusd_address}"
+          - type: "uint256"
+            value: "${input_slots.cusd_amount_to_deposit}"
+
+      - description: "Deposit cUSD into stcUSD vault to receive stcUSD shares"
+        target: "${constants.stcusd_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.cusd_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_shares"
+          type: "uint256"
+
+      # Step 2: stcUSD -> ST-stcUSD (Royco Senior Tranche)
+      - description: "Approve stcUSD spending by Senior Tranche"
+        target: "${constants.stcusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+
+      - description: "Deposit stcUSD into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      cusd_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of cUSD to deposit (18 decimals). Operator must ensure caliber holds at least this amount of cUSD before calling, otherwise the approve/deposit step reverts with insufficient balance."
