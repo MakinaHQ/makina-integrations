@@ -1,0 +1,14 @@
+name = "DMG"
+chain = "mainnet"
+address = "0xC4fFab8540AC27E40D4e2930517aA711e9C00c5b"
+
+[calibers.mainnet]
+address = "0xD36f095556d5717fd9231a2091e8e98bEb7cB621"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/DMG/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
