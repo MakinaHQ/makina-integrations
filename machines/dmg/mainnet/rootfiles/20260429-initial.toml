@@ -11,7 +11,7 @@ symbol = "USDC"
 [tokens."${token_list.mainnet.mGLOBAL}"]
 chainId = 1
 address = "0x7433806912eae67919e66aea853d46fa0aef98a8"
-name = "Midas Fasanara Global "
+name = "Midas Fasanara Global"
 decimals = 18
 symbol = "mGLOBAL"
 
