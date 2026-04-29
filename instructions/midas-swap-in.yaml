@@ -1,0 +1,32 @@
+# Synthetic "swap in" instruction for asset -> mtoken
+
+# SWAP IN
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/deposit.yaml:swap_asset_for_mtoken"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      mtoken_address:
+        type: "address"
+        value: ${position.mtoken_address}
+      depositor_address:
+        type: "address"
+        value: "${position.depositor_address}"
+
+# ACCOUNTING: 0
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.mtoken_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/account.yaml:account_0"
+    inputs: {}

@@ -1,0 +1,15 @@
+protocol: "midas"
+
+constants: {}
+
+actions:
+
+  # Account: returns 0 (no-op)
+  account_0:
+    calls: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

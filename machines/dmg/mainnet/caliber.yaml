@@ -1,0 +1,15 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd36f095556d5717fd9231a2091e8e98beb7cb621"
+positions:
+  # ── Midas ────────────────────────────────────────────────────────
+  - id: "74279913377154171133723219389628797435147974258238735195930105321760025303591" # keccak256("midas.mglobal.swap-in")
+    group_id: "0"
+    description: "Midas mGlobal Swap In (synthetic)"
+    instructions: !include "../../../instructions/midas-swap-in.yaml"
+    vars:
+      label: "mGlobal Swap In (synthetic)"
+      asset_address: ${token_list.mainnet.USDC}
+      mtoken_address: ${token_list.mainnet.mGLOBAL}
+      depositor_address: "0xCe29c36c6D4556f2d01d79414C1354B968dDDEf1"
