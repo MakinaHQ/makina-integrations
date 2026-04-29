@@ -1,0 +1,167 @@
+protocol: "royco-st-syrupusdc"
+
+# Royco Senior Tranche syrupUSDC Account Blueprint
+# Sums caliber's exposure in syrupUSDC space, then converts ONCE to USDC via
+# the syrupUSDC vault's exit rate. This avoids cross-rate drift between the ST
+# kernel's NAV path (which subtracts unrealizedLosses *via* its own rate) and
+# the Maple withdrawal path (which uses convertToExitAssets), and avoids the
+# 1-wei floor truncation that occurs when scaling NAV (18 dec) -> USDC (6 dec)
+# via mulDiv(nav, 1, 1e12).
+#
+# Components:
+#   1. Active ST position: ST.convertToAssets(shares).stAssets  (syrupUSDC, 6 dec)
+#   2. Pending Maple withdrawal:  WithdrawalManager.userEscrowedShares  (syrupUSDC, 6 dec)
+#   3. total_syrup = active_syrup + escrowed_syrup
+#   4. total_usdc = syrupUSDC.convertToExitAssets(total_syrup)
+#
+# No KV store needed. lockedShares semantics in Maple include both queue-pending
+# and manualSharesAvailable, so userEscrowedShares is sufficient.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+  senior_tranche_address:
+    type: "address"
+    value: "0x66182442522D3049A941035190C315379c959250"
+  kernel_address:
+    type: "address"
+    value: "0xde1Ce2cF64808e50d000F93058784270E412B3A4"
+  syrupusdc_address:
+    type: "address"
+    value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+  withdrawal_manager_address:
+    type: "address"
+    value: "0x1bc47a0Dd0FdaB96E9eF982fdf1F34DC6207cfE3"
+
+inputs: {}
+
+actions:
+  account:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Sync tranche accounting state before reading shares -> assets rate
+      - description: "Sync tranche accounting on the market kernel"
+        target: "${constants.kernel_address}"
+        selector: "syncTrancheAccounting()"
+        parameters: []
+
+      # === ACTIVE ST POSITION (in syrupUSDC space) ===
+
+      # Get ST share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Convert ST shares to asset claims tuple (stAssets, jtAssets, nav)
+      - description: "Convert ST shares to asset claims tuple"
+        target: "${constants.senior_tranche_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+        return:
+          name: "asset_claims"
+          type: "(uint256,uint256,uint256)"
+
+      # Extract stAssets (index 0) - syrupUSDC equivalent of the active ST position (6 dec)
+      - description: "Extract stAssets (syrupUSDC, 6 dec) from asset claims tuple"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "active_st_assets"
+          type: "uint256"
+      # Extract jtAssets (index 1) - USDC equivalent of the active ST position (6 dec)
+      - description: "Extract jtAssets (USDC, 6 dec) from asset claims tuple"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "active_jt_assets"
+          type: "uint256"
+
+      # === PENDING SYRUPUSDC (escrowed in Maple WithdrawalManager) ===
+
+      # Read escrowed shares from Maple WithdrawalManager
+      - description: "Get escrowed syrupUSDC shares from Maple WithdrawalManager"
+        target: "${constants.withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "escrowed_syrup"
+          type: "uint256"
+
+      # === COMBINE ===
+
+      - description: "Total total_tranche_assets = active_st_assets + active_jt_assets"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.active_st_assets}"
+          - type: "uint256"
+            value: "${returns.active_jt_assets}"
+        return:
+          name: "total_tranche_assets"
+          type: "uint256"
+
+      # Sum active + escrowed in syrupUSDC space (single source of truth, single rate)
+      - description: "Total syrupUSDC = active_syrup + escrowed_syrup"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_tranche_assets}"
+          - type: "uint256"
+            value: "${returns.escrowed_syrup}"
+        return:
+          name: "total_syrup"
+          type: "uint256"
+
+      # Convert ONCE to USDC via the syrupUSDC vault's exit rate
+      - description: "Convert total syrupUSDC to USDC via convertToExitAssets"
+        target: "${constants.syrupusdc_address}"
+        selector: "convertToExitAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_syrup}"
+        return:
+          name: "total_usdc"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_usdc}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
