@@ -1,0 +1,66 @@
+# this is a generated file - do not edit manually
+# root: 0x1819587ae1e39f0683c5993682ca900795867d98074b4666d1a8488fed58f791
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.mainnet.mGLOBAL}"]
+chainId = 1
+address = "0x7433806912eae67919e66aea853d46fa0aef98a8"
+name = "Midas Fasanara Global "
+decimals = 18
+symbol = "mGLOBAL"
+
+[instructions.midas.account_0."mGlobal Swap In (synthetic)"]
+position_id = "74279913377154171133723219389628797435147974258238735195930105321760025303591"
+description = "Midas mGlobal Swap In (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x7433806912eae67919e66aea853d46fa0aef98a8"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.midas.swap_asset_for_mtoken."mGlobal Swap In (synthetic)"]
+position_id = "74279913377154171133723219389628797435147974258238735195930105321760025303591"
+description = "Midas mGlobal Swap In (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x313ce56701ff000000000002a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x394c8f7501000203ff0000023d623b199e290358416415ea7e05b635e442e3c0",
+  "0xc02dd27a0104020105ff00ffce29c36c6d4556f2d01d79414c1354b968dddef1",
+]
+state = [
+  "0x7373e813b271fa34d6ee6ba052fd3c8ff5caba8ef5e78aae732dc62bea5eb921",
+  "0x1096c48c2dca8226c3453819bbd1d79c52851e4c64f45b2d916d34fe57f368ec",
+  "0x000000000000000000000000ce29c36c6d4556f2d01d79414c1354b968dddef1",
+  "0x0000000000000000000000000000000000000000000000000000000000000012",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "79753679747094952374228423616820674560"
+
+[[instructions.midas.swap_asset_for_mtoken."mGlobal Swap In (synthetic)".inputs_slots]]
+index = 0
+name = "asset_amount"
+type = "Uint"
+
+[[instructions.midas.swap_asset_for_mtoken."mGlobal Swap In (synthetic)".inputs_slots]]
+index = 1
+name = "min_mtoken_amount"
+type = "Uint"
