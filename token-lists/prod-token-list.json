@@ -159,6 +159,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x7433806912Eae67919e66aea853d46Fa0aef98A8",
+      "name": "Midas Fasanara Global",
+      "decimals": 18,
+      "symbol": "mGLOBAL"
+    },
+    {
+      "chainId": 1,
       "address": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
       "name": "Staked USDe",
       "decimals": 18,

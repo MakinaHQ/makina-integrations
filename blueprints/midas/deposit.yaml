@@ -1,0 +1,71 @@
+protocol: "midas"
+
+constants:
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+inputs:
+  caliber_address:
+    type: "address"
+  mtoken_address:
+    type: "address"
+  asset_address:
+    type: "address"
+  depositor_address:
+    type: "address"
+
+actions:
+  swap_asset_for_mtoken:
+    calls:
+      - description: "Approve asset spending"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.depositor_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Get asset decimals"
+        target: "${inputs.asset_address}"
+        selector: "decimals()"
+        parameters: []
+        return:
+          name: "asset_decimals"
+          type: "uint8"
+
+      - description: "Scale asset amount to 18 decimals for Midas"
+        target: "${constants.math_helper_address}"
+        selector: "scaleAmount(uint256,uint8,uint8)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "uint8"
+            value: "${returns.asset_decimals}"
+          - type: "uint8"
+            value: "18"
+        return:
+          name: "asset_amount_e18"
+          type: "uint256"
+
+      - description: "Deposit asset"
+        target: "${inputs.depositor_address}"
+        selector: "depositInstant(address,uint256,uint256,bytes32)"
+        parameters:
+          - type: "address"
+            value: "${inputs.asset_address}"
+          - type: "uint256"
+            value: "${returns.asset_amount_e18}"
+          - type: "uint256"
+            value: "${input_slots.min_mtoken_amount}"
+          - type: "bytes32"
+            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of asset to deposit (in asset decimals)"
+      min_mtoken_amount:
+        type: "uint256"
+        description: "Minimum amount of mtoken to receive (slippage protection, in correct decimals)"
