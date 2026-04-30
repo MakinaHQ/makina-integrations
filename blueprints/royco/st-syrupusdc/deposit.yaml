@@ -1,0 +1,81 @@
+protocol: "royco-st-syrupusdc"
+
+# Royco Senior Tranche syrupUSDC Deposit Blueprint
+# Multi-step deposit: USDC -> syrupUSDC (Maple ERC4626) -> Senior Tranche shares
+# 5-step flow: 2 approvals + 2 deposits (syrupUSDC.deposit returns shares, used for ST deposit)
+# NOTE: syrupUSDC has PERMISSIONED deposits -- caliber must be whitelisted by Maple poolPermissionManager
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  syrupusdc_address:
+    type: "address"
+    value: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b"
+  senior_tranche_address:
+    type: "address"
+    value: "0x66182442522D3049A941035190C315379c959250"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Step 1: Approve USDC to syrupUSDC vault
+      - description: "Approve USDC spending by syrupUSDC vault"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.syrupusdc_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      # Step 2: Deposit USDC into syrupUSDC (Maple ERC4626) -> returns shares (6 decimals)
+      - description: "Deposit USDC into syrupUSDC vault to receive syrupUSDC shares"
+        target: "${constants.syrupusdc_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "syrupusdc_shares"
+          type: "uint256"
+
+      # Step 3: Approve syrupUSDC to Senior Tranche
+      - description: "Approve syrupUSDC spending by Senior Tranche"
+        target: "${constants.syrupusdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.syrupusdc_shares}"
+
+      # Step 4: Deposit syrupUSDC into Senior Tranche (TRANCHE_UNIT = 6 decimals)
+      - description: "Deposit syrupUSDC into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.syrupusdc_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"

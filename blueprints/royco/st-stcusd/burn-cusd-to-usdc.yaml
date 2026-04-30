@@ -1,0 +1,89 @@
+protocol: "royco-st-stcusd"
+
+# Royco Senior Tranche stcUSD - Burn cUSD -> USDC (standalone)
+# Drains caliber-held cUSD into USDC via Cap Vault.burn.
+# Used to finish the bank-run unwind path that started with withdraw-to-cusd.yaml.
+#
+# Whitelist-gated: reverts if caliber is not whitelisted on the Cap Vault. This is by design —
+# this flow is only meant to be called when the operator wants the no-fee path. If un-whitelisted,
+# the operator should DCA out of cUSD via secondary markets instead of paying the burn fee here.
+#
+# Basket-asset note: the Cap Vault holds multiple backing assets (USDC and wWTGXX as of
+# 2026-04, more may be added). We deliberately call burn(asset=USDC, ...) which is the
+# SINGLE-ASSET path — receives USDC only, never wWTGXX or other basket components. The
+# basket-redemption function is the separate redeem(amountIn, minAmountsOut[], ...) call,
+# which we never invoke. So new backing assets in the Vault are irrelevant to this flow's
+# output — only the Vault's USDC inventory liquidity matters.
+#
+# Liquidity revert: if the Vault has insufficient idle USDC to honor the burn (because
+# too much is lent out via the Lender), the burn step reverts. Operator falls back to DCA.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  cusd_address:
+    type: "address"
+    value: "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC"
+
+inputs: {}
+
+actions:
+  burn_cusd_to_usdc:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Whitelist gate
+      - description: "Read whitelist status of caliber on Cap Vault"
+        target: "${constants.cusd_address}"
+        selector: "whitelisted(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "is_whitelisted"
+          type: "bool"
+
+      - description: "Revert if caliber is not whitelisted (would incur burn fees)"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_whitelisted}"
+
+      # Burn cUSD for USDC
+      - description: "Burn cUSD for USDC via Cap Vault"
+        target: "${constants.cusd_address}"
+        selector: "burn(address,uint256,uint256,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.usdc_address}"
+          - type: "uint256"
+            value: "${input_slots.cusd_amount_to_burn}"
+          - type: "uint256"
+            value: "${input_slots.min_usdc_out}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}" # deadline
+
+    input_slots:
+      cusd_amount_to_burn:
+        type: "uint256"
+        description: "Amount of cUSD to burn (18 decimals). Operator must ensure caliber holds at least this amount of cUSD before calling, otherwise the burn step reverts with insufficient balance."
+      min_usdc_out:
+        type: "uint256"
+        description: "Minimum USDC to receive from Cap Vault.burn (6 decimals). Whitelisted callers pay no fee but the rate is NOT exactly 1:1 — it tracks the Vault's value-per-cUSD (Lender interest, basket PnL) and moves over time. As of 2026-04 the whitelisted rate is ~0.999999149 USDC per cUSD, but it can drift either way. Operator must quote fresh via cUSD.getBurnAmount(caliber, USDC, cusd_amount_to_burn) immediately before broadcasting and apply a small tolerance (e.g., 1-2 bps)."

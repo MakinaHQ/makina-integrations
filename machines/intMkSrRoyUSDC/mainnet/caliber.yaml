@@ -100,3 +100,17 @@ positions:
     instructions: !include "../../../instructions/royco-st-snusd.yaml"
     position_tokens:
       - "0x2070Af1C865f5d764F673Baf5654822947e71243" # ST-sNUSD
+  - id: "194837215653509666367263068364758760256"
+    group_id: "0"
+    description: "Royco Senior Tranche stcUSD (Cap Protocol)"
+    instructions: !include "../../../instructions/royco-st-stcusd.yaml"
+    position_tokens:
+      - "0x88887bE419578051FF9F4eb6C858A951921D8888" # stcUSD
+      - "0xa7Da92685ea436276B2e87aE12E5eE6DABaD5bB5" # ST-stcUSD
+  - id: "254538356013004780517290454886290844158"
+    group_id: "0"
+    description: "Royco Senior Tranche syrupUSDC V2"
+    instructions: !include "../../../instructions/royco-st-syrupusdc.yaml"
+    position_tokens:
+      - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      - "0x66182442522D3049A941035190C315379c959250" # ST-syrupUSDC
