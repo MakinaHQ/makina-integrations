@@ -1,0 +1,121 @@
+protocol: "royco-st-stcusd"
+
+# Royco Senior Tranche stcUSD - Partial Withdraw Blueprint (stops at cUSD)
+# ST-stcUSD -> stcUSD (kernel sends asset) -> cUSD; leaves cUSD in caliber.
+# Use this when the Cap Vault is illiquid for cUSD->USDC and you want to exit
+# Royco/stcUSD anyway. Pair with burn-cusd-to-usdc.yaml when Vault liquidity returns.
+# No whitelist guard needed — does not touch the Cap Vault.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  stcusd_address:
+    type: "address"
+    value: "0x88887bE419578051FF9F4eb6C858A951921D8888"
+  senior_tranche_address:
+    type: "address"
+    value: "0xa7Da92685ea436276B2e87aE12E5eE6DABaD5bB5"
+
+inputs: {}
+
+actions:
+  withdraw_to_cusd:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Compute ST shares to redeem from bps
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      - description: "Calculate ST shares to redeem based on basis points"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      # Step 1: ST-stcUSD -> stcUSD (sandwich balance)
+      - description: "Get stcUSD balance before ST redeem"
+        target: "${constants.stcusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_before"
+          type: "uint256"
+
+      - description: "Redeem Senior Tranche shares to receive stcUSD"
+        target: "${constants.senior_tranche_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      - description: "Get stcUSD balance after ST redeem"
+        target: "${constants.stcusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_after"
+          type: "uint256"
+
+      - description: "Compute stcUSD received from ST redeem"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)" # sub(a, b) = a - b
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_after}"
+          - type: "uint256"
+            value: "${returns.stcusd_before}"
+        return:
+          name: "stcusd_received"
+          type: "uint256"
+
+      # Step 2: stcUSD -> cUSD via ERC4626 redeem (no approval needed)
+      - description: "Redeem stcUSD for cUSD (leaves cUSD in caliber)"
+        target: "${constants.stcusd_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_received}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of ST shares to redeem (10000 = 100%)"

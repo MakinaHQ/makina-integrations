@@ -1,0 +1,82 @@
+# Royco Senior Tranche stcUSD (Cap Protocol)
+# Atomic chain: USDC <-> cUSD (Cap Vault) <-> stcUSD (ERC4626) <-> ST-stcUSD
+#
+# Six instructions covering all reasonable transitions:
+#   1 ACCOUNTING: NAV-based, syncTrancheAccounting + convertToAssets[index=2]
+#   5 MANAGEMENT covering this state graph at the caliber level:
+#         USDC ──deposit──► ST
+#         USDC ◄─withdraw── ST
+#         cUSD ◄─withdraw-to-cusd── ST     (escape hatch: skip Cap Vault on exit)
+#         cUSD ──burn-cusd-to-usdc──► USDC (drain leftover cUSD when re-whitelisted)
+#         cUSD ──deposit-from-cusd──► ST   (re-enter without the burn->mint roundtrip)
+#
+# Whitelist guards on Cap Vault touches (BooleanHelper.revertIfFalse):
+#   - DEPOSIT (USDC->cUSD mint): GUARDED — never enter unless whitelisted
+#   - BURN-CUSD (cUSD->USDC burn): GUARDED — only call when re-whitelisted (no fee path)
+#   - WITHDRAW (full unwind): NOT GUARDED — escape hatch, may pay Cap fee if un-whitelisted
+#   - WITHDRAW-TO-CUSD / DEPOSIT-FROM-CUSD: no Cap touch, no guard needed
+
+# DEPOSIT: USDC -> cUSD -> stcUSD -> ST shares (atomic, whitelist-gated)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-ST-stcUSD"
+    path: "../../../blueprints/royco/st-stcusd/deposit.yaml:deposit"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Sync tranche + read NAV field from convertToAssets
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-ST-stcUSD"
+    path: "../../../blueprints/royco/st-stcusd/account-nav.yaml:account_nav"
+    inputs: {}
+
+# WITHDRAW (full): redeem ST -> stcUSD -> cUSD -> USDC (atomic, whitelist-gated)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-ST-stcUSD"
+    path: "../../../blueprints/royco/st-stcusd/withdraw.yaml:withdraw"
+    inputs: {}
+
+# WITHDRAW-TO-CUSD (partial): redeem ST -> stcUSD -> cUSD; leaves cUSD in caliber
+# Use when Cap Vault is illiquid for cUSD->USDC and you want to exit Royco/stcUSD anyway.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-ST-stcUSD"
+    path: "../../../blueprints/royco/st-stcusd/withdraw-to-cusd.yaml:withdraw_to_cusd"
+    inputs: {}
+
+# BURN-CUSD: drain caliber-held cUSD into USDC via Cap Vault.burn (whitelist-gated)
+# Use to finish the bank-run unwind path that started with WITHDRAW-TO-CUSD.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-ST-stcUSD"
+    path: "../../../blueprints/royco/st-stcusd/burn-cusd-to-usdc.yaml:burn_cusd_to_usdc"
+    inputs: {}
+
+# DEPOSIT-FROM-CUSD: re-enter ST from caliber-held cUSD (skips Cap Vault entirely)
+# Used after a withdraw-to-cusd when the operator wants to redeploy cUSD without
+# the burn->mint roundtrip. No whitelist guard — does not touch the Cap Vault.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-ST-stcUSD-DepositFromCUSD"
+    path: "../../../blueprints/royco/st-stcusd/deposit-from-cusd.yaml:deposit_from_cusd"
+    inputs: {}

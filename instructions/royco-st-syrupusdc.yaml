@@ -1,0 +1,37 @@
+# Royco Senior Tranche syrupUSDC
+# Multi-step deposit: USDC -> syrupUSDC (Maple ERC4626) -> Senior Tranche shares
+# Queue-based withdraw: redeem ST -> syrupUSDC -> requestRedeem (manual withdrawal). USDC airdropped later.
+# Accounting: NAV-based + pending syrupUSDC from Maple WithdrawalManager
+#
+# Prerequisites:
+#   - Caliber must be whitelisted on Maple PoolPermissionManager for deposits
+#   - AccessManager roles 9623252227852051139 + 15053450870919821405
+
+# DEPOSIT: USDC -> syrupUSDC -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-syrupUSDC"
+    path: "../../../blueprints/royco/st-syrupusdc/deposit.yaml:deposit"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: Active ST NAV + pending syrupUSDC from WithdrawalManager
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-syrupUSDC-NAV"
+    path: "../../../blueprints/royco/st-syrupusdc/account.yaml:account"
+    inputs: {}
+
+# WITHDRAW: Redeem ST -> syrupUSDC -> requestRedeem (Maple queue)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "ROY-ST-syrupUSDC"
+    path: "../../../blueprints/royco/st-syrupusdc/withdraw.yaml:request_redeem"
+    inputs: {}
