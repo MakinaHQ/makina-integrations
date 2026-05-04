@@ -1,0 +1,45 @@
+protocol: "securitize"
+
+# Securitize on-ramp deposit. Pulls liquidity_token from the caliber and mints
+# the corresponding Securitize digital security (dsToken, e.g. VBILL) at the
+# current NAV via SecuritizeOnRamp.swap(uint256,uint256).
+#
+# Caller (caliber) MUST be registered as a Securitize investor in the
+# DSRegistryService for this dsToken; the on-ramp's `investorSubscriptionEnabled`
+# flag MUST be true; and `amount_to_deposit` must meet the on-ramp's
+# `minSubscriptionAmount` (50,000 USDC for VBILL as of 2026-04-28).
+
+inputs:
+  onramp_address:
+    type: "address"
+  liquidity_token:
+    type: "address"
+
+actions:
+  deposit:
+    calls:
+      - description: "Approve on-ramp to spend liquidity token"
+        target: ${inputs.liquidity_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.onramp_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+
+      - description: "Swap liquidity token for dsToken at current NAV"
+        target: ${inputs.onramp_address}
+        selector: "swap(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "uint256"
+            value: ${input_slots.min_out_amount}
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of liquidity token (USDC) to deposit into the Securitize position"
+      min_out_amount:
+        type: "uint256"
+        description: "Minimum dsToken amount to receive (slippage protection)"

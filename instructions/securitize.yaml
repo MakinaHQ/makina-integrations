@@ -1,0 +1,105 @@
+# Securitize protocol — deposit USDC (or another stablecoin set immutably at
+# the on-ramp's initialize()) into a Securitize digital security (e.g. VBILL,
+# USTB, BUIDL) via the on-ramp; redeem via the off-ramp for whatever liquidity
+# token the off-ramp's LP currently supplies (RLUSD on all 3 deployed off-ramps
+# as of 2026-05-01). Accounting reads price from the Makina OracleRegistry.
+#
+# Expected position vars:
+#   label:                    string  — display name (e.g. "VBILL")
+#   ds_token_address:         address — Securitize dsToken
+#   ds_token_unit_scale:      uint256 — 10^ds_token_decimals (e.g. "1000000" for VBILL@6dec)
+#   onramp_address:           address — Securitize on-ramp proxy
+#   offramp_address:          address — Securitize off-ramp proxy
+#   offramp_liquidity_token:  address — what the caliber RECEIVES on redeem
+#                                       (RLUSD on all current off-ramps)
+#
+# Expected caliber config:
+#   caliber_address
+#
+# Notes:
+#  * Redeem output is RLUSD (Securitize/Ripple LP), NOT the on-ramp's input
+#    USDC. Operator runs a separate RLUSD→USDC swap (e.g. an existing
+#    instructions/.../curve-usdc-rlusd.yaml) to consolidate back to the
+#    accounting token.
+#  * Liquidity-token asymmetry between deposit and redeem is intentional:
+#      - On-ramp `liquidityToken` is set at initialize() and immutable, so
+#        USDC is hardcoded here (`${token_list.mainnet.USDC}`).
+#      - Off-ramp `liquidityProvider` (and thus its liquidity token) is
+#        mutable via `updateLiquidityProvider(onlyOwner)` — parameterized via
+#        `${position.offramp_liquidity_token}` so a future LP swap is a
+#        one-line caliber.yaml change.
+#  * Accounting hardcodes USDC as the quote token (matches this caliber's
+#    accounting token). For a non-USDC caliber, parameterize via a position
+#    var or `${config.accounting_token}`.
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/securitize/deposit.yaml:deposit"
+    inputs:
+      onramp_address:
+        type: "address"
+        value: ${position.onramp_address}
+      liquidity_token:
+        type: "address"
+        value: ${token_list.mainnet.USDC}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/securitize/account.yaml:account"
+    inputs:
+      ds_token:
+        type: "address"
+        value: ${position.ds_token_address}
+      quote_token:
+        type: "address"
+        value: ${token_list.mainnet.USDC}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      ds_token_unit_scale:
+        type: "uint256"
+        value: ${position.ds_token_unit_scale}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.offramp_liquidity_token} # token RECEIVED on redeem (RLUSD today). dsToken is a position token, not base, so excluded.
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/securitize/withdraw.yaml:redeem"
+    inputs:
+      offramp_address:
+        type: "address"
+        value: ${position.offramp_address}
+      ds_token:
+        type: "address"
+        value: ${position.ds_token_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.offramp_liquidity_token} # token RECEIVED on redeem (RLUSD today). dsToken is a position token, not base, so excluded.
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/securitize/withdraw.yaml:redeem_relative"
+    inputs:
+      offramp_address:
+        type: "address"
+        value: ${position.offramp_address}
+      ds_token:
+        type: "address"
+        value: ${position.ds_token_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
