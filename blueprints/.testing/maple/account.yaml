@@ -1,0 +1,40 @@
+protocol: "maple"
+
+constants: {}
+
+inputs:
+  pool_address:
+    type: "address"
+  withdrawal_manager_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  account_withdrawal:
+    calls:
+      - description: "Get escrowed shares balance"
+        target: "${inputs.withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "escrowed_shares"
+          type: "uint256"
+
+      - description: "Convert to assets"
+        target: "${inputs.pool_address}"
+        selector: "convertToExitAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_shares}"
+        return:
+          name: "assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.assets}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

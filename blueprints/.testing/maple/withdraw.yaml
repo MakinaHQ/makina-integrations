@@ -1,0 +1,26 @@
+protocol: "maple"
+
+constants: {}
+
+inputs:
+  pool_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  request_redeem:
+    calls:
+      - description: "Request Maple pool redemption via queue"
+        target: "${inputs.pool_address}"
+        selector: "requestRedeem(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Pool shares to redeem in correct decimals"

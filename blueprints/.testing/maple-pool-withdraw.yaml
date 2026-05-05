@@ -1,0 +1,32 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.pool_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/maple/withdraw.yaml:request_redeem"
+    inputs:
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/maple/account.yaml:account_withdrawal"
+    inputs:
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      withdrawal_manager_address:
+        type: "address"
+        value: "${position.withdrawal_manager_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
