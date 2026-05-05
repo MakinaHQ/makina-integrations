@@ -87,7 +87,7 @@ positions:
       aave_token: "0xEc4ef66D4fCeEba34aBB4dE69dB391Bc5476ccc8"
 
   # ── Securitize Treasury Funds (group_id: 0) ──────────────────────
-  - id: "101570474008733119772487529128350045735" # ${keccak256(makina.mainnet.securitize.vbill)}[0:16]
+  - id: "309722523608876619470540797402857939247"
     group_id: "0"
     description: "Securitize VanEck VBILL"
     instructions: !include "../../../instructions/securitize.yaml"

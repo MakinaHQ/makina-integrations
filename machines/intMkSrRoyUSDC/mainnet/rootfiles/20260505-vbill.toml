@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0xda01fbbf958644c7f868a01832c4f8e4d3c3ba089ebeab3a20b06960d2b21872
+# root: 0x79fd4ef2a0110af572830b9c71a5e25f6cb8ce0d9ca01a1d75ba09e721f3ba6f
 
 [tokens."${token_list.mainnet.NUSD}"]
 chainId = 1
@@ -1113,7 +1113,7 @@ name = "bps_to_redeem"
 type = "Uint"
 
 [instructions.securitize.account.VBILL]
-position_id = "101570474008733119772487529128350045735"
+position_id = "309722523608876619470540797402857939247"
 description = "Securitize VanEck VBILL"
 is_debt = false
 group_id = "0"
@@ -1137,7 +1137,7 @@ bitmap = "164824271477329568240072075474762727424"
 inputs_slots = []
 
 [instructions.securitize.deposit.VBILL]
-position_id = "101570474008733119772487529128350045735"
+position_id = "309722523608876619470540797402857939247"
 description = "Securitize VanEck VBILL"
 is_debt = false
 group_id = "0"
@@ -1166,7 +1166,7 @@ name = "min_out_amount"
 type = "Uint"
 
 [instructions.securitize.redeem.VBILL]
-position_id = "101570474008733119772487529128350045735"
+position_id = "309722523608876619470540797402857939247"
 description = "Securitize VanEck VBILL"
 is_debt = false
 group_id = "0"
@@ -1195,7 +1195,7 @@ name = "min_output_amount"
 type = "Uint"
 
 [instructions.securitize.redeem_relative.VBILL]
-position_id = "101570474008733119772487529128350045735"
+position_id = "309722523608876619470540797402857939247"
 description = "Securitize VanEck VBILL"
 is_debt = false
 group_id = "0"
