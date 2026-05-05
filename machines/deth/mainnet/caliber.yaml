@@ -111,3 +111,51 @@ positions:
     group_id: "4"
     description: "Morpho USDT debt (market: 0xe7e9...87d2)"
     instructions: !include "./instructions/morpho-market-wsteth-usdt-debt.yaml"
+  - id: "66296194878735909975264388408023694049"
+    group_id: "5"
+    description: "Morpho weETH collateral (market: 0x37e7...2ba7)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "weETH/WETH (0x37e7...2ba7)"
+      market_id: "0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7"
+      collateral_token: ${token_list.mainnet.weETH}
+  - id: "221367487496355189468609584383691724012"
+    group_id: "5"
+    description: "Morpho WETH debt (market: 0x37e7...2ba7)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "weETH/WETH (0x37e7...2ba7)"
+      market_id: "0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7"
+      loan_token: ${token_list.mainnet.WETH}
+  - id: "229248262372270670683116215637114243726"
+    group_id: "6"
+    description: "Morpho wstETH collateral (market: 0xb8fc...a85e)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/WETH (0xb8fc...a85e)"
+      market_id: "0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "15670928802442181581418053777565254351"
+    group_id: "6"
+    description: "Morpho WETH debt (market: 0xb8fc...a85e)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/WETH (0xb8fc...a85e)"
+      market_id: "0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e"
+      loan_token: ${token_list.mainnet.WETH}
+  - id: "318645634383426469263021075027482084356"
+    group_id: "7"
+    description: "Morpho wstETH collateral (market: 0xd0e5...ec5d)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/WETH (0xd0e5...ec5d)"
+      market_id: "0xd0e50cdac92fe2172043f5e0c36532c6369d24947e40968f34a5e8819ca9ec5d"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "90190535649841219979284333009586953746"
+    group_id: "7"
+    description: "Morpho WETH debt (market: 0xd0e5...ec5d)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/WETH (0xd0e5...ec5d)"
+      market_id: "0xd0e50cdac92fe2172043f5e0c36532c6369d24947e40968f34a5e8819ca9ec5d"
+      loan_token: ${token_list.mainnet.WETH}
