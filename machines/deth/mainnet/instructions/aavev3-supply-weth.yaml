@@ -1,3 +1,31 @@
+# AaveV3 Supply WETH (deth mainnet) — extends the shared aavev3-supply template
+# with a direct ingress from a stranded Aave Umbrella WETH cooldown.
+#
+# The claim-to-aToken flow below is owned by THIS position (AaveV3 Supply WETH)
+# rather than the Umbrella WETH position because:
+#   - It drains stkwaEthWETH (Umbrella value Y -> 0) while crediting ~Y aEthWETH
+#     to the caliber via the Umbrella batch helper's AToken path (redeemATokens —
+#     direct aToken transfer, does NOT touch Aave pool liquidity).
+#   - Under the Umbrella position, _checkPositionMaxDelta(Y, 0, loss) would
+#     revert (position drops Y with zero matching WETH inflow on affected
+#     tokens).
+#   - Under AaveV3 Supply WETH, isPositionIncrease=true, isDebt=false, so
+#     `isDebt == isPositionIncrease` is false and the slippage check is
+#     skipped entirely in _managePosition.
+#
+# Operator workflow — ONE transaction via managePositionBatch, two instruction
+# pairs in order:
+#   Pair 0 (this file): claim_cooldown_to_atoken mgmt + aavev3-supply ACCOUNTING
+#     → batch helper's AToken path; aEthWETH position Z → Z+Y, no pool liquidity.
+#   Pair 1 (aave-umbrella-weth.yaml:resync_position):
+#     aave-umbrella/withdraw.yaml:resync_position mgmt + umbrella ACCOUNTING
+#     → pre-mgmt acct observes on-chain stkwaEthWETH=0 and closes the Umbrella
+#       position; post-mgmt acct returns change=0 so the slippage check is
+#       skipped. The Umbrella position ends this tx already closed, so no
+#       accounting gap remains.
+
+# ── Standard AaveV3 Supply actions (add_collateral / withdraw_collateral / account) ──
+
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -44,7 +72,30 @@
     inputs:
       aave_token:
         type: "address"
-        value: "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8" # aWeETH
+        value: "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8" # aEthWETH
       account:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── Direct claim from Umbrella into AaveV3 Supply WETH ────────────────────
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+  instruction:
+    label: "WETH - Umbrella Claim To AToken"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown_to_atoken"
+    inputs:
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      a_token_address:
+        type: "address"
+        value: "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8" # aEthWETH
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
+      caliber_address:
         type: "address"
         value: "${config.caliber_address}"
