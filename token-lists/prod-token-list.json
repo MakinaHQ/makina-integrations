@@ -221,6 +221,20 @@
       "symbol": "srRoyUSDC"
     },
     {
+      "chainId": 1,
+      "address": "0x88887bE419578051FF9F4eb6C858A951921D8888",
+      "name": "Staked cap USD",
+      "decimals": 18,
+      "symbol": "stcUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0x2255718832bC9fD3bE1CaF75084F4803DA14FF01",
+      "name": "VanEck Treasury Fund",
+      "decimals": 6,
+      "symbol": "VBILL"
+    },
+    {
       "chainId": 8453,
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
       "name": "EURC",

@@ -1,0 +1,109 @@
+protocol: "securitize"
+
+# Securitize off-ramp redemption. Pulls dsToken from the caliber and pays out
+# the off-ramp's liquidity token via SecuritizeOffRamp.redeem(amount, minOut).
+#
+# Today every Securitize off-ramp on mainnet uses RLUSD as its liquidity token
+# (Ripple-operated AllowanceLiquidityProvider). The dsToken is set per off-ramp
+# at init; the liquidity token can be swapped via updateLiquidityProvider — so
+# the blueprint stays generic.
+#
+# Caller (caliber) MUST be a registered investor wallet whose country code is
+# not in the off-ramp's restricted list. The off-ramp must not be paused, NAV
+# rate must be > 0, and `availableLiquidity()` must cover the expected payout
+# (else `InsufficientLiquidity` from the LP).
+
+constants:
+  # MathHelper — used by redeem_relative for bps math: mulDiv(balance, bps, 10000).
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+inputs:
+  offramp_address:
+    type: "address"
+  ds_token:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  redeem:
+    calls:
+      - description: "Approve off-ramp to spend dsToken"
+        target: ${inputs.ds_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.offramp_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_redeem}
+
+      - description: "Redeem dsToken for liquidity token (RLUSD today)"
+        target: ${inputs.offramp_address}
+        selector: "redeem(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: ${input_slots.amount_to_redeem}
+          - type: "uint256"
+            value: ${input_slots.min_output_amount}
+
+    input_slots:
+      amount_to_redeem:
+        type: "uint256"
+        description: "Amount of dsToken to redeem (in dsToken decimals)"
+      min_output_amount:
+        type: "uint256"
+        description: "Minimum liquidity token to receive (slippage protection, in liquidity-token decimals)"
+
+  redeem_relative:
+    calls:
+      - description: "Get caliber's dsToken balance"
+        target: ${inputs.ds_token}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.caliber_address}
+        return:
+          name: "ds_balance"
+          type: "uint256"
+
+      - description: "amount = balance * bps_to_redeem / 10000"
+        target: ${constants.unsigned_math_helper_address}
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: ${returns.ds_balance}
+          - type: "uint256"
+            value: ${input_slots.bps_to_redeem}
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_redeem"
+          type: "uint256"
+
+      - description: "Approve off-ramp to spend dsToken"
+        target: ${inputs.ds_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.offramp_address}
+          - type: "uint256"
+            value: ${returns.amount_to_redeem}
+
+      - description: "Redeem dsToken for liquidity token (RLUSD today)"
+        target: ${inputs.offramp_address}
+        selector: "redeem(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: ${returns.amount_to_redeem}
+          - type: "uint256"
+            value: ${input_slots.min_output_amount}
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of dsToken balance to redeem (10000 = 100%)"
+      min_output_amount:
+        type: "uint256"
+        description: "Minimum liquidity token to receive (slippage protection, in liquidity-token decimals)"

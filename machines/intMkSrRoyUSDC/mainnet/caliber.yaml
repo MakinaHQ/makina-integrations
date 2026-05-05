@@ -86,6 +86,24 @@ positions:
       asset_address: ${token_list.mainnet.USDtb}
       aave_token: "0xEc4ef66D4fCeEba34aBB4dE69dB391Bc5476ccc8"
 
+  # ── Securitize Treasury Funds (group_id: 0) ──────────────────────
+  - id: "309722523608876619470540797402857939247"
+    group_id: "0"
+    description: "Securitize VanEck VBILL"
+    instructions: !include "../../../instructions/securitize.yaml"
+    position_tokens:
+      - "0x2255718832bC9fD3bE1CaF75084F4803DA14FF01" # VBILL
+    vars:
+      label: "VBILL"
+      ds_token_address: ${token_list.mainnet.VBILL}
+      ds_token_unit_scale: "1000000" # 10^VBILL.decimals (6) — for accounting mulDiv
+      onramp_address: "0x488EFd3eD474b205A0AaDe3732E4741432cba50B"
+      offramp_address: "0x1eD617529d80AE87E6611f11D8de8532ECED42bC"
+      # Token the caliber RECEIVES when calling redeem on the off-ramp (NOT what
+      # is deposited). RLUSD on every Securitize off-ramp deployed today; mutable
+      # by Securitize via offramp.updateLiquidityProvider(onlyOwner).
+      offramp_liquidity_token: ${token_list.mainnet.RLUSD}
+
   # ── Royco Positions V2 (group_id: 0) ─────────────────────────────
   - id: "330465051322128162217677944512864209642"
     group_id: "0"
