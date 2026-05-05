@@ -1,20 +1,20 @@
-- is_debt: false
-  instruction_type: "MANAGEMENT"
-  affected_tokens:
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
-  instruction:
-    label: "WETH"
-    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
-    inputs:
-      asset_address:
-        type: "address"
-        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
-      stake_token_address:
-        type: "address"
-        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
-      umbrella_batch_helper_address:
-        type: "address"
-        value: "${config.aave_umbrella_batch_helper}"
+# - is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens:
+#     - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+#   instruction:
+#     label: "WETH"
+#     path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+#     inputs:
+#       asset_address:
+#         type: "address"
+#         value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+#       stake_token_address:
+#         type: "address"
+#         value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+#       umbrella_batch_helper_address:
+#         type: "address"
+#         value: "${config.aave_umbrella_batch_helper}"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
@@ -83,3 +83,17 @@
       rewards_controller_address:
         type: "address"
         value: "0x4655Ce3D625a63d30bA704087E52B4C31E38188B" # Aave Umbrella Rewards Controller
+
+# ── Resync pair for the Umbrella claim-to-aToken exit ────────────────────
+# Intended to be called in the SAME managePositionBatch as the claim-to-aToken
+# pair living under the AaveV3 Supply WETH position, placed AFTER that pair.
+# The pre-mgmt accounting call observes stkwaEthWETH=0 on-chain and closes this
+# position atomically; the post-mgmt accounting returns change=0 so the
+# slippage check is skipped.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "WETH - Resync After Umbrella Exit"
+    path: "../../../blueprints/aave-umbrella/withdraw.yaml:resync_position"
+    inputs: {}
