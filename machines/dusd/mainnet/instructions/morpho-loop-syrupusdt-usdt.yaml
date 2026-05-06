@@ -43,7 +43,7 @@
     - "${token_list.mainnet.USDT}"
   instruction:
     label: "syrupUSDT/USDT Morpho Loop"
-    path: "../../../blueprints/morpho-loop/account.yaml:account_loop"
+    path: "../../../blueprints/morpho-loop/account.yaml:account_loop_and_maple_withdrawal"
     inputs:
       morpho_address:
         type: "address"
@@ -63,6 +63,12 @@
       collateral_token:
         type: "address"
         value: "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
+      maple_pool_address:
+        type: "address"
+        value: "0x356b8d89c1e1239cbbb9de4815c39a1474d5ba7d"
+      maple_withdrawal_manager_address:
+        type: "address"
+        value: "0x86eBDf902d800F2a82038290B6DBb2A5eE29eB8C"
 
 # ── Loop Management ──────────────────────────────────────────────────
 
