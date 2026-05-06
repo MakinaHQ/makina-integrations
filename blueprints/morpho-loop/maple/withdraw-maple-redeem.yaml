@@ -11,8 +11,7 @@ inputs:
     type: "bytes32"
   caliber_address:
     type: "address"
-  swap_module:
-    type: "address"
+
   maple_pool_address:
     type: "address"
 
