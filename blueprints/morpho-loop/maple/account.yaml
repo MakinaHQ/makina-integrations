@@ -1,18 +1,21 @@
 protocol: "morpho"
 
-# Morpho loop accounting blueprints.
-# Two variants depending on how collateral is valued in loan-token terms:
-#
-#   account_loop   — ERC4626-based: uses convertToAssets(collateral) to get loan-token value.
-#                    Assumes the collateral vault's underlying IS the loan token (1:1 peg).
-#                    Used by: syrupUSDC/USDC, syrupUSDT/USDT.
-#
-#   account_equity — Oracle-based: uses Morpho oracle price() scaled by 1e36.
-#                    Used when collateral underlying != loan token (no 1:1 peg).
-#                    Used by: sUSDS/USDT, wsrUSD/USDC, wsrUSD/USDT, PT-srNUSD/USDC.
+# Maple account blueprint for special case of syrupUSDT/USDT Morpho Loop.
+
+# This blueprint is used to account for the collateral and debt of the Morpho loop position,
+# plus the amount that is held in the Maple pool redemption queue.
+
+# IMPORTANT: When using this blueprint, we are assuming that a single position is redeeming from Maple at a time
+# (as we rely on userEscrowedShares(address) for the whole caliber).
 
 inputs:
+  math_helper:
+    type: "address"
   morpho_address:
+    type: "address"
+  maple_pool_address:
+    type: "address"
+  maple_withdrawal_manager_address:
     type: "address"
   morpho_market_id:
     type: "bytes32"
@@ -20,23 +23,99 @@ inputs:
     type: "address"
   caliber_address:
     type: "address"
-  math_helper:
-    type: "address"
-  # Used by account_loop only
   collateral_token:
-    type: "address"
-  # Used by account_equity only
-  oracle_address:
     type: "address"
 
 actions:
-  # ============================================================================
-  # account_loop: ERC4626-based accounting
-  # ============================================================================
-  # Collateral value = convertToAssets(collateral_amount) (assumes underlying pegs 1:1 to loan token)
-  # Used by: syrupUSDC/USDC, syrupUSDT/USDT, etc.
-  account_loop:
+  account_loop_and_maple_withdrawal:
     calls:
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "accrue interest"
+        target: "${inputs.morpho_address}"
+        selector: "accrueInterest((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+
       - description: "Get our position data"
         target: "${inputs.morpho_address}"
         selector: "position(bytes32,address)"
@@ -133,12 +212,56 @@ actions:
           name: "debt_amount"
           type: "uint256"
 
-      - description: "Convert collateral shares to underlying asset value via ERC4626"
+      - description: "Get Maple escrowed shares balance"
+        target: "${inputs.maple_withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "escrowed_shares"
+          type: "uint256"
+
+      - description: "Add escrowed to collateral amount"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "uint256"
+            value: "${returns.escrowed_shares}"
+        return:
+          name: "collateral_amount_plus_escrowed"
+          type: "uint256"
+
+      - description: "Convert collateral amount plus escrowed to loan token terms"
         target: "${inputs.collateral_token}"
-        selector: "convertToAssets(uint256)"
+        selector: "convertToExitAssets(uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.collateral_amount}"
+            value: "${returns.collateral_amount_plus_escrowed}"
+        return:
+          name: "collateral_amount_plus_escrowed_in_loan_token"
+          type: "uint256"
+
+      - description: "Convert just escrowed shares to loan token terms"
+        target: "${inputs.collateral_token}"
+        selector: "convertToExitAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_shares}"
+        return:
+          name: "escrowed_in_loan_token"
+          type: "uint256"
+
+      - description: "Get collateral part as remainder to reduce split-rounding drift"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_in_loan_token}"
+          - type: "uint256"
+            value: "${returns.collateral_amount_plus_escrowed_in_loan_token}"
         return:
           name: "collateral_in_loan_token"
           type: "uint256"
@@ -171,159 +294,6 @@ actions:
       - type: "uint256"
         value: "${returns.equity_in_loan_token}"
       - type: "uint256"
-        value: "${builtins.UINT256_MAX}"
-
-  # ============================================================================
-  # account_equity: Oracle-based accounting
-  # ============================================================================
-  # Collateral value = collateral_amount * oracle.price() / 1e36
-  # Used by: wsrUSD/USDC, wsrUSD/USDT, PT-srNUSD/USDC, etc.
-  account_equity:
-    calls:
-      - description: "Get our position data"
-        target: "${inputs.morpho_address}"
-        selector: "position(bytes32,address)"
-        parameters:
-          - type: "bytes32"
-            value: "${inputs.morpho_market_id}"
-          - type: "address"
-            value: "${inputs.caliber_address}"
-        return:
-          name: "position_data"
-          type: "(uint256,uint128,uint128)"
-
-      - description: "Extract collateral amount (index 2)"
-        target: "${inputs.caliber_helper}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
-        parameters:
-          - type: "(uint256,uint128,uint128)"
-            value: "${returns.position_data}"
-          - type: "uint256"
-            value: "2"
-        return:
-          name: "collateral_amount"
-          type: "uint256"
-
-      - description: "Extract borrow shares (index 1)"
-        target: "${inputs.caliber_helper}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
-        parameters:
-          - type: "(uint256,uint128,uint128)"
-            value: "${returns.position_data}"
-          - type: "uint256"
-            value: "1"
-        return:
-          name: "borrow_shares"
-          type: "uint256"
-
-      - description: "Get market state"
-        target: "${inputs.morpho_address}"
-        selector: "market(bytes32)"
-        parameters:
-          - type: "bytes32"
-            value: "${inputs.morpho_market_id}"
-        return:
-          name: "market_data"
-          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
-
-      - description: "Extract total borrow shares (index 3)"
-        target: "${inputs.caliber_helper}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
-        parameters:
-          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
-            value: "${returns.market_data}"
-          - type: "uint256"
-            value: "3"
-        return:
-          name: "total_borrow_shares_raw"
-          type: "uint256"
-
-      - description: "Floor to 1 to avoid mulDiv division by zero when market has no borrows"
-        target: "${inputs.math_helper}"
-        selector: "max(uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.total_borrow_shares_raw}"
-          - type: "uint256"
-            value: "1"
-        return:
-          name: "total_borrow_shares"
-          type: "uint256"
-
-      - description: "Extract total borrow assets (index 2)"
-        target: "${inputs.caliber_helper}"
-        selector: "extractElementFromStaticTuple(bytes,uint256)"
-        parameters:
-          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
-            value: "${returns.market_data}"
-          - type: "uint256"
-            value: "2"
-        return:
-          name: "total_borrow_assets"
-          type: "uint256"
-
-      - description: "Calculate debt amount: borrow_shares * total_borrow_assets / total_borrow_shares"
-        target: "${inputs.math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.borrow_shares}"
-          - type: "uint256"
-            value: "${returns.total_borrow_assets}"
-          - type: "uint256"
-            value: "${returns.total_borrow_shares}"
-        return:
-          name: "debt_amount"
-          type: "uint256"
-
-      - description: "Get collateral/loan_token price from Morpho oracle (scaled by 1e36)"
-        target: "${inputs.oracle_address}"
-        selector: "price()"
-        parameters: []
-        return:
-          name: "oracle_price"
-          type: "uint256"
-
-      - description: "collateral_in_loan_token = collateral_amount * price / 1e36"
-        target: "${inputs.math_helper}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.collateral_amount}"
-          - type: "uint256"
-            value: "${returns.oracle_price}"
-          - type: "uint256"
-            value: "1000000000000000000000000000000000000"
-        return:
-          name: "collateral_in_loan_token"
-          type: "uint256"
-
-      - description: "Cap debt at collateral value to avoid underflow when underwater"
-        target: "${inputs.math_helper}"
-        selector: "min(uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.debt_amount}"
-          - type: "uint256"
-            value: "${returns.collateral_in_loan_token}"
-        return:
-          name: "capped_debt"
-          type: "uint256"
-
-      - description: "Equity = collateral_in_loan_token - capped_debt (saturates to 0 when underwater). sub(a, b) = b - a"
-        target: "${inputs.math_helper}"
-        selector: "sub(uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.capped_debt}"
-          - type: "uint256"
-            value: "${returns.collateral_in_loan_token}"
-        return:
-          name: "equity_in_loan_token"
-          type: "uint256"
-
-    reserved_slots:
-      - type: "uint256"
-        value: "${returns.equity_in_loan_token}"
+        value: "${returns.escrowed_in_loan_token}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"
