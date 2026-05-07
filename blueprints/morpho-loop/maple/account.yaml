@@ -290,10 +290,28 @@ actions:
           name: "equity_in_loan_token"
           type: "uint256"
 
+      # Combine equity + escrowed_in_loan into ONE slot. When the caliber's
+      # accounting token differs from the loan token (e.g. dusd uses USDC,
+      # this loop's loan is USDT), the caliber floor-converts each reserved
+      # slot independently. Splitting equity vs escrowed loses up to 1 wei of
+      # carry between the two floors per accounting call, producing intermittent
+      # 1-wei position drift on operations that move value across slots
+      # (notably withdraw_collateral_and_request_maple_redeem). Summing here
+      # leaves a single floor at the conversion boundary, eliminating the drift.
+      - description: "Sum equity + escrowed (single-slot to avoid cross-slot floor-rounding drift)"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.equity_in_loan_token}"
+          - type: "uint256"
+            value: "${returns.escrowed_in_loan_token}"
+        return:
+          name: "total_in_loan_token"
+          type: "uint256"
+
     reserved_slots:
       - type: "uint256"
-        value: "${returns.equity_in_loan_token}"
-      - type: "uint256"
-        value: "${returns.escrowed_in_loan_token}"
+        value: "${returns.total_in_loan_token}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"

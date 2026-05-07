@@ -41,7 +41,6 @@
   instruction_type: "ACCOUNTING"
   affected_tokens:
     - "${token_list.mainnet.USDT}"
-    - "${token_list.mainnet.USDT}"
   instruction:
     label: "syrupUSDT/USDT Morpho Loop"
     path: "../../../blueprints/morpho-loop/maple/account.yaml:account_loop_and_maple_withdrawal"
