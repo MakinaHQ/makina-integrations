@@ -41,10 +41,9 @@
   instruction_type: "ACCOUNTING"
   affected_tokens:
     - "${token_list.mainnet.USDT}"
-    - "${token_list.mainnet.USDT}"
   instruction:
     label: "syrupUSDT/USDT Morpho Loop"
-    path: "../../../blueprints/morpho-loop/account.yaml:account_loop_and_maple_withdrawal"
+    path: "../../../blueprints/morpho-loop/maple/account.yaml:account_loop_and_maple_withdrawal"
     inputs:
       morpho_address:
         type: "address"
@@ -178,7 +177,7 @@
     - "${token_list.mainnet.USDT}"
   instruction:
     label: "syrupUSDT/USDT Morpho Loop - Withdraw Collateral and Request Maple Redeem"
-    path: "../../../blueprints/morpho-loop/withdraw-maple-redeem.yaml:withdraw_collateral_and_request_maple_redeem"
+    path: "../../../blueprints/morpho-loop/maple/withdraw-maple-redeem.yaml:withdraw_collateral_and_request_maple_redeem"
     inputs:
       collateral_token:
         type: "address"
