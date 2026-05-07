@@ -43,7 +43,7 @@
     - "${token_list.mainnet.USDT}"
   instruction:
     label: "syrupUSDT/USDT Morpho Loop"
-    path: "../../../blueprints/morpho-loop/account.yaml:account_loop"
+    path: "../../../blueprints/morpho-loop/maple/account.yaml:account_loop_and_maple_withdrawal"
     inputs:
       morpho_address:
         type: "address"
@@ -63,6 +63,12 @@
       collateral_token:
         type: "address"
         value: "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
+      maple_pool_address:
+        type: "address"
+        value: "0x356b8d89c1e1239cbbb9de4815c39a1474d5ba7d"
+      maple_withdrawal_manager_address:
+        type: "address"
+        value: "0x86eBDf902d800F2a82038290B6DBb2A5eE29eB8C"
 
 # ── Loop Management ──────────────────────────────────────────────────
 
@@ -164,3 +170,30 @@
       swap_module:
         type: "address"
         value: "${config.swap_module}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDT}"
+  instruction:
+    label: "syrupUSDT/USDT Morpho Loop - Withdraw Collateral and Request Maple Redeem"
+    path: "../../../blueprints/morpho-loop/maple/withdraw-maple-redeem.yaml:withdraw_collateral_and_request_maple_redeem"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: "0x356B8d89c1e1239Cbbb9dE4815c39A1474d5BA7D"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0xa4774e3e693fff2ebd1dcbbd69b1b0a5b9bb0ccc753bfda5dd07bdac97c4818a"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      maple_pool_address:
+        type: "address"
+        value: "0x356b8d89c1e1239cbbb9de4815c39a1474d5ba7d"
