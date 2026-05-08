@@ -1,0 +1,125 @@
+# Morpho Lend — supply, withdraw and account a passive lend position in a Morpho Blue market.
+#
+# Expected position vars:
+#   label:       string   — e.g. "siUSD/USDC (0xbbf7...c99)"
+#   market_id:   bytes32  — Morpho market identifier
+#   loan_token:  address  — loan token of the market (the asset being supplied)
+#
+# Expected config:
+#   caliber_address
+#   morpho_address
+#   caliber_helper_address
+#   unsigned_math_helper_address
+#
+# Example position block in caliber.yaml:
+#   - id: "<unique uint128>"
+#     group_id: "0"
+#     description: "Morpho USDC loan (market: 0xbbf7...c99)"
+#     instructions: !include "../../../instructions/morpho-lend.yaml"
+#     vars:
+#       label: "siUSD/USDC (0xbbf7...c99)"
+#       market_id: "0xbbf7ce1b40d32d3e3048f5cf27eeaa6de8cb27b80194690aab191a63381d8c99"
+#       loan_token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+
+# 1/4 - Lend (supply) loan_token to the market
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/lend.yaml:lend_to_market"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# 2/4 - Withdraw an exact amount of loan_token from the market
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/lend.yaml:withdraw_from_market"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# 3/4 - Redeem a fraction (bps) of held supply shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/lend.yaml:redeem_from_market_relative"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# 4/4 - Accounting: outstanding loan position value (assets owed to the caliber)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/account.yaml:account_loan"
+    inputs:
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

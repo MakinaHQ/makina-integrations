@@ -189,6 +189,16 @@ positions:
       asset_address: ${token_list.mainnet.AUSD}
       vault_address: "0x32401B9fb79065Bc15949DE0BD43927492f02F0C"
 
+  # ── Morpho Lending ────────────────────────────────────────────────
+  - id: "233812392305217120018639900280612878694"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0xacc4...2c67)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "srRoyUSDC/USDC (0xacc4...2c67)"
+      market_id: "0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67"
+      loan_token: ${token_list.mainnet.USDC}
+
   # ── Aave Umbrella ─────────────────────────────────────────────────
   # - id: "176021688445186810403025048632929053161"
   #   group_id: "0"
@@ -324,6 +334,17 @@ positions:
       loan_token: ${token_list.mainnet.RLUSD}
       morpho_market_id: "0xc0ae375fd761ff19b3f04de5534c0f1ec110f80e1c2ede27c42c1c43c3040394"
       oracle_address: "0xf766F4F1Bcb0CBBF4EEF5E26FF7c7f66a713c1B5"
+  - id: "912841315826493817206538461275893042156"
+    group_id: "0"
+    description: "sUSDe/USDtb Morpho Loop"
+    instructions: !include "../../../instructions/morpho-loop-swap-direct.yaml"
+    vars:
+      label: "sUSDe/USDtb Morpho Loop"
+      direct_label: "sUSDe/USDtb Morpho Loop - Direct"
+      collateral_token: ${token_list.mainnet.sUSDe}
+      loan_token: ${token_list.mainnet.USDtb}
+      morpho_market_id: "0x88a18b2f4d94e7ad27a381b15531c06abf05a7c99dd5d3c3679875fed6f7e742"
+      oracle_address: "0x67BcC03438D7d71c39343d7AD21cb73Dc19aDB89"
 
   # ── InfiniFi Lockers ──────────────────────────────────────────────
   - id: "2013457072841808719642938411712424809"
