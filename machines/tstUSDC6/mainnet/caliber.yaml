@@ -1,0 +1,17 @@
+config:
+  etherfi_async_redeemer_address:
+    type: "address"
+    value: "0x99ba4244b782A1a9C09c676211E3fAd54fc822Be" # THIS IS TEST CONTRACT AND NOT AUDITED
+
+positions:
+  # EtherFi Async Redemption
+  # id = uint128(sha256("makina.mainnet.tstUSDC6.etherfi.async-redemption"))
+  #     = 0x05148c5970039abe401f8f4c9892ee4c
+  - id: "6752832539412929551864840485300530764"
+    group_id: "0"
+    description: "EtherFi Async Redemption (weETH → WETH)"
+    instructions: !include "../../../instructions/.testing/etherfi-async-redemption.yaml"
+    vars:
+      label: "EtherFi Async Redemption"
+      weeth_address: ${token_list.mainnet.weETH}
+      weth_address: ${token_list.mainnet.WETH}

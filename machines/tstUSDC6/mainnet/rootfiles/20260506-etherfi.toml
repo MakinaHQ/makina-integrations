@@ -1,0 +1,129 @@
+# this is a generated file - do not edit manually
+# root: 0x9f10e45d5276d07e6f8b51359f7f4c5884ce359c90e3a2c92523e6031ddcbe1b
+
+[tokens."${token_list.mainnet.WETH}"]
+chainId = 1
+address = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+name = "Wrapped Ether"
+decimals = 18
+symbol = "WETH"
+
+[tokens."${token_list.mainnet.weETH}"]
+chainId = 1
+address = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
+name = "Wrapped eETH"
+decimals = 18
+symbol = "weETH"
+
+[instructions.etherfi.account_pending_redemption."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+position_tokens = []
+commands = ["0x72c1197801ff00000000000099ba4244b782a1a9c09c676211e3fad54fc822be"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "85070591730234615865843651857942052864"
+inputs_slots = []
+
+[instructions.etherfi.claim_redemption."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x42842e0e01020100ff0000ff7d5706f6ef3f89b3951e23e557cdfbc3239d4e2c",
+]
+state = [
+  "0xdef95225edfaec92465af6ea1ade5a12c156c6674faefda64a4ffcfea8b09326",
+  "0x00000000000000000000000099ba4244b782a1a9c09c676211e3fad54fc822be",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.etherfi.claim_redemption."EtherFi Async Redemption".inputs_slots]]
+index = 0
+name = "request_id"
+type = "Uint"
+
+[instructions.etherfi.recover_funds."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
+position_tokens = []
+commands = ["0xb79550be01ff0000000000ff99ba4244b782a1a9c09c676211e3fad54fc822be"]
+state = []
+bitmap = "0"
+inputs_slots = []
+
+[instructions.etherfi.recover_nft."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x9486e0a40100ff00000000ff99ba4244b782a1a9c09c676211e3fad54fc822be"]
+state = ["0xdef95225edfaec92465af6ea1ade5a12c156c6674faefda64a4ffcfea8b09326"]
+bitmap = "0"
+
+[[instructions.etherfi.recover_nft."EtherFi Async Redemption".inputs_slots]]
+index = 0
+name = "request_id"
+type = "Uint"
+
+[instructions.etherfi.request_redemption."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ffcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+  "0xccc143b8010002ff00000002fbfe6b9cee0e555bad7e2e7309effc75200cbe38",
+  "0x4048ba360102ff00000000ff99ba4244b782a1a9c09c676211e3fad54fc822be",
+]
+state = [
+  "0x7675aefd5828d26c8fafcbdac205be339cfdbcd429afcfbb54c61dbe6fdf07b0",
+  "0x000000000000000000000000fbfe6b9cee0e555bad7e2e7309effc75200cbe38",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.etherfi.request_redemption."EtherFi Async Redemption".inputs_slots]]
+index = 0
+name = "weeth_amount"
+type = "Uint"
+
+[instructions.etherfi.unregister_redemption."EtherFi Async Redemption"]
+position_id = "6752832539412929551864840485300530764"
+description = "EtherFi Async Redemption (weETH → WETH)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xb5eb9fba0100ff00000000ff99ba4244b782a1a9c09c676211e3fad54fc822be"]
+state = ["0xdef95225edfaec92465af6ea1ade5a12c156c6674faefda64a4ffcfea8b09326"]
+bitmap = "0"
+
+[[instructions.etherfi.unregister_redemption."EtherFi Async Redemption".inputs_slots]]
+index = 0
+name = "request_id"
+type = "Uint"
