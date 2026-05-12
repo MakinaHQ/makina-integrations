@@ -1,0 +1,266 @@
+protocol: "royco-st-susdai"
+
+# Royco Senior Tranche sUSDai Withdraw Blueprint (Arbitrum)
+# Two-transaction withdrawal due to sUSDai redemption queue:
+#   TX 1 (withdraw_request): Redeem ST shares -> sUSDai -> requestRedeem (enter queue) -> store ID in KV
+#   TX 2 (withdraw_claim): After admin services queue -> claim USDai -> withdraw to PYUSD -> clear KV
+# Only one redemption in flight at a time (enforced by convention).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x49a05b9c885086D0BA363281628e48E0aB86dEAf"
+  pyusd_address:
+    type: "address"
+    value: "0x46850aD61C2B7d64d08c9C754F45254596696984"
+  usdai_address:
+    type: "address"
+    value: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+  susdai_address:
+    type: "address"
+    value: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+  senior_tranche_address:
+    type: "address"
+    value: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+
+inputs:
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+
+actions:
+  # ──────────────────────────────────────────────────────────────────
+  # TX 1: Redeem ST shares, enter sUSDai redemption queue, store ID
+  # ──────────────────────────────────────────────────────────────────
+  withdraw_request:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get ST share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Calculate shares to redeem from bps
+      - description: "Calculate shares to redeem based on basis points"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      # Balance sandwich: sUSDai before ST redeem
+      - description: "Get sUSDai balance before ST redeem"
+        target: "${constants.susdai_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "susdai_before"
+          type: "uint256"
+
+      # Redeem ST shares to receive sUSDai
+      - description: "Redeem Senior Tranche shares to receive sUSDai"
+        target: "${constants.senior_tranche_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      # Balance sandwich: sUSDai after ST redeem
+      - description: "Get sUSDai balance after ST redeem"
+        target: "${constants.susdai_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "susdai_after"
+          type: "uint256"
+
+      # Calculate sUSDai received
+      # NOTE: Arbitrum MathHelper sub(a,b) computes b-a (reversed parameter order)
+      - description: "Calculate sUSDai received from ST redeem"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susdai_before}"
+          - type: "uint256"
+            value: "${returns.susdai_after}"
+        return:
+          name: "susdai_received"
+          type: "uint256"
+
+      # Enter sUSDai redemption queue (capture redemption ID)
+      - description: "Request sUSDai redemption (enters FIFO queue, burns sUSDai)"
+        target: "${constants.susdai_address}"
+        selector: "requestRedeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susdai_received}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "redemption_id"
+          type: "uint256"
+
+      # Store redemption ID in KV store for accounting to read
+      # Key: keccak256("royco_st_susdai_redemption_id")
+      - description: "Store redemption ID in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.redemption_id}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of ST shares to redeem (10000 = 100%)"
+
+  # ──────────────────────────────────────────────────────────────────
+  # TX 2: Claim serviced redemption and withdraw USDai to PYUSD
+  # (must wait for admin to call serviceRedemptions on sUSDai)
+  # ──────────────────────────────────────────────────────────────────
+  withdraw_claim_to_pyusd:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get total redeemable (serviced) shares
+      - description: "Get total redeemable sUSDai shares from serviced queue"
+        target: "${constants.susdai_address}"
+        selector: "maxRedeem(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "redeemable_shares"
+          type: "uint256"
+
+      # Claim USDai from serviced redemptions
+      - description: "Redeem serviced sUSDai shares for USDai"
+        target: "${constants.susdai_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.redeemable_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "usdai_received"
+          type: "uint256"
+
+      # Withdraw USDai to PYUSD (base token, no swap)
+      - description: "Withdraw USDai to PYUSD (direct unscale, no swap)"
+        target: "${constants.usdai_address}"
+        selector: "withdraw(address,uint256,uint256,address)"
+        parameters:
+          - type: "address"
+            value: "${constants.pyusd_address}"
+          - type: "uint256"
+            value: "${returns.usdai_received}"
+          - type: "uint256"
+            value: "${input_slots.min_pyusd_amount}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      # Clear redemption ID from KV store
+      # Key: keccak256("royco_st_susdai_redemption_id")
+      - description: "Clear redemption ID from KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "0"
+
+    input_slots:
+      min_pyusd_amount:
+        type: "uint256"
+        description: "Minimum PYUSD to receive (6 decimals). PYUSD is base token so 0 is safe."
+
+  withdraw_claim_to_usdai:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get total redeemable (serviced) shares
+      - description: "Get total redeemable sUSDai shares from serviced queue"
+        target: "${constants.susdai_address}"
+        selector: "maxRedeem(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "redeemable_shares"
+          type: "uint256"
+
+      # Claim USDai from serviced redemptions
+      - description: "Redeem serviced sUSDai shares for USDai"
+        target: "${constants.susdai_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.redeemable_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      # Clear redemption ID from KV store
+      # Key: keccak256("royco_st_susdai_redemption_id")
+      - description: "Clear redemption ID from KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "0"

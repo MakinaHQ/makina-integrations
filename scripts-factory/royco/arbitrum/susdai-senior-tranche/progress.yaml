@@ -1,0 +1,80 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "royco-susdai-st"
+  pool_name: "Royco ST sUSDai"
+  protocol: "royco"
+  chain: "arbitrum"
+  machine: "dusd"
+  actions: [deposit, withdraw, account]
+  base_tokens:
+    - address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+      symbol: "USDC"
+      decimals: 6
+      index: 0
+  context: |
+    Add a new Royco ST market for USDai on Arbitrum.
+    Flow: USDC -> USDai -> sUSDai -> Royco ST (deposit), reverse for withdraw.
+    Key contracts:
+      USDai: 0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF
+      sUSDai: 0x0B2b2B2076d95dda7817e785989fE353fe955ef9
+      ST market: 0x90465aad4e426948A4ea342AC49A1A38200B7017
+      Kernel: 0xFdb17E53eA5d342124b8473188BCB9F05F1949CA
+    Withdraw may require two-step process if queues or cooldowns exist.
+    For testing on virtual testnet, need to set whitelists for minting/redeeming USDai.
+    Use DUSD machine (has Arbitrum caliber at 0xd1a1c248b253f1fc60eacd90777b9a63f8c8c1bc).
+    Price any position in sUSDai or USDai queue using Kernel's conversion.
+    Pattern similar to sNUSD ST integration (USDC -> NUSD -> sNUSD -> ST).
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent: { status: completed, timestamp: "2026-04-08T00:00:00Z" }
+  1_specs: { status: completed, timestamp: "2026-04-08T00:00:00Z" }
+  1b_enrich: { status: completed, timestamp: "2026-04-08T00:00:00Z" }
+  2_deposit:
+    status: completed
+    timestamp: "2026-04-08T00:00:00Z"
+    artifacts: [execution-deposit.md]
+    notes: |
+      USDC deposit path fails (no Uniswap V3 USDC/PYUSD liquidity at 100bps).
+      PYUSD deposit works. AccessManager role 0x858ca8ea411ba2c3 required.
+      maxDeposit very low (~0.1 sUSDai).
+  2_account:
+    status: completed
+    timestamp: "2026-04-08T00:00:00Z"
+    artifacts: [execution-account.md]
+    notes: |
+      syncTrancheAccounting() NOT needed - convertToAssets previews post-sync.
+      NAV-based valuation: ST shares -> convertToAssets -> nav (18 dec) -> /1e12 -> USDC.
+  2_withdraw:
+    status: completed
+    timestamp: "2026-04-08T00:00:00Z"
+    artifacts: [execution-withdraw.md]
+    notes: |
+      Two-transaction flow: (redeem + requestRedeem) -> [admin service] -> (claim + withdraw).
+      MIN_REDEMPTION_SHARES = 1e18 (hard limit).
+      USDC withdrawal fails (same liquidity issue). PYUSD works.
+  3_blueprint:
+    status: completed
+    timestamp: "2026-04-08T00:00:00Z"
+    artifacts:
+      - blueprints/royco/st-susdai/deposit.yaml
+      - blueprints/royco/st-susdai/withdraw.yaml
+      - blueprints/royco/st-susdai/account-nav.yaml
+      - instructions/royco-st-susdai.yaml
+  4_test:
+    status: completed
+    timestamp: "2026-04-08T00:00:00Z"
+    artifacts: [test-report.md]
+    notes: |
+      Deposit and Account-NAV: PASS (validated E2E via spellcaster CLI).
+      Withdraw: NOT TESTED (protocol constraints - maxDeposit too low + MIN_REDEMPTION_SHARES).
+      Bug fix: affected_tokens needed 2 USDC entries for 2 reserved_slots in accounting.
+      Testnet: 163713df-39cf-4c1e-96d3-15392f351b6e
+
+# Shared resources
+testnets:
+  deposit_account_withdraw:
+    vnet_id: "1caf0022-d243-490b-8ff6-2cb769d513a9"
+    admin_rpc: "https://virtual.arbitrum.eu.rpc.tenderly.co/ee3b751d-a854-46b3-bf3f-3e831d4263b9"
+    test_address: "0x7Eae5E2f495ffbE0781B99529A7E8F116BD60450"

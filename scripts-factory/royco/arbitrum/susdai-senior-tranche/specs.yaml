@@ -1,0 +1,748 @@
+# Royco sUSDai Senior Tranche - Pool Specifications
+# Generated: 2026-04-08
+# Multi-step deposit/withdraw through USDai protocol stack on Arbitrum
+
+pool:
+  id: "royco-susdai-st"
+  name: "Royco Senior Tranche sUSDai"
+  protocol: "royco"
+  version: "1.0"
+  network: "arbitrum"
+  chain_id: 42161
+  category: "yield-tranche"
+  description: |
+    Senior tranche vault on Royco protocol using sUSDai (Staked USDai) as the underlying asset.
+    The full deposit path is USDC -> USDai (via USDai.deposit with swap adapter) -> sUSDai (ERC4626 staking) -> ST shares.
+    Withdrawal is multi-step with a queue-based redemption mechanism on sUSDai:
+      1. Redeem ST shares -> receive sUSDai
+      2. requestRedeem on sUSDai -> enter redemption queue
+      3. Wait for admin to serviceRedemptions (external process)
+      4. redeem/withdraw on sUSDai -> receive USDai
+      5. USDai.withdraw(USDC, ...) -> receive USDC
+    The USDai contract uses an internal Uniswap V3 swap adapter to convert between USDC and PYUSD (base token).
+    USDai:USD conversion rate is admin-oracle set (currently 1:1 WAD).
+    Kernel blacklist IS enabled but transfer whitelist is NOT enforced.
+
+contracts:
+  senior_tranche:
+    address: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+    name: "Royco Senior Tranche sUSDai"
+    symbol: "ROY-ST-sUSDai"
+    decimals: 18
+    type: "UUPS proxy"
+    implementation: "0x4afd9e2b4fbec1f11d09bf2e3d3f82869fa5bc5f"
+    abi_source: "https://arbiscan.io/address/0x4afd9e2b4fbec1f11d09bf2e3d3f82869fa5bc5f#code"
+    asset: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9" # sUSDai
+    kernel: "0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+    tranche_type: 0 # Senior
+    notes:
+      - "ERC4626-like vault with deposit/redeem"
+      - "deposit(uint256,address) -- 2-arg, NOT 3-arg like sNUSD ST"
+      - "redeem(uint256,address,address) -- 3-arg with shares, receiver, owner"
+      - "convertToAssets() returns AssetClaims tuple (stAssets, jtAssets, nav)"
+      - "deposit() transfers sUSDai from msg.sender directly to KERNEL (safeTransferFrom)"
+      - "Approval for sUSDai must be granted to ST contract address, not Kernel"
+      - "restricted modifier uses AccessManaged - currently open for deposit/redeem"
+
+  susdai:
+    address: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+    name: "Staked USDai"
+    symbol: "sUSDai"
+    decimals: 18
+    type: "ERC4626 vault with queue-based redemption (proxy)"
+    implementation: "0xda8c2f3da2857e9d66f813d11baba555aab46460"
+    asset: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF" # USDai
+    abi_source: "https://arbiscan.io/address/0xda8c2f3da2857e9d66f813d11baba555aab46460#code"
+    version: "1.7"
+    notes:
+      - "Queue-based withdrawal: requestRedeem() -> wait for serviceRedemptions() -> redeem()/withdraw()"
+      - "NO cooldown mechanism (unlike sNUSD which has cooldownShares)"
+      - "Direct redeem/withdraw are DISABLED (previewRedeem/previewWithdraw revert with DisabledImplementation)"
+      - "deposit(uint256,address) for standard ERC4626 deposit"
+      - "deposit(uint256,address,uint256) for deposit with minShares slippage protection"
+      - "requestRedeem(shares, controller, owner) burns sUSDai and enters redemption queue"
+      - "redeem(shares, receiver, controller) claims fulfilled redemption (redeemableShares)"
+      - "withdraw(amount, receiver, controller) claims fulfilled redemption by USDai amount"
+      - "redemptionIds(controller) returns array of active redemption IDs"
+      - "redemption(id) returns Redemption struct with queue state"
+      - "claimableRedeemRequest(id, controller) returns redeemable shares"
+      - "pendingRedeemRequest(id, controller) returns pending shares"
+      - "maxRedeem(controller) returns total redeemable shares across all redemptions"
+      - "maxWithdraw(controller) returns total withdrawable USDai amount"
+      - "serviceRedemptions() is admin-only (STRATEGY_ADMIN_ROLE)"
+      - "redemptionSharePrice() gives the sUSDai-to-USDai rate for redemptions"
+      - "depositSharePrice() gives the sUSDai-to-USDai rate for deposits"
+      - "Operator mechanism: setOperator(address, bool) allows delegated redeem/withdraw"
+
+  usdai:
+    address: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+    name: "USDai"
+    symbol: "USDai"
+    decimals: 18
+    type: "TransparentProxy"
+    implementation: "0x5477072aa366cff31c1c28b81ed783a2a1cf87a2"
+    abi_source: "https://arbiscan.io/address/0x5477072aa366cff31c1c28b81ed783a2a1cf87a2#code"
+    version: "1.4"
+    base_token: "0x46850aD61C2B7d64d08c9C754F45254596696984" # PYUSD (PayPal USD, 6 decimals)
+    swap_adapter: "0x56adba107dA1cB73E423c19EC7685E8312d0Ef04" # Uniswap V3 Swap Adapter
+    notes:
+      - "deposit(depositToken, depositAmount, usdaiAmountMinimum, recipient) for minting USDai"
+      - "withdraw(withdrawToken, usdaiAmount, withdrawAmountMinimum, recipient) for burning USDai"
+      - "Also has 5-arg versions with bytes data for custom swap paths"
+      - "If depositToken != baseToken (PYUSD), uses swap adapter to swap via Uniswap V3"
+      - "If depositToken == baseToken (PYUSD), scales directly (1 PYUSD = 1e12 USDai scaling)"
+      - "USDC is whitelisted on swap adapter -- deposit with USDC is supported"
+      - "Blacklist exists -- isBlacklisted(address) check on transfers"
+      - "DEPOSIT_ADMIN_ROLE only bypasses supply cap (currently unlimited)"
+      - "_scale(1e6) = 1e18 (6 decimals -> 18 decimals)"
+      - "_unscale(1e18) = 1e6 (18 decimals -> 6 decimals)"
+
+  kernel:
+    address: "0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+    name: "sUSDai_ST_JT_RedemptionSharePriceToAdminOracle_Kernel"
+    type: "UUPS proxy"
+    implementation: "0x8c87ac66d7970f557c742357eaa26cacb9130dda"
+    abi_source: "https://arbiscan.io/address/0x8c87ac66d7970f557c742357eaa26cacb9130dda#code"
+    senior_tranche: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+    junior_tranche: "0xeB60a64039289a4c07879147073A1Ec5AEA91553"
+    st_asset: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9" # sUSDai
+    jt_asset: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9" # sUSDai (same for both tranches)
+    accountant: "0x1b282c9CDB63378788Bbfd059a7cd44bc9Cba738"
+    usdai: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+    enforce_tranche_shares_transfer_whitelist: false
+    is_blacklist_enabled: true
+    stored_conversion_rate_wad: "1000000000000000000" # 1e18 (USDai:USD = 1:1)
+    notes:
+      - "NAV conversion: sUSDai -> USD via (redemptionSharePrice * storedConversionRateWAD / WAD)"
+      - "getTrancheUnitToNAVUnitConversionRateWAD() returns the sUSDai-to-USD rate"
+      - "stConvertTrancheUnitsToNAVUnits(sUSDaiAmount) converts sUSDai to USD NAV"
+      - "stConvertNAVUnitsToTrancheUnits(navAmount) converts USD NAV to sUSDai amount"
+      - "getState() returns (isBlacklistEnabled, protocolFeeRecipient, stSelfLiquidationBonusWAD, stOwnedYieldBearingAssets, jtOwnedYieldBearingAssets)"
+      - "syncTrancheAccounting() syncs accounting state (callable by anyone)"
+      - "previewSyncTrancheAccounting(trancheType) previews the accounting state"
+      - "Blacklist uses USDai's blacklist -- isBlacklisted checks against USDai"
+
+  swap_adapter:
+    address: "0x56adba107dA1cB73E423c19EC7685E8312d0Ef04"
+    name: "Uniswap V3 Swap Adapter"
+    version: "1.0"
+    base_token: "0x46850aD61C2B7d64d08c9C754F45254596696984" # PYUSD
+    whitelisted_tokens:
+      - address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+        symbol: "USDC"
+      - address: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9"
+        symbol: "USDT"
+      - address: "0x437cc33344a0B27A429f795ff6B469C72698B291"
+        symbol: "wM"
+    notes:
+      - "Used internally by USDai for deposit/withdraw when token != PYUSD"
+      - "When path is empty (default 4-arg deposit/withdraw), uses exactInputSingle with default fee"
+      - "When path is provided (5-arg deposit/withdraw), uses exactInput with custom path"
+      - "Only callable by USDai contract (USDAI_ROLE)"
+
+  usdc:
+    address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+    symbol: "USDC"
+    decimals: 6
+
+  pyusd:
+    address: "0x46850aD61C2B7d64d08c9C754F45254596696984"
+    symbol: "PYUSD"
+    decimals: 6
+    notes:
+      - "PayPal USD - base token underlying USDai"
+      - "Not directly used in our flow (USDai handles USDC->PYUSD swap internally)"
+
+helpers:
+  kernel:
+    address: "0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+    purpose: "Tranche accounting, NAV conversion, and position valuation"
+    useful_functions:
+      - "getTrancheUnitToNAVUnitConversionRateWAD() returns (uint256)"
+      - "stConvertTrancheUnitsToNAVUnits(uint256 _stAssets) returns (uint256 nav)"
+      - "stConvertNAVUnitsToTrancheUnits(uint256 _navAssets) returns (uint256 stAssets)"
+      - "getStoredConversionRateWAD() returns (uint256)"
+      - "previewSyncTrancheAccounting(uint8 trancheType) returns (SyncedAccountingState, AssetClaims, uint256)"
+      - "getState() returns (bool, address, uint64, uint256, uint256)"
+      - "stMaxDeposit(address) returns (uint256)"
+      - "stMaxWithdrawable(address) returns (uint256, uint256, uint256, uint256, uint256)"
+
+# ============================================================================
+# DEPOSIT FLOW: USDC -> USDai -> sUSDai -> Senior Tranche shares
+# ============================================================================
+flows:
+  deposit:
+    description: |
+      Multi-step deposit converting USDC into Senior Tranche shares.
+      Path: USDC -> USDai (via USDai.deposit with internal USDC->PYUSD swap) -> sUSDai (ERC4626 deposit) -> Senior Tranche.
+      Requires 3 approve + 3 action steps.
+
+      TRANCHE_UNIT: The Senior Tranche deposit() takes amounts in TRANCHE_UNIT (18 decimals).
+      Since sUSDai is 18 decimals, the sUSDai amount IS the TRANCHE_UNIT amount (1:1 denomination).
+
+      Key difference from sNUSD: USDai.deposit() handles the USDC->PYUSD swap internally via swap adapter.
+      There is no separate "Router" -- USDai is the entry/exit point.
+
+      Key difference from sNUSD: ST deposit() is 2-arg (assets, receiver), NOT 3-arg.
+
+    preconditions:
+      - "Caller must hold sufficient USDC"
+      - "Caller must not be on USDai blacklist"
+      - "USDai supply cap must not be exceeded (currently unlimited)"
+      - "sUSDai contract must not be paused"
+      - "Senior Tranche must not be paused"
+      - "Kernel must not be paused"
+      - "ST maxDeposit(receiver) must be >= deposit amount in sUSDai terms"
+
+    steps:
+      - action: approve_usdc_to_usdai
+        contract: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+        function: "approve(address,uint256)"
+        params:
+          spender:
+            value: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+            description: "USDai contract address"
+          amount:
+            type: "uint256"
+            description: "USDC amount to deposit (6 decimals)"
+
+      - action: deposit_usdc_to_usdai
+        contract: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+        function: "deposit(address,uint256,uint256,address)"
+        params:
+          depositToken:
+            value: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+            description: "USDC address"
+          depositAmount:
+            type: "uint256"
+            description: "USDC amount (6 decimals)"
+          usdaiAmountMinimum:
+            type: "uint256"
+            description: "Minimum USDai to receive (18 decimals). Set to 0 or use _scale(depositAmount) * slippage."
+          recipient:
+            type: "address"
+            description: "Receiver of minted USDai (typically msg.sender / caliber)"
+        returns: "uint256 usdaiAmount - USDai minted (18 decimals)"
+        notes:
+          - "Internally swaps USDC to PYUSD via Uniswap V3 swap adapter, then scales to USDai"
+          - "4-arg version uses default Uniswap V3 fee tier (empty path)"
+          - "USDC->PYUSD swap may incur minor slippage"
+          - "usdaiAmountMinimum should account for swap slippage"
+
+      - action: approve_usdai_to_susdai
+        contract: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+        function: "approve(address,uint256)"
+        params:
+          spender:
+            value: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+            description: "sUSDai contract address"
+          amount:
+            type: "uint256"
+            description: "USDai amount (18 decimals)"
+
+      - action: deposit_usdai_to_susdai
+        contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+        function: "deposit(uint256,address)"
+        params:
+          amount:
+            type: "uint256"
+            description: "USDai amount to deposit (18 decimals)"
+          receiver:
+            type: "address"
+            description: "Receiver of sUSDai shares (typically msg.sender / caliber)"
+        returns: "uint256 shares - sUSDai shares minted (18 decimals)"
+        notes:
+          - "Standard ERC4626 deposit"
+          - "sUSDai/USDai exchange rate is > 1:1 due to accrued yield"
+          - "Use previewDeposit(assets) to estimate shares received"
+          - "depositSharePrice() returns current deposit rate"
+
+      - action: approve_susdai_to_senior_tranche
+        contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+        function: "approve(address,uint256)"
+        params:
+          spender:
+            value: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+            description: "Senior Tranche address (ST does safeTransferFrom to Kernel)"
+          amount:
+            type: "uint256"
+            description: "sUSDai amount (18 decimals)"
+
+      - action: deposit_susdai_to_senior_tranche
+        contract: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+        function: "deposit(uint256,address)"
+        params:
+          assets:
+            type: "uint256"
+            description: "sUSDai amount in TRANCHE_UNIT (18 decimals). sUSDai amount = TRANCHE_UNIT amount."
+          receiver:
+            type: "address"
+            description: "Receiver of ST shares (typically msg.sender / caliber)"
+        returns: "uint256 shares - ST shares minted (18 decimals)"
+        notes:
+          - "2-arg deposit (NOT 3-arg like sNUSD ST which takes assets, receiver, controller)"
+          - "TRANCHE_UNIT is 18 decimals, same as sUSDai denomination"
+          - "Use previewDeposit(assets) to estimate shares"
+          - "ST.deposit() calls safeTransferFrom(msg.sender, KERNEL, assets)"
+          - "Approval must be to ST address, not Kernel"
+
+    events_to_monitor:
+      - "Deposited(address indexed caller, address indexed recipient, address depositToken, uint256 depositAmount, uint256 mintAmount)  # USDai"
+      - "Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares)  # sUSDai"
+      - "Deposit(address indexed sender, address indexed receiver, uint256 assets, uint256 shares)  # Senior Tranche"
+
+    token_movements:
+      in:
+        - token: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+          symbol: "USDC"
+          description: "USDC sent to USDai contract (swapped to PYUSD internally)"
+      out:
+        - token: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+          symbol: "ROY-ST-sUSDai"
+          description: "Senior Tranche shares received"
+      intermediate:
+        - token: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+          symbol: "USDai"
+          description: "Minted from USDC deposit, then deposited to sUSDai"
+        - token: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          symbol: "sUSDai"
+          description: "Received from staking USDai, then deposited to Senior Tranche"
+
+  # ============================================================================
+  # WITHDRAW FLOW (TWO OR THREE TRANSACTIONS due to redemption queue)
+  # TX 1: Redeem ST shares -> get sUSDai -> requestRedeem on sUSDai (enter queue)
+  # TX 2 (after serviceRedemptions by admin): redeem sUSDai -> get USDai -> withdraw to USDC
+  # ============================================================================
+  withdraw:
+    description: |
+      Multi-step withdrawal from Senior Tranche back to USDC.
+      This is a TWO-TRANSACTION process due to the sUSDai redemption queue:
+
+      Transaction 1 (withdraw_step1):
+        1. Redeem Senior Tranche shares -> receive sUSDai
+        2. Call sUSDai.requestRedeem(shares, controller, owner) -> enter redemption queue
+
+      Transaction 2 (withdraw_step2, after redemptions are serviced):
+        1. Call sUSDai.redeem(shares, receiver, controller) -> receive USDai
+        2. Call USDai.withdraw(USDC, usdaiAmount, minUSDC, recipient) -> receive USDC
+
+      The redemption queue is serviced by an admin (STRATEGY_ADMIN_ROLE) calling
+      serviceRedemptions(). There is NO fixed cooldown period -- the time depends
+      on when the admin services the queue and available liquidity.
+
+    preconditions:
+      - "Caller must hold Senior Tranche shares"
+      - "Senior Tranche must not be paused"
+      - "sUSDai contract must not be paused"
+      - "For step2: redemption must have been serviced (redeemableShares > 0)"
+      - "Caller must not be on USDai blacklist"
+
+    step1_redeem_and_request:
+      description: "Redeem ST shares and enter sUSDai redemption queue"
+      steps:
+        - action: redeem_senior_tranche
+          contract: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+          function: "redeem(uint256,address,address)"
+          params:
+            shares:
+              type: "uint256"
+              description: "Number of ST shares to redeem (18 decimals)"
+            receiver:
+              type: "address"
+              description: "Receiver of sUSDai (typically msg.sender / caliber)"
+            owner:
+              type: "address"
+              description: "Owner of shares (typically same as receiver / caliber)"
+          returns: "AssetClaims (stAssets uint256, jtAssets uint256, nav uint256)"
+          notes:
+            - "stAssets = sUSDai amount received (TRANCHE_UNIT, 18 decimals)"
+            - "jtAssets should be 0 for Senior Tranche"
+            - "nav = NAV value for accounting"
+            - "The Kernel transfers sUSDai directly to receiver"
+            - "Use previewRedeem(shares) to estimate output"
+
+        - action: request_redeem_susdai
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          function: "requestRedeem(uint256,address,address)"
+          params:
+            shares:
+              type: "uint256"
+              description: "sUSDai shares to redeem (18 decimals). Use full sUSDai balance from ST redeem."
+            controller:
+              type: "address"
+              description: "Controller who can claim the redemption (typically msg.sender / caliber)"
+            owner:
+              type: "address"
+              description: "Owner of sUSDai shares (typically same as controller / caliber)"
+          returns: "uint256 redemptionId - ID to track this redemption request"
+          notes:
+            - "Burns sUSDai shares immediately"
+            - "Enters the redemption queue -- shares are pending until serviced"
+            - "Multiple requestRedeem calls create SEPARATE redemption IDs (do NOT overwrite like sNUSD cooldown)"
+            - "Track the returned redemptionId for later claiming"
+
+    step2_claim_and_withdraw:
+      description: "Claim serviced redemption and withdraw USDai to USDC (after admin services queue)"
+      steps:
+        - action: redeem_susdai
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          function: "redeem(uint256,address,address)"
+          params:
+            shares:
+              type: "uint256"
+              description: "Redeemable shares to claim. Use claimableRedeemRequest(redemptionId, controller) or maxRedeem(controller) to get available amount."
+            receiver:
+              type: "address"
+              description: "Receiver of USDai (typically msg.sender / caliber)"
+            controller:
+              type: "address"
+              description: "Controller of the redemption (typically msg.sender / caliber)"
+          returns: "uint256 amount - USDai amount received (18 decimals)"
+          notes:
+            - "Only works for shares that have been serviced (redeemableShares)"
+            - "If controller != msg.sender, must be set as operator via setOperator"
+            - "Can partially claim if only some shares have been serviced"
+            - "Alternative: use withdraw(uint256,address,address) to claim by USDai amount instead of shares. Use maxWithdraw(controller) to get available amount."
+
+        - action: withdraw_usdai_to_usdc
+          contract: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+          function: "withdraw(address,uint256,uint256,address)"
+          params:
+            withdrawToken:
+              value: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+              description: "USDC address"
+            usdaiAmount:
+              type: "uint256"
+              description: "USDai amount to burn/withdraw (18 decimals)"
+            withdrawAmountMinimum:
+              type: "uint256"
+              description: "Minimum USDC to receive (6 decimals). Account for swap slippage."
+            recipient:
+              type: "address"
+              description: "Receiver of USDC (typically msg.sender / caliber)"
+          returns: "uint256 withdrawAmount - USDC received (6 decimals)"
+          notes:
+            - "Burns USDai and internally swaps PYUSD->USDC via Uniswap V3 swap adapter"
+            - "withdrawAmountMinimum should account for swap slippage"
+            - "No whitelist enforcement on USDai withdraw (unlike NUSD Router redeem)"
+
+    redemption_queue_details:
+      mechanism: "queue-based (NOT cooldown-based like sNUSD)"
+      service_role: "STRATEGY_ADMIN_ROLE on sUSDai"
+      query_functions:
+        - function: "redemptionIds(address controller) returns (uint256[])"
+          description: "Get all active redemption IDs for a controller"
+        - function: "redemption(uint256 redemptionId) returns (Redemption, uint256)"
+          description: "Get full redemption struct: (prev, next, pendingShares, redeemableShares, withdrawableAmount, controller, redemptionTimestamp)"
+        - function: "claimableRedeemRequest(uint256 redemptionId, address controller) returns (uint256)"
+          description: "Get redeemable (claimable) shares for a specific redemption"
+        - function: "pendingRedeemRequest(uint256 redemptionId, address controller) returns (uint256)"
+          description: "Get pending (not yet serviced) shares for a specific redemption"
+        - function: "maxRedeem(address controller) returns (uint256)"
+          description: "Total redeemable shares across all redemptions"
+        - function: "maxWithdraw(address controller) returns (uint256)"
+          description: "Total withdrawable USDai amount across all redemptions"
+        - function: "redemptionQueueInfo() returns (uint256 index, uint256 head, uint256 tail, uint256 pending, uint256 balance)"
+          description: "Global queue state"
+      notes:
+        - "Unlike sNUSD cooldown, multiple requestRedeem() calls create SEPARATE redemptions (no overwrite)"
+        - "There is no fixed cooldown -- depends on admin servicing frequency and available liquidity"
+        - "The redemptionTimestamp indicates when the next batch service will occur"
+        - "Current redemptionTimestamp: 1777960800 (May 5, 2026)"
+
+    events_to_monitor:
+      - "Redeem(address indexed sender, address indexed receiver, AssetClaims claims, uint256 shares)  # Senior Tranche"
+      - "RedeemRequest(address indexed controller, address indexed owner, uint256 indexed requestId, address sender, uint256 shares)  # sUSDai requestRedeem"
+      - "Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)  # sUSDai redeem/withdraw"
+      - "Withdrawn(address indexed caller, address indexed recipient, address withdrawToken, uint256 usdaiAmount, uint256 withdrawAmount)  # USDai"
+
+    token_movements:
+      in:
+        - token: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+          symbol: "ROY-ST-sUSDai"
+          description: "ST shares burned on redeem"
+      out:
+        - token: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+          symbol: "USDC"
+          description: "USDC received from USDai.withdraw"
+      intermediate:
+        - token: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          symbol: "sUSDai"
+          description: "Received from ST redeem, then burned via requestRedeem"
+        - token: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+          symbol: "USDai"
+          description: "Received from sUSDai.redeem, then withdrawn to USDC"
+
+  # ============================================================================
+  # ACCOUNTING: Track position across multiple states
+  # ============================================================================
+  accounting:
+    description: |
+      Position accounting must track value across FIVE states:
+      1. Active ST shares in Senior Tranche
+      2. sUSDai balance held directly (between ST redeem and requestRedeem)
+      3. sUSDai in redemption queue (pending servicing)
+      4. USDai claimable from serviced redemptions (redeemableShares)
+      5. USDai balance held directly (between sUSDai claim and USDai.withdraw)
+
+      The primary position state is (1). States (2)-(5) are transient during withdrawal.
+
+    position_query:
+      description: "Query active Senior Tranche shares"
+      contract: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+      function: "balanceOf(address)"
+      params:
+        account:
+          type: "address"
+          description: "Account to query (caliber address)"
+      returns:
+        type: "uint256"
+        description: "Senior Tranche share balance (18 decimals)"
+
+    position_value_query:
+      description: "Convert ST shares to underlying asset claims"
+      contract: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+      function: "convertToAssets(uint256)"
+      params:
+        shares:
+          type: "uint256"
+          description: "ST shares to convert"
+      returns:
+        type: "tuple(uint256 stAssets, uint256 jtAssets, uint256 nav)"
+        description: |
+          stAssets: sUSDai amount claimable (TRANCHE_UNIT, 18 decimals)
+          jtAssets: always 0 for Senior Tranche
+          nav: NAV value in NAV_UNIT (18 decimals, USD-denominated)
+
+    susdai_balance_query:
+      description: "Query sUSDai balance held directly (transient state)"
+      contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+      function: "balanceOf(address)"
+      params:
+        account:
+          type: "address"
+          description: "Account to query (caliber address)"
+      returns:
+        type: "uint256"
+        description: "sUSDai balance (18 decimals)"
+
+    susdai_value_conversion:
+      description: "Convert sUSDai shares to underlying USDai value"
+      contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+      function: "convertToAssets(uint256)"
+      params:
+        shares:
+          type: "uint256"
+          description: "sUSDai shares"
+      returns:
+        type: "uint256"
+        description: "USDai amount (18 decimals)"
+
+    redemption_queue_query:
+      description: "Query sUSDai redemption queue state (pending + redeemable)"
+      steps:
+        - function: "redemptionIds(address controller) returns (uint256[])"
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          description: "Get all redemption IDs for the account"
+        - function: "redemption(uint256 redemptionId) returns (Redemption, uint256)"
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          description: "For each ID, get (prev, next, pendingShares, redeemableShares, withdrawableAmount, controller, redemptionTimestamp)"
+      aggregate_queries:
+        - function: "maxRedeem(address controller) returns (uint256)"
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          description: "Total redeemable (serviced) shares across all redemptions"
+        - function: "maxWithdraw(address controller) returns (uint256)"
+          contract: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+          description: "Total withdrawable USDai amount"
+      notes:
+        - "pendingShares: shares in queue, not yet serviced"
+        - "redeemableShares: shares serviced, available to claim"
+        - "withdrawableAmount: USDai amount available to withdraw"
+        - "To get total pending: sum pendingShares across all redemptionIds"
+
+    usdai_balance_query:
+      description: "Query USDai balance held directly (transient state between sUSDai claim and withdraw)"
+      contract: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+      function: "balanceOf(address)"
+      params:
+        account:
+          type: "address"
+          description: "Account to query (caliber address)"
+      returns:
+        type: "uint256"
+        description: "USDai balance (18 decimals)"
+
+    total_position_value:
+      description: |
+        To compute the total position value in USDC:
+
+        1. st_shares = SeniorTranche.balanceOf(account)
+        2. (stAssets, _, nav) = SeniorTranche.convertToAssets(st_shares)
+           # stAssets is sUSDai amount from ST position
+           # nav is USD value already (use this directly for pricing)
+        3. susdai_balance = sUSDai.balanceOf(account)
+           # any sUSDai held directly (transient)
+        4. redemption_ids = sUSDai.redemptionIds(account)
+           # for each id: get pendingShares and redeemableShares
+        5. usdai_balance = USDai.balanceOf(account)
+           # any USDai held directly (transient)
+
+        # Convert sUSDai amounts to USDai
+        6. usdai_from_st = sUSDai.convertToAssets(stAssets)
+        7. usdai_from_susdai = sUSDai.convertToAssets(susdai_balance)
+
+        # For pending/redeemable shares in queue, use redemptionSharePrice
+        8. susdai_in_queue_usdai = sum(pendingShares + redeemableShares) * sUSDai.redemptionSharePrice() / 1e18
+
+        # Total USDai value
+        9. total_usdai = usdai_from_st + usdai_from_susdai + susdai_in_queue_usdai + usdai_balance
+
+        # USDai is ~1:1 to USD (check storedConversionRateWAD for exact rate)
+        # To convert USDai to USDC: unscale (divide by 1e12)
+        10. total_usdc = total_usdai / 1e12  # approximate, for exact use swap quotes
+
+        # Alternatively, use Kernel conversion directly:
+        # nav_from_st = SeniorTranche.convertToAssets(st_shares).nav  # already in USD
+        # This gives the most accurate USD value for the ST position
+
+    kernel_conversion:
+      description: "Use Kernel for accurate USD valuation of sUSDai positions"
+      contract: "0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+      functions:
+        - "stConvertTrancheUnitsToNAVUnits(uint256 sUSDaiAmount) returns (uint256 navUSD)"
+        - "getTrancheUnitToNAVUnitConversionRateWAD() returns (uint256 rate)"
+        - "getStoredConversionRateWAD() returns (uint256 usdaiToUSD)"
+      notes:
+        - "NAV is in 18-decimal USD terms"
+        - "Rate = sUSDai.redemptionSharePrice() * getStoredConversionRateWAD() / WAD"
+        - "Current getStoredConversionRateWAD = 1e18 (USDai:USD = 1:1)"
+        - "Current getTrancheUnitToNAVUnitConversionRateWAD = ~1.077e18"
+
+conversion_notes:
+  usdc_to_usdai:
+    description: "USDC (6 decimals) -> USDai (18 decimals) via USDai.deposit(USDC, amount, min, recipient)"
+    rate: "~1:1 after swap, but includes USDC->PYUSD Uniswap V3 swap slippage"
+    decimals_change: "6 -> 18"
+    notes:
+      - "USDai internally swaps USDC->PYUSD via swap adapter, then scales PYUSD amount by 1e12"
+      - "_scale(1e6 PYUSD) = 1e18 USDai"
+      - "Swap slippage depends on Uniswap V3 USDC/PYUSD pool liquidity"
+  usdai_to_susdai:
+    description: "USDai (18 decimals) -> sUSDai shares (18 decimals) via sUSDai.deposit()"
+    rate: "Variable - sUSDai appreciates over time as yield accrues"
+    current_deposit_share_price: "1077941723499341027 (1 sUSDai ≈ 1.078 USDai)"
+    current_redemption_share_price: "1077667193934938070 (1 sUSDai ≈ 1.078 USDai for redemption)"
+  susdai_to_tranche_unit:
+    description: "sUSDai (18 decimals) = TRANCHE_UNIT (18 decimals)"
+    rate: "1:1 denomination (sUSDai amount IS the TRANCHE_UNIT amount)"
+  tranche_unit_to_shares:
+    description: "TRANCHE_UNIT -> ST shares via SeniorTranche.deposit()"
+    rate: "Variable - use convertToShares/previewDeposit"
+  tranche_unit_to_nav:
+    description: "sUSDai -> USD via Kernel conversion"
+    rate: "redemptionSharePrice * storedConversionRateWAD / WAD"
+    current_rate: "~1.077e18 (1 sUSDai ≈ 1.077 USD)"
+
+important_notes:
+  no_whitelist_enforcement: |
+    Unlike the sNUSD integration where the NUSD Router enforces a redeem whitelist,
+    the USDai.withdraw() function does NOT enforce a whitelist for withdrawals.
+    The USDai contract does have a blacklist (isBlacklisted) but no explicit
+    mint/redeem whitelist. Any non-blacklisted address can deposit and withdraw.
+
+  queue_based_redemption: |
+    sUSDai uses a QUEUE-BASED redemption mechanism (not cooldown like sNUSD):
+    1. requestRedeem() burns sUSDai shares and enters them in a FIFO queue
+    2. Admin (STRATEGY_ADMIN_ROLE) calls serviceRedemptions() to process the queue
+    3. After servicing, shares become "redeemable" and USDai becomes "withdrawable"
+    4. User calls redeem() or withdraw() to claim the USDai
+    Multiple requestRedeem() calls create SEPARATE entries (no overwrite).
+    There is no fixed cooldown duration -- timing depends on admin servicing.
+
+  blacklist: |
+    The USDai contract has a blacklist mechanism. The Kernel also uses USDai's
+    blacklist to prevent blacklisted addresses from interacting with tranches.
+    The Kernel's isBlacklisted(address) checks against USDai's blacklist.
+    Verify: USDai.isBlacklisted(caliber) should return false.
+
+  st_deposit_2_arg: |
+    The Senior Tranche on Arbitrum uses a 2-argument deposit:
+    deposit(uint256 assets, address receiver)
+    This is different from the sNUSD Senior Tranche on mainnet which uses 3-argument:
+    deposit(uint256 assets, address receiver, address controller)
+    This is a critical difference for blueprint generation.
+
+  st_max_deposit: |
+    The Senior Tranche has a maxDeposit limit that depends on the Kernel's
+    accounting state. Currently maxDeposit returns ~1.02e17 (about 0.1 sUSDai).
+    This may indicate the vault is near capacity or there are utilization limits.
+    Check Kernel.stMaxDeposit(receiver) before depositing.
+
+  usdai_swap_slippage: |
+    USDai deposit/withdraw with USDC involves an internal Uniswap V3 swap
+    between USDC and PYUSD (base token). Set appropriate slippage parameters
+    in usdaiAmountMinimum (deposit) and withdrawAmountMinimum (withdraw).
+
+  operator_mechanism: |
+    sUSDai supports an operator mechanism via setOperator(address, bool).
+    If the caliber needs a different address to call redeem/withdraw on its behalf,
+    the caliber must first call sUSDai.setOperator(operatorAddress, true).
+
+metadata:
+  generated_at: "2026-04-08T00:00:00Z"
+  data_sources:
+    - etherscan_arb
+    - tenderly_rpc
+    - cast_rpc
+  verified_on_chain:
+    - "USDai name: USDai, symbol: USDai, decimals: 18"
+    - "USDai baseToken: 0x46850aD61C2B7d64d08c9C754F45254596696984 (PYUSD, 6 decimals)"
+    - "USDai swapAdapter: 0x56adba107dA1cB73E423c19EC7685E8312d0Ef04 (Uniswap V3)"
+    - "USDai supplyCap: type(uint256).max (unlimited)"
+    - "USDai totalSupply: ~238.8M (2.388e26)"
+    - "USDai IMPLEMENTATION_VERSION: 1.4"
+    - "sUSDai name: Staked USDai, symbol: sUSDai, decimals: 18"
+    - "sUSDai asset: 0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF (USDai)"
+    - "sUSDai totalAssets: ~224.7M (2.247e26 USDai)"
+    - "sUSDai totalSupply: ~127.9M (1.279e26)"
+    - "sUSDai depositSharePrice: ~1.078e18"
+    - "sUSDai redemptionSharePrice: ~1.078e18"
+    - "sUSDai convertToAssets(1e18) = ~1.078e18"
+    - "sUSDai convertToShares(1e18) = ~9.277e17"
+    - "sUSDai paused: false"
+    - "sUSDai previewRedeem: REVERTS (DisabledImplementation - direct redeem disabled)"
+    - "sUSDai previewWithdraw: REVERTS (DisabledImplementation - direct withdraw disabled)"
+    - "sUSDai redemptionQueueInfo: index=2154, head=2120, tail=2154, pending=~2.45e24, balance=~4.02e24"
+    - "sUSDai redemptionTimestamp: 1777960800 (May 5, 2026)"
+    - "sUSDai IMPLEMENTATION_VERSION: 1.7"
+    - "Senior Tranche name: Royco Senior Tranche sUSDai, symbol: ROY-ST-sUSDai, decimals: 18"
+    - "Senior Tranche asset: 0x0B2b2B2076d95dda7817e785989fE353fe955ef9 (sUSDai)"
+    - "Senior Tranche KERNEL: 0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+    - "Senior Tranche TRANCHE_TYPE: 0 (Senior)"
+    - "Senior Tranche paused: false"
+    - "Senior Tranche totalSupply: ~8.60e17"
+    - "Senior Tranche implementation: 0x4afd9e2b4fbec1f11d09bf2e3d3f82869fa5bc5f"
+    - "Senior Tranche deposit is 2-arg: deposit(uint256,address)"
+    - "Senior Tranche convertToAssets(1e18) = (~9.30e17, 0, ~1.00e18)"
+    - "Senior Tranche maxDeposit(any) = ~1.03e17"
+    - "Kernel ST_ASSET: sUSDai, JT_ASSET: sUSDai (identical)"
+    - "Kernel ENFORCE_WHITELIST: false"
+    - "Kernel isBlacklistEnabled: true"
+    - "Kernel storedConversionRateWAD: 1e18 (USDai:USD = 1:1)"
+    - "Kernel getTrancheUnitToNAVUnitConversionRateWAD: ~1.078e18"
+    - "Kernel stConvertTrancheUnitsToNAVUnits(1e18) = ~1.078e18"
+    - "Kernel implementation: 0x8c87ac66d7970f557c742357eaa26cacb9130dda (sUSDai_ST_JT_RedemptionSharePriceToAdminOracle_Kernel)"
+    - "SwapAdapter: Uniswap V3 Swap Adapter v1.0"
+    - "SwapAdapter whitelisted: USDC, USDT, wM"
+    - "SwapAdapter isWhitelistedToken(USDC): true"
+    - "USDC: 0xaf88d065e77c8cC2239327C5EDb3A432268e5831, decimals: 6"
+    - "PYUSD: 0x46850aD61C2B7d64d08c9C754F45254596696984, decimals: 6"
+  notes:
+    - "USDai is NOT a simple 1:1 stablecoin -- it wraps PYUSD with yield accrual"
+    - "sUSDai/USDai rate appreciates over time (currently ~1.078 USDai per sUSDai)"
+    - "sUSDai uses QUEUE-based redemption (not cooldown like sNUSD)"
+    - "ST deposit is 2-arg on Arbitrum (vs 3-arg on mainnet sNUSD ST)"
+    - "No redeem whitelist enforcement (unlike NUSD Router)"
+    - "USDai swap slippage exists due to USDC<->PYUSD Uniswap V3 swap"
+    - "Kernel NAV conversion: sUSDai -> USD via redemptionSharePrice * storedConversionRate"
+    - "ST maxDeposit is currently very low (~0.1 sUSDai) -- may indicate near-capacity"

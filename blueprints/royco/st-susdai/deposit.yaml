@@ -1,0 +1,172 @@
+protocol: "royco-st-susdai"
+
+# Royco Senior Tranche sUSDai Deposit Blueprint (Arbitrum)
+# Multi-step deposit: PYUSD -> USDai (internal scale) -> sUSDai (ERC4626) -> Senior Tranche shares
+# USDai wraps PYUSD via direct scaling (no swap needed when using PYUSD as deposit token)
+# ST deposit is 2-arg: deposit(uint256, address)
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  pyusd_address:
+    type: "address"
+    value: "0x46850aD61C2B7d64d08c9C754F45254596696984"
+  usdai_address:
+    type: "address"
+    value: "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF"
+  susdai_address:
+    type: "address"
+    value: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+  senior_tranche_address:
+    type: "address"
+    value: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+
+inputs: {}
+
+actions:
+  deposit_pyusd:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Approve PYUSD to USDai
+      - description: "Approve PYUSD spending by USDai"
+        target: "${constants.pyusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.usdai_address}"
+          - type: "uint256"
+            value: "${input_slots.pyusd_amount_to_deposit}"
+
+      # Deposit PYUSD into USDai (PYUSD is base token, no swap needed)
+      - description: "Deposit PYUSD into USDai (direct scale, no swap)"
+        target: "${constants.usdai_address}"
+        selector: "deposit(address,uint256,uint256,address)"
+        parameters:
+          - type: "address"
+            value: "${constants.pyusd_address}"
+          - type: "uint256"
+            value: "${input_slots.pyusd_amount_to_deposit}"
+          - type: "uint256"
+            value: "${input_slots.min_usdai_amount}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "usdai_amount"
+          type: "uint256"
+
+      # Approve USDai to sUSDai
+      - description: "Approve USDai spending by sUSDai vault"
+        target: "${constants.usdai_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.susdai_address}"
+          - type: "uint256"
+            value: "${returns.usdai_amount}"
+
+      # Deposit USDai into sUSDai (ERC4626)
+      - description: "Deposit USDai into sUSDai vault to receive sUSDai shares"
+        target: "${constants.susdai_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usdai_amount}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "susdai_shares"
+          type: "uint256"
+
+      # Approve sUSDai to Senior Tranche
+      - description: "Approve sUSDai spending by Senior Tranche"
+        target: "${constants.susdai_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.susdai_shares}"
+
+      # Deposit sUSDai into Senior Tranche (2-arg deposit)
+      - description: "Deposit sUSDai into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susdai_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      pyusd_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of PYUSD to deposit (6 decimals)"
+      min_usdai_amount:
+        type: "uint256"
+        description: "Minimum USDai to receive (18 decimals)"
+
+  deposit_usdai:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Approve USDai to sUSDai
+      - description: "Approve USDai spending by sUSDai vault"
+        target: "${constants.usdai_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.susdai_address}"
+          - type: "uint256"
+            value: "${input_slots.usdai_amount_to_deposit}"
+
+      # Deposit USDai into sUSDai (ERC4626)
+      - description: "Deposit USDai into sUSDai vault to receive sUSDai shares"
+        target: "${constants.susdai_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdai_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "susdai_shares"
+          type: "uint256"
+
+      # Approve sUSDai to Senior Tranche
+      - description: "Approve sUSDai spending by Senior Tranche"
+        target: "${constants.susdai_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.susdai_shares}"
+
+      # Deposit sUSDai into Senior Tranche (2-arg deposit)
+      - description: "Deposit sUSDai into Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susdai_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdai_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDai to deposit (in USDai decimals)"

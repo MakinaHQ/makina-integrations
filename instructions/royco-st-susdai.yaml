@@ -1,0 +1,91 @@
+# Royco Senior Tranche sUSDai (Arbitrum)
+# Multi-step deposit: PYUSD -> USDai (scale) -> sUSDai (ERC4626) -> Senior Tranche shares
+# Two-step withdraw: redeem ST + requestRedeem -> [admin service] -> claim + withdraw to PYUSD
+# Accounting: NAV-based via convertToAssets + queue state via KV-stored redemption ID
+# One redemption in flight at a time.
+
+# DEPOSIT: PYUSD -> USDai -> sUSDai -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.arbitrum.PYUSD}" # PYUSD
+  instruction:
+    label: "ROY-ST-sUSDai"
+    path: "../../../blueprints/royco/st-susdai/deposit.yaml:deposit_pyusd"
+    inputs: {}
+
+# DEPOSIT: USDai -> sUSDai -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.arbitrum.USDai}" # USDai
+  instruction:
+    label: "ROY-ST-sUSDai"
+    path: "../../../blueprints/royco/st-susdai/deposit.yaml:deposit_usdai"
+    inputs: {}
+
+# NAV-BASED ACCOUNTING: ST position value (USDC) + queue state via KV store
+# Two affected_tokens because reserved_slots emits two values before the sentinel:
+#   slot 0 = usdc_value (active ST NAV), slot 1 = queue_usdai_value (pending/claimable redemption)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.arbitrum.USDC}" # USDC - active ST position NAV
+    - "${token_list.arbitrum.USDai}" # USDai - pending redemption queue value
+  instruction:
+    label: "ROY-ST-sUSDai-NAV"
+    path: "../../../blueprints/royco/st-susdai/account-nav.yaml:account_nav"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: "${position.kv_storage_key}"
+
+# WITHDRAW STEP 1: Redeem ST shares + enter sUSDai redemption queue + store ID in KV
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "ROY-ST-sUSDai"
+    path: "../../../blueprints/royco/st-susdai/withdraw.yaml:withdraw_request"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: "${position.kv_storage_key}"
+
+# WITHDRAW STEP 2 (PYUSD): Claim serviced redemption + withdraw to PYUSD + clear KV
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.arbitrum.PYUSD}" # PYUSD
+  instruction:
+    label: "ROY-ST-sUSDai"
+    path: "../../../blueprints/royco/st-susdai/withdraw.yaml:withdraw_claim_to_pyusd"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: "${position.kv_storage_key}"
+
+# WITHDRAW STEP 2 (USDai): Claim serviced redemption + withdraw to USDai + clear KV
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.arbitrum.USDai}" # USDai
+  instruction:
+    label: "ROY-ST-sUSDai"
+    path: "../../../blueprints/royco/st-susdai/withdraw.yaml:withdraw_claim_to_usdai"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: "${position.kv_storage_key}"
