@@ -1,0 +1,78 @@
+# Royco Junior Tranche stcUSD (Cap Protocol)
+# Atomic chain: USDC <-> cUSD (Cap Vault) <-> stcUSD (ERC4626) <-> JT-stcUSD
+#
+# Six instructions covering all reasonable transitions:
+#   1 ACCOUNTING: cUSD-denominated (no nav), via JT.convertToAssets sum + stcUSD.convertToAssets
+#   5 MANAGEMENT covering this state graph at the caliber level:
+#         USDC ──deposit──► JT
+#         USDC ◄─withdraw── JT
+#         cUSD ◄─withdraw-to-cusd── JT     (escape hatch: skip Cap Vault on exit)
+#         cUSD ──burn-cusd-to-usdc──► USDC (drain leftover cUSD when re-whitelisted)
+#         cUSD ──deposit-from-cusd──► JT   (re-enter without the burn->mint roundtrip)
+#
+# Whitelist guards on Cap Vault touches (BooleanHelper.revertIfFalse):
+#   - DEPOSIT (USDC->cUSD mint): GUARDED — never enter unless whitelisted
+#   - BURN-CUSD (cUSD->USDC burn): GUARDED — only call when re-whitelisted (no fee path)
+#   - WITHDRAW (full unwind): NOT GUARDED — escape hatch, may pay Cap fee if un-whitelisted
+#   - WITHDRAW-TO-CUSD / DEPOSIT-FROM-CUSD: no Cap touch, no guard needed
+
+# DEPOSIT: USDC -> cUSD -> stcUSD -> JT shares (atomic, whitelist-gated)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-JT-stcUSD"
+    path: "../../../blueprints/royco/jt-stcusd/deposit.yaml:deposit"
+    inputs: {}
+
+# cUSD-DENOMINATED ACCOUNTING: Sync tranche + sum stAssets+jtAssets in stcUSD, then convertToAssets to cUSD
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-JT-stcUSD"
+    path: "../../../blueprints/royco/jt-stcusd/account.yaml:account"
+    inputs: {}
+
+# WITHDRAW (full): redeem JT -> stcUSD -> cUSD -> USDC (atomic, escape hatch)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-JT-stcUSD"
+    path: "../../../blueprints/royco/jt-stcusd/withdraw.yaml:withdraw"
+    inputs: {}
+
+# WITHDRAW-TO-CUSD (partial): redeem JT -> stcUSD -> cUSD; leaves cUSD in caliber
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-JT-stcUSD"
+    path: "../../../blueprints/royco/jt-stcusd/withdraw-to-cusd.yaml:withdraw_to_cusd"
+    inputs: {}
+
+# BURN-CUSD: drain caliber-held cUSD into USDC via Cap Vault.burn (whitelist-gated)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-JT-stcUSD"
+    path: "../../../blueprints/royco/jt-stcusd/burn-cusd-to-usdc.yaml:burn_cusd_to_usdc"
+    inputs: {}
+
+# DEPOSIT-FROM-CUSD: re-enter JT from caliber-held cUSD (skips Cap Vault entirely)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.cUSD}"
+  instruction:
+    label: "ROY-JT-stcUSD-DepositFromCUSD"
+    path: "../../../blueprints/royco/jt-stcusd/deposit-from-cusd.yaml:deposit_from_cusd"
+    inputs: {}
