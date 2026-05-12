@@ -371,3 +371,19 @@ positions:
       weeks: "4"
       share_token_address: "0x66bCF6151D5558AfB47c38B20663589843156078" # liUSD-4w
       kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-4w)}"
+
+  # ── Royco Junior Tranches V2 (cUSD/USDC-denominated accounting; no NAV path) ──
+  - id: "237425469270040991629623293889452380931"
+    group_id: "0"
+    description: "Royco Junior Tranche stcUSD (Cap Protocol)"
+    instructions: !include "../../../instructions/royco-jt-stcusd.yaml"
+    position_tokens:
+      - "0x88887bE419578051FF9F4eb6C858A951921D8888" # stcUSD
+      - "0xe4060e83ad26618c7ed56a02ce099beba4f73b29" # JT-stcUSD
+  - id: "324471518229524566118053937012927109991"
+    group_id: "0"
+    description: "Royco Junior Tranche syrupUSDC"
+    instructions: !include "../../../instructions/royco-jt-syrupusdc.yaml"
+    position_tokens:
+      - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC

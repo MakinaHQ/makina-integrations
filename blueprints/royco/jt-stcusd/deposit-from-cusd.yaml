@@ -1,0 +1,78 @@
+protocol: "royco-jt-stcusd"
+
+# Royco Junior Tranche stcUSD - Deposit from cUSD Blueprint
+# cUSD (already in caliber) -> stcUSD (ERC4626) -> JT-stcUSD shares.
+# Used to re-enter from caliber-held cUSD WITHOUT touching the Cap Vault —
+# avoids the burn->mint roundtrip and any Cap fee/whitelist exposure.
+# No whitelist guard needed — does not touch the Cap Vault.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  cusd_address:
+    type: "address"
+    value: "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC"
+  stcusd_address:
+    type: "address"
+    value: "0x88887bE419578051FF9F4eb6C858A951921D8888"
+  junior_tranche_address:
+    type: "address"
+    value: "0xe4060e83ad26618c7ed56a02ce099beba4f73b29"
+
+inputs: {}
+
+actions:
+  deposit_from_cusd:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Approve cUSD spending by stcUSD vault"
+        target: "${constants.cusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.stcusd_address}"
+          - type: "uint256"
+            value: "${input_slots.cusd_amount_to_deposit}"
+
+      - description: "Deposit cUSD into stcUSD vault to receive stcUSD shares"
+        target: "${constants.stcusd_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.cusd_amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_shares"
+          type: "uint256"
+
+      - description: "Approve stcUSD spending by Junior Tranche"
+        target: "${constants.stcusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.junior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+
+      - description: "Deposit stcUSD into Junior Tranche to receive JT shares"
+        target: "${constants.junior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      cusd_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of cUSD to deposit (18 decimals). Operator must ensure caliber holds at least this amount of cUSD before calling, otherwise the approve/deposit step reverts with insufficient balance."

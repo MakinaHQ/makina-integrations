@@ -60,8 +60,10 @@ struct AssetClaims {
 
 **Finding**: Based on Etherscan contract source references and Royco protocol architecture:
 
-- **TRANCHE_UNIT**: Denominated in the **tranche asset** (stcUSD) with **18 decimals** (standard ERC20 WAD)
-  - For ST-stcUSD: measured in stcUSD (Cap staked vault shares)
+- **TRANCHE_UNIT**: Denominated in the **tranche's deposit asset** (the result of `tranche.asset()`).
+  - For the stcUSD market (both ST and JT): TRANCHE_UNIT == stcUSD @ 18 decimals.
+  - Both `stAssets` AND `jtAssets` in the AssetClaims tuple are in this unit. They do NOT cross
+    denominations — `jtAssets` is in stcUSD, not cUSD. Source: `royco/dawn-msig-orchestration/src/libraries/Types.sol:15-19`.
 
 - **NAV_UNIT**: Denominated in **USD** (pricing unit) with **18 decimals** (WAD per Royco convention)
   - Represents the USD value of the tranche's collateral after accounting for senior/junior protection
@@ -69,9 +71,14 @@ struct AssetClaims {
 
 ### Interpretation
 
-- `stAssets`: Amount of stcUSD held by the tranche (units of stcUSD @ 18 decimals)
-- `jtAssets`: Amount of cUSD held by junior tranche (first-loss capital) (units of cUSD @ 18 decimals)
-- `nav`: USD value of the tranche's net asset position (USD WAD @ 18 decimals)
+- `stAssets`: Caliber's pro-rata claim on the senior layer's accumulator, in stcUSD (18 dec).
+- `jtAssets`: Caliber's pro-rata claim on the junior layer's accumulator, in stcUSD (18 dec).
+- `nav`: Caliber's pro-rata USD value of the position (USD WAD @ 18 decimals).
+
+Both `stAssets` and `jtAssets` are typically non-zero on either tranche side; the kernel
+distributes the caller's claim across both accumulators. Summing the two gives the caliber's
+total stcUSD-denominated entitlement — this is the basis of the alternative cUSD-denominated
+accounting in `blueprints/royco/jt-stcusd/account.yaml`.
 
 **Example**: If ST-stcUSD holds 1,000 stcUSD shares and those are worth $1,200 USD, NAV ≈ 1.2e21 (1,200 * 1e18).
 
@@ -240,8 +247,8 @@ cast call 0x88887bE419578051FF9F4eb6C858A951921D8888 \
 | ----------------- | ----------------------------------------------------------------------------- |
 | **Return Type**   | `(uint256,uint256,uint256)` fixed tuple, 96 bytes encoded                     |
 | **Field Order**   | stAssets [0], jtAssets [1], nav [2]                                           |
-| **stAssets Unit** | stcUSD (Cap vault shares), 18 decimals                                        |
-| **jtAssets Unit** | cUSD (Cap vault), 18 decimals                                                 |
+| **stAssets Unit** | stcUSD (TRANCHE_UNIT for the stcUSD market), 18 decimals                      |
+| **jtAssets Unit** | stcUSD (TRANCHE_UNIT for the stcUSD market), 18 decimals — NOT cUSD           |
 | **nav Unit**      | USD, 18 decimals (WAD)                                                        |
 | **NAV Source**    | `IRoycoKernel.previewSyncTrancheAccounting()`                                 |
 | **Oracle 1**      | `stcUSD.convertToAssets()` for stcUSD→cUSD rate                               |
@@ -260,7 +267,7 @@ For the `ST-stcUSD` accounting blueprint:
 # Position value = nav field from convertToAssets tuple
 # Collateral breakdown:
 #   - stAssets: stcUSD in senior tranche
-#   - jtAssets: cUSD in junior tranche (first-loss capital)
+#   - jtAssets: stcUSD claim on the junior layer (TRANCHE_UNIT, same as stAssets)
 # NAV tracks total USD value after fee accruals and coverage adjustments
 
 actions:

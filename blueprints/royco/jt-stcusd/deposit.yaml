@@ -1,0 +1,130 @@
+protocol: "royco-jt-stcusd"
+
+# Royco Junior Tranche stcUSD - Deposit Blueprint
+# Atomic chain: USDC -> cUSD (Cap Vault.mint) -> stcUSD (ERC4626) -> JT-stcUSD shares
+# Reverts if caliber is not whitelisted on the Cap Vault (would otherwise be charged dynamic mint fees).
+# Mirrors blueprints/royco/st-stcusd/deposit.yaml exactly; only the tranche address differs.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  cusd_address:
+    type: "address"
+    value: "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC"
+  stcusd_address:
+    type: "address"
+    value: "0x88887bE419578051FF9F4eb6C858A951921D8888"
+  junior_tranche_address:
+    type: "address"
+    value: "0xe4060e83ad26618c7ed56a02ce099beba4f73b29"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Read whitelist status of caliber on Cap Vault"
+        target: "${constants.cusd_address}"
+        selector: "whitelisted(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "is_whitelisted"
+          type: "bool"
+
+      - description: "Revert if caliber is not whitelisted (would incur mint fees)"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_whitelisted}"
+
+      - description: "Approve USDC spending by Cap Vault"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.cusd_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      - description: "Mint cUSD from USDC via Cap Vault (no fees because whitelisted)"
+        target: "${constants.cusd_address}"
+        selector: "mint(address,uint256,uint256,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.usdc_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+          - type: "uint256"
+            value: "${input_slots.min_cusd_out}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+        return:
+          name: "cusd_minted"
+          type: "uint256"
+
+      - description: "Approve cUSD spending by stcUSD vault"
+        target: "${constants.cusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.stcusd_address}"
+          - type: "uint256"
+            value: "${returns.cusd_minted}"
+
+      - description: "Deposit cUSD into stcUSD vault to receive stcUSD shares"
+        target: "${constants.stcusd_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.cusd_minted}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_shares"
+          type: "uint256"
+
+      - description: "Approve stcUSD spending by Junior Tranche"
+        target: "${constants.stcusd_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.junior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+
+      - description: "Deposit stcUSD into Junior Tranche to receive JT shares"
+        target: "${constants.junior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_shares}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"
+      min_cusd_out:
+        type: "uint256"
+        description: "Minimum cUSD to receive from Cap Vault.mint (18 decimals). Whitelisted callers pay no fee but the rate is NOT exactly 1:1 — it tracks the Vault's value-per-cUSD (Lender interest, basket PnL) and moves over time. As of 2026-04 the whitelisted rate is ~1.0000009 cUSD per USDC, but it can drift either way. Operator must quote fresh via cUSD.getMintAmount(caliber, USDC, usdc_amount_to_deposit) immediately before broadcasting and apply a small tolerance (e.g., 1-2 bps)."

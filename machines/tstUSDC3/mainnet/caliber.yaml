@@ -278,6 +278,26 @@ positions:
     instructions: !include "../../../instructions/royco-st-snusd.yaml"
     position_tokens: ["0x3B2df77f0eaA0CA98aAabFFa96B03eaF08ec6c8e"] # ST-sNUSD
 
+  # Royco Junior Tranches V2 (cUSD/USDC-denominated accounting; no NAV path)
+  # id = uint128(sha256("makina.mainnet.tstUSDC3.royco.jt-stcusd"))
+  #     = 0x576ca343ca22f06f5205fd39f379de4d
+  - id: "116206915097619936887735720699640798797"
+    group_id: "0"
+    description: "Royco Junior Tranche stcUSD (Cap Protocol)"
+    instructions: !include "../../../instructions/royco-jt-stcusd.yaml"
+    position_tokens:
+      - "0x88887bE419578051FF9F4eb6C858A951921D8888" # stcUSD
+      - "0xe4060e83ad26618c7ed56a02ce099beba4f73b29" # JT-stcUSD
+  # id = uint128(sha256("makina.mainnet.tstUSDC3.royco.jt-syrupusdc"))
+  #     = 0x1a5a030374eb0c33b6141837b5cbbaed
+  - id: "35027295728773662009058359124354120429"
+    group_id: "0"
+    description: "Royco Junior Tranche syrupUSDC"
+    instructions: !include "../../../instructions/royco-jt-syrupusdc.yaml"
+    position_tokens:
+      - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+
   # Grove Staking
   - id: "184729365018472936501847293650"
     group_id: "0"

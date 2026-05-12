@@ -1,0 +1,143 @@
+protocol: "royco-jt-stcusd"
+
+# Royco Junior Tranche stcUSD - Full Withdraw Blueprint
+# Atomic unwind: JT-stcUSD -> stcUSD -> cUSD (ERC4626) -> USDC (Cap Vault.burn)
+# Mirrors blueprints/royco/st-stcusd/withdraw.yaml; only the tranche address differs.
+# Junior tranche redeem is synchronous (no queue at the tranche layer).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  cusd_address:
+    type: "address"
+    value: "0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC"
+  stcusd_address:
+    type: "address"
+    value: "0x88887bE419578051FF9F4eb6C858A951921D8888"
+  junior_tranche_address:
+    type: "address"
+    value: "0xe4060e83ad26618c7ed56a02ce099beba4f73b29"
+
+inputs: {}
+
+actions:
+  withdraw:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Get Junior Tranche share balance"
+        target: "${constants.junior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "jt_shares"
+          type: "uint256"
+
+      - description: "Calculate JT shares to redeem based on basis points"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.jt_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Get stcUSD balance before JT redeem"
+        target: "${constants.stcusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_before"
+          type: "uint256"
+
+      - description: "Redeem Junior Tranche shares to receive stcUSD"
+        target: "${constants.junior_tranche_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      - description: "Get stcUSD balance after JT redeem"
+        target: "${constants.stcusd_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "stcusd_after"
+          type: "uint256"
+
+      - description: "Compute stcUSD received from JT redeem"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)" # sub(a, b) = a - b; pass (after, before) → after - before
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_after}"
+          - type: "uint256"
+            value: "${returns.stcusd_before}"
+        return:
+          name: "stcusd_received"
+          type: "uint256"
+
+      - description: "Redeem stcUSD for cUSD"
+        target: "${constants.stcusd_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stcusd_received}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "cusd_received"
+          type: "uint256"
+
+      - description: "Burn cUSD for USDC via Cap Vault"
+        target: "${constants.cusd_address}"
+        selector: "burn(address,uint256,uint256,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.usdc_address}"
+          - type: "uint256"
+            value: "${returns.cusd_received}"
+          - type: "uint256"
+            value: "${input_slots.min_usdc_out}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of JT shares to redeem (10000 = 100%)"
+      min_usdc_out:
+        type: "uint256"
+        description: "Minimum USDC to receive from Cap Vault.burn (6 decimals). The exact output depends on (a) the Vault's current value-per-cUSD rate, which moves with Lender interest and basket PnL — even whitelisted users do NOT get an exact 1:1 conversion (rate was ~0.999999149 USDC/cUSD as of 2026-04); and (b) the dynamic burn fee, which whitelisted callers bypass but un-whitelisted callers pay (~0.1% as of 2026-04, but verify on-chain). Operator must quote fresh via cUSD.getBurnAmount(caliber, USDC, cusd_received) immediately before broadcasting and apply a small tolerance (e.g., 1-2 bps)."

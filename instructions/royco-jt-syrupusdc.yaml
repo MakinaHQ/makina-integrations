@@ -1,0 +1,41 @@
+# Royco Junior Tranche syrupUSDC
+# Multi-step deposit: USDC -> syrupUSDC (Maple ERC4626) -> Junior Tranche shares
+# Queue-based withdraw: redeem JT -> syrupUSDC -> requestRedeem (manual withdrawal). USDC airdropped later.
+# Accounting: USDC-denominated (no nav) + pending syrupUSDC from Maple WithdrawalManager.
+#
+# Prerequisites:
+#   - Caliber must be whitelisted on Maple PoolPermissionManager for deposits
+#   - Caliber holds the Royco AccessManager (`0x7cC6fB28...`) deposit/redeem role `9623252227852051139` and the kernel sync role `15053450870919821405`. Same roles as the ST sibling — both are market-agnostic.
+#
+# WARNING: WithdrawalManager.userEscrowedShares is keyed on caliber, not tranche.
+# Do not hold simultaneous pending withdrawals from both ST and JT on the same caliber,
+# or accounting will double-count the pending USDC across the two account.yaml runs.
+
+# DEPOSIT: USDC -> syrupUSDC -> Junior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-JT-syrupUSDC"
+    path: "../../../blueprints/royco/jt-syrupusdc/deposit.yaml:deposit"
+    inputs: {}
+
+# USDC-DENOMINATED ACCOUNTING: Active JT in syrupUSDC + pending escrow, then convertToExitAssets to USDC
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "ROY-JT-syrupUSDC"
+    path: "../../../blueprints/royco/jt-syrupusdc/account.yaml:account"
+    inputs: {}
+
+# WITHDRAW: Redeem JT -> syrupUSDC -> requestRedeem (Maple queue)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "ROY-JT-syrupUSDC"
+    path: "../../../blueprints/royco/jt-syrupusdc/withdraw.yaml:request_redeem"
+    inputs: {}

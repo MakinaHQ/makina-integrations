@@ -5,7 +5,7 @@
 #
 # Prerequisites:
 #   - Caliber must be whitelisted on Maple PoolPermissionManager for deposits
-#   - AccessManager roles 9623252227852051139 + 15053450870919821405
+#   - Caliber holds AccessManager (`0x7cC6fB28...`) role `9623252227852051139` (deposit/redeem on the ST tranche) and `15053450870919821405` (syncTrancheAccounting on the kernel). Both are market-agnostic; one grant of each unlocks every Royco V2 ST + JT.
 
 # DEPOSIT: USDC -> syrupUSDC -> Senior Tranche shares
 - is_debt: false
