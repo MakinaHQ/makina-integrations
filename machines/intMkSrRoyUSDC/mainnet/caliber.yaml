@@ -8,6 +8,9 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
@@ -26,7 +29,7 @@ positions:
   - id: "317674047022373827182618653676880817492"
     group_id: "0"
     description: "Morpho Vault Steakhouse USDC"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens:
       - "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"
     vars:
@@ -36,7 +39,7 @@ positions:
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
     description: "Morpho Vault Sentora PYUSD Main (V2)"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
     position_tokens:
       - "0xb576765fB15505433aF24FEe2c0325895C559FB2"
     vars:

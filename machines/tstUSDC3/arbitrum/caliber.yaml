@@ -11,7 +11,7 @@ positions:
   - id: "225919034311554859614117379052402566520"
     group_id: "0"
     description: "Morpho Vault Steakhouse High Yield"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     vars:
       vault_label: "Steakhouse High Yield"
       token_address: ${token_list.arbitrum.USDC}
@@ -19,7 +19,7 @@ positions:
   - id: "71468695781592263857408046912715450492"
     group_id: "0"
     description: "Morpho Vault Clearstar USDC Reactor"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     vars:
       vault_label: "Clearstar USDC Reactor"
       token_address: ${token_list.arbitrum.USDC}
@@ -27,7 +27,7 @@ positions:
   - id: "222373581378271374640912175777392407527"
     group_id: "0"
     description: "Morpho Vault kpk USDC Yield"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     vars:
       vault_label: "kpk USDC Yield"
       token_address: ${token_list.arbitrum.USDC}
@@ -35,7 +35,7 @@ positions:
   - id: "101713165790861857821926700839246075716"
     group_id: "0"
     description: "Morpho Vault Clearstar High Yield USDC"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     vars:
       vault_label: "Clearstar High Yield USDC"
       token_address: ${token_list.arbitrum.USDC}
@@ -43,7 +43,7 @@ positions:
   - id: "236938787749183114180580308124846321709"
     group_id: "0"
     description: "Morpho Vault Hyperithm USDC"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     vars:
       vault_label: "Hyperithm USDC"
       token_address: ${token_list.arbitrum.USDC}

@@ -104,7 +104,7 @@ positions:
   - id: "128264429154381135287798106504544985667"
     group_id: "0"
     description: "Morpho Vault USDC Steakhouse Reservoir"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
     vars:
       label: "Smokehouse Reservoir USDC"
