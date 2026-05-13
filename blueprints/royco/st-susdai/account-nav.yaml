@@ -1,0 +1,189 @@
+protocol: "royco-st-susdai"
+
+# Royco Senior Tranche sUSDai NAV-based Account Blueprint (Arbitrum)
+# Slot 0: Active ST position priced via convertToAssets NAV, scaled to USDC (6 dec).
+# Slot 1: Queue position (pending + claimable sUSDai) expressed in USDai terms:
+#         sUSDai->USDai = redemptionSharePrice (1e18 fixed point)
+#         Redemption ID read from KV store (set by withdraw_request, cleared by withdraw_claim).
+#         When no redemption in flight, KV returns 0 -> pendingRedeemRequest(0) = 0 -> slot 1 = 0.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x49a05b9c885086D0BA363281628e48E0aB86dEAf"
+  revertable_caliber_helper_address:
+    type: "address"
+    value: "0x6b09a22087B5D6C7E1051ee9a8AA94eA56C91008"
+  susdai_address:
+    type: "address"
+    value: "0x0B2b2B2076d95dda7817e785989fE353fe955ef9"
+  senior_tranche_address:
+    type: "address"
+    value: "0x90465aad4e426948A4ea342AC49A1A38200B7017"
+  kernel_address:
+    type: "address"
+    value: "0xFdb17E53eA5d342124b8473188BCB9F05F1949CA"
+
+inputs:
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+
+actions:
+  account_nav:
+    calls:
+      # Get caliber address
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Sync tranche accounting state before reading NAV (crystallizes protocol fee shares)
+      - description: "Sync tranche accounting on the Royco kernel"
+        target: "${constants.kernel_address}"
+        selector: "syncTrancheAccounting()"
+        parameters: []
+
+      # Get ST share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Convert ST shares to asset claims tuple (stAssets, jtAssets, nav)
+      - description: "Convert ST shares to asset claims with NAV"
+        target: "${constants.senior_tranche_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+        return:
+          name: "asset_claims"
+          type: "(uint256,uint256,uint256)"
+
+      # Extract NAV (index 2) from the tuple - USD value with 18 decimals
+      - description: "Extract NAV (USD 18 decimals) from asset claims tuple"
+        target: "${constants.revertable_caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "nav_usd_18dec"
+          type: "uint256"
+
+      # Scale NAV from 18 decimals to 6 decimals (USDC)
+      - description: "Convert NAV from USD (18 dec) to USDC (6 dec)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.nav_usd_18dec}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "1000000000000"
+        return:
+          name: "usdc_value"
+          type: "uint256"
+
+      # ── Slot 1: Queue position via KV-stored redemption ID ──────────
+
+      # Read redemption ID from KV store (0 if no redemption in flight)
+      # Key: keccak256("royco_st_susdai_redemption_id")
+      - description: "Read stored redemption ID from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "redemption_id"
+          type: "uint256"
+
+      # Get pending shares (not yet serviced) - returns 0 if ID is 0
+      - description: "Get pending sUSDai shares for this redemption"
+        target: "${constants.susdai_address}"
+        selector: "pendingRedeemRequest(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.redemption_id}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "pending_shares"
+          type: "uint256"
+
+      # Get claimable shares (serviced, ready to claim) - returns 0 if ID is 0
+      - description: "Get claimable sUSDai shares for this redemption"
+        target: "${constants.susdai_address}"
+        selector: "claimableRedeemRequest(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.redemption_id}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "claimable_shares"
+          type: "uint256"
+
+      # Total queue shares = pending + claimable
+      - description: "Calculate total sUSDai shares in queue"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_shares}"
+          - type: "uint256"
+            value: "${returns.claimable_shares}"
+        return:
+          name: "total_queue_shares"
+          type: "uint256"
+
+      # ── Price queue shares in USDai terms ───────────────────────────
+
+      # Get sUSDai -> USDai conversion rate (redemption pricing)
+      - description: "Get sUSDai redemption share price (sUSDai -> USDai rate)"
+        target: "${constants.susdai_address}"
+        selector: "redemptionSharePrice()"
+        parameters: []
+        return:
+          name: "redemption_share_price"
+          type: "uint256"
+
+      # Queue USDai value = total_queue_shares * redemptionSharePrice / WAD
+      - description: "Calculate USDai value of queue position"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_queue_shares}"
+          - type: "uint256"
+            value: "${returns.redemption_share_price}"
+          - type: "uint256"
+            value: "1000000000000000000"
+        return:
+          name: "queue_usdai_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usdc_value}"
+      - type: "uint256"
+        value: "${returns.queue_usdai_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

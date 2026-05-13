@@ -1,0 +1,23 @@
+config:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  caliber_address:
+    type: "address"
+    value: "0x5476F4E23dAA093Ce6700e1026013c55F7AF9083"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  key_value_store_address:
+    type: "address"
+    value: "0x6d7faa359a091d202c6358b37b5411329129b08a"
+
+positions:
+  # Royco ST sUSDai
+  - id: "53227599948955703910590613083104374166"
+    group_id: "0"
+    description: "Royco ST sUSDai"
+    instructions: !include "../../../instructions/royco-st-susdai.yaml"
+    position_tokens: ["0x90465aad4e426948A4ea342AC49A1A38200B7017"] # ST-sUSDai
+    vars:
+      kv_storage_key: ${keccak256(makina.arbitrum.royco-st-susdai)}
