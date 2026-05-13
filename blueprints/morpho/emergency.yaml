@@ -1,0 +1,69 @@
+# NOTE: emergency_redeem_vault is a naive emergency withdrawal that redeems
+# our full share balance. It assumes the vault has enough idle liquidity to
+# process the full redemption. Will revert if most assets are allocated to
+# markets and insufficient liquidity is available. Intended for Morpho V1 vaults.
+#
+# emergency_redeem_vault_v2 is the equivalent for Morpho V2 vaults. V2 vaults'
+# native maxRedeem(address) returns 0, so it queries the Morpho-provided
+# VaultV2LiquidityLib lens (mainnet: 0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690)
+# which walks the vault's allocations to compute the actually redeemable share
+# amount, then redeems that.
+# Audit-pinned source (commit 9293142):
+# https://github.com/morpho-org/morpho-snippets/blob/9293142da55804b6bcfccdd0ddfe237ee9b4d27a/src/vault-v2/VaultV2LiquidityLib.sol
+
+protocol: "morpho"
+
+inputs:
+  vault_address:
+    type: "address"
+  receiver_address:
+    type: "address"
+  liquidity_lens:
+    type: "address"
+
+actions:
+  emergency_redeem_vault:
+    calls:
+      - description: "Query our balance of shares in the vault"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "shares_balance"
+          type: "uint256"
+      - description: "Redeem all shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_balance}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+
+  emergency_redeem_vault_v2:
+    calls:
+      - description: "Query max redeemable shares via Morpho V2 liquidity lens"
+        target: "${inputs.liquidity_lens}"
+        selector: "maxRedeem(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+        return:
+          name: "max_redeemable"
+          type: "uint256"
+      - description: "Redeem the lens-reported max redeemable shares from the vault"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.max_redeemable}"
+          - type: "address"
+            value: "${inputs.receiver_address}"
+          - type: "address"
+            value: "${inputs.receiver_address}"

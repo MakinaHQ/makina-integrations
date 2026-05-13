@@ -11,6 +11,9 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
@@ -99,7 +102,7 @@ positions:
   - id: "276843631519342658565251846836976075217"
     group_id: "0"
     description: "Morpho Vault PYUSD Steakhouse"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
     vars:
       label: "Steakhouse PYUSD"
@@ -108,7 +111,7 @@ positions:
   - id: "30651621090656837837542443694366525060"
     group_id: "0"
     description: "Morpho Vault USDC MEV Capital"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xd63070114470f685b75B74D60EEc7c1113d33a3D"]
     vars:
       label: "MEV Capital USDC"
@@ -117,7 +120,7 @@ positions:
   - id: "287972541400220405479010366660803291000"
     group_id: "0"
     description: "Morpho Vault eUSD Gauntlet Core"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xc080f56504e0278828A403269DB945F6c6D6E014"]
     vars:
       label: "Gauntlet eUSD Core"
@@ -126,7 +129,7 @@ positions:
   - id: "77590748279218246310796884579338401703"
     group_id: "0"
     description: "Morpho Vault USDC Smokehouse"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
     vars:
       label: "Smokehouse USDC"
@@ -135,7 +138,7 @@ positions:
   - id: "11232424494326814282538250204373920286"
     group_id: "0"
     description: "Morpho Vault USDC Gauntlet Frontier"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"]
     vars:
       label: "Gauntlet USDC Frontier"
@@ -144,7 +147,7 @@ positions:
   - id: "188442457890402398659043284211703237226"
     group_id: "0"
     description: "Morpho Vault USDC Gauntlet Core"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
     vars:
       label: "Gauntlet USDC Core"
@@ -153,7 +156,7 @@ positions:
   - id: "128264429154381135287798106504544985667"
     group_id: "0"
     description: "Morpho Vault USDC Steakhouse Reservoir"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
     vars:
       label: "Smokehouse Reservoir USDC"
@@ -162,7 +165,7 @@ positions:
   - id: "101479911391298992514073662718338576961"
     group_id: "0"
     description: "Morpho Vault RLUSD Sentora"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
     position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
     vars:
       label: "Sentora RLUSD"
@@ -171,7 +174,7 @@ positions:
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
     description: "Morpho Vault PYUSD Sentora"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
     position_tokens: ["0xb576765fB15505433aF24FEe2c0325895C559FB2"]
     vars:
       label: "Sentora PYUSD"
@@ -182,12 +185,14 @@ positions:
   - id: "208384069883257652684922644584564420340"
     group_id: "0"
     description: "Morpho Vault AUSD Flowdesk RWA Strategy"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
     position_tokens: ["0x32401B9fb79065Bc15949DE0BD43927492f02F0C"]
     vars:
       label: "Flowdesk AUSD RWA"
       asset_address: ${token_list.mainnet.AUSD}
       vault_address: "0x32401B9fb79065Bc15949DE0BD43927492f02F0C"
+    tags:
+      - "228339:emergency_redeem_vault_v2"
 
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "233812392305217120018639900280612878694"
@@ -200,21 +205,21 @@ positions:
       loan_token: ${token_list.mainnet.USDC}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
-  # - id: "176021688445186810403025048632929053161"
-  #   group_id: "0"
-  #   description: "Aave Umbrella USDC"
-  #   instructions: !include "./instructions/aave-umbrella-usdc.yaml"
-  #   position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
+  - id: "176021688445186810403025048632929053161"
+    group_id: "0"
+    description: "Aave Umbrella USDC"
+    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
   - id: "293691712937964969352275672791079139559"
     group_id: "0"
     description: "Aave Umbrella USDT"
     instructions: !include "./instructions/aave-umbrella-usdt.yaml"
     position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
-  # - id: "229457643934747132111107431329088218367"
-  #   group_id: "0"
-  #   description: "Aave Umbrella GHO"
-  #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
-  #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+  - id: "229457643934747132111107431329088218367"
+    group_id: "0"
+    description: "Aave Umbrella GHO"
+    instructions: !include "./instructions/aave-umbrella-gho.yaml"
+    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
   - id: "107031348711587941411569515464890863894"
     group_id: "0"
     description: "Aave Savings GHO"
@@ -368,3 +373,19 @@ positions:
       weeks: "4"
       share_token_address: "0x66bCF6151D5558AfB47c38B20663589843156078" # liUSD-4w
       kv_storage_key: "${keccak256(makina.mainnet.infinifi.liusd-4w)}"
+
+  # ── Royco Junior Tranches V2 (cUSD/USDC-denominated accounting; no NAV path) ──
+  - id: "237425469270040991629623293889452380931"
+    group_id: "0"
+    description: "Royco Junior Tranche stcUSD (Cap Protocol)"
+    instructions: !include "../../../instructions/royco-jt-stcusd.yaml"
+    position_tokens:
+      - "0x88887bE419578051FF9F4eb6C858A951921D8888" # stcUSD
+      - "0xe4060e83ad26618c7ed56a02ce099beba4f73b29" # JT-stcUSD
+  - id: "324471518229524566118053937012927109991"
+    group_id: "0"
+    description: "Royco Junior Tranche syrupUSDC"
+    instructions: !include "../../../instructions/royco-jt-syrupusdc.yaml"
+    position_tokens:
+      - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
+      - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
