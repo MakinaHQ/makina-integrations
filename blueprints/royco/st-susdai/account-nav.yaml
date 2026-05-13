@@ -6,8 +6,6 @@ protocol: "royco-st-susdai"
 #         sUSDai->USDai = redemptionSharePrice (1e18 fixed point)
 #         Redemption ID read from KV store (set by withdraw_request, cleared by withdraw_claim).
 #         When no redemption in flight, KV returns 0 -> pendingRedeemRequest(0) = 0 -> slot 1 = 0.
-# NOTE: syncTrancheAccounting() is NOT called because convertToAssets() already
-# previews post-sync state internally, and the sync function is access-controlled.
 
 constants:
   context_helper_address:
