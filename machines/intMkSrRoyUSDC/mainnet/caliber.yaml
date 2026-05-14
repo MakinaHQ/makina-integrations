@@ -26,7 +26,7 @@ positions:
   - id: "317674047022373827182618653676880817492"
     group_id: "0"
     description: "Morpho Vault Steakhouse USDC"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens:
       - "0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB"
     vars:
@@ -36,7 +36,7 @@ positions:
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
     description: "Morpho Vault Sentora PYUSD Main (V2)"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
     position_tokens:
       - "0xb576765fB15505433aF24FEe2c0325895C559FB2"
     vars:
@@ -132,3 +132,11 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x66182442522D3049A941035190C315379c959250" # ST-syrupUSDC
+  - id: "96337836397589143298085381665746466353"
+    group_id: "0"
+    description: "Royco Senior Tranche Pareto FalconX V2"
+    instructions: !include "../../../instructions/royco-st-pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # AA tranche
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
+      - "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b" # ST-Pareto-FalconX
