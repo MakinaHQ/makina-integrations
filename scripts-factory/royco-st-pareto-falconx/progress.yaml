@@ -1,0 +1,210 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "royco-pareto-st"
+  pool_name: "Royco Senior Tranche - Pareto FalconX"
+  protocol: "royco"
+  chain: "mainnet"
+  machine: "intMkSrRoyUSDC"
+  actions: [deposit, withdraw, account]
+  base_tokens:
+    - address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      symbol: "USDC"
+      decimals: 6
+      index: 0
+  context: |
+    New Senior Tranche (ST) integration for Pareto FalconX.
+
+    Use machine intMkSrRoyUSDC for testing (already has other ST integrations:
+    autousd, snusd, smokehouse-usdc, stcusd, syrupusdc).
+
+    Key contracts:
+      - Pareto FalconX vault (asset/underlying ERC4626 over USDC):
+          0xc26a6fa2c37b38e549a4a1807543801db684f99c
+      - Royco Pareto FalconX ST (the senior tranche):
+          0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b
+      - Royco Pareto FalconX Kernel (for NAV-based pricing):
+          0x15bb63C07740ff972F76716cAcC5766f0C641791
+      - Pareto oracle (used by Morpho, candidate for asset pricing):
+          0x50449B3D1f5931d568A1951Ee506A9534e7f7dFf
+
+    Documentation: https://docs.pareto.credit/developers/integrators/smart-contract
+    Vault UI: https://app.pareto.credit/vault#0xC26A6Fa2C37b38E549a4a1807543801Db684f99C
+    Reference mint tx: 0xbb9c2e8697bb98546d97b090c49ee0528d6dd5555d0be82af48557c3dc56d282
+
+    The pattern should mirror the existing Royco ST integrations in this repo
+    (see scripts-factory/royco-st-syrupusdc, scripts-factory/royco-st-stcusd,
+    blueprints/royco/st-syrupusdc/, blueprints/royco/st-stcusd/).
+    Specifically: USDC -> Pareto vault (ERC4626) -> ST shares for deposit,
+    and the inverse for withdraw, with NAV-based or convertToAssets-based
+    accounting depending on what the kernel exposes.
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent: { status: completed, timestamp: "2026-04-30T00:00:00Z" }
+  1_specs:
+    status: completed
+    timestamp: "2026-04-30T13:00:00Z"
+    artifacts:
+      - specs.yaml
+      - SUMMARY.md
+    notes: |
+      Major divergence from prior Royco STs - middle layer is IdleCDOTranche
+      (NOT ERC4626), withdraw is epoch-queued (~32 days), and there are TWO
+      off-chain access gates (Pareto Keyring + Royco AccessManager).
+      Junior must be bootstrapped before senior deposits succeed (coverage check).
+      See SUMMARY.md for full divergence matrix.
+  1b_enrich:
+    status: completed
+    timestamp: "2026-04-30T13:10:00Z"
+    artifacts:
+      - functions.md
+    notes: |
+      RoycoSeniorTranche & RoycoFactory verified on Sourcify (not Etherscan).
+      Royco Kernel impl for this market unverified - recovered from sibling.
+      Pareto Keyring is actually KeyringIdleWhitelist - mapping at slot 2 is
+      the Tenderly bypass surface. syncTrancheAccounting is NOT idempotent.
+      FalconXUSDC receipt is non-transferrable.
+  1c_offchain:
+    status: skipped
+    reason: |
+      All flows in specs.yaml have offchain_indicators: []. No merkle proofs,
+      signatures, or API calls needed - integration is fully on-chain.
+      No harvest action in scope.
+  2_deposit:
+    status: completed
+    timestamp: "2026-04-30T13:30:00Z"
+    artifacts:
+      - execution-deposit.md
+    testnet_id: "5b132729-f79a-4ffc-8d2f-33bac4dc23f9"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/4ed6c929-bd54-4f22-a18d-aa575d39b78d"
+    block: "0x17d5d55"
+    notes: |
+      Surprises vs spec:
+       - Caliber ALREADY has Keyring credential on mainnet (no override needed)
+       - Caliber ALREADY has Royco AccessManager grants for ST deposit/redeem
+         and Kernel.syncTrancheAccounting (no override needed)
+       - Only setup gate granted: JT_LP role (0xded17f6f89970f45) for junior
+         bootstrap (junior bootstrapped via Royco JT, not Pareto BB, since
+         Royco JT's asset() is the AA tranche).
+      Deposit: 50000 USDC -> depositDuringEpoch -> 46248.053 AA ->
+      RoycoST.deposit -> 49715.825 ST shares. 1.005715 USDC per ST.
+      Mid-epoch discount applied.
+  2_account:
+    status: completed
+    timestamp: "2026-04-30T13:40:00Z"
+    artifacts:
+      - execution-account.md
+    notes: |
+      All 3 valuation paths converge at 49,715.824587 USDC (jtAssets, stranded_aa,
+      pending_usdc all zero in clean post-deposit state).
+      syncTrancheAccounting() empirically NOT load-bearing at this block, but
+      blueprint should still call it (kernel can lag across epochs).
+      tranchePrice(AA) is pure view, returned 1,074,982 consistently.
+      Recommended: Path A (asset-space full) so same blueprint works during
+      withdraw window when caliber holds FalconXUSDC receipt instead of AA.
+      Fork reverted to byte-identical post-deposit state for withdraw stage.
+  2_withdraw:
+    status: completed
+    timestamp: "2026-04-30T14:00:00Z"
+    artifacts:
+      - execution-withdraw.md
+    notes: |
+      Two-phase withdraw confirmed:
+        Phase 1: RoycoST.redeem -> AA -> requestWithdraw -> FalconXUSDC receipt
+        (wait ~32-65d for epoch close)
+        Phase 2: claimWithdrawRequest() (no args, claims entire pending)
+      Full redeem (49,715.825 ST) -> 50,326.617406 USDC (+0.653%, ~4.18% APR over ~57d).
+      Partial redeem also works; ~1.9 USDC slip from APR0 settlement bucket
+      (sub-cent non-deterministic). Treat FalconXUSDC.balanceOf as near-upper-bound.
+      Premature claim reverts NotAllowed() (0x3d693ada).
+      Detection: IdleCreditVault.epochNumber() > lastWithdrawRequest(caliber).
+      Post-claim re-deposit is idempotent.
+      stopEpoch is manager-only Pareto ops step - blueprint can't gate on it,
+      it's a runbook concern.
+  3_blueprint:
+    status: completed
+    timestamp: "2026-04-30T15:00:00Z"
+    artifacts:
+      - blueprints/royco/st-pareto-falconx/deposit-running.yaml
+      - blueprints/royco/st-pareto-falconx/deposit-idle.yaml
+      - blueprints/royco/st-pareto-falconx/withdraw.yaml
+      - blueprints/royco/st-pareto-falconx/claim.yaml
+      - blueprints/royco/st-pareto-falconx/account.yaml
+      - instructions/royco-st-pareto-falconx.yaml
+      - machines/intMkSrRoyUSDC/mainnet/caliber.yaml (modified — added position 204541588220296843188812650988416231208)
+    notes: |
+      Deposit branch problem resolved with TWO blueprint variants because
+      depositAA(uint256) and depositDuringEpoch(uint256,address) have
+      incompatible signatures (different selectors and parameter shapes) — a
+      weiroll ternary cannot dispatch between them in a single blueprint.
+       - deposit-running.yaml -> calls depositDuringEpoch; guards on
+         isEpochRunning && !isDepositDuringEpochDisabled (revertIfFalse / revertIfTrue).
+       - deposit-idle.yaml    -> calls depositAA; guard on !isEpochRunning.
+      Operator picks the variant that matches isEpochRunning() at submit time;
+      either variant reverts cleanly with the BooleanHelper guard if the wrong
+      one is invoked, so there is no risk of using depositAA mid-epoch (which
+      would otherwise revert with Pausable: paused) or depositDuringEpoch
+      between epochs (which the protocol allows but mints zero AA when no
+      epoch is active).
+
+      Account uses Path A (asset-space full):
+        (stAssets + jtAssets + stranded_aa) * tranchePrice / 1e18 + FalconXUSDC.balanceOf
+      so it remains correct during the multi-week withdraw window when the
+      caliber holds FalconXUSDC instead of AA, and during partial-execution.
+
+      Withdraw is split into two MANAGEMENT instructions (withdraw.yaml +
+      claim.yaml) — non-atomic, separated by ~32-65 days. Phase 2 has NO
+      Keyring gate and NO Royco role gate.
+
+      Compile check:
+        transpiler --input-file machines/intMkSrRoyUSDC/mainnet/caliber-test.yaml \
+          --output-file ...rootfiles/compile-output.toml \
+          --token-list token-lists/prod-token-list.json transpile
+        => "✅ Rootfile successfully transpiled".
+  4_test:
+    status: completed
+    timestamp: "2026-04-30T14:00:00Z"
+    artifacts:
+      - test-report.md
+    testnet_id: "438efdd7-701a-44e4-b7f0-acc3518e4c29"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/cb5bd01f-5aa3-4329-bea3-9dffb74a4676"
+    block: "0x17d5e3b"
+    notes: |
+      Full E2E ran on a fresh Tenderly mainnet fork through the spellcaster
+      CLI. All 4 management actions (deposit mid-epoch, request_redeem,
+      claim_redeem) plus account-positions executed successfully via
+      `spellcaster manage-position` / `account-positions`.
+
+      Pre-test setup (off-blueprint, runbook only): granted JT_LP role to
+      caliber from AccessManager admin (impersonated), bootstrapped the
+      junior leg via 10k USDC -> AA -> RoycoJT.deposit, funded borrower +
+      manager with USDC/ETH for the Pareto stopEpoch ops.
+
+      Senior deposit (50k USDC) -> 49,716.025 ST shares; account valuation
+      49,715.531514 USDC matched on-chain math to the wei.
+
+      Phase 1 redeem -> FalconXUSDC receipt 50,322.519155; display-positions
+      correctly resourced position value to receipt during pending window.
+
+      Phase 2 claim (after time-warp + startEpoch + stopEpoch) -> caliber
+      USDC +50,322.519155 (matches receipt to the wei). Final account
+      collapses position to 0.
+
+      Senior P&L on the e2e fork: +322.519 USDC (+0.645%) over a simulated
+      ~57 day cycle - tracks the explorer's +326.617 USDC closely.
+
+      No blueprint or instruction edits required. No oracle staleness issues
+      (accounting uses tranchePrice view, not Chainlink). Tenderly time
+      control quirks (MEMORY.md) materialised: had to use
+      tenderly_setNextBlockTimestamp before manager-only stopEpoch /
+      startEpoch direct calls because evm_increaseTime did not persist
+      across blocks. Spellcaster manage-position calls were unaffected.
+
+      Production-ready as shipped. Operator runbook items: pick deposit
+      variant from isEpochRunning(); verify junior is bootstrapped before
+      first senior deposit; gate Phase 2 on
+      epochNumber > lastWithdrawRequest(caliber).
+
+# Shared resources (populated as stages run)
+testnets: {}

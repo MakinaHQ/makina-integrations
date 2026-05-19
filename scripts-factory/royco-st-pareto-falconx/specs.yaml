@@ -1,0 +1,739 @@
+pool:
+  id: "royco-pareto-st"
+  name: "Royco Senior Tranche - Pareto FalconX"
+  protocol: "royco"
+  version: "v2"
+  network: "mainnet"
+
+# =============================================================================
+# OVERVIEW
+# =============================================================================
+# This is a Royco V2 Senior Tranche (ST) whose underlying ERC4626 asset is the
+# Pareto Credit Vault AA tranche (IdleCDOTranche), itself a tranche over the
+# Pareto FalconX USDC credit vault (IdleCDOEpochVariant).
+#
+# This is materially DIFFERENT from the syrupUSDC and stcUSD ST integrations:
+#   1. Pareto's underlying vault (`AA_FalconXUSDC`, `0xc26a...f99c`) is NOT an
+#      ERC4626 vault. It is an Idle CDO tranche token. Mint/burn happen via the
+#      parent IdleCDOEpochVariant `0x433D...4d` and use the bespoke functions
+#      `depositAA(uint256)` / `requestWithdraw(uint256, AATranche)`. There is
+#      NO `deposit(uint256,address)` / `redeem(uint256,address,address)` entry
+#      on the AA tranche token.
+#
+#   2. Pareto deposits/withdrawals are gated by Keyring KYC
+#      (`isWalletAllowed(msg.sender)` on the IdleCDOEpochVariant). Caliber
+#      MUST be Keyring-whitelisted on policy id 18 against Keyring contract
+#      `0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3` BEFORE any deposit can
+#      succeed. There is no on-chain bypass.
+#
+#   3. Pareto runs in EPOCHS (~32 days). Behavior depends on epoch state:
+#        - Between epochs (NOT paused): `depositAA(amount)` for sync mint.
+#        - During an epoch (paused): only `depositDuringEpoch(amount, AATranche)`
+#          works, and only if `isDepositDuringEpochDisabled == false`. As of
+#          spec generation epoch is running and mid-epoch deposits ARE enabled.
+#      Withdrawals are NEVER synchronous: caller MUST `requestWithdraw(amount,
+#      AATranche)` between epochs, wait for the epoch to start AND end
+#      (`stopEpoch` to be called by the manager), then `claimWithdrawRequest()`.
+#      End-to-end this is up to 2 * epochDuration plus buffer (~37 days).
+#
+#   4. The Royco ST itself does NOT bridge any of this. It treats the AA
+#      tranche token as a plain ERC20 underlying:
+#        - On `ST.deposit(_assets, receiver)` it `transferFrom`s AA tranche
+#          tokens from msg.sender into the kernel and reads `tranchePrice(AA)`
+#          on the IdleCDOEpochVariant for accounting.
+#        - On `ST.redeem(shares, receiver, owner)` it transfers AA tranche
+#          tokens out of the kernel back to receiver. No interaction with
+#          Pareto's mint/burn machinery.
+#
+#   5. Therefore the deposit blueprint for the caliber must be a multi-step
+#      atomic chain at the Pareto level:
+#        USDC --approve--> IdleCDOEpochVariant
+#        IdleCDOEpochVariant.depositAA(amount)              [or
+#        IdleCDOEpochVariant.depositDuringEpoch(amount, AA) during epoch]
+#          -> caliber receives AA tranche tokens (18 dec)
+#        AA --approve--> Royco ST
+#        Royco_ST.deposit(aaAmount, caliber)
+#          -> caliber receives ROY-ST-AA-FalconXUSDC shares (18 dec)
+#
+#      And withdraw is a queued multi-call sequence that CANNOT be atomic and
+#      should be modeled as 2 separate actions (request_redeem + claim_redeem)
+#      with at least one epoch boundary between them.
+#
+#   6. Royco access control: The Royco ST/Kernel are wrapped by an
+#      AccessManager-compatible authority `RoycoFactory @ 0x7cC6...253C`. Every
+#      call into `ST.deposit / redeem / approve` and `Kernel.syncTrancheAccounting`
+#      passes through `RoycoFactory.canCall(caller, target, selector)`. The
+#      caliber must be granted the relevant Royco market role BEFORE the
+#      blueprint will work. This is granted off-chain by Royco when the caliber
+#      subscribes to the market (same model as the existing stcUSD / syrupUSDC
+#      ST integrations).
+#
+#   7. The Royco senior tranche cannot be initialized with senior-only deposits
+#      against an empty junior tranche: a coverage check
+#      (`postOpSyncTrancheAccountingAndEnforceCoverage`) reverts with
+#      `coverageWAD = 0.03 = 3%` minimum if `jtRawNAV == 0`. The market needs a
+#      junior bootstrap deposit before senior deposits succeed. As of spec
+#      generation the Royco Pareto market is empty (totalSupply = 0); a
+#      bootstrap is REQUIRED before testing.
+#
+# =============================================================================
+
+contracts:
+  pool:
+    address: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+    name: "Royco Senior Tranche AA-FalconXUSDC"
+    symbol: "ROY-ST-AA-FalconXUSDC"
+    decimals: 18
+    proxy_type: "ERC1967Proxy"
+    implementation: "0x98dF5263392C83dD739d8959A6bACf01EA034bba"
+    contract_type: "RoycoSeniorTranche"
+    abi_source: "https://etherscan.io/address/0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b#code"
+    notes: |
+      - Implementation is unverified on Blockscout/Etherscan but is binary-identical
+        to the RoycoSeniorTranche family (same selectors, same access pattern,
+        same `(stAssets, jtAssets, nav)` 3-tuple return shape). A verified twin
+        of the stcUSD ST impl exists at `0x78493b5421fa73e1d7192011a5c0459d83ef7679`
+        (compiler 0.8.34, Prague EVM) and is the most reliable code reference.
+      - Inherits OZ AccessManaged; `_checkCanCall(msg.sender, msg.data)` runs
+        on every state-changing entrypoint.
+      - asset() = 0xc26a...f99c (AA tranche). Decimals = 18. The ST takes the
+        AA tranche as input on deposit and returns it on redeem.
+
+  underlying:
+    # The "asset()" of the Royco ST. It is the Pareto AA tranche token,
+    # NOT USDC and NOT a standard ERC4626 vault.
+    address: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+    name: "Pareto AA Tranche - FalconXUSDC"
+    symbol: "AA_FalconXUSDC"
+    decimals: 18
+    contract_type: "IdleCDOTranche"
+    is_erc4626: false
+    parent_cdo: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+    notes: |
+      - Plain ERC20 with `mint` / `burn` callable only by `minter()`, which is
+        the IdleCDOEpochVariant. There is NO ERC4626 deposit/redeem on this
+        contract.
+      - To obtain AA tranche tokens, you must call `depositAA(uint256)` or
+        `depositDuringEpoch(uint256, AATranche)` on the parent
+        IdleCDOEpochVariant.
+      - To redeem AA tranche tokens, you must call `requestWithdraw(uint256,
+        AATranche)` on the parent IdleCDOEpochVariant (queued, multi-epoch).
+
+  base_token:
+    # The starting / ending asset on the caliber's books. Caliber holds USDC,
+    # converts USDC -> AA -> ROY-ST and back.
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    symbol: "USDC"
+    decimals: 6
+
+  pareto_credit_vault:
+    # Layer 1: parent IdleCDOEpochVariant. Owns AA & BB tranches, runs the
+    # epoch lifecycle, performs Keyring whitelist check, holds the strategy
+    # token (FalconXUSDC), and is the only contract that mints/burns AA.
+    address: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+    name: "Pareto FalconX USDC IdleCDOEpochVariant"
+    proxy_type: "TransparentUpgradeableProxy"
+    implementation: "0x8016E6f35a4B32a5Ea4c3919418039C7DaffCcaf"
+    contract_type: "IdleCDOEpochVariant"
+    abi_source: "https://etherscan.io/address/0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d#code"
+    underlying_token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+    AATranche: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+    BBTranche: "0xacbb25b7dd30b6b2f7131865dc1023622de3b3d6"
+    strategy_token: "0x17e9ab2992dfecbe779a06a92a6cdb9fe6aeeef3" # FalconXUSDC
+    state_at_spec_time:
+      isEpochRunning: true
+      epochEndDate: 1779480958 # 2026-05-04 17:29:34 UTC
+      epochDuration: 2790207 # ~32.3 days
+      isDepositDuringEpochDisabled: false
+      defaulted: false
+      paused: true # because epoch is running
+      keyring: "0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3"
+      keyringPolicyId: 18
+      tranchePrice_AA: 1074982 # in USDC 6-dec, scaled into a 1e18-paired ratio
+      # i.e. 1 AA share ~= 1.074982 USDC
+      isAYSActive: false
+      lossToleranceBps: 100000 # 100% (monotranche -> losses split by TVL)
+      trancheAPRSplitRatio: 100000 # all yield to AA
+      fee: 10000 # 10% of yield (FULL_ALLOC = 100000)
+      bbTotalSupply: 0 # no junior tranche minted yet
+    notes: |
+      - Keyring gate: `isWalletAllowed(msg.sender)` MUST return true before
+        depositAA / depositBB / depositDuringEpoch / requestWithdraw can
+        succeed. Caliber needs Keyring policy id 18 credential. There is NO
+        bypass.
+      - Mid-epoch deposit pricing: `depositDuringEpoch` mints fewer AA shares
+        than a sync `depositAA` to compensate latecomers for the prorated
+        portion of the epoch they missed.
+      - Withdrawals are queued: `requestWithdraw(_amount, AATranche)` burns AA
+        shares and credits the user with a receipt token in the IdleCreditVault
+        strategy contract. The receipt is claimable via `claimWithdrawRequest()`
+        only after the manager calls `stopEpoch` (i.e. one epoch later).
+      - Borrower default risk: if the borrower fails to repay at `stopEpoch`,
+        the manager calls `_handleBorrowerDefault`, sets `defaulted = true`,
+        pauses the contract, and disables withdraw requests.
+        `claimInstantWithdrawRequest()` and existing pending `claimWithdrawRequest()`
+        may still be honored. AA bears losses last (senior).
+
+  pareto_strategy:
+    # Layer 2: IdleCreditVault FalconXUSDC. Holds receipt tokens for pending
+    # withdrawals and is the conduit for borrower funding. Caliber should NOT
+    # touch this directly.
+    address: "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3"
+    name: "Pareto Credit Vault FalconX USDC"
+    symbol: "FalconXUSDC"
+    decimals: 6
+    contract_type: "IdleCreditVault"
+    notes: |
+      - Mints "FalconXUSDC" receipt tokens to users with pending withdraw
+        requests; equal to underlying-USDC owed.
+      - Caliber will accumulate FalconXUSDC balance after `requestWithdraw` and
+        zero it out on `claimWithdrawRequest` once the next epoch closes.
+
+  pareto_keyring:
+    address: "0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3"
+    name: "Keyring (Pareto policy host)"
+    notes: |
+      Used by Pareto to gate deposits/withdrawals.
+      Selector: `checkCredential(uint256 policyId, address user) -> bool`.
+      Caliber must obtain policyId 18 credential out-of-band BEFORE calling
+      any `depositAA / depositDuringEpoch / requestWithdraw`. Without it the
+      Pareto contract reverts with `NotAllowed()`.
+
+  royco_kernel:
+    # Layer 3: Royco market accountant. Holds the AA tranche balance backing
+    # the senior + junior tranche shares, computes NAV, mints/burns ST shares.
+    address: "0x15bb63C07740ff972F76716cAcC5766f0C641791"
+    name: "Royco Pareto FalconX Kernel"
+    proxy_type: "ERC1967Proxy"
+    implementation: "0xAA9631dF7ec04AbB825bD6a663f96c9BB3Ed7e1e"
+    contract_type: "RoycoKernel"
+    accountant_subimpl: "0x288bc6a8600d0bc1f179816c3b3001b00566c110"
+    state_at_spec_time:
+      stRawNAV: 0
+      jtRawNAV: 0
+      stEffectiveNAV: 0
+      jtEffectiveNAV: 0
+      betaWAD: 1000000000000000000 # 1.0 (full pass-through)
+      coverageWAD: 30000000000000000 # 3% minimum coverage
+      liquidationUtilizationWAD: 2940000000000000000 # 2.94 = 294%
+      marketState: 0 # OPEN
+    notes: |
+      - `syncTrancheAccounting()` is access-restricted via the Royco
+        AccessManager. Only callers granted the matching role for this kernel
+        can invoke it. The caliber's role grant on subscription should cover
+        this.
+      - The kernel reads `tranchePrice(AATranche)` on the parent
+        IdleCDOEpochVariant to derive `stRawNAV`. It does NOT call into
+        Pareto's deposit/redeem.
+      - On any deposit/redeem the kernel runs
+        `postOpSyncTrancheAccountingAndEnforceCoverage(op, stRawNAV, jtRawNAV)`
+        which reverts with `RoycoAccountant: coverage` if utilization exceeds
+        `liquidationUtilizationWAD` or coverage falls below `coverageWAD`.
+        With `jtRawNAV == 0` and any positive `stRawNAV`, utilization is
+        infinite -> all senior deposits revert until junior is bootstrapped.
+
+  royco_factory:
+    # AccessManager / authority controlling all Royco V2 contracts.
+    address: "0x7cC6fB28eC7b5e7afC3cB3986141797ffc27253C"
+    name: "Royco Factory (AccessManager authority)"
+    proxy_type: "ERC1967Proxy"
+    implementation: "0x34DB2f4215e55ec8e2c3dE0a826935EBF158be77"
+    contract_type: "RoycoFactory"
+    notes: |
+      - Every Royco state-changing entrypoint goes through
+        `canCall(caller, target, selector) -> (allowed, executionDelay)`.
+      - Roles are per-(target, selector). The role id derived from
+        (st_address, deposit selector) is what the caliber needs membership in
+        to call ST.deposit. Same for ST.redeem, Kernel.syncTrancheAccounting,
+        and ST.transfer (if the blueprint ever transfers ST shares).
+      - Granting is performed off-chain by Royco when the caliber subscribes
+        to the market. Mirrors the existing stcUSD / syrupUSDC ST integrations.
+
+  pareto_oracle:
+    # Helper oracle the team uses to price AA tranche shares against USDC.
+    # Used by Morpho on the same vault. NOT used by the Royco kernel itself.
+    address: "0x50449B3D1f5931d568A1951Ee506A9534e7f7dFf"
+    name: "TranchesChainlinkOracle"
+    contract_type: "TranchesChainlinkOracle"
+    notes: |
+      Verified on Blockscout. Used by Morpho for the same Pareto vault.
+      Candidate for an out-of-protocol AA<->USDC price feed if accounting
+      needs a separate sanity check, but the Royco kernel itself derives NAV
+      directly from `IdleCDOEpochVariant.tranchePrice(AA)`.
+
+# =============================================================================
+# HELPERS (caliber's own helper contracts; reused from existing royco-st specs)
+# =============================================================================
+helpers:
+  context_helper:
+    address: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+    purpose: "Returns msg.sender of the caliber-as-spellcaster (caliber address)"
+    selector: "msgSender()"
+
+  unsigned_math_helper:
+    address: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+    purpose: "Add/sub/mulDiv on uint256 (no overflow, used for delta sandwiches)"
+
+  bytes32_helper:
+    address: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+    purpose: |
+      Extracts a single uint256 word out of a packed static tuple bytes blob.
+      Required for picking `stAssets`/`jtAssets`/`nav` out of
+      `convertToAssets(uint256)` which returns `(uint256,uint256,uint256)`.
+    selector: "getTupleWord(bytes,uint256)"
+
+# =============================================================================
+# FLOWS
+# =============================================================================
+flows:
+
+  # ------------------------------------------------------------------
+  # DEPOSIT
+  # ------------------------------------------------------------------
+  deposit:
+    description: |
+      Atomic 4-step USDC -> ROY-ST chain. Behaviour bifurcates on epoch state:
+
+      Path A - between epochs (`isEpochRunning == false`, `paused == false`):
+        1. USDC.approve(IdleCDOEpochVariant, amount)
+        2. IdleCDOEpochVariant.depositAA(amount) -> mints AA to caliber
+        3. AA.approve(Royco ST, aaMinted)
+        4. Royco_ST.deposit(aaMinted, caliber) -> mints ST shares to caliber
+
+      Path B - during an epoch, mid-epoch deposit enabled
+      (`isEpochRunning == true`, `isDepositDuringEpochDisabled == false`):
+        1. USDC.approve(IdleCDOEpochVariant, amount)
+        2. IdleCDOEpochVariant.depositDuringEpoch(amount, AATranche)
+              -> mints AA to caliber (smaller mint than depositAA: includes
+                 prorated discount for the remaining epoch + buffer)
+        3. AA.approve(Royco ST, aaMinted)
+        4. Royco_ST.deposit(aaMinted, caliber)
+
+      Both paths converge to step 3 onward. `aaMinted` MUST be read via a
+      balance sandwich (AA.balanceOf(caliber) before vs after Pareto deposit)
+      because both `depositAA` and `depositDuringEpoch` return the minted
+      amount but blueprint-level return-capture varies; the sandwich is the
+      safe choice.
+
+    preconditions:
+      - "Caliber must be Keyring-credentialed for policy 18 (Pareto)."
+      - "Caliber must be granted Royco role for ST.deposit selector."
+      - "Pareto vault must NOT be in default state (defaulted == false)."
+      - "Royco market must have nonzero junior NAV (jtRawNAV > 0); otherwise the coverage check reverts on ANY senior deposit."
+      - "If during epoch: `isDepositDuringEpochDisabled` must be false and `block.timestamp < epochEndDate`."
+      - "If between epochs: `paused` must be false (handled automatically by the IdleCDOEpochVariant lifecycle)."
+      - "Caliber must hold sufficient USDC."
+      - "If `_trancheSupply(AATranche) == 0` mid-epoch deposits revert (Pareto safety against pricing discontinuities). With this market the AA tranche already has nonzero supply."
+
+    steps:
+      - action: approve
+        contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+        function: "approve(address,uint256)"
+        params:
+          spender: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d" # IdleCDOEpochVariant
+          amount: "<usdc_amount>"
+
+      - action: deposit_pareto_between_epoch # path A only
+        condition: "isEpochRunning == false"
+        contract: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+        function: "depositAA(uint256)"
+        params:
+          _amount: "<usdc_amount>"
+        returns: "uint256 minted (AA tranche shares, 18 dec)"
+
+      - action: deposit_pareto_during_epoch # path B only
+        condition: "isEpochRunning == true && isDepositDuringEpochDisabled == false"
+        contract: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+        function: "depositDuringEpoch(uint256,address)"
+        params:
+          _amount: "<usdc_amount>"
+          _tranche: "0xc26a6fa2c37b38e549a4a1807543801db684f99c" # AATranche
+        returns: "uint256 minted (AA tranche shares, 18 dec)"
+
+      - action: approve
+        contract: "0xc26a6fa2c37b38e549a4a1807543801db684f99c" # AA tranche
+        function: "approve(address,uint256)"
+        params:
+          spender: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b" # Royco ST
+          amount: "<aaMinted>"
+
+      - action: deposit_royco
+        contract: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+        function: "deposit(uint256,address)"
+        params:
+          _assets: "<aaMinted>"
+          _receiver: "<caliber_address>"
+        returns: "uint256 sharesMinted (ST shares, 18 dec)"
+
+    events_to_monitor:
+      - "USDC.Transfer(caliber, IdleCDOEpochVariant, _amount)"
+      - "AA.Transfer(0x0, caliber, aaMinted)         # mint via IdleCDO"
+      - "AA.Transfer(caliber, RoycoKernel, aaMinted) # ST pulls into kernel"
+      - "ROY-ST.Transfer(0x0, caliber, sharesMinted)"
+
+    offchain_indicators: []
+  # No merkle proofs / signatures / paths are required for either path.
+
+  # ------------------------------------------------------------------
+  # WITHDRAW (cannot be a single atomic blueprint)
+  # ------------------------------------------------------------------
+  withdraw:
+    description: |
+      Withdraw is a 2-phase queued process. It CANNOT be atomic.
+
+      Phase 1 - request_redeem (between epochs only):
+        1. Royco_ST.redeem(stShares, caliber, caliber)
+              -> kernel transfers AA tranche tokens out to caliber
+              -> caliber receives `aaReceived = stAssets` (from the
+                 (stAssets, jtAssets, nav) tuple). Sandwich the AA balance
+                 to capture the exact amount.
+        2. IdleCDOEpochVariant.requestWithdraw(aaReceived, AATranche)
+              -> burns AA from caliber
+              -> mints FalconXUSDC receipt token to caliber (6 dec, equals
+                 the USDC owed at next epoch end including next-epoch
+                 interest minus fee)
+              NOTE: this step CANNOT execute while `isEpochRunning == true`.
+              It also requires `allowAAWithdrawRequest == true` (default true
+              between epochs; flipped off during epochs and on default).
+
+      Phase 2 - claim_redeem (after the next stopEpoch):
+        - Wait for the manager to call `stopEpoch` (1 full epoch + buffer).
+        - IdleCDOEpochVariant.claimWithdrawRequest()
+              -> burns caliber's FalconXUSDC receipt
+              -> transfers USDC to caliber
+
+      End-to-end this can take up to 2 * epochDuration + bufferPeriod
+      (currently ~37 days max). Operator timing matters: requesting just
+      after `stopEpoch` minimises wait; requesting just before `startEpoch`
+      means the request is queued for the NEXT `stopEpoch`.
+
+      Edge cases:
+        - If APR has dropped enough to qualify for instant withdraw and
+          `disableInstantWithdraw == false`, `requestWithdraw` may be
+          re-routed into the instant path. As of spec time
+          `disableInstantWithdraw == true` (it is the protocol default), so
+          we rely on the queued path only.
+        - If borrower defaults during the wait window, AA holders may still
+          claim their queued receipt against whatever USDC the strategy
+          recovered, but proceeds may be < expected.
+
+    preconditions:
+      - "Caliber holds Royco ST shares."
+      - "Caliber must be granted Royco role for ST.redeem selector."
+      - "Caliber must be Keyring-credentialed for policy 18."
+      - "For Phase 1 step 2: `isEpochRunning == false` AND `allowAAWithdrawRequest == true`."
+      - "For Phase 2: at least one `stopEpoch` has happened since requestWithdraw."
+      - "`defaulted == false` (otherwise withdraws may be partial)."
+
+    phase_1_request_redeem:
+      steps:
+        - action: get_balance_before
+          contract: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+          function: "balanceOf(address)"
+          params:
+            owner: "<caliber_address>"
+          returns: "aaBefore"
+
+        - action: redeem_royco
+          contract: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+          function: "redeem(uint256,address,address)"
+          params:
+            _shares: "<shares_to_redeem>"
+            _receiver: "<caliber_address>"
+            _owner: "<caliber_address>"
+          returns: "(uint256 stAssets, uint256 jtAssets, uint256 nav)"
+          note: |
+            Only `stAssets` flows back to the caliber as AA tokens. `jtAssets`
+            is reported for accounting only (no junior position held by the
+            caliber). Use a balance sandwich on AA instead of trusting the
+            tuple decode.
+
+        - action: get_balance_after
+          contract: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+          function: "balanceOf(address)"
+          params:
+            owner: "<caliber_address>"
+          returns: "aaAfter"
+
+        - action: compute_delta
+          contract: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+          function: "sub(uint256,uint256)"
+          params: [aaAfter, aaBefore]
+          returns: "aaDelta"
+
+        - action: request_withdraw_pareto
+          contract: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+          function: "requestWithdraw(uint256,address)"
+          params:
+            _amount: "<aaDelta>"
+            _tranche: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+          returns: "uint256 underlyingsRequested (USDC, 6 dec)"
+
+      events_to_monitor:
+        - "ROY-ST.Transfer(caliber, 0x0, shares)"
+        - "AA.Transfer(RoycoKernel, caliber, aaDelta)"
+        - "AA.Transfer(caliber, 0x0, aaDelta)             # burn in IdleCDO"
+        - "FalconXUSDC.Transfer(0x0, caliber, underlyingsRequested)"
+        - "(IdleCDOEpochVariant) Referral / WithdrawAA event family"
+
+    phase_2_claim_redeem:
+      steps:
+        - action: get_usdc_balance_before
+          contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          function: "balanceOf(address)"
+          params:
+            owner: "<caliber_address>"
+          returns: "usdcBefore"
+
+        - action: claim_withdraw_pareto
+          contract: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+          function: "claimWithdrawRequest()"
+          params: []
+          returns: "uint256 amountClaimed (USDC, 6 dec)"
+
+        - action: get_usdc_balance_after
+          contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          function: "balanceOf(address)"
+          params:
+            owner: "<caliber_address>"
+          returns: "usdcAfter"
+
+      events_to_monitor:
+        - "FalconXUSDC.Transfer(caliber, 0x0, amountClaimed)"
+        - "USDC.Transfer(IdleCreditVault, caliber, amountClaimed)"
+
+    offchain_indicators: []
+
+  # ------------------------------------------------------------------
+  # ACCOUNTING
+  # ------------------------------------------------------------------
+  accounting:
+    description: |
+      Caliber position has up to THREE components, all of which must be
+      summed into USDC (6 dec) for caliber accounting:
+
+        A. Active Royco ST shares (held directly).
+           Source: `ROY_ST.balanceOf(caliber) -> shares`.
+           Convert via `ROY_ST.convertToAssets(shares) -> (stAssets, jtAssets, nav)`.
+           Per the existing royco-st-syrupusdc convention we use
+           `stAssets + jtAssets` (in AA-tranche-asset units, 18 dec) — both
+           because including jtAssets covers the case of a senior write-down
+           where junior assets get reassigned to senior, AND because in the
+           steady senior-only state jtAssets = 0 so there is no double count.
+
+        B. Pending withdraw receipts (FalconXUSDC).
+           Source: `FalconXUSDC.balanceOf(caliber)`. This is in USDC units
+           (6 dec) and represents USDC owed at next stopEpoch. NO conversion.
+
+        C. Stranded AA tranche tokens (transient / between blueprint steps).
+           Source: `AA.balanceOf(caliber)`. In normal operation this is zero;
+           include defensively to handle partial-execution and instant-
+           withdraw recovery.
+
+      Conversion to USDC:
+        - stAssets / jtAssets / strandedAA are all denominated in AA tranche
+          units (18 decimals). Convert via the AA tranche price pulled from
+          the parent IdleCDOEpochVariant:
+            usdc_value = aaUnits * tranchePrice(AA) / 1e18
+          where tranchePrice(AA) is in USDC 6-dec scaled by 1e18 of AA
+          (i.e. tranchePrice ~= 1.07e6 today).
+          This yields USDC 6-dec directly.
+        - FalconXUSDC balance is already in USDC 6-dec; add as-is.
+
+      Sync requirement:
+        - `Kernel.syncTrancheAccounting()` MUST be called before reading
+          `convertToAssets` so that protocol fees are crystallised and the
+          stEffectiveNAV / jtEffectiveNAV are up to date. This is access-
+          restricted: the caliber's role grant on subscription should permit
+          it. Identical to the stcUSD / syrupUSDC integrations.
+
+      NAV-vs-asset path tradeoff:
+        - The `nav` field of `convertToAssets` is in USD WAD (18 dec).
+          Scaling to USDC requires `mulDiv(nav, 1, 1e12)` which truncates
+          sub-cent values. The asset-space path (stAssets + jtAssets ->
+          tranchePrice) avoids this and is the recommended account blueprint
+          (matches royco-st-syrupusdc design rationale).
+        - If the team prefers the NAV path (matches royco-st-stcusd design
+          rationale) the `nav` value alone, scaled mulDiv(nav, 1, 1e12), is
+          the position's USD-pegged value pre-self-liquidation-bonus.
+
+    queries:
+      sync:
+        contract: "0x15bb63C07740ff972F76716cAcC5766f0C641791"
+        function: "syncTrancheAccounting()"
+        access_restricted: true
+
+      st_balance:
+        contract: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+        function: "balanceOf(address)"
+
+      st_to_assets:
+        contract: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+        function: "convertToAssets(uint256)"
+        return_shape: "(uint256 stAssets, uint256 jtAssets, uint256 nav)"
+        decimals: "stAssets/jtAssets: 18 (AA units); nav: 18 (USD WAD)"
+
+      pareto_aa_balance:
+        contract: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+        function: "balanceOf(address)"
+        decimals: 18
+
+      pareto_aa_price:
+        contract: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+        function: "tranchePrice(address)"
+        params:
+          _tranche: "0xc26a6fa2c37b38e549a4a1807543801db684f99c"
+        returns: "uint256 priceInUSDC6dec_per_AA1e18"
+
+      pareto_pending_receipt:
+        contract: "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3"
+        function: "balanceOf(address)"
+        decimals: 6
+        notes: "USDC owed at next stopEpoch."
+
+    offchain_indicators: []
+
+  # ------------------------------------------------------------------
+  # HARVEST (out of scope but flagged)
+  # ------------------------------------------------------------------
+  harvest:
+    in_scope: false
+    notes: |
+      Royco ST contracts may be eligible for Royco campaign rewards (R points
+      / external token incentives) distributed via Royco's
+      MerkleClaimDistributor or per-market reward streams. This integration
+      is NOT documenting harvest; flagged here so a follow-up integration can
+      add it once Royco publishes the reward stream contract for the Pareto
+      FalconX ST market. Pareto's IdleCDOEpochVariant does NOT itself emit
+      a separate reward token — yield is paid in USDC and accrues into the
+      AA tranche price.
+
+# =============================================================================
+# ACCESS / SAFETY MATRIX
+# =============================================================================
+access_control:
+  pareto:
+    keyring_required: true
+    keyring_address: "0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3"
+    keyring_policy_id: 18
+    affected_calls:
+      - "depositAA(uint256)"
+      - "depositBB(uint256)"
+      - "depositDuringEpoch(uint256,address)"
+      - "requestWithdraw(uint256,address)"
+    bypass: "none"
+    notes: |
+      `claimWithdrawRequest()` is NOT keyring-checked - once the caliber holds
+      a FalconXUSDC receipt, claim is permissionless. This means de-listing
+      the caliber from Keyring after Phase 1 does not strand the funds; Phase 2
+      still works.
+  royco:
+    access_manager: "0x7cC6fB28eC7b5e7afC3cB3986141797ffc27253C"
+    affected_calls:
+      - { target: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b", selector: "deposit(uint256,address)" }
+      - { target: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b", selector: "redeem(uint256,address,address)" }
+      - { target: "0x15bb63C07740ff972F76716cAcC5766f0C641791", selector: "syncTrancheAccounting()" }
+    notes: |
+      Roles are granted off-chain by Royco when the caliber subscribes to the
+      market. Verify membership with:
+        RoycoFactory.canCall(caliber, target, selector) -> (allowed, delay)
+      Both `allowed == true` and `delay == 0` are required.
+
+pause_state:
+  royco_st:
+    paused_at_spec_time: false
+    notes: "ROY-ST has its own `_requireNotPaused`; check `paused()` before deposit/redeem."
+  pareto_cdo:
+    paused_at_spec_time: true
+    notes: |
+      Pareto pauses the CDO whenever an epoch is running (it is the lock
+      mechanism for sync deposits). Paused != broken. `depositDuringEpoch`
+      bypasses this pause; `depositAA` / `depositBB` do not.
+
+# =============================================================================
+# DIVERGENCE FROM REFERENCE INTEGRATIONS
+# =============================================================================
+divergence:
+  vs_royco_st_syrupusdc:
+    - "syrupUSDC underlying IS ERC4626; AA tranche IS NOT. Use `depositAA` / `depositDuringEpoch` instead of `vault.deposit`."
+    - "syrupUSDC withdraw flow uses Maple's `requestRedeem` on a vault share token. Pareto's `requestWithdraw` operates on the AA tranche directly; the underlying CDO burns shares immediately and mints a separate FalconXUSDC receipt token."
+    - "syrupUSDC has a separate WithdrawalManager contract holding `userEscrowedShares`. Pareto has NO equivalent: pending withdraws are tracked via the FalconXUSDC receipt token in the IdleCreditVault, queried via `balanceOf`."
+    - "syrupUSDC has poolPermissionManager whitelist (Maple). Pareto has Keyring (different system, equivalent intent)."
+    - "syrupUSDC does not have epoch state; Pareto does, which gates whether to use `depositAA` (between) or `depositDuringEpoch` (during)."
+
+  vs_royco_st_stcusd:
+    - "stcUSD underlying IS ERC4626 over Cap Vault cUSD; AA tranche IS NOT."
+    - "stcUSD has SYNCHRONOUS withdraw (Cap Vault.burn). Pareto withdraw is QUEUED and takes up to 2 epoch durations."
+    - "stcUSD has Cap Vault whitelist (mint/burn fees). Pareto has Keyring (hard revert on miss, no fee-based bypass)."
+    - "stcUSD account blueprint uses NAV path with `nav -> USDC` via `mulDiv(nav, 1, 1e12)`. Pareto recommendation is the asset-space path (matches syrupUSDC) so we don't lose precision and so we naturally include `pendingFalconXUSDC` and any stranded AA in the same denomination conversion."
+
+# =============================================================================
+# OPEN QUESTIONS / VERIFICATION REQUIRED BEFORE TESTING
+# =============================================================================
+open_questions:
+  - id: junior_bootstrap
+    description: |
+      The Royco Pareto market currently has stTotalSupply = 0 and jtTotalSupply = 0.
+      Senior deposits revert with the coverage check until junior is bootstrapped.
+      Confirm with Royco who is bootstrapping the junior tranche and at what
+      junior:senior ratio. Until then deposit blueprints WILL revert in
+      production even with all access set up.
+    blocking: true
+
+  - id: caliber_keyring
+    description: |
+      Confirm how the caliber will obtain Keyring policyId 18 credential. Is
+      there an off-chain enrollment Pareto/Dialectic must perform on the
+      caliber address before testnet/mainnet? Without it Phase 1 of withdraw
+      and ALL deposits revert with `NotAllowed()`.
+    blocking: true
+
+  - id: caliber_royco_role
+    description: |
+      Confirm Royco grants the caliber address the role for (ROY-ST, deposit),
+      (ROY-ST, redeem), (Kernel, syncTrancheAccounting). Verify post-grant by
+      reading `RoycoFactory.canCall(caliber, target, selector)`.
+    blocking: true
+
+  - id: epoch_alignment
+    description: |
+      Operations team must coordinate withdraw timing with Pareto's epoch
+      schedule. Building a small offchain helper to read `epochEndDate`,
+      `isEpochRunning`, `bufferPeriod`, `disableInstantWithdraw`,
+      `allowAAWithdrawRequest`, and `allowInstantWithdraw` is recommended.
+    blocking: false
+
+  - id: account_blueprint_choice
+    description: |
+      Decide whether to use the asset-space path (sum stAssets + jtAssets +
+      stranded AA, then * tranchePrice / 1e18, then + pendingFalconXUSDC)
+      vs the NAV path (mulDiv(nav, 1, 1e12)). The asset-space path is
+      recommended; document choice in the blueprint comments.
+    blocking: false
+
+# =============================================================================
+# METADATA
+# =============================================================================
+metadata:
+  generated_at: "2026-04-30T12:50:00Z"
+  data_sources:
+    - "Tenderly mainnet vnet (forked at block 0x17d5cd4 / ~24,992,884)"
+    - "Blockscout (Ethereum mainnet)"
+    - "Pareto integrator docs (https://docs.pareto.credit/developers/integrators/smart-contract)"
+    - "Verified contract source: IdleCDOEpochVariant @ 0x8016E6f35a4B32a5Ea4c3919418039C7DaffCcaf"
+    - "Verified contract source: TranchesChainlinkOracle @ 0x50449B3D1f5931d568A1951Ee506A9534e7f7dFf"
+    - "Reference deposit tx (Pareto-direct, NOT through Royco ST): 0xbb9c2e8697bb98546d97b090c49ee0528d6dd5555d0be82af48557c3dc56d282"
+    - "Reference deposit tx (Royco syrupUSDC ST, same family): 0xf1b63b0663e7d84834c0bb3c1161d73811a686ff279b9581b087821e6dcdad53"
+  notes: |
+    The Royco ST (`0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b`) and Kernel
+    (`0x15bb63C07740ff972F76716cAcC5766f0C641791`) implementations are NOT
+    verified on Etherscan or Blockscout. Specs are derived from:
+      (a) on-chain function probing on Tenderly,
+      (b) full call-trace analysis of an attempted deposit,
+      (c) cross-reference with the verified twin of the stcUSD ST
+          implementation `0x78493b5421fa73e1d7192011a5c0459d83ef7679`,
+      (d) the (verified) IdleCDOEpochVariant source,
+      (e) the canonical syrupUSDC ST mainnet deposit.
+    Anywhere this spec quotes a function signature on the unverified ST
+    contract it has been confirmed to exist by direct selector probing on the
+    forked vnet.

@@ -1,0 +1,66 @@
+# Royco Senior Tranche over Pareto FalconX (USDC)
+# Multi-step deposit:    USDC -> Pareto IdleCDOEpochVariant -> AA tranche -> Royco ST shares
+# Two-phase queued withdraw (~32-65 days end-to-end):
+#   Phase 1: ST.redeem -> AA -> requestWithdraw -> FalconXUSDC receipt
+#   Phase 2: claimWithdrawRequest()  -> burns receipt, pays USDC
+# Asset-space accounting:
+#   sum (stAssets + jtAssets + stranded_aa) * tranchePrice(AA) / 1e18 + FalconXUSDC.balanceOf
+#
+# Two deposit variants are exposed because the Pareto entry call differs based on epoch
+# state and the calls have incompatible signatures (different selectors, different args):
+#   - deposit-running.yaml -> mid-epoch path (depositDuringEpoch). Guarded to revert if
+#                              epoch not running OR mid-epoch deposits disabled.
+#   - deposit-idle.yaml    -> between-epoch path (depositAA). Guarded to revert if epoch
+#                              is running. depositAA is gated by Pausable and the CDO is
+#                              paused for the duration of any running epoch.
+# The operator picks whichever matches `IdleCDOEpochVariant.isEpochRunning()` at submit time.
+
+# DEPOSIT (mid-epoch): USDC -> depositDuringEpoch -> AA -> ST shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-Pareto-FalconX (mid-epoch)"
+    path: "../../../blueprints/royco/st-pareto-falconx/deposit-running.yaml:deposit"
+    inputs: {}
+
+# DEPOSIT (between epochs): USDC -> depositAA -> AA -> ST shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-Pareto-FalconX (between epochs)"
+    path: "../../../blueprints/royco/st-pareto-falconx/deposit-idle.yaml:deposit"
+    inputs: {}
+
+# WITHDRAW Phase 1: ST.redeem -> AA -> requestWithdraw -> FalconXUSDC receipt (between epochs only)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-Pareto-FalconX (request)"
+    path: "../../../blueprints/royco/st-pareto-falconx/withdraw.yaml:request_redeem"
+    inputs: {}
+
+# WITHDRAW Phase 2: claimWithdrawRequest() -> burn FalconXUSDC, payout USDC
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-Pareto-FalconX (claim)"
+    path: "../../../blueprints/royco/st-pareto-falconx/claim.yaml:claim_redeem"
+    inputs: {}
+
+# ACCOUNTING: asset-space full (stAssets + jtAssets + stranded_aa) * tranchePrice(AA) + FalconXUSDC
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-ST-Pareto-FalconX"
+    path: "../../../blueprints/royco/st-pareto-falconx/account.yaml:account"
+    inputs: {}

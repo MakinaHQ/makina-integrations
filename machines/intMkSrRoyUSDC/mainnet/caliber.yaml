@@ -90,7 +90,7 @@ positions:
       aave_token: "0xEc4ef66D4fCeEba34aBB4dE69dB391Bc5476ccc8"
 
   # ── Securitize Treasury Funds (group_id: 0) ──────────────────────
-  - id: "101570474008733119772487529128350045735" # ${keccak256(makina.mainnet.securitize.vbill)}[0:16]
+  - id: "309722523608876619470540797402857939247"
     group_id: "0"
     description: "Securitize VanEck VBILL"
     instructions: !include "../../../instructions/securitize.yaml"
@@ -142,3 +142,11 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x66182442522D3049A941035190C315379c959250" # ST-syrupUSDC
+  - id: "96337836397589143298085381665746466353"
+    group_id: "0"
+    description: "Royco Senior Tranche Pareto FalconX V2"
+    instructions: !include "../../../instructions/royco-st-pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # AA tranche
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
+      - "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b" # ST-Pareto-FalconX
