@@ -1,0 +1,139 @@
+protocol: "royco-st-pareto-falconx"
+
+# Royco Senior Tranche over Pareto FalconX — Deposit (between epochs)
+# Path A: USDC -> Pareto IdleCDOEpochVariant.depositAA -> AA tranche -> Royco ST shares
+#
+# When to use: epoch is NOT running (isEpochRunning() == false). The CDO is unpaused between
+# epochs, so the sync mint path `depositAA` is available. The companion `deposit-running.yaml`
+# covers the mid-epoch path. Mid-epoch you must use depositDuringEpoch — depositAA reverts on
+# `whenNotPaused`.
+#
+# Guard:
+#   - isEpochRunning() == false  (else use deposit-running.yaml)
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+  aa_tranche_address:
+    type: "address"
+    value: "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C"
+  senior_tranche_address:
+    type: "address"
+    value: "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      # 0. caliber address
+      - description: "Get caliber's address"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # === Guard: only run sync deposit path between epochs ===
+      - description: "Read isEpochRunning on Pareto CDO"
+        target: "${constants.cdo_address}"
+        selector: "isEpochRunning()"
+        parameters: []
+        return:
+          name: "epoch_running"
+          type: "bool"
+
+      - description: "Revert if epoch is running (use deposit-running.yaml instead)"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.epoch_running}"
+
+      # === Step 1: USDC -> AA via Pareto depositAA ===
+      - description: "Approve USDC spending by Pareto IdleCDOEpochVariant"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.cdo_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      # AA balance sandwich (mint amount is rate-dependent; sandwich is the safe capture)
+      - description: "Snapshot AA balance before Pareto deposit"
+        target: "${constants.aa_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "aa_before"
+          type: "uint256"
+
+      - description: "Pareto depositAA: mints AA tranche shares to caliber at sync price"
+        target: "${constants.cdo_address}"
+        selector: "depositAA(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      - description: "Snapshot AA balance after Pareto deposit"
+        target: "${constants.aa_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "aa_after"
+          type: "uint256"
+
+      - description: "Compute aa_minted = aa_after - aa_before"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.aa_after}"
+          - type: "uint256"
+            value: "${returns.aa_before}"
+        return:
+          name: "aa_minted"
+          type: "uint256"
+
+      # === Step 2: AA -> ROY-ST via Royco Senior Tranche ===
+      - description: "Approve AA tranche spending by Royco Senior Tranche"
+        target: "${constants.aa_tranche_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${returns.aa_minted}"
+
+      - description: "Deposit AA into Royco Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.aa_minted}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"
