@@ -1,0 +1,35 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xCb8AcA2f661f41200B863A2Abac54c2E6d2dAB07"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  etherfi_async_redeemer_address:
+    type: "address"
+    value: "0x9C41D1CE48b6118331fAa79AD403C2Ce9c6eE45F" # THIS IS TEST CONTRACT AND NOT AUDITED
+
+positions:
+  # EtherFi Async Redemption
+  # id = uint128(sha256("makina.mainnet.tstETH2.etherfi.async-redemption"))
+  #     = 0xf247f7282a3fbdec819c60ef2922c8c5
+  - id: "322046840994279646166683717130453698757"
+    group_id: "0"
+    description: "EtherFi Async Redemption (weETH/wstETH → WETH)"
+    instructions: !include "../../../instructions/.testing/etherfi-async-redemption.yaml"
+    vars:
+      label: "EtherFi Async Redemption"
+      weeth_address: ${token_list.mainnet.weETH}
+      weth_address: ${token_list.mainnet.WETH}
+      wsteth_address: ${token_list.mainnet.wstETH}
+
+  # AaveV3 Supply WETH
+  - id: "132834842824704009878878367726033477050"
+    group_id: "1"
+    description: "AaveV3 Supply WETH"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"] # aEthWETH
+    vars:
+      label: "WETH"
+      asset_address: ${token_list.mainnet.WETH}
+      aave_token: "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8" # aEthWETH
