@@ -1,0 +1,84 @@
+# Generic Midas Redemption Vault — async, admin-settled redemption of an mToken
+# into a stablecoin tokenOut. Submits a `redeemRequest` now, the Midas admin
+# settles later by pushing the stable directly to the caliber. One in-flight
+# request per position; an on-chain Request-struct check disambiguates the
+# id-0 KV ambiguity (see blueprints/midas/withdraw.yaml header for details).
+#
+# Expected caliber vars (per-position):
+#   label:              string   — friendly label (e.g. "mGLOBAL Redemption")
+#   redeemer_address:   address  — Midas redemption vault
+#   mtoken_address:     address  — mToken being redeemed (escrowed in vault)
+#   token_out_address:  address  — stablecoin the admin will settle in
+#   kv_storage_key:     bytes32  — unique per position (e.g. keccak256("makina.<chain>.midas.<vault>"))
+#
+# Expected config:
+#   key_value_store_address
+
+# MANAGEMENT — redeem_request (absolute mToken amount)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.mtoken_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/withdraw.yaml:redeem_request"
+    inputs:
+      redeemer_address:
+        type: "address"
+        value: ${position.redeemer_address}
+      mtoken_address:
+        type: "address"
+        value: ${position.mtoken_address}
+      token_out_address:
+        type: "address"
+        value: ${position.token_out_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# MANAGEMENT — redeem_request_relative (bps of caliber's mToken balance)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.mtoken_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/withdraw.yaml:redeem_request_relative"
+    inputs:
+      redeemer_address:
+        type: "address"
+        value: ${position.redeemer_address}
+      mtoken_address:
+        type: "address"
+        value: ${position.mtoken_address}
+      token_out_address:
+        type: "address"
+        value: ${position.token_out_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# ACCOUNTING — value the in-flight request (and reset KV when no longer Pending)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.mtoken_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/account.yaml:account"
+    inputs:
+      redeemer_address:
+        type: "address"
+        value: ${position.redeemer_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}

@@ -1,0 +1,458 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "mglobal-redemption"
+  pool_name: "Midas mGLOBAL Redemption Vault (with Aave)"
+  protocol: "midas"
+  chain: "mainnet"
+  machine: "dusd"
+  actions: [withdraw, account]
+  base_tokens:
+    - address: "0x7433806912Eae67919e66aea853d46Fa0aef98A8"
+      symbol: "mGLOBAL"
+      decimals: 18
+      index: 0
+  context: |
+    Withdraw-only integration on the existing Midas mGLOBAL redemption vault.
+    Proxy (operational): 0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B
+    Implementation: 0xf687E76e3d62d62fE6F6A7f66ce9faE21df6438d (MGlobalRedemptionVaultWithAave)
+
+    ## Async two-step request flow (NOT instant)
+    Use `redeemRequest(tokenOut, amountMTokenIn, recipient)` — NOT `redeemInstant`.
+    This is admin-settled: the caliber calls redeemRequest now, escrowing mGLOBAL
+    in the vault; admin later calls `approveRequest(id, newRate)` which pushes
+    USDC directly to `recipient` (set the caliber as recipient). No on-chain
+    claim function — funds appear in caliber wallet at admin settlement time.
+
+    ## Token configuration (verified on-chain 2026-05-15)
+    - mToken (mGLOBAL): 0x7433806912Eae67919e66aea853d46Fa0aef98A8 (18 dec)
+    - tokenOut: ONLY USDC (0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
+    - tokensConfig[USDC].fee = 0           → zero per-token fee
+    - tokensConfig[USDC].stable = true     → tokenOutRate fixed at 1e18 (STABLECOIN_RATE)
+    - tokensConfig[USDC].dataFeed = 0x3aAc6fd73fA4e16Ec683BD4aaF5Ec89bb2C0EdC2
+    - minAmount = 0                         → no minimum
+    - instantFee = 50 (0.5%)                → NOT applied on request flow (isInstant=false)
+    - requestRedeemer: 0xaB9dA7953D82d81006639A6f87883d59594918b9
+    - mTokenDataFeed: 0xb468A6F63868cB6C6D99105EDfbe73d6B21f139E
+    - currentRequestId: 0 (vault is new, no requests yet)
+
+    Net: user receives (amountMTokenIn * newMTokenRate) / 1e18 USDC at settlement,
+    less truncation to 6 decimals. Zero fee.
+
+    ## KV-store request tracking (architectural pattern)
+    Store the in-flight `requestId` in KV; allow only ONE request in flight per
+    caliber. Pattern is analogous to blueprints/infinifi/withdraw.yaml +
+    blueprints/infinifi/account.yaml which use the same KV-store helper.
+
+    Withdraw action ("redeem_request"):
+      1. kv.get(key) — revert if != 0 (one-in-flight enforcement)
+      2. read currentRequestId() on vault → next_id (this will be assigned next)
+      3. approve(vault, amountMTokenIn) on mGLOBAL
+      4. redeemRequest(USDC, amountMTokenIn, caliber_address) on vault
+      5. kv.set(key, next_id)
+    The trick: capture next_id BEFORE calling redeemRequest, since redeemRequest
+    increments currentRequestId atomically using the pre-increment value.
+
+    Account action (CORRECTED after Stage 1b — see functions.md):
+      1. kv.get(key) → stored_id_plus_one  (see "ID-0 sentinel" below)
+      2. read redeemRequests(stored_id) → (sender, tokenOut, status, amountMToken, mTokenRate, tokenOutRate)
+      3. ACTUAL RequestStatus enum: {Pending=0, Processed=1, Canceled=2} — NO None variant
+      4. "Request exists & is pending" requires BOTH status==0 AND sender != address(0)
+         (status==0 alone is ambiguous because Solidity zero-initialises the slot)
+      5. If pending: value = amountMToken * mTokenRate_stored / 1e18
+         IMPORTANT: use the STORED mTokenRate from the Request struct, NOT a live
+         mTokenDataFeed read — the live feed currently reverts ("DF: feed is
+         unhealthy"). Stored rate is the snapshot taken at request time and is
+         the conservative best estimate. (Admin can settle at a different rate
+         later via approveRequest, but we report based on snapshot.)
+      6. If not pending: reset kv; value = 0. Per-caliber USDC accounting catches
+         the settled amount once admin pushes it.
+      7. The unbound mGLOBAL balance is accounted by the caliber's native asset
+         registry — do NOT double-count it here.
+
+    ## ID-0 sentinel (CRITICAL — discovered Stage 1b)
+    currentRequestId is a Counters.Counter starting at 0. The contract uses
+    pre-increment: `requestId = currentRequestId.current(); currentRequestId.increment();`
+    So the FIRST request ever made gets id=0. Since currentRequestId is currently 0,
+    the caliber's first withdraw will land on id 0. This breaks "KV == 0 means
+    no request in flight". Resolution options for the blueprint-writer to pick:
+      (a) Store (requestId + 1) in KV. Sentinel: KV==0 → no request. Cleanest.
+      (b) Store raw id, disambiguate by reading redeemRequests(0).sender on every
+          accounting call. Costs an extra SLOAD but no encoding gymnastics.
+    Recommendation: (a). Document the +1 offset clearly.
+
+    ## Risks to document (not blockers)
+    - Admin can `rejectRequest` → status=Canceled and escrowed mGLOBAL is NOT
+      auto-refunded. After our KV reset we lose tracking; admin must manually
+      `withdrawToken` and return funds. Off-chain monitoring required.
+    - `approveRequest` is NOT gated by variationTolerance; admin can settle at
+      any rate. We use current NAV in accounting as conservative best estimate.
+
+    ## Reference helpers (existing in this repo)
+    - context_helper:  0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE (msgSender, blockTimestamp)
+    - math_helper:     0x3D623B199E290358416415eA7e05B635E442e3c0 (mulDiv, eq, add, scaleAmount)
+    - boolean_helper:  0x00c93e3b09Ca2f544487d4298339765EadCD8353 (revertIfFalse, revertIfTrue)
+    - KV store: per-caliber, address passed as input
+    - Pattern reference: blueprints/infinifi/{withdraw,account}.yaml
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - progress.yaml
+  1_specs:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - specs.yaml
+      - SUMMARY.md
+    notes: |
+      SUMMARY.md content returned inline in agent response (harness blocked .md
+      write). Specs cover withdraw (redeem_request 3-arg) and account (read
+      redeemRequests + value via stored mTokenRate). All on-chain values
+      verified 2026-05-15: currentRequestId=0, tokensConfig(USDC)=(0x3aAc...,
+      fee=0, allowance≈1e27, stable=true), instantFee=50, minAmount=0.
+      Notable: live mTokenDataFeed.getDataInBase18() reverts 'DF: feed is
+      unhealthy' — accounting uses the stored rate from the Request struct,
+      and new withdraw txs will revert until the feed recovers.
+  1b_enrich:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - functions.md
+    notes: |
+      Fetched Solidity source for the request-path functions and supporting
+      base/interface contracts from the verified implementation
+      0xf687E76e3d62d62fE6F6A7f66ce9faE21df6438d on mainnet via blockscout.
+      Documented: redeemRequest(3-arg), _redeemRequest, _approveRequest,
+      _calcAndValidateRedeem, _validateRequest, _validateLiquidity,
+      _getFeeAmount, _tokenTransferFromUser, _requireAndUpdateAllowance,
+      _validateUserAccess, redeemRequests mapping, currentRequestId,
+      tokensConfig mapping, Request struct, RequestStatus enum, TokenConfig
+      struct, and relevant events. Confirmed the mGLOBAL wrapper only
+      overrides vaultRole/greenlistedRole and RedemptionVaultWithAave only
+      overrides _redeemInstant (request path unchanged).
+      IMPORTANT CORRECTION TO specs.yaml: actual RequestStatus is
+      {Pending=0, Processed=1, Canceled=2} (no None variant). Accounting
+      must detect "no request" via sender != address(0), not status == 0.
+      This must be propagated to the accounting blueprint at stage 3.
+  1c_offchain:
+    status: skipped
+    timestamp: "2026-05-15T00:00:00Z"
+    notes: |
+      No offchain data needed. All state lives on-chain: the requestId is
+      captured via currentRequestId() pre-call, the Request struct is read via
+      redeemRequests(uint256), and settlement is detected via status. No merkle
+      proofs, no signatures, no API endpoints. KV store is local infra, not
+      offchain data.
+  2_withdraw:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - execution-withdraw.md
+    testnet_id: "a8d4ee98-ff6c-4047-a0b4-201583af7725"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/a09bfee8-88e1-469c-9ffe-f806142a9a7f"
+    notes: |
+      Verified the full redeemRequest flow end-to-end on the Tenderly mainnet
+      fork. Three on-chain blockers had to be cleared before the call could
+      succeed; all are documented in execution-withdraw.md section 0:
+        (A) live mTokenDataFeed.getDataInBase18() reverts "DF: feed is
+            unhealthy" — replaced implementation code with a pure-returns-1e18
+            stub via tenderly_setCode at 0x94Cd5b8904c1F1426f9408eE5c98b789c6a864c6.
+        (B) greenlist gate (M_GLOBAL_GREENLISTED_ROLE) — granted to BOTH the
+            caliber AND the vault (mGLOBAL token's transfer hook checks both
+            from and to via mTokenPermissioned._beforeTokenTransfer) via direct
+            storage writes on MidasAccessControl. Also granted
+            M_GLOBAL_REDEMPTION_VAULT_ADMIN_ROLE to a test EOA so we could
+            unpause and approve/reject.
+        (C) per-selector pause — fnPaused[0x15571a04] = true on mainnet;
+            unpaused via unpauseFn(bytes4) from the test admin EOA. This is
+            currently true on mainnet so a production blueprint will revert
+            until Midas unpauses; flagged for the blueprint-writer.
+      Key empirical findings (also encoded in execution-withdraw.md):
+        - First request gets id=0 (currentRequestId.current() pre-increment).
+          Confirms the ID-0 sentinel issue — blueprint MUST store requestId+1
+          in KV per option (a) in progress.yaml/intent.
+        - feeAmount = 0 in the event (tokensConfig[USDC].fee = 0). Therefore
+          Request.amountMToken == amountMTokenIn exactly. Caliber mGLOBAL
+          balance drops by exactly amount; vault holds exactly amount.
+        - Contract does NOT enforce one-in-flight: a second redeemRequest
+          succeeded while id=0 was still Pending. Our blueprint must enforce
+          the invariant via KV.
+        - Gas for redeemRequest: 332,031 (0x512ff).
+      Funding: caliber 1000e18 mGLOBAL, requestRedeemer 100,000 USDC + MAX
+      allowance to vault. No mGLOBAL transfer hook beyond greenlist was hit;
+      no rounding issues (18-dec token).
+  2_account:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - execution-account.md
+    testnet_id: "a8d4ee98-ff6c-4047-a0b4-201583af7725"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/a09bfee8-88e1-469c-9ffe-f806142a9a7f"
+    notes: |
+      Walked through every accounting state by direct redeemRequests(uint256)
+      reads on the same testnet as 2_withdraw (shared state, per task spec).
+      Phases verified:
+        Phase 1 (no request)    : all-zero struct. Sender field is the canonical
+                                   "exists" probe — status=0 is ambiguous with
+                                   Pending.
+        Phase 2 (pending)       : sender=caliber, status=0, amountMToken=100e18,
+                                   mTokenRate=1e18 (stub snapshot), tokenOutRate
+                                   =1e18 (STABLECOIN_RATE because USDC.stable=
+                                   true). value_18 = amount*rate/1e18 = 100e18.
+        Phase 3 (processed)     : after approveRequest(0, 1e18): status flipped
+                                   to 1, sender unchanged, mTokenRate
+                                   OVERWRITTEN with newMTokenRate (confirms
+                                   _approveRequest behaviour). Caliber USDC
+                                   balance increased by exactly 100,000,000
+                                   (100 USDC, 6 dec, truncated). Vault mGLOBAL
+                                   reduced by 100e18 (burnt).
+        Phase 4 (canceled)      : reverted snapshot, then rejectRequest(0):
+                                   status=2; ALL other fields unchanged. Caliber
+                                   mGLOBAL balance NOT restored (still 850e18
+                                   after two unsettled in-flight requests).
+                                   Confirms the "rejection does not refund"
+                                   risk from intent.context.
+        Phase 5 (pricing)       : confirmed live mTokenDataFeed.getDataInBase18()
+                                   reverts on mainnet; stored Request.mTokenRate
+                                   is the only viable source. Accounting
+                                   blueprint MUST read the stored field.
+      Status enum reaffirmed: {Pending=0, Processed=1, Canceled=2} (no None).
+      Accounting decision matrix encoded at end of execution-account.md.
+  3_blueprint:
+    status: completed
+    timestamp: "2026-05-15T00:00:00Z"
+    artifacts:
+      - blueprints/midas-mglobal-redemption/withdraw.yaml
+      - blueprints/midas-mglobal-redemption/account.yaml
+      - machines/dusd/mainnet/instructions/midas-mglobal-redemption.yaml
+    notes: |
+      Created a new top-level blueprint protocol dir (midas-mglobal-redemption)
+      rather than extending blueprints/midas/, because the redemption vault has
+      a fundamentally different (async, admin-settled) flow than the deposit
+      vault that blueprints/midas/deposit.yaml targets. This mirrors how
+      blueprints/royco-v1/, blueprints/morpho-loop/, etc. split off from their
+      simpler base counterparts.
+
+      Blueprint highlights:
+        - withdraw.yaml exposes two actions: redeem_request (absolute mGLOBAL
+          amount) and redeem_request_relative (bps of caliber's mGLOBAL
+          balance). Both:
+            1. Read KV sentinel; revert via boolean_helper.revertIfFalse if
+               non-zero (one-in-flight invariant).
+            2. Read currentRequestId() (pre-increment value = id to be assigned).
+            3. Add 1 (id-0 sentinel offset) → kv_value_to_store.
+            4. context_helper.msgSender() → caliber_address.
+            5. (relative only) balanceOf + mulDiv to derive amount.
+            6. mGLOBAL.approve(vault, amount).
+            7. vault.redeemRequest(USDC, amount, caliber_address).
+            8. kv.set(key, kv_value_to_store).
+        - account.yaml reads kv → max(stored,1)-1 to recover requestId without
+          underflow on the "no request" case (which then reads the zero-init
+          redeemRequests(0) struct; the is_pending mask filters it out).
+          Extracts (sender, status, amountMToken, mTokenRate) from the tuple
+          via caliber_helper.extractElementFromStaticTuple, computes
+          is_pending = (status == 0) AND (sender != 0) (using bytes32_helper.eq
+          on the sender field for the address-zero check), casts that bool to
+          a 0/1 uint mask via math_helper.ternary, multiplies the stored-rate
+          value by the mask, and writes new_kv = stored_sentinel * mask to KV
+          (no-op on Pending; reset to 0 on Processed/Canceled/zero-init —
+          satisfies the user-requested housekeeping reset).
+        - Reserved_slots returns [value_usd18, UINT256_MAX] matching the
+          infinifi/account.yaml convention.
+
+      Critical design points reflected in header comments:
+        - ID-0 sentinel: KV stores requestId + 1 because the vault's first
+          request gets id 0 (Counters pre-increment, confirmed in
+          execution-withdraw.md).
+        - One-in-flight invariant: vault permits multiple concurrent Pending
+          requests per caller (verified); blueprint enforces the invariant
+          via the KV sentinel check.
+        - Status enum CORRECTED to {Pending=0, Processed=1, Canceled=2} (no
+          None) — sender != address(0) used to distinguish "real" Pending
+          from a zero-init slot, per the contract's own _validateRequest.
+        - Valuation uses the STORED mTokenRate from the Request struct, NOT
+          a live mTokenDataFeed call (the live feed currently reverts with
+          "DF: feed is unhealthy" on mainnet; the stored snapshot is the
+          conservative best estimate and is immune to feed health).
+        - Accounting writes back to KV every call (1 SSTORE, no-op when
+          Pending, reset to 0 otherwise) — explicitly requested.
+        - Header comments call out: (1) feed unhealthy will block submission
+          until Midas restores feed health, (2) selector 0x15571a04 is
+          currently per-selector paused on mainnet, (3) greenlist
+          requirements for both caliber and vault.
+
+      Instruction file machines/dusd/mainnet/instructions/midas-mglobal-redemption.yaml
+      hard-codes the addresses (per the CLAUDE.md rule on protocol-specific
+      addresses not going in caliber.yaml config) and binds:
+        - vault_address: 0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B
+        - mtoken_address: 0x7433806912Eae67919e66aea853d46Fa0aef98A8
+        - token_out_address: USDC 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+        - kv_store_address: ${config.key_value_store_address}
+                            (dusd uses 0xa81fC382489F9560211AB15aD87f001b98C92E91)
+        - kv_storage_key: 0x3d2572d8cf9d8f1fb2d01586929e412a44b570bd84dabd8ea5bf29175e81abc7
+                          (keccak256("makina.mainnet.midas.mglobal-redemption"))
+      The instruction exposes the two MANAGEMENT actions (redeem_request,
+      redeem_request_relative) and the ACCOUNTING action. affected_tokens lists
+      only mGLOBAL — USDC settlement is delivered out-of-band by admin and
+      tracked by the caliber's native asset registry.
+
+      This instruction is intentionally machine-specific rather than general
+      because the mGLOBAL redemption vault is a singleton (no multiple
+      deployments to parameterize). The /compile validation is left to the
+      parent orchestrator per the agent contract.
+  4_test:
+    status: completed
+    timestamp: "2026-05-18T13:20:00Z"
+    artifacts:
+      - test-report.md
+    testnet_id: "48f42712-156d-42c3-a8e8-34e06ee0665e"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/ed37611b-de57-4ac9-a5c5-1aae7eaf39be"
+    rootfile: "/workspace/machines/dusd/mainnet/rootfiles-test/test-output.toml"
+    merkle_root: "0x32854e566d0a296630821c5b0ed519f268019c4b06eaaa18ba5f94ccc74f939d"
+    notes: |
+      Re-run 2026-05-18 (3rd run) after Option B refactor of BOTH withdraw.yaml
+      and account.yaml.
+
+      What changed (Option B):
+        - KV now stores RAW requestId (no +1 sentinel offset). The
+          `add(next_id, 1)` op is gone from withdraw; `max(stored,1)` and
+          `sub(floored,1)` are gone from account.
+        - Withdraw guard now reads vault.redeemRequests(kv_stored_id), extracts
+          (sender, status), and reverts via revertIfTrue if (status == Pending)
+          AND (sender != 0). The old single-step revertIfFalse(eq(kv,0)) is
+          replaced with a 7-step struct-based check.
+
+      All 7 phases pass on fresh testnet 48f42712-…/0665e. New KV trace under
+      Option B: 0 → 0 → 0 (no-op) → revert → 0 → 0 → 1 → 1.
+
+      Critical phase verifications:
+        - Phase 2 (first-ever withdraw, KV=0, struct sender=0): GUARD ALLOWED.
+          The new "not(eq(sender, 0)) AND eq(status, 0) → revert" sequence
+          correctly resolves to in_flight=false when both are zero.
+        - Phase 4 (second redeem attempt, KV=0 but struct.sender=caliber):
+          GUARD REVERTED at boolean_helper.revertIfTrue(true) at
+          absolute_position 401 in the Tenderly call trace. Operation id
+          29413635-0ca8-4c05-ab36-5495ae068efb. NOT the old eq(kv,0) path.
+
+      Refactor confirmed via call-trace inspection (op_id 0686f56d-… for
+      Phase 3 account, op_id 557670f8-… for Phase 7 account):
+        - WeirollVM `mul` count per account: 2 (unchanged from prev run).
+        - WeirollVM `mulDiv` count: 0 (unchanged).
+        - WeirollVM `max` / `sub` / `add` count: 0 (was 1/1/1 in pre-Option-B).
+        - caliber_helper.extractElementFromStaticTuple count: 3 (unchanged).
+        - Rootfile commands: account=13 (was 15), withdraw=14 (was 8). The
+          withdraw blueprint grew because the new guard adds the
+          redeemRequests read + 6 helper ops.
+        - 100e18 / 50e18 slot-0 amounts confirmed in Phase 3 / Phase 7.
+        - Caliber-side mulDiv(amount, 1e6, 1e18) converts to 100e6 / 50e6 USDC
+          via display-positions oracle path.
+
+      Fork-prep identical to prior run (mTokenDataFeed + USDC dataFeed stubs,
+      greenlist via storage writes at slot 101, role grant to test admin EOA,
+      unpauseFn, addBaseToken via riskManagerTimelock, setFeedRoute via
+      Dialectic admin with role 1). Previous testnet e89e74ff-… was poisoned
+      by the prior Phase 7 50e18 Pending request, so a fresh testnet was
+      created.
+
+      Previous notes from 2026-05-18 (account-only refactor) and 2026-05-15
+      (initial run) retained below.
+
+    notes_account_refactor_run: |
+      Re-run 2026-05-18 after refactoring blueprints/midas/account.yaml.
+      Slot 0 now reports the raw escrowed mGLOBAL amount (18 dec) directly
+      instead of value_usd18 = amountMToken * mTokenRate / 1e18. The caliber's
+      base-token registry oracle-prices mGLOBAL via setFeedRoute (USDC/USD
+      placeholder), so display-positions still shows the correct USDC-
+      denominated value (100 / 50 USDC). All 7 phases pass on the fresh
+      testnet e89e74ff-6b08-46b9-85a4-a9500546be4c. New compiled merkle root:
+      0x7ab58b85…dd1a (down from 0x20cd539f… on the pre-refactor blueprint).
+      Refactor confirmed via call-trace inspection:
+        - WeirollVM `mul` count: 2 (escrow_amount mask + KV writeback)
+        - WeirollVM `mulDiv` count: 0 (was 1 in pre-refactor)
+        - caliber_helper `extractElementFromStaticTuple` count: 3 (was 4)
+        - 100e18 / 50e18 slot-0 amounts observed in Phase 3 / Phase 7.
+        - Caliber-side `mulDiv(amount, 1e6, 1e18)` converts to 100e6 / 50e6 USDC.
+      Extra fork-prep step vs the previous run: also stubbed the USDC
+      dataFeed impl at 0xB93b94c99c6Df85cc9FaA338e68c27c72484251e — it is
+      ALSO unhealthy on mainnet and IS read inside _redeemRequest's
+      _getTokenRate(tokenOut) path. Stub returns 1e18, same shape as the
+      mGLOBAL feed stub. Without this stub Phase 2 reverts in simulation.
+      Previous notes from 2026-05-15 retained below.
+
+    notes_previous_run: |
+      End-to-end test on a FRESH Tenderly fork via the spellcaster CLI. All 7
+      phases of the test plan passed. KV transitions matched design exactly:
+      0 → 1 → 1 (no-op) → revert (one-in-flight) → 0 (after approve) → 0
+      (after reject) → 2 (new request) → 2 (no-op).
+
+      Fork prep beyond the execution-explorer's set:
+        - Granted role 0 already present on admin EOA 0x6224... (used as-is).
+        - Granted role 1 to admin so it could call setFeedRoute.
+        - Registered Chainlink USDC/USD feed (0x8fff...) as the mGLOBAL price
+          route (placeholder for testing; mGLOBAL → ≈$1).
+        - Called caliber.addBaseToken(mGLOBAL) — required because the
+          accounting instruction's affected_tokens contains mGLOBAL and the
+          caliber's set-membership check (EnumerableSet.contains) failed
+          otherwise.
+
+      Phase outcomes (all PASS):
+        Phase 1 (no request)     : value=0, KV stays 0 ✓
+        Phase 2 (redeem 100e18)  : tx 0xbcc90228...; KV 0→1; vault +100e18;
+                                   caliber -100e18; RedeemRequestWithCustomRecipient
+                                   event with requestId=0, feeAmount=0 ✓
+        Phase 3 (account Pending): tx 0xcf4629e3...; value=$100; KV stays 1 ✓
+        Phase 4 (one-in-flight)  : reverted at boolean_helper.revertIfFalse
+                                   after the KV sentinel read returned 1 ✓
+        Phase 5 (settlement)     : approveRequest(0, 1e18) — status→1, vault
+                                   mGLOBAL burnt, caliber USDC +100,000,000.
+                                   account tx 0x71f7f621... reset KV 1→0, value=0 ✓
+        Phase 6 (cancellation)   : revertVnet to snapshot; rejectRequest(0) —
+                                   status→2, vault still 100e18 (NOT refunded,
+                                   confirms documented risk). account reset
+                                   KV→0, value=0, PositionClosed emitted ✓
+        Phase 7 (cycle freshness): redeem 50e18 — requestId=1; KV 0→2; account
+                                   value=$50, KV stays 2 ✓
+
+      All blueprint actions ran through spellcaster (manage-position,
+      account-positions, dev-update-root, display-positions). Tenderly was
+      used only for environment setup and the admin-side approve/reject
+      transactions (not blueprint paths).
+
+# Shared resources
+testnets:
+  midas_mglobal_main:
+    id: "a8d4ee98-ff6c-4047-a0b4-201583af7725"
+    chain: "ethereum"
+    network_id: 1
+    fork_block: "0x17f03af"
+    admin_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/a09bfee8-88e1-469c-9ffe-f806142a9a7f"
+    public_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/8d297bc0-e749-4f15-86da-c79c642e2c8a"
+    used_by: [2_withdraw, 2_account]
+  midas_mglobal_e2e:
+    id: "7d4954d8-41ce-4430-afd5-8e2421e60cfc"
+    chain: "ethereum"
+    network_id: 1
+    fork_block: "0x17f03af"
+    admin_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/ffca030d-ccde-4b48-8cc1-785be53b8448"
+    public_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/fc1a37ee-027b-46df-ab77-0de0702fe4f6"
+    used_by: [4_test_initial]
+  midas_mglobal_e2e_rerun:
+    id: "e89e74ff-6b08-46b9-85a4-a9500546be4c"
+    chain: "ethereum"
+    network_id: 1
+    fork_block: "0x17f03af"
+    admin_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/0aea2ca6-7182-4b1c-bd1a-e5a7b65cd25a"
+    public_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/a435c1f3-ee3b-46df-86e1-aad006174994"
+    used_by: [4_test_account_refactor]
+  midas_mglobal_optionb:
+    id: "48f42712-156d-42c3-a8e8-34e06ee0665e"
+    chain: "ethereum"
+    network_id: 1
+    fork_block: "0x17f03af"
+    admin_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/ed37611b-de57-4ac9-a5c5-1aae7eaf39be"
+    public_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/db208510-70c6-4d83-823b-56e2d6da281b"
+    used_by: [4_test]

@@ -1,0 +1,497 @@
+# Midas mGLOBAL Redemption Vault (with Aave) - Pool Specifications
+# Generated: 2026-05-15
+# Scope: WITHDRAW + ACCOUNT only. Caliber holds mGLOBAL upstream and redeems to USDC
+# through an asynchronous, admin-settled request flow.
+
+pool:
+  id: "mglobal-redemption"
+  name: "Midas mGLOBAL Redemption Vault (with Aave)"
+  protocol: "midas"
+  version: "RedemptionVaultWithAave (mGLOBAL)"
+  network: "mainnet"
+  chain_id: 1
+  category: "rwa-redemption-async"
+  description: |
+    Midas request-based redemption vault that converts mGLOBAL into USDC via an
+    admin-settled two-step flow:
+      1. User calls redeemRequest(USDC, amountMTokenIn, recipient): mGLOBAL is
+         escrowed inside the vault contract (status = Pending). A requestId is
+         minted via the OpenZeppelin Counters library (current() then increment()).
+      2. Admin (M_GLOBAL_REDEMPTION_VAULT_ADMIN_ROLE) calls approveRequest(id,
+         newMTokenRate). The vault pulls USDC from `requestRedeemer` (an EOA-like
+         liquidity address) and pushes it directly to `request.sender`
+         (= the recipient set at step 1), then burns the escrowed mGLOBAL.
+
+    There is NO on-chain claim function for the user — USDC simply appears in
+    `recipient`'s wallet on the admin's settlement tx. This dictates the design:
+      - withdraw flow MUST set recipient = caliber address (not msg.sender) so
+        USDC lands on the caliber, not on an intermediate executor.
+      - account flow MUST read the on-chain Request struct (sender, status,
+        amountMToken, mTokenRate) to value the in-flight position.
+
+    On-chain config snapshot (mainnet, verified 2026-05-15):
+      - mToken (mGLOBAL):        0x7433806912Eae67919e66aea853d46Fa0aef98A8 (18 dec)
+      - USDC (only tokenOut):    0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (6 dec)
+      - requestRedeemer:         0xaB9dA7953D82d81006639A6f87883d59594918b9
+      - mTokenDataFeed:          0xb468A6F63868cB6C6D99105EDfbe73d6B21f139E
+      - tokensConfig[USDC].dataFeed = 0x3aAc6fd73fA4e16Ec683BD4aaF5Ec89bb2C0EdC2
+      - tokensConfig[USDC].fee = 0           → request flow charges ZERO mGLOBAL fee
+      - tokensConfig[USDC].stable = true     → tokenOutRate hard-pinned to 1e18
+      - tokensConfig[USDC].allowance ≈ 1e27  → effectively uncapped
+      - minAmount = 0                         → no minimum mGLOBAL per request
+      - instantFee = 50 (0.5%)                → NOT applied on request path
+      - currentRequestId = 0                  → vault is new, no requests yet
+      - implementation = MGlobalRedemptionVaultWithAave (extends RedemptionVaultWithAave)
+
+contracts:
+  vault_proxy:
+    address: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+    name: "MGlobalRedemptionVaultWithAave (operational proxy)"
+    type: "TransparentUpgradeableProxy (EIP-1967)"
+    implementation: "0xf687E76e3d62d62fE6F6A7f66ce9faE21df6438d"
+    impl_contract_name: "MGlobalRedemptionVaultWithAave"
+    impl_compiler: "v0.8.9+commit.e5eed63a"
+    abi_source: "https://eth.blockscout.com/address/0xf687E76e3d62d62fE6F6A7f66ce9faE21df6438d?tab=contract"
+    notes:
+      - "All user-facing calls target the proxy 0xA0Fc...01B."
+      - "MGlobalRedemptionVaultWithAave only overrides vaultRole() and greenlistedRole();"
+      - "the actual redemption logic lives in RedemptionVault.sol (inherited via RedemptionVaultWithAave)."
+      - "Has Greenlist + Sanctions list + Blacklist (Pausable, WithSanctionsList, Blacklistable, Greenlistable)."
+      - "_validateUserAccess(msg.sender) AND (if recipient != msg.sender) _validateUserAccess(recipient) — caliber must pass these gates."
+      - "Counters.Counter currentRequestId: requestId = current() pre-increment."
+      - "Pre-increment semantics: read currentRequestId() BEFORE redeemRequest; that value will be the new id."
+
+  mtoken:
+    address: "0x7433806912Eae67919e66aea853d46Fa0aef98A8"
+    name: "Midas Fasanara Global"
+    symbol: "mGLOBAL"
+    decimals: 18
+    notes:
+      - "Burnable mToken. The vault calls mToken.burn(address(this), request.amountMToken) on approveRequest()."
+      - "On redeemRequest the vault pulls amountMTokenWithoutFee from msg.sender into address(this) (escrow)."
+      - "With tokensConfig[USDC].fee = 0 and instantFee not applied on request path, amountMTokenWithoutFee == amountMTokenIn."
+
+  usdc:
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    symbol: "USDC"
+    decimals: 6
+    notes:
+      - "The only accepted tokenOut on this vault (per tokensConfig)."
+      - "USDC is pulled from requestRedeemer (NOT from the vault's own balance) on settlement."
+      - "Output amount is _truncate-d to USDC's 6 decimals; sub-unit dust is lost."
+
+  mtoken_data_feed:
+    address: "0xb468A6F63868cB6C6D99105EDfbe73d6B21f139E"
+    type: "TransparentUpgradeableProxy"
+    implementation: "0x94Cd5b8904c1F1426f9408eE5c98b789c6a864c6"
+    purpose: "Chainlink-style price feed for mGLOBAL/USD (returns 1e18-scaled rate)"
+    notes:
+      - "Function: getDataInBase18() returns (uint256)."
+      - "VAULT INTERNAL USE ONLY for fresh-rate quotes. Has a 'DF: feed is unhealthy' staleness guard."
+      - "Live mainnet probe on 2026-05-15: getDataInBase18() REVERTS with 'DF: feed is unhealthy'."
+      - "Implication: do NOT use this feed directly from accounting — read the stored mTokenRate from the Request struct instead."
+
+  usdc_data_feed:
+    address: "0x3aAc6fd73fA4e16Ec683BD4aaF5Ec89bb2C0EdC2"
+    purpose: "Token-out price feed for USDC"
+    notes:
+      - "stable=true in tokensConfig — vault hard-codes tokenOutRate = 1e18 regardless of feed value."
+
+  request_redeemer:
+    address: "0xaB9dA7953D82d81006639A6f87883d59594918b9"
+    purpose: "USDC liquidity source — vault pulls USDC from here on approveRequest()"
+    notes:
+      - "Must hold sufficient USDC and have granted allowance to the vault."
+      - "_validateLiquidity() (only used in safeBulkApproveRequest, not approveRequest) checks balance."
+      - "Off-chain monitoring required — there is no on-chain enforcement of liquidity at request time."
+
+helpers:
+  # These are existing makina/dialectic helpers used by other instructions
+  # (see blueprints/infinifi/{withdraw,account}.yaml for the same pattern).
+  context_helper:
+    address: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+    purpose: "Get caliber/msg.sender at instruction-execution time"
+    useful_functions:
+      - "msgSender() returns (address)"
+      - "blockTimestamp() returns (uint256)"
+
+  math_helper:
+    address: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+    purpose: "Pure-math helpers usable in instructions"
+    useful_functions:
+      - "eq(uint256,uint256) returns (bool)"
+      - "mulDiv(uint256,uint256,uint256) returns (uint256)"
+
+  boolean_helper:
+    address: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+    purpose: "Revert-control helpers"
+    useful_functions:
+      - "revertIfTrue(bool)"
+      - "revertIfFalse(bool)"
+
+  kv_store:
+    purpose: "Per-caliber key/value store for tracking the in-flight requestId."
+    address: "<NEEDS_MANUAL_VERIFICATION>" # passed as input at instruction time (see blueprints/infinifi/withdraw.yaml inputs.kv_store_address)
+    useful_functions:
+      - "get(bytes32) returns (bytes32)"
+      - "set(bytes32,bytes32)"
+    notes:
+      - "Address is per-caliber and supplied as an instruction input, not constant."
+      - "Storage key is a unique bytes32 chosen per pool, e.g. keccak256('midas_mglobal_redemption_request_id')."
+
+flows:
+  # ============================================================================
+  # WITHDRAW: redeem_request (async, admin-settled)
+  # Single-tx call that escrows mGLOBAL and registers a Pending request whose USDC
+  # output is later pushed by the admin directly to the caliber address.
+  # ============================================================================
+  withdraw:
+    description: |
+      Submits a non-instant redemption request to convert mGLOBAL → USDC.
+
+      One-in-flight invariant: only ONE Pending request may exist per caliber at a
+      time. The blueprint enforces this by storing the assigned requestId in the
+      KV store and reverting if a non-zero id is already present.
+
+      Pre-increment trick: the vault assigns requestIds via
+        requestId = currentRequestId.current(); currentRequestId.increment();
+      so the value of currentRequestId() READ IMMEDIATELY BEFORE redeemRequest()
+      is the id that will be assigned. We capture it on-chain in the same
+      transaction to avoid races.
+
+      Recipient = caliber address: we use the 3-arg overload
+      `redeemRequest(address tokenOut, uint256 amountMTokenIn, address recipient)`
+      so when the admin later calls approveRequest, USDC is pushed directly to
+      the caliber address (not to msg.sender of the redeemRequest call, which
+      could be a separate executor / blueprint runtime).
+
+    preconditions:
+      - "Caliber holds >= amountMTokenIn mGLOBAL."
+      - "Caliber is greenlisted on the vault (M_GLOBAL_GREENLISTED_ROLE) — verify before deployment."
+      - "Caliber is NOT blacklisted and NOT on the sanctions list."
+      - "Vault is not paused on selector `redeemRequest(address,uint256,address)`."
+      - "KV store entry for the request key is 0 (no in-flight request)."
+      - "amountMTokenIn > 0 (vault reverts on zero)."
+
+    offchain_indicators: [] # no offchain data required for the withdraw call itself
+
+    steps:
+      - action: kv_get_existing_request_id
+        contract: "${inputs.kv_store_address}"
+        function: "get(bytes32)"
+        params:
+          key:
+            type: "bytes32"
+            description: "Pool-unique key, e.g. keccak256('midas_mglobal_redemption_request_id')"
+        returns: "uint256 existing_request_id"
+        notes:
+          - "If non-zero, a request is already in flight — revert."
+
+      - action: check_no_in_flight
+        contract: "${constants.math_helper_address}"
+        function: "eq(uint256,uint256)"
+        params:
+          a:
+            value: "${returns.existing_request_id}"
+          b:
+            value: "0"
+        returns: "bool no_in_flight"
+
+      - action: revert_if_in_flight
+        contract: "${constants.boolean_helper_address}"
+        function: "revertIfFalse(bool)"
+        params:
+          condition:
+            value: "${returns.no_in_flight}"
+
+      - action: read_next_request_id
+        contract: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+        function: "currentRequestId()"
+        params: {}
+        returns: "uint256 next_request_id"
+        notes:
+          - "Counters.current() — this is the id that will be assigned to the next redeemRequest."
+          - "Must be read in the SAME transaction as redeemRequest to avoid races."
+
+      - action: approve_mtoken_to_vault
+        contract: "0x7433806912Eae67919e66aea853d46Fa0aef98A8"
+        function: "approve(address,uint256)"
+        params:
+          spender:
+            value: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+            description: "Vault proxy"
+          amount:
+            type: "uint256"
+            description: "amountMTokenIn (18 decimals)."
+        notes:
+          - "tokensConfig[USDC].fee == 0 so the full amount is escrowed; no separate fee transfer happens."
+
+      - action: get_caliber_address
+        contract: "${constants.context_helper_address}"
+        function: "msgSender()"
+        params: {}
+        returns: "address caliber_address"
+        notes:
+          - "msgSender on the context helper resolves to the caliber itself."
+
+      - action: redeem_request
+        contract: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+        function: "redeemRequest(address,uint256,address)"
+        params:
+          tokenOut:
+            value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+            description: "USDC — the only accepted tokenOut."
+          amountMTokenIn:
+            type: "uint256"
+            description: "mGLOBAL amount to redeem (18 decimals)."
+          recipient:
+            value: "${returns.caliber_address}"
+            description: "Set the caliber as recipient so USDC settlement lands on the caliber wallet."
+        returns: "uint256 requestId  // == next_request_id captured above"
+        notes:
+          - "Internally: pulls amountMToken into the vault, records Request{sender=recipient, tokenOut, status=Pending, amountMToken, mTokenRate, tokenOutRate=1e18}, then currentRequestId.increment()."
+          - "Reverts if vault paused, user/recipient not greenlisted, sanctioned, blacklisted, or amount < minAmount."
+
+      - action: kv_set_request_id
+        contract: "${inputs.kv_store_address}"
+        function: "set(bytes32,bytes32)"
+        params:
+          key:
+            type: "bytes32"
+            description: "Same key as kv_get above."
+          value:
+            type: "uint256"
+            description: "${returns.next_request_id}  // store the assigned id"
+        notes:
+          - "Store the PRE-READ id (not a return-decoded id) — keeps the blueprint blockchain-pure."
+
+    events_to_monitor:
+      - "RedeemRequestWithCustomRecipient(uint256 indexed requestId, address indexed sender, address indexed tokenOut, address recipient, uint256 amountMTokenIn, uint256 feeAmount)"
+      - "Transfer(caliber, vault_proxy, amountMTokenIn) on mGLOBAL  // escrow"
+
+    token_movements:
+      in:
+        - token: "0x7433806912Eae67919e66aea853d46Fa0aef98A8"
+          symbol: "mGLOBAL"
+          description: "Caliber's mGLOBAL transferred to the vault as escrow."
+      out: [] # USDC arrives later via admin settlement, not in this tx
+      pending:
+        - token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+          symbol: "USDC"
+          description: "Will be pushed from requestRedeemer to caliber on admin approveRequest()."
+
+  # ============================================================================
+  # ACCOUNT: value the in-flight Pending request (and only that — see notes).
+  # ============================================================================
+  accounting:
+    description: |
+      Returns the USD-value of the caliber's in-flight redemption request, if any.
+
+      Storage model (one bucket per caliber):
+        - kv_store[key] = 0           → no in-flight request, position value = 0.
+        - kv_store[key] = id (uint)   → there is a request; read redeemRequests(id)
+          on the vault to value it.
+
+      Valuation:
+        - We use the request's STORED mTokenRate (captured at request creation),
+          NOT the live mTokenDataFeed. Reasons:
+            1. The live feed has a staleness guard ('DF: feed is unhealthy') and
+               currently reverts on mainnet (2026-05-15 probe).
+            2. The admin can settle at an arbitrary rate (approveRequest is NOT
+               gated by variationTolerance) — using the stored rate is therefore
+               a conservative best estimate of the value that will materialize.
+            3. The request struct already has the snapshot — no extra feed call
+               is required, making the call cheaper and reorg-stable.
+        - tokenOutRate is hard-pinned to 1e18 because tokensConfig[USDC].stable
+          is true, so the conversion to USDC (18-dec USD-equivalent) is simply
+          amountMToken * mTokenRate / 1e18.
+        - Result is in 18-dec USD-equivalent units. Downstream caliber pricing
+          can scale to 6-dec USDC if needed via /1e12 (but our accounting
+          convention here returns 18-dec to match other blueprints).
+
+      Status handling:
+        - Pending (1): value = amountMToken * mTokenRate / 1e18  (18-dec USD)
+        - None (0):    treated as "no request" — value = 0, KV must already be 0.
+        - Processed (2): USDC has already landed on the caliber via admin push
+          and is accounted by the caliber's normal asset registry. We reset the
+          KV to 0 (off-chain housekeeping, blueprint emits 0 here to avoid
+          double-counting). Note: the on-chain blueprint may not be able to do
+          conditional KV writes; see "design notes" below.
+        - Canceled (3): admin called rejectRequest — escrowed mGLOBAL is NOT
+          auto-refunded. We emit 0 here and rely on off-chain monitoring to
+          recover the position via admin manual withdrawToken. KV reset same as
+          Processed.
+
+      IMPORTANT — DO NOT double-count the un-staked mGLOBAL balance:
+        The caliber's mGLOBAL "spot" balance (the portion not yet sent into a
+        redemption request) is accounted by the caliber's normal base-token
+        registry (mGLOBAL is index 0 in the intent's base_tokens). This
+        accounting blueprint MUST therefore return ONLY the value of the
+        in-flight request — adding the spot balance here would double-count.
+
+    position_query:
+      description: "Read the stored Request struct for the in-flight id (if any)."
+      contract: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+      function: "redeemRequests(uint256)"
+      params:
+        requestId:
+          type: "uint256"
+          description: "Id captured from KV store at withdraw time."
+      returns:
+        type: "tuple(address sender, address tokenOut, uint8 status, uint256 amountMToken, uint256 mTokenRate, uint256 tokenOutRate)"
+        description: |
+          sender:        the recipient set at redeemRequest time (= caliber).
+          tokenOut:      USDC.
+          status:        RequestStatus enum {None=0, Pending=1, Processed=2, Canceled=3}.
+          amountMToken:  escrowed mGLOBAL (18 dec).
+          mTokenRate:    mGLOBAL/USD rate (18 dec) captured at request creation
+                         OR overwritten to newMTokenRate on admin approval.
+          tokenOutRate:  fixed at 1e18 (stable=true).
+
+    request_status_enum:
+      None: 0
+      Pending: 1
+      Processed: 2
+      Canceled: 3
+
+    valuation_formula:
+      pending:
+        description: "Pending request value in 18-dec USD"
+        formula: "value_usd18 = amountMToken * mTokenRate / 1e18"
+        notes:
+          - "tokenOutRate is 1e18 (USDC.stable=true), so amountMToken*mTokenRate/tokenOutRate == amountMToken*mTokenRate/1e18 == USD18."
+          - "To express as 6-dec USDC: usdc6 = value_usd18 / 1e12 (then truncate)."
+      not_pending:
+        description: "Anything not Pending (None, Processed, Canceled) → value = 0; reset KV."
+
+    helper_queries:
+      current_request_id:
+        contract: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+        function: "currentRequestId()"
+        returns: "uint256"
+        notes:
+          - "Counters.current() — the id that will be assigned to the NEXT request."
+      mtoken_balance:
+        contract: "0x7433806912Eae67919e66aea853d46Fa0aef98A8"
+        function: "balanceOf(address)"
+        returns: "uint256"
+        notes:
+          - "Used by the caliber's standalone mGLOBAL base-token accounting (NOT in this blueprint)."
+      live_mtoken_rate:
+        contract: "0xb468A6F63868cB6C6D99105EDfbe73d6B21f139E"
+        function: "getDataInBase18()"
+        returns: "uint256"
+        notes:
+          - "CAUTION: reverts with 'DF: feed is unhealthy' when stale."
+          - "NOT used by this accounting blueprint — we read the snapshot rate from the Request struct."
+
+    design_notes:
+      - |
+          Conditional KV reset on non-Pending status:
+            The instruction language does not have if/else branches. A robust
+            pattern (mirroring blueprints/infinifi/account.yaml) is:
+            - Compute is_pending = (status == 1) via math_helper.eq.
+            - Compute value_if_pending and select with arithmetic:
+                value = is_pending * (amountMToken * mTokenRate / 1e18).
+            - For the KV reset on non-pending, do it explicitly in a separate
+              settlement instruction (or accept that "stale Processed/Canceled
+              ids" will continue to read amountMToken/mTokenRate but contribute
+              0 to value because of the multiplier above). See blueprint stage
+              for the chosen approach.
+      - |
+          Reserved slots (matching infinifi/account.yaml shape):
+          Final result is a single uint256 placed in reserved_slots[0]; second
+          slot is UINT256_MAX. This is the makina account-blueprint convention.
+
+    reserved_slots:
+      - type: "uint256"
+        value: "value_in_18dec_usd  // see valuation_formula"
+      - type: "uint256"
+        value: "UINT256_MAX"
+
+# ============================================================================
+# Out-of-scope flows (documented for completeness; NOT to be implemented)
+# ============================================================================
+out_of_scope_flows:
+  deposit: |
+    The caliber receives mGLOBAL from a separate upstream integration; this
+    vault has NO deposit function on the redemption side. (Midas issues mGLOBAL
+    via a different DepositVault contract — not relevant here.)
+
+  harvest: |
+    No staking, no rewards on this contract. Aave-related code (the "WithAave"
+    extension) only governs idle-USDC management on the requestRedeemer/admin
+    side; it does NOT emit rewards to redeemers.
+
+  redeem_instant: |
+    Explicitly out of scope per intent. The instant path would apply a 0.5%
+    fee (instantFee=50) and requires _validateLiquidity. We always use the
+    request path.
+
+  redeem_fiat_request: |
+    Out of scope. We only redeem to USDC, never to fiat (MANUAL_FULLFILMENT_TOKEN).
+
+risks:
+  reject_request_no_auto_refund: |
+    Admin can call rejectRequest(id), which sets status=Canceled but does NOT
+    auto-refund the escrowed mGLOBAL. The blueprint will reset its KV tracking
+    and report 0 value, but the mGLOBAL remains stuck in the vault contract
+    until the admin manually calls withdrawToken to send it back to the
+    caliber. Off-chain monitoring + manual recovery is required.
+
+  approve_request_unbounded_rate: |
+    approveRequest(id, newMTokenRate) does NOT enforce variationTolerance —
+    that is only enforced by safeApproveRequest. The admin can therefore
+    settle at any rate. We mitigate by valuing the position at the STORED
+    rate (best snapshot) rather than the admin's future rate.
+
+  oracle_feed_unhealthy: |
+    Live probe shows mTokenDataFeed.getDataInBase18() currently REVERTS with
+    'DF: feed is unhealthy'. Our accounting uses the stored mTokenRate from
+    the Request struct, which is immune to this. However, a NEW redeemRequest
+    WILL revert if the feed is unhealthy at submission time (RedemptionVault
+    reads getDataInBase18 inside _redeemRequest). Verify feed health before
+    submitting withdraw txs.
+
+  output_decimal_truncation: |
+    _truncate to 6 decimals on USDC payout (dust < $0.000001 is lost). Per-tx
+    impact is negligible at our notional sizes.
+
+  single_in_flight_invariant: |
+    The blueprint enforces "max one Pending request at a time" via the KV
+    store. If multiple withdrawals are needed, they must be sequenced: wait
+    for admin settlement of the prior request, then submit the next. This is
+    a soft limit imposed by our blueprint design — the vault contract itself
+    allows arbitrarily many concurrent requests per user.
+
+  greenlist_gate: |
+    _validateUserAccess checks the greenlist on BOTH msg.sender AND recipient
+    (if they differ). For the request path we expect msg.sender == recipient
+    (= caliber), so a single greenlist grant on the caliber address is
+    sufficient. Confirm before deployment.
+
+metadata:
+  generated_at: "2026-05-15T00:00:00Z"
+  data_sources:
+    - blockscout_mainnet
+    - on-chain reads (mainnet)
+    - intent context (progress.yaml)
+    - reference blueprints/infinifi/{withdraw,account}.yaml
+  verified_on_chain_2026_05_15:
+    - "vault_proxy mToken() = 0x7433806912Eae67919e66aea853d46Fa0aef98A8 (mGLOBAL)"
+    - "vault_proxy requestRedeemer() = 0xaB9dA7953D82d81006639A6f87883d59594918b9"
+    - "vault_proxy mTokenDataFeed() = 0xb468A6F63868cB6C6D99105EDfbe73d6B21f139E"
+    - "vault_proxy instantFee() = 50 (0.5%)"
+    - "vault_proxy minAmount() = 0"
+    - "vault_proxy currentRequestId() = 0 (vault is new)"
+    - "vault_proxy tokensConfig(USDC) = (0x3aAc...EdC2, fee=0, allowance≈1e27, stable=true)"
+    - "vault implementation = 0xf687E76e3d62d62fE6F6A7f66ce9faE21df6438d (MGlobalRedemptionVaultWithAave)"
+    - "implementation source: contracts/products/mGLOBAL/MGlobalRedemptionVaultWithAave.sol on blockscout"
+    - "mGLOBAL.decimals() = 18, mGLOBAL.symbol() = 'mGLOBAL'"
+    - "mTokenDataFeed.getDataInBase18() currently REVERTS with 'DF: feed is unhealthy'"
+  notes:
+    - "Request struct order matters: (sender, tokenOut, status, amountMToken, mTokenRate, tokenOutRate)."
+    - "requestId is assigned via Counters.current() (pre-increment) then Counters.increment()."
+    - "redeemRequest 3-arg signature: redeemRequest(address tokenOut, uint256 amountMTokenIn, address recipient) — used to set caliber as recipient."
+    - "approveRequest is admin-only (M_GLOBAL_REDEMPTION_VAULT_ADMIN_ROLE). The caliber does not call it."
+    - "Use stored mTokenRate from the Request struct for accounting; live feed may revert."
