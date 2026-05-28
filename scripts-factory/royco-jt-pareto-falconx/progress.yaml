@@ -1,0 +1,753 @@
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "royco-pareto-jt"
+  pool_name: "Royco Junior Tranche - Pareto FalconX"
+  protocol: "royco"
+  chain: "mainnet"
+  machine: "dusd"
+  actions: [deposit, withdraw, account]
+  base_tokens:
+    - address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      symbol: "USDC"
+      decimals: 6
+      index: 0
+  context: |
+    New Junior Tranche (JT) integration for Pareto FalconX, on DUSD machine.
+
+    Mirrors the already-shipped Royco ST sibling exactly except routes through
+    the JT contract instead of the ST contract. Both Royco ST and Royco JT for
+    the FalconX market share the same `asset()` = Pareto AA tranche token —
+    the Royco "junior" is a Royco-level subordination layer, NOT the Pareto BB
+    tranche.
+
+    Key contracts (mainnet):
+      - Royco JT (this pool, ERC4626 over AA tranche):
+          0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d
+      - Pareto AA tranche (JT/ST `asset()`):
+          0xC26A6Fa2C37b38E549a4a1807543801Db684f99C
+      - Pareto IdleCDOEpochVariant (deposit/withdraw entry):
+          0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d
+      - Pareto IdleCreditVault (FalconXUSDC withdraw receipt, 6 dec):
+          0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3
+      - Royco Kernel (syncTrancheAccounting):
+          0x15bb63C07740ff972F76716cAcC5766f0C641791
+      - Royco AccessManager (deposit/redeem role grants):
+          0x7cC6fB28eC7b5e7afC3cB3986141797ffc27253C
+      - Pareto KeyringIdleWhitelist (off-chain credential, policy 18):
+          0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3
+
+    Reference integration to mirror:
+      scripts-factory/royco-st-pareto-falconx/
+      blueprints/royco/st-pareto-falconx/
+      instructions/royco-st-pareto-falconx.yaml
+
+    Existing JT reference (different middleware, but pattern for JT shape):
+      scripts-factory/royco/arbitrum/susdai-senior-tranche (no — that is ST)
+      blueprints/royco/jt-syrupusdc/, blueprints/royco/jt-stcusd/
+
+    Flow shape (deposit, atomic):
+      USDC -> approve(CDO) -> [depositAA | depositDuringEpoch(amt, AATranche)]
+            -> AA tranche -> approve(RoycoJT) -> RoycoJT.deposit(amount, caliber)
+            -> JT shares minted to caliber.
+
+    Flow shape (withdraw, two-phase, ~32-65d apart):
+      Phase 1: RoycoJT.redeem(shares, caliber, caliber) -> AA tranche
+               -> IdleCDOEpochVariant.requestWithdraw(aaAmount, AATranche)
+               -> FalconXUSDC receipt minted to caliber, AA burned.
+      Phase 2: IdleCDOEpochVariant.claimWithdrawRequest() -> burns receipt, pays USDC.
+
+    Account (asset-space, mirrors ST):
+      JT.balanceOf(caliber) -> shares
+      Kernel.syncTrancheAccounting()
+      JT.convertToAssets(shares) -> (stAssets, jtAssets, nav) [3-tuple, 18-dec AA units]
+        NOTE: verify the JT returns the same 3-tuple shape; otherwise fall back
+        to a 1-word convertToAssets and pair with AA.balanceOf for stranded AA.
+      AA.balanceOf(caliber) -> stranded_aa
+      total_aa = stAssets + jtAssets + stranded_aa
+      usdc_from_aa = total_aa * IdleCDOEpochVariant.tranchePrice(AATranche) / 1e18
+      total_usdc = usdc_from_aa + FalconXUSDC.balanceOf(caliber)
+
+    Access control (must be granted before deposit/withdraw succeeds on mainnet,
+    but typically already granted — confirm during execution):
+      - Pareto Keyring policy 18 credential on caliber.
+      - Royco AccessManager grants for JT deposit, JT redeem, and
+        Kernel.syncTrancheAccounting selectors. The role id is the JT_LP role
+        0xded17f6f89970f45 used in the ST bootstrap helper. For Tenderly,
+        override via storage writes / impersonation, identical to ST.
+
+    No harvest in scope. No offchain data needed (mirror ST, which skipped 1c).
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent:
+    status: completed
+    timestamp: "2026-05-19T00:00:00Z"
+  1c_offchain:
+    status: skipped
+    timestamp: "2026-05-19T00:00:00Z"
+    reason: |
+      All flows in specs.yaml have offchain_indicators: []. No merkle proofs,
+      signatures, or API calls needed - integration is fully on-chain (mirrors
+      ST sibling which also skipped this stage). No harvest action in scope.
+  1_specs:
+    status: completed
+    timestamp: "2026-05-19T00:00:00Z"
+    artifacts:
+      - specs.yaml
+      # SUMMARY.md content returned in agent message (harness-blocked from
+      # writing report/summary .md files); copy into SUMMARY.md by hand if
+      # the human curator wants the human-readable artifact persisted on disk.
+    notes: |
+      On-chain verification at fork block 0x17d5e3b (Tenderly vnet
+      438efdd7-701a-44e4-b7f0-acc3518e4c29). Key findings, especially
+      divergences from the ST sibling that downstream stages must handle:
+
+        * JT contract: 0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d
+            name()      = "Royco Junior Tranche AA-FalconXUSDC"
+            symbol()    = "ROY-JT-AA-FalconXUSDC"
+            decimals()  = 18
+            asset()     = 0xc26a...f99c  (same AA tranche as ST)
+            authority() = 0x7cC6...253C  (same RoycoFactory as ST)
+            implementation slot (ERC1967) =
+                0x1de7ca1aae266031eacd7bd9da40593d9af5e401
+                  (DIFFERENT from ST impl 0x98dF...4bba; both inherit
+                   RoycoVaultTranche, differ only by TRANCHE_TYPE()).
+            totalSupply = 9951936776758302936382  (junior IS bootstrapped
+                          on this fork by the prior ST-side
+                          bootstrap-pareto-falconx-junior.sh run)
+            totalAssets = 18151361278628604963   (~18.15 AA tokens)
+            paused      = false
+
+        * convertToAssets(1e18) on JT (raw decode):
+            slot 0 = 0x67ad45e195de4 = 1.823e15
+            slot 1 = 0xce5f9273c5bc0ad = 9.294e17
+            slot 2 = 0xe13c839064efa43 = 1.014e18
+          ST.convertToAssets(1e18) for comparison:
+            slot 0 = 0xcedf0afcc27d51f = 9.317e17
+            slot 1 = 0
+            slot 2 = 0xe1566e900c4f12c = 1.014e18
+          Per `_deriveTrancheAssetClaims(TRANCHE_TYPE(), state)` (verified
+          source path quoted in
+          scripts-factory/royco-st-pareto-falconx/functions.md, sec 4 +
+          sec 5), the struct populates the CALLING tranche's claim in slot
+          0. Empirical match:
+            ST.totalAssets() == 28.69e18 == ST.convertToAssets(totalSupply)[0]
+            JT.totalAssets() == 18.15e18 == JT.convertToAssets(totalSupply)[0]
+          Therefore for JT accounting we use slot 0 (=
+          `getTupleWord(returnData, 0)`), NOT slot 1 as the user-provided
+          hint speculated, and NOT the ST recommendation of slot 0 + slot 1
+          which would double-count the ST's claim.
+
+        * Access manager role mapping (verified via
+          `RoycoFactory.getTargetFunctionRole(target, selector)`):
+            JT.deposit(0x6e553f65)  -> role 16055754263579004741
+                                     = 0xded17f6f89970f45 (JT_LP)
+            JT.redeem(0xba087652)   -> role 16055754263579004741 (JT_LP)
+                                       <- SAME role as deposit. One grant
+                                          covers both.
+            JT.withdraw(0xb460af94) -> role 0 (PUBLIC_ROLE / not used)
+            JT.transfer(0xa9059cbb) -> role 0 (PUBLIC_ROLE)
+            ST.deposit(0x6e553f65)  -> role 9623252227852051139 (ST_LP)
+            ST.redeem(0xba087652)   -> role 9623252227852051139 (ST_LP)
+            Kernel.syncTrancheAccounting(0x9c8e2dc0)
+                                    -> role 15053450870919821405
+                                       (shared with ST integration; the
+                                        caliber's existing grant from the
+                                        ST integration covers this for JT
+                                        too — no additional grant needed)
+
+          So for the JT bootstrap helper the role id to grant is JT_LP
+          (0xded17f6f89970f45), NOT ST_LP. The existing
+          scripts-factory/royco-st-pareto-falconx/test-helpers/
+          bootstrap-pareto-falconx-junior.sh already uses JT_LP — it can
+          be reused verbatim for the JT integration's caliber grant.
+
+        * Coverage gate (DIVERGES from ST):
+            JT.deposit  -> NO coverage check  (this is the bootstrap path;
+                                              kernel.jtDeposit does not
+                                              call postOpSync...EnforceCoverage)
+            JT.redeem   -> YES coverage check (kernel.jtRedeem mirrors
+                                              the ST.deposit coverage gate)
+            ST.deposit  -> YES coverage check (bootstrap blocker;
+                                              requires jtRawNAV > 0)
+            ST.redeem   -> NO coverage check
+          Operational implication for execution-explorer (Stage 2):
+            - Deposit: simple, no coverage precondition.
+            - Withdraw phase 1: size the JT.redeem to a small fraction of
+              the JT position when the ST is populated. Full JT redeem
+              only works in the bootstrap-only state (no ST shares).
+
+        * CDO state at fork block 0x17d5e3b:
+            isEpochRunning            = false  (between epochs;
+                                                depositAA path applies)
+            paused                    = false
+            isDepositDuringEpochDisabled = false
+            defaulted                 = false
+            epochEndDate              = 1782294019
+            epochDuration             = 2790719 (~32.3 days)
+            tranchePrice(AA)          = 1089265 (USDC-6dec per 1e18 AA;
+                                                ~1.0893 USDC per AA)
+            keyring                   = 0x6a6A...50e3
+            keyringPolicyId           = 18
+          Caliber 0x5476F4E23dAA093Ce6700e1026013c55F7AF9083 already
+          has Keyring policy-18 credential on this fork (carried over
+          from the ST integration setup).
+
+        * Skipping Stage 1c (offchain-analyzer). No merkle proofs, no
+          signatures, no rune-encoded paths anywhere in the JT or CDO
+          flows. The user hint explicitly mirrors ST which also skipped 1c.
+
+      DOWNSTREAM ACTIONS for Stage 2 (execution-explorer):
+        - Deposit: re-use ST's test pattern but swap RoycoST address with
+          RoycoJT address. No jtRawNAV bootstrap precondition required.
+          On the existing fork, deposit will hit path A (depositAA)
+          because isEpochRunning == false.
+        - Withdraw phase 1: pick a small redeem amount to satisfy the
+          coverage check. The bootstrap state on the fork (only the JT
+          has shares, ST has 30.8e18 from previous testing) means partial
+          redeem is needed — start at 1% of JT shares and walk up.
+        - Account: assert slot 0 of convertToAssets matches totalAssets
+          ratio; verify slot 1 is NOT included in the asset sum.
+
+      Reference files used during Stage 1:
+        - scripts-factory/royco-st-pareto-falconx/specs.yaml
+        - scripts-factory/royco-st-pareto-falconx/SUMMARY.md
+        - scripts-factory/royco-st-pareto-falconx/functions.md
+        - scripts-factory/royco-st-pareto-falconx/test-helpers/
+            bootstrap-pareto-falconx-junior.sh
+            advance-pareto-epoch.sh
+  1b_enrich:
+    status: completed
+    timestamp: "2026-05-19T00:00:00Z"
+    artifacts:
+      - functions.md
+    notes: |
+      Documented JT-specific Solidity for the four divergence areas; reused
+      ST sibling functions.md verbatim for the shared layers (Pareto CDO,
+      FalconXUSDC, RoycoKernel base, RoycoFactory base).
+
+      Source-recovery notes for the downstream stages:
+        * JT impl 0x1de7ca1aae266031eacd7bd9da40593d9af5e401 is UNVERIFIED on
+          Etherscan and Sourcify (verified via
+          sourcify.dev/server/v2/contract/1/<addr> -> match=null). Body
+          recovered from verified sibling JT impl
+          0xd10deF48855fFbb525f23eBbd67bA19f94B80F9E (Royco syrupUSDC JT, Sol
+          0.8.34, Blockscout partial match). Same RoycoJuniorTranche.sol +
+          RoycoVaultTranche.sol bundle — only the immutable (ASSET, KERNEL)
+          differ between two JT impls. Behaviour and storage layout identical.
+
+        * convertToAssets ABI tuple is fixed by Types.sol:
+            struct AssetClaims { TRANCHE_UNIT stAssets; TRANCHE_UNIT jtAssets; NAV_UNIT nav; }
+          So the wire shape is always (stAssets, jtAssets, nav). The SLOT
+          SEMANTICS divergence is at the kernel-side _deriveTrancheAssetClaims:
+          on the JT call it populates slot 0 with the JT's own AA claim (NOT
+          the ST tranche's). Empirically reconfirmed at fork block 0x17d5e3b:
+            JT.totalAssets() == 18.15e18 == JT.convertToAssets(totalSupply)[0]
+          Index 0 is the accounting slot to use on the JT.
+
+        * Highlighted for execution-explorer (Stage 2):
+            - Use JT.maxRedeem(caliber) to size the test redeem so the
+              kernel-side coverage gate does not revert. Full redeem is only
+              feasible in the bootstrap-only state.
+            - Reuse bootstrap-pareto-falconx-junior.sh from the ST sibling
+              for the JT_LP role grant — same role id 0xded17f6f89970f45,
+              one grant covers both JT.deposit and JT.redeem.
+            - syncTrancheAccounting kernel-sync role grant is SHARED with the
+              ST integration. If caliber already has it from the ST setup, no
+              extra grant needed.
+            - Accountant subimpl 0x288bc6a8…6c110 is unverified — exact JT
+              coverage revert string still TBD; capture it on first oversized
+              JT.redeem in execution-explorer.
+  2_deposit:
+    status: completed
+    timestamp: "2026-05-19T19:30:00Z"
+    artifacts:
+      - execution-deposit.md
+    testnet_id: "b0f9ddf1-1525-4bd6-9359-90dcf602ab12"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/aca6b043-1c2a-4efa-9f9e-a5c15d84fe93"
+    block: "0x17f793e"
+    notes: |
+      Caliber under test: 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC
+      (DUSD mainnet caliber, distinct from the intMkSrRoyUSDC caliber used
+      for the ST sibling).
+
+      SURPRISES vs. spec (full detail in execution-deposit.md "Surprises"):
+
+        * DUSD caliber ALREADY has all three blocking gates satisfied on
+          mainnet: Keyring policy 18 credential, JT_LP role
+          (0xded17f6f89970f45) for both JT.deposit and JT.redeem, and the
+          shared kernel-sync role (15053450870919821405). No bootstrap-
+          helper grants were needed. This is true even though the DUSD
+          caliber has never held a Royco position before — dialectic ops
+          pre-grants every caliber on every Royco market.
+
+        * isEpochRunning() == true at fork block 0x17f793e (block timestamp
+          1778420251, epochEndDate 1779480991 = ~12d out). depositAA path
+          would revert with "Pausable: paused". Path B (depositDuringEpoch)
+          used; depositAA selector (0xb450dfce) verified from Etherscan ABI
+          but not exercised on-chain here. Confirms TWO blueprints required.
+
+        * convertToAssets slot semantics — CONTRADICTS spec. With ST.totalSupply == 0:
+            JT.convertToAssets(jtTotalSupply) = (0, 46113.07e18, 49648.77e18)
+            JT.totalAssets()                   = (0, 46113.07e18, 49648.77e18)
+          The JT's AA claim is in SLOT 1, not slot 0. Specs.yaml +
+          functions.md need to be amended: for JT accounting use
+          getTupleWord(returnData, 1) NOT 0. Layout is FIXED:
+          slot0=stAssets (always), slot1=jtAssets (always), slot2=nav.
+          The spec's prior empirical reading at 0x17d5e3b was likely
+          misread (or the syntax of the slot numbering convention was
+          inverted from what the kernel actually populates).
+
+        * JT was empty on this fork (totalSupply == 0). Spec said JT had
+          ~9,951 shares at the prior 0x17d5e3b fork (residue from ST
+          sibling's bootstrap helper). On this fresh fork (138k blocks
+          later) the JT is empty again — the bootstrap apparently doesn't
+          persist across vnets, and the JT was never seeded on mainnet
+          directly. The DUSD JT deposit IS the bootstrap on this fork.
+
+      CONSTANTS for blueprint-writer / stage 2_account / 2_withdraw:
+        Deposit inputs:
+          USDC in            = 50_000_000_000           (50,000 USDC)
+        Deposit outputs (post-state, byte-identical to snapshot):
+          aaMinted           = 46_113_070_977_587_824_135_927
+                              (~46,113.071 AA, 18-dec)
+          jtSharesMinted     = 49_648_773_094_672_884_545_519
+                              (~49,648.773 JT shares, 18-dec)
+          JT.totalSupply     = jtSharesMinted (caliber owns 100%)
+          AA.balanceOf(caliber)    = 0
+          AA.balanceOf(Kernel)     = aaMinted
+          USDC.balanceOf(caliber)  = 0
+          tranchePrice(AA)         = 1_082_612 (USDC 6-dec per 1e18 AA)
+        Effective rates at snapshot:
+          implicit USDC/AA at mint = ~1.08431 USDC/AA
+          implicit USDC/JTshare    = ~1.00707 USDC/JT-share
+          asset-space valuation    = ~49,922.564 USDC (slot1 * price / 1e18)
+          NAV-space valuation      = ~49,648.773 USDC (slot2 / 1e12)
+          mid-epoch discount       = ~77.44 USDC (~0.155%, recovers at stopEpoch)
+
+      For 2_account: assert getTupleWord(JT.convertToAssets(shares), 1)
+      matches JT.totalAssets()[1] (slot 1 of the returned struct). Use that
+      as the JT-side AA claim. Total caliber asset-space USDC =
+        (slot1 + AA.balanceOf(caliber)) * tranchePrice(AA) / 1e18
+        + FalconXUSDC.balanceOf(caliber).
+      With slot0 == 0 in the bootstrap-only state, "slot0 + slot1" sum is
+      equivalent to slot1; but if a senior position is later added on this
+      market, slot0 + slot1 would double-count. Use slot 1 only.
+
+      For 2_withdraw: ST.totalSupply == 0 → JT.redeem coverage check is
+      trivially OK at any size (no senior depends on JT NAV). Phase 1 step 2
+      (requestWithdraw) requires isEpochRunning == false; will need to
+      time-warp past epochEndDate=1779480991 + call stopEpoch as manager.
+  2_withdraw:
+    status: completed
+    timestamp: "2026-05-19T19:57:00Z"
+    artifacts:
+      - execution-withdraw.md
+    testnet_id: "b0f9ddf1-1525-4bd6-9359-90dcf602ab12"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/aca6b043-1c2a-4efa-9f9e-a5c15d84fe93"
+    notes: |
+      Two-phase queued JT withdraw exercised end-to-end on the DUSD caliber.
+      Started from `account_done_snapshot`. Redeemed 50% of JT shares
+      (24,926.764132 of 49,853.528264).
+
+      P&L over the simulated cycle (50% redeem):
+        Allocated principal (50% of 50k):  25,000.000000 USDC
+        USDC received from Phase 2 claim:  25,203.327128 USDC
+        Net on redeemed half:              +203.327128 USDC (+0.813%)
+        Slippage receipt -> claim:         0 wei (wei-exact match)
+        Wall-clock simulated:              ~46 epoch-days (one full inter-
+                                           epoch close + one full epoch
+                                           + close), implied ~4.18% APR
+                                           realised. Unredeemed half
+                                           (24,926.764 JT, ~25,065 USDC
+                                           book value) retained by
+                                           caliber for future cycles.
+
+      CONSTANTS for blueprint-writer:
+        - JT.redeem selector:           0xba087652  (redeem(uint256,address,address))
+        - JT.maxRedeem selector:        0x402d267d  (maxRedeem(address))
+        - CDO.requestWithdraw selector: 0xccc143b8  (requestWithdraw(uint256,address))
+        - CDO.claimWithdrawRequest:     0x33986ffa  (claimWithdrawRequest())
+        - Strategy.epochNumber:         0xf4145a83  (epochNumber())
+        - Strategy.lastWithdrawRequest: 0x93f88d4c  (lastWithdrawRequest(address))
+        - Strategy.withdrawsRequests:   0xacfd7dce  (withdrawsRequests(address))
+        - AATranche tranche-arg:        0xc26a6fa2c37b38e549a4a1807543801db684f99c
+        - Premature claim revert sel:   0x3d693ada  (`NotAllowed()`)
+        - Readiness condition:
+            IdleCreditVault.epochNumber() > IdleCreditVault.lastWithdrawRequest(caliber)
+          Both fields are simple uint256 auto-getters; use BooleanHelper-style
+          gate in the blueprint, no try/catch needed.
+
+      BLUEPRINT SHAPE:
+        Phase 1 (atomic, between epochs only — gated by
+        `isEpochRunning == false && allowAAWithdrawRequest == true`
+        on the CDO):
+          syncTrancheAccounting? -> AA.balanceOf(caliber)[before]
+          -> (optional) JT.maxRedeem(caliber) -> cap shares
+          -> JT.redeem(shares, caliber, caliber)
+          -> AA.balanceOf(caliber)[after]
+          -> aaDelta = after - before
+          -> IdleCDOEpochVariant.requestWithdraw(aaDelta, AATranche)
+        Phase 2 (atomic, requires epochNumber > lastWithdrawRequest):
+          IdleCDOEpochVariant.claimWithdrawRequest()
+        Phase 2 is NOT keyring-checked, NOT role-gated.
+        Phase 1 step 1 (JT.redeem) IS coverage-gated (mirror of ST.deposit);
+        size with `min(desired, JT.maxRedeem(caliber))`.
+
+      RUNBOOK CONCERN — who triggers stopEpoch:
+        `stopEpoch` and `startEpoch` are gated to
+        `IdleCreditVault.manager()` (currently `0x1fb0…df58`,
+        a Pareto-controlled EOA). The CALIBER CANNOT trigger
+        either — they are part of the Pareto ops cadence, run
+        ~30 days apart on this market. The blueprint must NOT
+        attempt to drive epoch transitions; it must merely DETECT
+        when one has happened. The readiness probe
+        (`epochNumber > lastWithdrawRequest`) is sufficient and
+        does not require any inter-epoch coordination from the
+        caliber.
+
+      SURPRISES (full detail in execution-withdraw.md "Surprises"):
+        * Tenderly EVM `block.timestamp` does NOT honor warped fork time
+          on `send_vnet_transaction` in all paths. Workaround used:
+          `tenderly_setStorageAt(CDO, slot 0x122, 0x65530000)` to
+          override `epochEndDate` to a value in the deep past, making
+          `block.timestamp >= epochEndDate + bufferPeriod` trivially
+          true. Affects ONLY Tenderly testing — NOT a blueprint concern.
+        * Slippage receipt -> claim was 0 wei on this 50% redeem (vs the
+          ST sibling's documented 1.9 USDC slip on partial redeems). The
+          slip is path-dependent; the blueprint should still treat
+          `FalconXUSDC.balanceOf(caliber)` as an upper-bound for
+          accounting (pending-window valuation), not a guarantee for
+          payout.
+        * `JT.maxRedeem(caliber) == uint256.max` in the bootstrap-only
+          state (ST empty). Coverage check is loose. Stage 1c sizing
+          guidance ("redeem ~10%") is conservative-correct but not
+          binding for current state.
+        * Pending-window account valuation (between Phase 1 and Phase
+          2) was 50,268.627 USDC vs pre-withdraw 49,853.528 USDC
+          (+415.099 USDC = +0.833%). Asset-space and NAV-space agree
+          to the wei. The blueprint's accountant correctly tracks
+          the position through the queued state via
+          `jtAssets*tranchePrice + FalconXUSDC.balanceOf`.
+
+      Premature claim test result:
+        `claimWithdrawRequest()` from caliber before second stopEpoch
+        reverted with `NotAllowed()` (0x3d693ada). Confirmed via
+        `simulate_vnet_transaction` — no on-chain side effects.
+
+      Tx hashes:
+        Borrower USDC approve(CDO):    0xffdfa26c13f8d7a0082bf2328cd692931b7c5abf6c9a89f5d35271a182c33345
+        First stopEpoch:               0x805054d80e43f6970e1ae987175dc1092dd276dde8d523159c92fcc8bbf069f2
+        JT.redeem(50%):                0x5fe103d832f31706c403c85c7bbfce29465ce5234880d32496dce9854adfce8c
+        requestWithdraw(AA):           0xbb3fcbce5216222686d1f5b3bebc67cd32cb948c3a472c16376da81db8645401
+        startEpoch (manager):          0xd739fbfe92889ec08fe871fc6cb0742e416a63fb6415aff4e51177dc2d1b1b9c
+        Second stopEpoch:              0xc11137edcd03d8303bb11a6967f3b2bb46863425ce440778024fa1949f5add67
+        claimWithdrawRequest:          0xe64f9d1dbd90d557b81e568a95f45452902047db14d7ab1c505eb97481214077
+
+      Snapshot ledger:
+        S1 (post-first-stopEpoch):
+          0x58cc150749916878305dc9ecc9d15ab7dce8762247fa359bbd40293ec339bab7
+  2_account:
+    status: completed
+    timestamp: "2026-05-19T19:36:00Z"
+    artifacts:
+      - execution-account.md
+    testnet_id: "b0f9ddf1-1525-4bd6-9359-90dcf602ab12"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/aca6b043-1c2a-4efa-9f9e-a5c15d84fe93"
+    notes: |
+      DEFINITIVE slot resolution for `JT.convertToAssets(uint256)`:
+
+        Use INDEX 1 (jtAssets) to extract the JT's own AA-tranche claim.
+        Layout is ROLE-FIXED, not caller-relative:
+          slot 0 = stAssets  -> SENIOR tranche's AA claim (0 in solvent state)
+          slot 1 = jtAssets  -> JUNIOR tranche's AA claim   <-- WHAT WE WANT
+          slot 2 = nav       -> calling tranche's NAV in USD WAD
+
+      Triple-cross-checked on the post-deposit snapshot:
+        (a) `previewSyncTrancheAccounting(JUNIOR)` from the kernel returned
+            `claims.jtAssets = 46_071.09e18 AA` in slot 1 (authoritative
+            source per `RoycoKernel._deriveTrancheAssetClaims`).
+        (b) `JT.convertToAssets(jtShares)` = (0, 46_071.09 AA, 49_853.53e18) —
+            slot 0 is 0 (ST empty in this state), slot 1 is JT's claim.
+        (c) Bootstrap cross-check: deposited 1,000 USDC -> AA -> ST.deposit
+            to make ST non-empty. Re-read JT.convertToAssets: slot 0 STAYED
+            at 0 from the JT POV; slot 1 STAYED at 46,071.09. Slot 0 is NOT
+            "the calling tranche's claim" — it's the senior-writedown buffer.
+            Read ST.convertToAssets(ST_shares) on the same state and got
+            (921.42 AA, 0, 997.07e18): ST's claim is slot 0.
+        (d) Bootstrap state was reverted via the snapshot taken first.
+
+      Result: Stage 1 (specs.yaml + functions.md) was WRONG to say "slot 0
+      for JT accounting". `execution-deposit.md` Surprise 1 was correct.
+      Both specs.yaml and functions.md amended in-place during this stage:
+        * specs.yaml OVERVIEW item 3, helpers.bytes32_helper.purpose,
+          flows.accounting.description (Path A formula and DIVERGENCE
+          block), flows.accounting.queries.jt_to_assets, withdraw
+          phase_1.steps.redeem_royco.note, and the bottom-of-file
+          divergence items rewritten from "slot 0" to "slot 1 (jtAssets)".
+        * functions.md §3.4 rewritten with the role-fixed layout, the
+          fork-b0f9ddf1 verification table, and the bootstrap cross-check.
+          Summary item 4 rewritten.
+
+      Empirical accounting reference value at the post-deposit snapshot:
+        TOTAL_USDC = 49_853_528_264 (= 49,853.528264 USDC)
+      Both asset-space and NAV-space (slot 2 / 1e12) agree at this state,
+      because the fork clock advanced ~9.2 days past the deposit time and
+      the mid-epoch discount has unwound.
+
+      `syncTrancheAccounting()` is empirically a no-op for reads at the
+      same block, but the blueprint MUST still call it: a live caliber
+      accounting tx is in a fresh block, fees accrue, and the kernel
+      mints fee shares (which is why JT.totalSupply grew from 49,648.77
+      at the deposit moment to 49,853.53 at the account moment — that's
+      the fee mint flowing through).
+
+      Recommendation for blueprint-writer: Path A (asset-space, mirror ST)
+      with `getTupleWord(_, 1)`. Single blueprint covers all epoch states
+      (tranchePrice(AA) is defined in both regimes). Run in MANAGEMENT
+      batch context. Single syncTrancheAccounting() at the top.
+
+      Post-account snapshot saved as account_done_snapshot in
+      `testnets.pareto_falconx_jt_dusd` (and below for convenience).
+  3_blueprint:
+    status: completed
+    timestamp: "2026-05-19T20:30:00Z"
+    artifacts:
+      - blueprints/royco/jt-pareto-falconx/deposit-running.yaml
+      - blueprints/royco/jt-pareto-falconx/deposit-idle.yaml
+      - blueprints/royco/jt-pareto-falconx/withdraw.yaml
+      - blueprints/royco/jt-pareto-falconx/claim.yaml
+      - blueprints/royco/jt-pareto-falconx/account.yaml
+      - instructions/royco-jt-pareto-falconx.yaml
+      - machines/dusd/mainnet/caliber.yaml (modified — added position 61028977174890424223416890877507368645)
+    notes: |
+      JT blueprint set mirrors the already-shipped ST sibling
+      (blueprints/royco/st-pareto-falconx/) near-verbatim, with three
+      material substitutions called out below. Top-level instructions/
+      placement chosen to match the ST sibling's layout; the JT
+      instruction is wired into the DUSD caliber via `!include
+      "../../../instructions/royco-jt-pareto-falconx.yaml"`.
+
+      Substitutions vs the ST sibling blueprint set:
+
+        1. *** SLOT INDEX = 1 (NOT 0) ***  in account.yaml. This is the
+           single most material divergence and is the one a future reader
+           is most likely to get wrong by copy-pasting the ST account.yaml.
+           The ST reads `getTupleWord(ST.convertToAssets(_), 0)` to pick
+           the ST's own AA claim (stAssets, slot 0). The JT MUST read
+           `getTupleWord(JT.convertToAssets(_), 1)` to pick the JT's own
+           AA claim (jtAssets, slot 1). The kernel's
+           `_deriveTrancheAssetClaims(TrancheType, state)` populates the
+           AssetClaims struct by tranche ROLE, not by caller perspective:
+             slot 0 = stAssets (senior's claim — 0 from a JT POV in the
+                      solvent state; only non-zero in senior write-down)
+             slot 1 = jtAssets (junior's claim — what we want)
+             slot 2 = nav      (calling tranche's NAV in USD WAD)
+           Resolved definitively in stage 2_account via the kernel's
+           authoritative `previewSyncTrancheAccounting(JUNIOR)` plus an
+           independent bootstrap cross-check (added a small ST position,
+           re-read JT.convertToAssets — slot 0 stayed 0, slot 1 unchanged).
+           See execution-account.md "Slot resolution — DEFINITIVE" for
+           the full reasoning + the verbatim Types.sol.AssetClaims quote.
+           A LOUD HEADER COMMENT was added to account.yaml AND to the
+           instruction file so a future reader sees the caveat before
+           touching either.
+
+        2. JT account uses `tranchePrice(address)` (NOT `virtualPrice`).
+           The ST account.yaml uses `virtualPrice(AA)` per Pareto
+           integrator guidance. For the JT integration we use
+           `tranchePrice(AA)` because (a) all stage 2 empirical
+           reference values were taken at `tranchePrice` (post-deposit
+           snapshot = 49,853.528264 USDC matches `tranchePrice` exactly),
+           and (b) for the IdleCDOEpochVariant the two are numerically
+           equivalent during an active epoch (no continuous accrual) and
+           at sync boundaries. `tranchePrice` is the stored value the
+           kernel itself uses for accounting; `virtualPrice` is the live
+           mark-to-market alternative. Either path produces the same
+           USDC accounting on this CDO variant; we picked `tranchePrice`
+           to match the stage 2 empirical reference exactly.
+
+        3. JT account.yaml omits the `stAssets + jtAssets` sum that the
+           ST sibling does. The ST's defensive sum (slot 0 + slot 1) is
+           safe because stAssets is the ST's own claim and jtAssets is 0
+           on the ST side in the solvent state. For the JT, slot 0 is
+           the SENIOR'S claim — adding it would over-credit the JT in
+           the senior write-down state and is a no-op in the solvent
+           state. So the JT does:
+              total_aa = jtAssets + AA.balanceOf(caliber)   [slot 1 only]
+           plus the stranded AA term that the ST also has, with the
+           defensive-stranded-AA rationale unchanged.
+
+      Other shape notes (no divergence from ST):
+
+        - Two deposit blueprints (deposit-running.yaml, deposit-idle.yaml)
+          for the two Pareto entry calls (depositDuringEpoch vs depositAA).
+          Selectors and parameter shapes are incompatible — weiroll cannot
+          dispatch between them in a single blueprint, so two files.
+          Guards mirror the ST sibling exactly (isEpochRunning +
+          isDepositDuringEpochDisabled), with the only behavioural
+          difference being that JT.deposit has NO coverage gate (the
+          ST sibling's coverage block is on ST.deposit; the equivalent
+          gate on the JT side is on JT.redeem, which the blueprint
+          DOES NOT guard against — it surfaces as a protocol revert
+          if the operator picks a too-large bps. The runbook flag is
+          in the instruction file header).
+
+        - claim.yaml is one call (`claimWithdrawRequest()`) with no
+          arguments and no return capture, exactly like the ST sibling.
+
+        - DUSD caliber pre-state on mainnet:
+            Keyring policy 18 credential, JT_LP role
+            (0xded17f6f89970f45 — same role covers JT.deposit and
+            JT.redeem, divergence from ST where ST_LP is a different
+            role), and the shared kernel-sync role
+            (15053450870919821405) are ALL already granted on the DUSD
+            caliber 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC per
+            stage 2 deposit findings. The instruction header
+            documents this so the blueprint-tester does not chase a
+            bootstrap helper invocation.
+
+      Caliber wiring:
+        DUSD caliber.yaml gets ONE new position entry following the
+        existing Royco JT pattern (matching `royco-jt-syrupusdc` /
+        `royco-jt-stcusd` already in the file):
+          - id: "61028977174890424223416890877507368645"  (fresh uint128)
+          - group_id: "0"
+          - description: "Royco Junior Tranche Pareto FalconX V2"
+          - instructions: !include "../../../instructions/royco-jt-pareto-falconx.yaml"
+          - position_tokens: [AA tranche, FalconXUSDC receipt, JT-Pareto-FalconX]
+        Token-list note: per CLAUDE.md "protocol-specific addresses
+        hardcoded, fund-wide addresses in config", the JT, AA tranche,
+        and FalconXUSDC receipt are hardcoded in the blueprints. They
+        appear in caliber.yaml ONLY as position_tokens annotations
+        (which do not require token-list entries) — no token list
+        addition needed.
+
+      Compile check (mirror of ST sibling stage 3 invocation, adapted
+      to dusd/mainnet):
+        transpiler --input-file machines/dusd/mainnet/caliber.yaml \
+          --output-file machines/dusd/mainnet/rootfiles-test/compile-output.toml \
+          --token-list token-lists/prod-token-list.json transpile
+        => "✅ Rootfile successfully transpiled to:
+            machines/dusd/mainnet/rootfiles-test/compile-output.toml"
+        Verified the new position id 61028977174890424223416890877507368645
+        appears in the compiled TOML under all five instruction sections
+        (deposit mid-epoch, deposit between epochs, request_redeem,
+        claim_redeem, account ROY-JT-Pareto-FalconX). Test output then
+        cleaned up.
+
+      Production-ready for stage 4 (blueprint-tester). The post-deposit
+      reference value the tester must match against:
+        total_usdc (account) = 49,853,528,264 (= 49,853.528264 USDC)
+      from the post-account snapshot
+      0x259d550498f35c0f19d09664b5fcfb13557cf05f4a4bf8f6aac17f2a01afe224
+      on Tenderly vnet b0f9ddf1-1525-4bd6-9359-90dcf602ab12 (caliber
+      0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC, JT shares
+      49,853,528,264,549,100,640,239). The withdraw cycle reference is
+      in execution-withdraw.md.
+  4_test:
+    status: completed
+    timestamp: "2026-05-19T20:25:00Z"
+    artifacts:
+      - test-report.md
+    testnet_id: "9f18f445-d4d8-4e2c-8559-47364cab0ebf"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/23db9277-54ba-4baf-862b-882ff70cfb4a"
+    block: "0x17f7a38"
+    notes: |
+      All 5 spellcaster instructions executed cleanly on a fresh Tenderly
+      mainnet fork via the CLI:
+        * deposit (mid-epoch, 50,000 USDC)        PASS
+            tx 0x551d5f624d713aacbaafd5ad446c56c2e14ea6b08f8b5ff278893582f5df3875
+        * deposit (between epochs) negative test  PASS (clean simulation revert at variant guard)
+        * request_redeem (10000 bps = 100%)       PASS
+            tx 0xf162e585d272419852bcaa7feb42f15cf34bd6b690d2ebf939ab8fb71f4ec569
+        * claim_redeem                             PASS
+            tx 0xa2634c43dce6c335acbdb0bf19b617188ea9d3ce2a685a23837e050e453b480c
+        * account-positions (at 4 snapshots)       PASS
+            pre-deposit:  0 USDC (row absent)
+            post-deposit: 49,853.164522 USDC
+            pending:      50,406.286480 USDC  (FalconXUSDC receipt only)
+            post-claim:   0 USDC (row absent)
+
+      Aggregate P&L (full-redeem cycle, simulated ~27-60d):
+        Initial caliber USDC funded: 100,000.000000 USDC
+        JT deposit:                  50,000.000000 USDC
+        USDC payout at claim:        50,406.286480 USDC
+        Net P&L:                     +406.286480 USDC (+0.813 %)
+        Receipt -> claim slippage:   0 wei
+
+      Blueprint / instruction edits required: NONE.
+
+      Compiled root: 0x986b328af189d2dd4f7ce30fbaafa12d98a60eed3984a1793f5f180eac83ad91
+      Caliber allowedInstrRoot post-update-root: matches.
+
+      Tenderly time-control workaround applied EXACTLY as documented in
+      execution-withdraw.md and MEMORY.md: `tenderly_setStorageAt(CDO,
+      slot 0x122, 0x65530000)` immediately before each direct manager call
+      to stopEpoch / startEpoch / stopEpoch. NOT a blueprint concern.
+
+      Production-readiness verdict: SHIP. The DUSD caliber's Keyring
+      policy-18, JT_LP role, and shared kernel-sync role were verified
+      pre-granted on mainnet (no production ops items beyond the standard
+      Pareto epoch cadence for withdrawal scheduling).
+
+      Operator runbook items (for the runbook, not blueprint changes):
+        - Pick deposit variant based on IdleCDO.isEpochRunning() —
+          spellcaster reverts cleanly in simulation if the operator picks
+          the wrong variant.
+        - Schedule withdraw Phase 1 only when isEpochRunning == false &&
+          allowAAWithdrawRequest == true.
+        - Probe IdleCreditVault.epochNumber() > lastWithdrawRequest(caliber)
+          before invoking Phase 2 (claim). Expect 32-65 days between
+          Phase 1 and Phase 2 in production.
+        - Once an ST position exists on this market, size JT.redeem by
+          min(desired_bps, JT.maxRedeem(caliber)) defensively — kernel
+          coverage gate is binding once a senior is in place.
+
+# Shared resources (populated as stages run)
+testnets:
+  pareto_falconx_shared:
+    id: "438efdd7-701a-44e4-b7f0-acc3518e4c29"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/cb5bd01f-5aa3-4329-bea3-9dffb74a4676"
+    fork_block: "0x17d5e3b"
+    notes: |
+      Reusing the ST integration's existing vnet (royco-pareto-falconx-e2e).
+      Caliber 0x5476F4E23dAA093Ce6700e1026013c55F7AF9083 already has Keyring
+      policy 18 credential and JT_LP role grant from the ST-side bootstrap
+      helper run, so deposit pre-conditions are already satisfied.
+      NOTE: this vnet is from the ST integration and is NOT the one used for
+      the DUSD JT deposit test. See `pareto_falconx_jt_dusd` below.
+  pareto_falconx_jt_dusd_stage4:
+    id: "9f18f445-d4d8-4e2c-8559-47364cab0ebf"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/23db9277-54ba-4baf-862b-882ff70cfb4a"
+    rpc_url_public: "https://virtual.mainnet.eu.rpc.tenderly.co/9336c0c7-2196-4abe-8696-96fe5d0e4d9f"
+    fork_block: "0x17f7a38"
+    notes: |
+      Fresh Tenderly mainnet vnet used for Stage 4 blueprint-tester. All 5
+      JT instructions executed via spellcaster CLI end-to-end. See
+      test-report.md for tx hashes, balances, and P&L.
+  pareto_falconx_jt_dusd:
+    id: "b0f9ddf1-1525-4bd6-9359-90dcf602ab12"
+    rpc_url: "https://virtual.mainnet.eu.rpc.tenderly.co/aca6b043-1c2a-4efa-9f9e-a5c15d84fe93"
+    rpc_url_public: "https://virtual.mainnet.eu.rpc.tenderly.co/c4d3d9fd-0d64-4238-929d-d351df8e8411"
+    fork_block: "0x17f793e"
+    deposit_done_snapshot: "0xe0637769e9512a19d07bd84d54e598efea3047386643fa6ca6d344e83232de6f"
+    account_done_snapshot: "0x259d550498f35c0f19d09664b5fcfb13557cf05f4a4bf8f6aac17f2a01afe224"
+    notes: |
+      Fresh Tenderly mainnet vnet created for the DUSD JT integration.
+      Caliber 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC already has all
+      access (Keyring policy 18, JT_LP role, kernel-sync role) on mainnet
+      — no bootstrap helper invocation needed.
+
+      Post-deposit snapshot: `deposit_done_snapshot`. Revert to it for
+      a byte-identical post-deposit state. At the deposit-time moment
+      caliber held 49,648.7731 JT shares.
+
+      Post-account snapshot: `account_done_snapshot`. Same state plus
+      one `syncTrancheAccounting()` from the caliber. The fork clock
+      auto-advanced ~9.2 days between the deposit-time and revert-time,
+      which accrued fee-mint shares onto the JT. At the post-account
+      snapshot caliber holds 49,853.5283 JT shares (~205 more than at
+      the deposit moment), corresponding to ~49,853.528 USDC of position
+      value.

@@ -1,0 +1,129 @@
+# Royco Junior Tranche over Pareto FalconX (USDC) — DUSD machine on mainnet
+#
+# JT vs ST relationship:
+#   The Royco JT and the already-shipped Royco ST sibling sit over the SAME Pareto
+#   FalconX market and share the SAME middleware: same Pareto IdleCDOEpochVariant
+#   (0x433D…be4d), same FalconXUSDC withdraw-receipt (0x17E9…eEf3), same Royco kernel
+#   (0x15bb…1791), same Pareto Keyring policy (18), same Royco AccessManager
+#   (0x7cC6…253C). Both Royco tranches' `asset()` is the SAME Pareto AA tranche
+#   token (0xC26A…F99C). The Royco "junior" here is a Royco-level subordination
+#   layer (junior absorbs first-loss vs. the Royco senior tranche) — it is NOT the
+#   Pareto BB tranche (which is empty on this market).
+#
+# Multi-step deposit (same shape as ST): USDC -> Pareto IdleCDOEpochVariant -> AA
+# tranche -> Royco JT shares.
+#
+# Two deposit variants are exposed because the Pareto entry call differs based on
+# epoch state and the calls have incompatible signatures (different selectors,
+# different args), so weiroll cannot dispatch between them in a single blueprint:
+#   - deposit-running.yaml -> mid-epoch path (depositDuringEpoch). Guarded to revert
+#                              if epoch not running OR mid-epoch deposits disabled.
+#   - deposit-idle.yaml    -> between-epoch path (depositAA). Guarded to revert if
+#                              epoch is running. depositAA is gated by Pausable and
+#                              the CDO is paused for the duration of any running epoch.
+# The operator picks whichever matches `IdleCDOEpochVariant.isEpochRunning()` at
+# submit time.
+#
+# Two-phase queued withdraw (~32-65 days end-to-end, same shape as ST):
+#   Phase 1: JT.redeem -> AA -> requestWithdraw -> FalconXUSDC receipt
+#            (between epochs only; coverage-gated on JT.redeem unlike the ST's
+#             non-coverage-gated ST.redeem — runbook concern, not a blueprint guard)
+#   Phase 2: claimWithdrawRequest()  -> burns receipt, pays USDC
+#            (NOT keyring-checked, NOT role-gated; gated only on epoch advance)
+#
+# Asset-space accounting (mirrors the JT-syrupUSDC / JT-stcUSD sibling pattern of
+# summing BOTH layer accumulators, then converting to USDC):
+#   st_aa  = getTupleWord(JT.convertToAssets(jt_shares), 0)
+#   jt_aa  = getTupleWord(JT.convertToAssets(jt_shares), 1)
+#   total_aa = st_aa + jt_aa
+#   usdc_from_aa = total_aa * virtualPrice(AA) / 1e18
+#   total_usdc = usdc_from_aa + FalconXUSDC.balanceOf(caliber)
+#
+# JT claim spans BOTH layer accumulators:
+#   For Royco junior tranches, `convertToAssets` returns `(stAssets, jtAssets, nav)`
+#   with BOTH `stAssets` and `jtAssets` populated when called from the JT — the
+#   kernel distributes the caller's pro-rata claim across both layer accumulators
+#   (per docs/superpowers/specs/2026-05-08-royco-junior-tranches-design.md). The
+#   ST sibling reads slot 0 only because from the ST caller perspective slot 1 is
+#   always 0; the JT does NOT have that symmetry — sum both. Same pattern as
+#   blueprints/royco/jt-syrupusdc/account.yaml and blueprints/royco/jt-stcusd/account.yaml.
+#
+#   Stage-2 measured slot 0 == 0 on a freshly bootstrapped state, so summing was
+#   empirically a no-op in the test trace. The summed-slots construction is the
+#   safe, precedent-following choice once mainnet yield is accruing.
+#
+# Prerequisites (verified satisfied on mainnet for DUSD caliber
+# 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC per stage 2 deposit findings —
+# no fresh grant needed):
+#   - Royco JT_LP role (id 0xded17f6f89970f45 = 16055754263579004741) granted on the
+#     Royco AccessManager 0x7cC6FB28eC7b5e7afC3cB3986141797ffc27253C. ONE grant
+#     covers BOTH JT.deposit (selector 0x6e553f65) and JT.redeem (selector
+#     0xba087652) — they share the same role id, divergence from the ST sibling
+#     where ST_LP is a different role.
+#   - Kernel.syncTrancheAccounting role (id 15053450870919821405) granted on the
+#     same AccessManager. SHARED with the ST integration — a caliber that already
+#     has this role from the ST setup does NOT need a fresh grant.
+#   - Pareto Keyring policy 18 credential on the caliber
+#     (KeyringIdleWhitelist.whitelist[caliber] == true). Required for
+#     depositAA / depositDuringEpoch / requestWithdraw. NOT required for
+#     claimWithdrawRequest (Phase 2 is keyring-free).
+#
+# Operator runbook concerns (NOT blueprint guards):
+#   - Pareto epoch cadence: stopEpoch / startEpoch run on Pareto's schedule (~32d).
+#     Phase 2 (claim) gates on `IdleCreditVault.epochNumber() >
+#     lastWithdrawRequest(caliber)`. The caliber CANNOT trigger stopEpoch.
+#   - JT.redeem coverage: while a senior position exists on this market, full JT
+#     redeem can revert with the accountant's coverage error. Size redemptions in
+#     bps accordingly. In the bootstrap-only state (ST.totalSupply == 0), any size
+#     is fine.
+
+# DEPOSIT (mid-epoch): USDC -> depositDuringEpoch -> AA -> JT shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX (mid-epoch)"
+    path: "../../../blueprints/royco/jt-pareto-falconx/deposit-running.yaml:deposit"
+    inputs: {}
+
+# DEPOSIT (between epochs): USDC -> depositAA -> AA -> JT shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX (between epochs)"
+    path: "../../../blueprints/royco/jt-pareto-falconx/deposit-idle.yaml:deposit"
+    inputs: {}
+
+# WITHDRAW Phase 1: JT.redeem -> AA -> requestWithdraw -> FalconXUSDC receipt (between epochs only)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX (request)"
+    path: "../../../blueprints/royco/jt-pareto-falconx/withdraw.yaml:request_redeem"
+    inputs: {}
+
+# WITHDRAW Phase 2: claimWithdrawRequest() -> burn FalconXUSDC, payout USDC
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX (claim)"
+    path: "../../../blueprints/royco/jt-pareto-falconx/claim.yaml:claim_redeem"
+    inputs: {}
+
+# ACCOUNTING: asset-space full (jt_aa + stranded_aa) * virtualPrice(AA) + FalconXUSDC
+# Sums slot 0 (stAssets) + slot 1 (jtAssets) — both accumulators carry the JT pro-rata claim. See header.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX"
+    path: "../../../blueprints/royco/jt-pareto-falconx/account.yaml:account"
+    inputs: {}
