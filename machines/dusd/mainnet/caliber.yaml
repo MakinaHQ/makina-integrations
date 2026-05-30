@@ -180,6 +180,15 @@ positions:
       label: "Sentora PYUSD"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+  - id: "244003111842323732524710741252875629950"
+    group_id: "0"
+    description: "Morpho Vault PYUSD Sentora PRIME Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"]
+    vars:
+      label: "Sentora PRIME Main PYUSD"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"
 
   # ── Morpho Vault AUSD ──────────────────────────────────────────────
   - id: "208384069883257652684922644584564420340"
@@ -389,3 +398,11 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+  - id: "330570121219840820532089219331590988878"
+    group_id: "0"
+    description: "Royco Junior Tranche Pareto FalconX V2"
+    instructions: !include "../../../instructions/royco-jt-pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
+      - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX

@@ -1,0 +1,38 @@
+protocol: "royco-jt-pareto-falconx"
+
+# Royco Junior Tranche over Pareto FalconX — Withdraw Phase 2 (claim_redeem)
+#
+# This is the SECOND of TWO non-atomic phases. Phase 1 (`withdraw.yaml`) issued the
+# `requestWithdraw` and credited the caliber a FalconXUSDC receipt token. This phase
+# burns that receipt and pays out USDC to the caliber.
+#
+# Phase 2 flow:
+#   1. IdleCDOEpochVariant.claimWithdrawRequest()
+#        -> burns the caliber's entire FalconXUSDC receipt
+#        -> transfers USDC to the caliber
+#
+# Readiness preconditions (revert with `NotAllowed()` 0x3d693ada if missed):
+#   - At least one full Pareto epoch + buffer has elapsed since requestWithdraw, AND
+#     the manager has called stopEpoch (which advances IdleCreditVault.epochNumber).
+#   - Equivalent runtime check the caller can use:
+#       IdleCreditVault.epochNumber() > IdleCreditVault.lastWithdrawRequest(caliber)
+#   - Caliber holds a non-zero FalconXUSDC receipt (i.e. Phase 1 actually ran).
+#
+# Identical to blueprints/royco/st-pareto-falconx/claim.yaml: Phase 2 of the queued
+# withdraw is shared between ST and JT — the receipt is held by the caliber, not the
+# tranche, and the CDO doesn't care which Royco tranche fed the request.
+
+constants:
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+
+inputs: {}
+
+actions:
+  claim_redeem:
+    calls:
+      - description: "Claim queued Pareto withdraw: burns FalconXUSDC receipt and pays out USDC"
+        target: "${constants.cdo_address}"
+        selector: "claimWithdrawRequest()"
+        parameters: []
