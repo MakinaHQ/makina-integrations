@@ -227,8 +227,19 @@ positions:
   - id: "257907866263469253975271928750178105060"
     group_id: "0"
     description: "Makina DUSD"
-    instructions: !include "./instructions/makina-dusd.yaml"
+    instructions: !include "../../../instructions/makina.yaml"
     position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"]
+    vars:
+      label: "DUSD"
+      machine_token: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"
+      machine: "0x6b006870C83b1Cd49E766Ac9209f8d68763Df721"
+      depositor: "0x94B1828F91c150C5E6776198e170aCa4304903d7"
+      redeemer: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c"
+      accounting_token: ${token_list.mainnet.USDC}
+      # keccak256("makina.mainnet.dusd.redemption_request_id")
+      redemption_request_id_key: "0x8134214dae542e89e9da9bf898cce9ad9d0bd9a3c9c8bc487ebc62a4e916fd3d"
+      # keccak256("makina.mainnet.dusd.pending_redemption_share_amount")
+      pending_redemption_share_amount_key: "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef"
 
   # ── Morpho Borrow cbBTC/USDC (group_id: 3) ────────────────────────
   - id: "332394650277740717569616982865246707996"
