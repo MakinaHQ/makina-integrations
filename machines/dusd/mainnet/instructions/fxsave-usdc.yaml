@@ -1,0 +1,165 @@
+# fxSAVE (f(x) Protocol USD savings) — refreshed to the current f(x) contracts
+# (direct fxSP/fxSAVE calls; the legacy diamond + converter deposit path is gone).
+#
+# IN  (deposit): USDC only — USDC -> fxSP -> fxSAVE atomically.
+# OUT (claim / instant_withdraw): fxSP redeems to a PRO-RATA slice of the pool's two
+#   assets, fxUSD + USDC (currently ~92% fxUSD by value). There is no USDC-only exit —
+#   the pool sets the split. Consolidate fxUSD -> USDC downstream (swap_module) if wanted.
+# Exit paths: async request_redeem(_relative) -> wait ~1h cooldown -> claim (fee-free),
+#   OR instant_withdraw(_relative) (no cooldown, ~1% fee). Each has absolute + bps variants.
+# Position valued in (fxUSD, USDC) via the OracleRegistry (both are dusd base tokens).
+#
+# fxSP  (FxUSDBasePool): 0x65C9A641afCEB9C0E6034e558A319488FA0FA3be
+# fxSAVE (SavingFxUSD) : 0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39
+
+# ── DEPOSIT: USDC -> fxSP -> fxSAVE ───────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC} # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/deposit.yaml:deposit"
+    inputs:
+      usdc_address:
+        type: "address"
+        value: ${token_list.mainnet.USDC}
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── ACCOUNTING: total fxSP (wrapped in fxSAVE + held in caliber) -> (fxUSD, USDC) ──
+# held = fxSP.balanceOf, which already includes any cooldown-reserved fxSP (requestRedeem
+# reserves, does not move it) — so there is NO separate in-flight term (would double-count).
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.fxUSD} # fxUSD  (reserved_slot 0)
+    - ${token_list.mainnet.USDC} # USDC   (reserved_slot 1)
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/account.yaml:account"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# ── WITHDRAW (async step 1): fxSAVE -> fxSP -> requestRedeem (cooldown) ────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # fxSAVE->fxSP stays in the caliber (requestRedeem reserves, doesn't move it); position value unchanged, no base token moves
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:request_redeem"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (async step 1, relative): bps of fxSAVE balance -> requestRedeem ──
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # fxSAVE->fxSP stays in the caliber (requestRedeem reserves, doesn't move it); position value unchanged, no base token moves
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:request_redeem_relative"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# ── WITHDRAW (async step 2): claim matured request -> fxUSD + USDC ────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.fxUSD} # fxUSD
+    - ${token_list.mainnet.USDC} # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:claim"
+    inputs:
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+# ── WITHDRAW (instant): fxSAVE -> fxSP -> instantRedeem -> fxUSD + USDC ────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.fxUSD} # fxUSD
+    - ${token_list.mainnet.USDC} # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:instant_withdraw"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (instant, relative): bps of fxSAVE balance -> instantRedeem ──
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.fxUSD} # fxUSD
+    - ${token_list.mainnet.USDC} # USDC
+  instruction:
+    label: "fxSAVE"
+    path: "../../../blueprints/fxsave/withdraw.yaml:instant_withdraw_relative"
+    inputs:
+      fx_save_address:
+        type: "address"
+        value: "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39"
+      fx_sp_address:
+        type: "address"
+        value: "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

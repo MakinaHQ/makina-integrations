@@ -1,53 +1,76 @@
 protocol: "fxSAVE"
 
+# fxSAVE (f(x) Protocol USD savings) deposit — USDC -> fxSP -> fxSAVE.
+#
+# Architecture (verified mainnet 2026-06-02):
+#   fxSP  = FxUSDBasePool (0x65C9…A3be): a fxUSD(yield)+USDC(stable) pool; accepts
+#           direct USDC deposits via deposit(receiver, tokenIn, amount, minSharesOut).
+#   fxSAVE = SavingFxUSD (0x7743…fc39): ERC4626 whose asset() == fxSP.
+#
+# Modernised: the legacy diamond/converter path (depositToFxSave + off-chain
+# abiEncodeConvert) is replaced by a direct, atomic two-hop deposit — fxSP now
+# takes USDC directly, so no converter calldata is needed. Mirrors 3jane sUSD3.
+
 inputs:
   usdc_address:
     type: "address"
-  fx_diamond:
+  fx_sp_address:
+    type: "address"
+  fx_save_address:
     type: "address"
   caliber_address:
-    type: "address"
-  converter_address:
     type: "address"
 
 actions:
   deposit:
     calls:
-      - description: "Approve fx_diamond to spend USDC"
+      - description: "Approve fxSP (FxUSDBasePool) to spend USDC"
         target: "${inputs.usdc_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.fx_diamond}"
+            value: "${inputs.fx_sp_address}"
           - type: "uint256"
-            value: "${input_slots.fx_save_data.amountToDeposit}"
+            value: "${input_slots.amount}"
 
-      - description: "Deposit USDC into fxSAVE"
-        target: "${inputs.fx_diamond}"
-        selector: "depositToFxSave((address,uint256,address,bytes,uint256,bytes),address,uint256,address)"
+      - description: "Deposit USDC into fxSP, mint fxSP shares to the caliber"
+        target: "${inputs.fx_sp_address}"
+        selector: "deposit(address,address,uint256,uint256)"
         parameters:
-          - type: "(address,uint256,address,bytes,uint256,bytes)"
-            value:
-              - type: "address"
-                value: "${input_slots.fx_save_data.tokenIn}"
-              - type: "uint256"
-                value: "${input_slots.fx_save_data.amountToDeposit}"
-              - type: "address"
-                value: "${inputs.converter_address}"
-              - type: "bytes"
-                value: "${input_slots.fx_save_data.abiEncodeConvert}"
-              - type: "uint256"
-                value: "${input_slots.fx_save_data.amountToDeposit}" # seems unused in contract
-              - type: "bytes"
-                value: "0x"
           - type: "address"
-            value: "${input_slots.fx_save_data.tokenIn}"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.usdc_address}"
           - type: "uint256"
-            value: "${input_slots.fx_save_data.minAmountOut}"
+            value: "${input_slots.amount}"
+          - type: "uint256"
+            value: "${input_slots.min_fxsp_out}"
+        return:
+          name: "fxsp_shares"
+          type: "uint256"
+
+      - description: "Approve fxSAVE to spend the freshly minted fxSP"
+        target: "${inputs.fx_sp_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.fx_save_address}"
+          - type: "uint256"
+            value: "${returns.fxsp_shares}"
+
+      - description: "Deposit fxSP into fxSAVE (ERC4626), mint fxSAVE to the caliber"
+        target: "${inputs.fx_save_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fxsp_shares}"
           - type: "address"
             value: "${inputs.caliber_address}"
 
     input_slots:
-      fx_save_data:
-        type: "FxSaveData"
-        description: "data to deposit into fxSAVE"
+      amount:
+        type: "uint256"
+        description: "Amount of USDC (6-dec) to deposit"
+      min_fxsp_out:
+        type: "uint256"
+        description: "Minimum fxSP shares from the USDC->fxSP leg (slippage protection; the fxSAVE wrap is deterministic)"

@@ -1,0 +1,62 @@
+protocol: "re"
+
+# Re Protocol — synthetic "swap in": deposit an accepted stablecoin into the
+# Insurance Capital Layer (ICL) and mint reUSD (senior tranche) into the caliber.
+#
+# Mechanism (verified on mainnet 2026-06-01):
+#   InsuranceCapitalLayer.deposit(address token, uint256 amount, uint256 minShares)
+#     - `onlyKYCUser`: the caliber MUST be KYC-approved on the re KYCRegistry
+#       (0x82F1806AEab5Ecb9a485eb041d5Ed4940b123995). dusd caliber is approved.
+#     - pulls `token` from msg.sender (caliber) via transferFrom -> approve first.
+#     - mints reUSD to msg.sender (caliber). Synchronous.
+#     - `amount` is in the deposit token's native decimals (USDC = 6).
+#     - `minShares` is the reUSD slippage floor in reUSD decimals (18). Operator
+#       supplies it off-chain (e.g. from ICL.convertToShares / previewDeposit
+#       minus tolerance).
+#
+# reUSD is held as a caliber base token (priced by the OracleRegistry reUSD/USD
+# feed), so its value is captured by the base-token registry and the paired
+# accounting action returns 0 (see account.yaml:account_0). The swap-in uses
+# affected_tokens=[] (see instructions/reusd-swap.yaml).
+#
+# Expected inputs (from instructions/reusd-swap.yaml):
+#   icl_address    — reUSD Insurance Capital Layer (0x4691C475bE804Fa85f91c2D6D0aDf03114de3093)
+#   asset_address  — deposit token pulled from the caliber (USDC today; the ICL
+#                    also accepts USDT, USDe, sUSDe)
+
+inputs:
+  icl_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  swap_asset_for_reusd:
+    calls:
+      - description: "Approve the ICL to spend the deposit token"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.icl_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Deposit token into the ICL and mint reUSD to the caliber"
+        target: "${inputs.icl_address}"
+        selector: "deposit(address,uint256,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.asset_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "uint256"
+            value: "${input_slots.min_shares}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of deposit token to swap into reUSD (in the token's native decimals, e.g. USDC 6-dec)"
+      min_shares:
+        type: "uint256"
+        description: "Minimum reUSD to mint (slippage protection, in reUSD 18-dec)"

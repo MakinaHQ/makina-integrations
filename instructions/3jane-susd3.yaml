@@ -1,0 +1,131 @@
+# 3Jane sUSD3 (junior tranche) — ERC4626 position, asset = USD3, routed via USDC.
+#
+# sUSD3.asset() is USD3, but USD3 is a position token (not a base token), so a
+# direct sUSD3->USD3 redeem would fail the caliber's loss reconciliation. Instead
+# the position is USDC-denominated and routes through USD3 atomically:
+#   deposit  : USDC -> USD3 -> sUSD3   (affected=[USDC])
+#   withdraw : sUSD3 -> USD3 -> USDC   (affected=[USDC])
+# Accounting double-hops previewRedeem (sUSD3->USD3->USDC), value in USDC.
+#
+# Redemption delay: sUSD3 has a 30-day initial lock per deposit, plus an optional
+# cooldown (cooldownDuration from ProtocolConfig; 0 as of 2026-06-02). When the
+# cooldown is active, call start_cooldown(_relative) first, then redeem after it
+# matures (within withdrawalWindow). startCooldown does NOT escrow shares (they stay
+# in the caliber) and overwrites any prior cooldown, so NO KV tracking is needed.
+#
+# Expected position vars (machines/dusd/mainnet/caliber.yaml):
+#   label                       string  — display name ("sUSD3")
+#   asset_address               address — USDC (base token in/out; accounting quote token)
+#   intermediate_vault_address  address — USD3 vault (transit)
+#   vault_address               address — sUSD3 vault/share token
+#
+# Expected caliber config: caliber_address
+#
+# Note: sUSD3 has a subordination cap — availableDepositLimit may be 0 (deposit
+# reverts) until the junior tranche reopens.
+
+# ── DEPOSIT: USDC -> USD3 -> sUSD3 ────────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/deposit.yaml:deposit_junior"
+    inputs:
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      intermediate_vault_address:
+        type: "address"
+        value: ${position.intermediate_vault_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── ACCOUNTING: previewRedeem sUSD3 -> USD3 -> USDC ───────────────────────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/account.yaml:account_junior"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      intermediate_vault_address:
+        type: "address"
+        value: ${position.intermediate_vault_address}
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── COOLDOWN (absolute): start sUSD3 cooldown for an exact share amount ────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # no token movement (cooldown is a flag); shares stay in the caliber
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:start_cooldown"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+# ── COOLDOWN (relative): start cooldown for bps of sUSD3 balance ──────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:start_cooldown_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (absolute): sUSD3 -> USD3 -> USDC ────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:redeem_junior"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      intermediate_vault_address:
+        type: "address"
+        value: ${position.intermediate_vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (relative): bps of sUSD3 balance -> USD3 -> USDC ─────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:redeem_junior_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      intermediate_vault_address:
+        type: "address"
+        value: ${position.intermediate_vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

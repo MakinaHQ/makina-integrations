@@ -1,0 +1,100 @@
+# Re Protocol — reUSD synthetic swap position (senior tranche), base-token model.
+#
+# reUSD is held as a caliber BASE token (priced by the OracleRegistry reUSD/USD
+# feed). ACCOUNTING returns 0 (account_0) — value is captured by the base-token
+# registry, so accounting it here would double-count. Both swap legs settle into
+# base tokens, so the MANAGEMENT instructions use affected_tokens=[] (with
+# account_0 the position change is always 0, so any declared affected token would
+# make the caliber loss-reconciliation revert on the swap's loss leg). Value
+# conservation is enforced by the min_shares / min_payout slippage args.
+# Same model as the mGLOBAL "swap in (synthetic)" position.
+#
+# Flows:
+#   * swap IN  USDC -> reUSD via the Insurance Capital Layer (ICL.deposit), synchronous,
+#     always available (caliber is KYC-approved).
+#   * swap OUT reUSD -> sUSDe via the RedemptionGateway instant path (redeemInstant),
+#     atomic, while the instant buffer has liquidity and the active payout token is sUSDe.
+#     If the buffer is short, exit via the caliber swap_module (reUSD is a base token).
+#
+# Expected position vars (machines/dusd/mainnet/caliber.yaml):
+#   label                       string  — display name ("reUSD Swap (synthetic)")
+#   asset_address               address — token swapped IN (USDC)
+#   reusd_address               address — reUSD share token
+#   icl_address                 address — reUSD Insurance Capital Layer (deposit/mint)
+#   gateway_address             address — RedemptionGateway (instant redeem entry)
+#   instant_redemption_address  address — InstantRedemption (reUSD approval spender)
+#
+# Expected caliber config:
+#   caliber_address
+#
+# Operational notes:
+#   * Deposit gate: ICL.deposit is `onlyKYCUser`; the caliber is KYC-approved.
+#   * Redeem gate: RedemptionGateway.redeemInstant is gated only by KYC (passes) and
+#     currentMode()==INSTANT; NOT AccessManager-restricted. The reUSD approval target is
+#     the InstantRedemption contract (it does the transferFrom), NOT the gateway.
+#   * Payout token is whatever payoutTokenRegistry.activePayoutToken() is on the day (sUSDe now).
+#   * reUSD must be added as a base token AND have a feed route in the OracleRegistry.
+
+# ── SWAP IN: USDC -> reUSD (ICL.deposit) ──────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # USDC -> reUSD, both base tokens; account_0 -> [] (else loss-check reverts)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/deposit.yaml:swap_asset_for_reusd"
+    inputs:
+      icl_address:
+        type: "address"
+        value: ${position.icl_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+
+# ── ACCOUNTING: 0 (reUSD valued by the caliber base-token registry) ───────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.reusd_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/account.yaml:account_0"
+    inputs: {}
+
+# ── SWAP OUT (absolute): reUSD -> sUSDe (gateway.redeemInstant) ───────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # reUSD -> sUSDe, both base tokens
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/withdraw.yaml:redeem"
+    inputs:
+      gateway_address:
+        type: "address"
+        value: ${position.gateway_address}
+      instant_redemption_address:
+        type: "address"
+        value: ${position.instant_redemption_address}
+      reusd_address:
+        type: "address"
+        value: ${position.reusd_address}
+
+# ── SWAP OUT (relative): bps of reUSD balance -> sUSDe ────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # reUSD -> sUSDe, both base tokens
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/withdraw.yaml:redeem_relative"
+    inputs:
+      gateway_address:
+        type: "address"
+        value: ${position.gateway_address}
+      instant_redemption_address:
+        type: "address"
+        value: ${position.instant_redemption_address}
+      reusd_address:
+        type: "address"
+        value: ${position.reusd_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

@@ -1,0 +1,102 @@
+protocol: "3jane"
+
+# 3Jane (USD3 / sUSD3) ERC4626 deposits. Both are Yearn-V3 TokenizedStrategy
+# vaults: USD3.asset() = USDC, sUSD3.asset() = USD3.
+#
+# Mechanism (verified mainnet 2026-06-02):
+#   ERC4626 deposit(uint256 assets, address receiver) -> shares; pulls `assets`
+#   from msg.sender (approve first) and mints shares to `receiver` (= caliber).
+#
+# - `deposit`        : USDC -> USD3 (the senior-tranche position).
+# - `deposit_junior` : USDC -> USD3 -> sUSD3 (the junior-tranche position). sUSD3's
+#                      asset is USD3, so a sUSD3 position is funded by routing USDC
+#                      through USD3 atomically. This keeps sUSD3 a USDC-denominated
+#                      position whose redeem can settle back to a base token (USDC).
+#
+# Notes: USD3 enforces minDeposit (1000 USDC as of 2026-06-02). sUSD3 has a
+# subordination cap — availableDepositLimit may be 0 (deposit reverts) until the
+# junior tranche reopens.
+
+inputs:
+  asset_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  intermediate_vault_address:
+    type: "address"
+
+actions:
+  # Single hop: asset -> vault (USDC -> USD3).
+  deposit:
+    calls:
+      - description: "Approve the vault to spend the deposit asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount}"
+
+      - description: "ERC4626 deposit asset into the vault, mint shares to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount:
+        type: "uint256"
+        description: "Amount of deposit asset (USDC, 6-dec) to deposit"
+
+  # Nested: USDC -> USD3 (intermediate_vault) -> sUSD3 (vault).
+  deposit_junior:
+    calls:
+      - description: "Approve USD3 vault to spend USDC"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.intermediate_vault_address}"
+          - type: "uint256"
+            value: "${input_slots.amount}"
+
+      - description: "Deposit USDC into USD3, mint USD3 to the caliber"
+        target: "${inputs.intermediate_vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "usd3_shares"
+          type: "uint256"
+
+      - description: "Approve sUSD3 vault to spend the freshly minted USD3"
+        target: "${inputs.intermediate_vault_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${returns.usd3_shares}"
+
+      - description: "Deposit USD3 into sUSD3, mint sUSD3 to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usd3_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      amount:
+        type: "uint256"
+        description: "Amount of USDC (6-dec) to route through USD3 into sUSD3 (>= USD3 minDeposit, 1000 USDC)"
