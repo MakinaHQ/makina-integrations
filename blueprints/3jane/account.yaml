@@ -1,0 +1,93 @@
+protocol: "3jane"
+
+# 3Jane position accounting via ERC4626 previewRedeem (no oracle needed).
+# Both vaults are Yearn-V3 strategies; previewRedeem(shares) -> assets reflects
+# the current (loss-adjusted) share price.
+#
+# - `account`        : single hop. previewRedeem(USD3 balance) -> USDC. Used by the
+#                      USD3 position (asset = USDC = accounting token), so the value
+#                      is reported directly in USDC.
+# - `account_junior` : double hop. previewRedeem(sUSD3 balance) -> USD3, then
+#                      previewRedeem(that) on the USD3 vault -> USDC. Used by the
+#                      sUSD3 position so its value is reported in USDC without
+#                      needing a USD3 price feed.
+#
+# The cooldown does NOT escrow sUSD3 — shares stay in the caliber throughout — so
+# balance-based accounting is correct in every cooldown state (no KV needed).
+
+inputs:
+  vault_address:
+    type: "address"
+  subject:
+    type: "address"
+  intermediate_vault_address:
+    type: "address"
+
+actions:
+  # Single hop (USD3): previewRedeem(USD3 balance) -> USDC.
+  account:
+    calls:
+      - description: "Caliber balance of vault shares"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "vault_balance"
+          type: "uint256"
+
+      - description: "previewRedeem(balance) -> assets (USDC)"
+        target: "${inputs.vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.vault_balance}"
+        return:
+          name: "assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.assets}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  # Double hop (sUSD3): sUSD3 balance -> USD3 -> USDC.
+  account_junior:
+    calls:
+      - description: "Caliber balance of sUSD3 shares"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.subject}"
+        return:
+          name: "susd3_balance"
+          type: "uint256"
+
+      - description: "previewRedeem(sUSD3 balance) -> USD3 amount"
+        target: "${inputs.vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susd3_balance}"
+        return:
+          name: "usd3_amount"
+          type: "uint256"
+
+      - description: "previewRedeem(USD3 amount) on the USD3 vault -> USDC"
+        target: "${inputs.intermediate_vault_address}"
+        selector: "previewRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usd3_amount}"
+        return:
+          name: "usdc_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usdc_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

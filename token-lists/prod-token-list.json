@@ -235,6 +235,27 @@
       "symbol": "VBILL"
     },
     {
+      "chainId": 1,
+      "address": "0x5086bf358635B81D8C47C66d1C8b9E567Db70c72",
+      "name": "Re Protocol Deposit Token",
+      "decimals": 18,
+      "symbol": "reUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0xf689555121e529Ff0463e191F9Bd9d1E496164a7",
+      "name": "sUSD3",
+      "decimals": 6,
+      "symbol": "sUSD3"
+    },
+    {
+      "chainId": 1,
+      "address": "0x056B269Eb1f75477a8666ae8C7fE01b64dD55eCc",
+      "name": "USD3",
+      "decimals": 6,
+      "symbol": "USD3"
+    },
+    {
       "chainId": 8453,
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
       "name": "EURC",
