@@ -1,0 +1,82 @@
+# 3Jane USD3 (senior tranche) — ERC4626 position, asset = USDC.
+#
+# Synchronous deposit/withdraw (minCommitmentTime = 0 as of 2026-06-02). USD3 is a
+# position token (position_tokens=[USD3]); accounting values it in USDC via
+# previewRedeem. affected_tokens=[USDC] on every leg gives the caliber's 3%/5% loss
+# reconciliation (USDC spent ≈ USD3 gained on deposit; USDC received ≈ USD3 burned on redeem).
+#
+# Expected position vars (machines/dusd/mainnet/caliber.yaml):
+#   label          string  — display name ("USD3")
+#   asset_address  address — USDC (deposit asset + accounting quote token)
+#   vault_address  address — USD3 vault/share token
+#
+# Expected caliber config: caliber_address
+#
+# Notes: USD3 enforces a 1000-USDC minDeposit; whitelist is currently off.
+
+# ── DEPOSIT: USDC -> USD3 ─────────────────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/deposit.yaml:deposit"
+    inputs:
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── ACCOUNTING: previewRedeem(USD3) -> USDC ───────────────────────────────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      subject:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (absolute): USD3 -> USDC ─────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── WITHDRAW (relative): bps of USD3 balance -> USDC ──────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # USDC
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/3jane/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

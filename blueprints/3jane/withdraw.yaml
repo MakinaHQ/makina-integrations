@@ -1,0 +1,262 @@
+protocol: "3jane"
+
+# 3Jane (USD3 / sUSD3) ERC4626 withdrawals (Yearn-V3 redeem).
+#
+# Redeem signature: redeem(uint256 shares, address receiver, address owner, uint256 maxLoss)
+#   maxLoss is in BPS (0 = revert on any loss vs previewRedeem; 10000 = allow up to 100%).
+#   Returns the assets withdrawn.
+#
+# - `redeem` / `redeem_relative`               : USD3 -> USDC (senior position).
+# - `redeem_junior` / `redeem_junior_relative` : sUSD3 -> USD3 -> USDC (junior position),
+#     atomically routing back to USDC so the position settles into a base token.
+# - `start_cooldown` / `start_cooldown_relative`: sUSD3 only. When the protocol sets
+#     cooldownDuration > 0, redemption requires startCooldown(shares) first, then a
+#     redeem after cooldownEnd and within withdrawalWindow. startCooldown does NOT
+#     move shares (they stay in the caliber), and OVERWRITES any prior cooldown, so
+#     no KV tracking is needed. When cooldownDuration == 0 (current), redeem works
+#     directly and start_cooldown is a no-op-ish convenience.
+#
+# sUSD3 also has a 30-day initial lock (lockedUntil) after each deposit; startCooldown
+# and redeem revert until the lock elapses.
+
+constants:
+  # MathHelper — relative variants: mulDiv(balance, bps, 10000).
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  intermediate_vault_address:
+    type: "address"
+
+actions:
+  # ---- Single hop: USD3 -> USDC -------------------------------------------
+  redeem:
+    calls:
+      - description: "Redeem USD3 shares for USDC to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+
+    input_slots:
+      shares:
+        type: "uint256"
+        description: "Exact USD3 shares to redeem"
+      max_loss_bps:
+        type: "uint256"
+        description: "Max acceptable loss in BPS vs previewRedeem (0 = none)"
+
+  redeem_relative:
+    calls:
+      - description: "Caliber USD3 balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "balance"
+          type: "uint256"
+
+      - description: "shares = balance * bps / 10000"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares"
+          type: "uint256"
+
+      - description: "Redeem USD3 shares for USDC to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of caliber's USD3 balance to redeem (10000 = 100%)"
+      max_loss_bps:
+        type: "uint256"
+        description: "Max acceptable loss in BPS vs previewRedeem (0 = none)"
+
+  # ---- Nested: sUSD3 -> USD3 -> USDC --------------------------------------
+  redeem_junior:
+    calls:
+      - description: "Redeem sUSD3 shares for USD3 to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+        return:
+          name: "usd3_assets"
+          type: "uint256"
+
+      - description: "Redeem the received USD3 for USDC to the caliber"
+        target: "${inputs.intermediate_vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usd3_assets}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+
+    input_slots:
+      shares:
+        type: "uint256"
+        description: "Exact sUSD3 shares to redeem"
+      max_loss_bps:
+        type: "uint256"
+        description: "Max acceptable loss in BPS vs previewRedeem, applied to both legs (0 = none)"
+
+  redeem_junior_relative:
+    calls:
+      - description: "Caliber sUSD3 balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "balance"
+          type: "uint256"
+
+      - description: "shares = balance * bps / 10000"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares"
+          type: "uint256"
+
+      - description: "Redeem sUSD3 shares for USD3 to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+        return:
+          name: "usd3_assets"
+          type: "uint256"
+
+      - description: "Redeem the received USD3 for USDC to the caliber"
+        target: "${inputs.intermediate_vault_address}"
+        selector: "redeem(uint256,address,address,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usd3_assets}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.max_loss_bps}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of caliber's sUSD3 balance to redeem (10000 = 100%)"
+      max_loss_bps:
+        type: "uint256"
+        description: "Max acceptable loss in BPS vs previewRedeem, applied to both legs (0 = none)"
+
+  # ---- Cooldown (sUSD3 only) ----------------------------------------------
+  start_cooldown:
+    calls:
+      - description: "Start the sUSD3 redemption cooldown for an exact share amount"
+        target: "${inputs.vault_address}"
+        selector: "startCooldown(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares}"
+
+    input_slots:
+      shares:
+        type: "uint256"
+        description: "Exact sUSD3 shares to place in cooldown"
+
+  start_cooldown_relative:
+    calls:
+      - description: "Caliber sUSD3 balance"
+        target: "${inputs.vault_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "balance"
+          type: "uint256"
+
+      - description: "shares = balance * bps / 10000"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_cooldown}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares"
+          type: "uint256"
+
+      - description: "Start the sUSD3 redemption cooldown for the computed share amount"
+        target: "${inputs.vault_address}"
+        selector: "startCooldown(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares}"
+
+    input_slots:
+      bps_to_cooldown:
+        type: "uint256"
+        description: "Basis points of caliber's sUSD3 balance to place in cooldown (10000 = 100%)"

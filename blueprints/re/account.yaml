@@ -1,0 +1,27 @@
+protocol: "re"
+
+# Re Protocol — no-op accounting for the reUSD synthetic swap position.
+#
+# reUSD is registered as a caliber base token and priced by the caliber's
+# OracleRegistry (reUSD/USD feed), so the position's value is captured by the
+# base-token registry. This accounting action therefore returns 0 to avoid
+# double counting — same pattern as blueprints/midas/account.yaml:account_0 for
+# the mGLOBAL swap-in.
+#
+# Both swap legs settle into base tokens (USDC→reUSD, reUSD→sUSDe), so the
+# MANAGEMENT instructions use affected_tokens=[]: with account_0 the position
+# value change is always 0, so declaring affected tokens would make the caliber's
+# loss reconciliation (_checkPositionMinDelta) revert on the swap's loss leg.
+# Value conservation is instead enforced by the min_shares / min_payout slippage
+# args inside the deposit/withdraw instructions.
+
+actions:
+  # Account: returns 0 (no-op) — value is held in base tokens (reUSD / sUSDe).
+  account_0:
+    calls: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

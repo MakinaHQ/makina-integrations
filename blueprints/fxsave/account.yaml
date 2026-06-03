@@ -1,5 +1,23 @@
 protocol: "fxSAVE"
 
+# fxSAVE position accounting — values the position as the (fxUSD, USDC) amounts
+# that redeeming the caliber's total fxSP exposure would yield. The caliber prices
+# fxUSD and USDC via the OracleRegistry (both are base tokens on dusd).
+#
+# Total fxSP exposure = fxSP wrapped in fxSAVE (convertToAssets of the fxSAVE
+#                       balance) + fxSP held directly in the caliber.
+#
+# These two terms cover every real state of the position:
+#   - after deposit: fxSAVE held, loose fxSP = 0.
+#   - during a redemption cooldown: fxSAVE may be partly/fully redeemed to fxSP,
+#     and that fxSP SITS IN THE CALIBER. fxSP.requestRedeem does NOT move the fxSP
+#     out of the wallet — it only RESERVES a sub-portion (redeemRequests[caliber].amount
+#     <= balanceOf). The fxSP stays in balanceOf until redeem/instantRedeem BURNS it.
+#   So fxSP.balanceOf already includes any in-flight/reserved fxSP — there is no
+#   separate "locked" balance to add (doing so would double-count), and no KV needed.
+#   - after claim/instant: fxSP is burned to fxUSD + USDC, which the caliber's
+#     base-token registry accounts separately (not here).
+
 inputs:
   fx_save_address:
     type: "address"
@@ -9,11 +27,13 @@ inputs:
     type: "address"
   caliber_helper_address:
     type: "address"
+  unsigned_math_helper_address:
+    type: "address"
 
 actions:
   account:
     calls:
-      - description: "Get our balance of fxSAVE"
+      - description: "Caliber balance of fxSAVE shares"
         target: "${inputs.fx_save_address}"
         selector: "balanceOf(address)"
         parameters:
@@ -23,27 +43,49 @@ actions:
           name: "fx_save_balance"
           type: "uint256"
 
-      - description: "Convert fxSAVE to assets (fxSP)"
+      - description: "fxSAVE shares -> fxSP (convertToAssets)"
         target: "${inputs.fx_save_address}"
         selector: "convertToAssets(uint256)"
         parameters:
           - type: "uint256"
             value: "${returns.fx_save_balance}"
         return:
-          name: "fx_sp_balance"
+          name: "fx_sp_from_fx_save"
           type: "uint256"
 
-      - description: "Preview redeem fxSP from fxSP contract, for (fxUSD, USDC)"
+      - description: "fxSP held directly in the caliber (includes any cooldown-reserved fxSP)"
+        target: "${inputs.fx_sp_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_in_caliber"
+          type: "uint256"
+
+      - description: "Total fxSP exposure = wrapped (from fxSAVE) + held in caliber"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_from_fx_save}"
+          - type: "uint256"
+            value: "${returns.fx_sp_in_caliber}"
+        return:
+          name: "total_fx_sp_balance"
+          type: "uint256"
+
+      - description: "Preview redeeming the total fxSP -> (fxUSD, USDC)"
         target: "${inputs.fx_sp_address}"
         selector: "previewRedeem(uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.fx_sp_balance}"
+            value: "${returns.total_fx_sp_balance}"
         return:
           name: "tokens_balances"
           type: "(uint256,uint256)"
 
-      - description: "Extract first field (fxUSD balance)"
+      - description: "Extract fxUSD amount (element 0)"
         target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
@@ -55,7 +97,7 @@ actions:
           name: "fxusd_amount"
           type: "uint256"
 
-      - description: "Extract second field (USDC balance)"
+      - description: "Extract USDC amount (element 1)"
         target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
