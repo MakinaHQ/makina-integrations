@@ -1,0 +1,30 @@
+config:
+  safe_address:
+    type: "address"
+    value: "0x81Aa9DA3b68ef186E34e96FB6Ae9ad16D7715C72"
+  makina_lite_module:
+    type: "address"
+    value: "0xA032aFD73Fd42deb549698f5Ac93E8b373330B09"
+  uniswap_x_reactor:
+    type: "address"
+    value: "0x00000011f84b9aa48e5f8aa8b9897600006289be"
+  aavev3_core_instance:
+    type: "address"
+    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  usdc_address:
+    type: "address"
+    value: ${token_list.mainnet.USDC}
+
+positions:
+  - id: "1"
+    group_id: "0"
+    description: "Aave v3 USDC inventory"
+    instructions: !include "./instructions/aave-usdc.yaml"
+
+  - id: "2"
+    group_id: "0"
+    description: "Uniswap X NVDAx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "NVDAx"
+      xstock_token: ${token_list.mainnet.NVDAx}

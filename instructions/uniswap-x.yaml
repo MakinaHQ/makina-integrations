@@ -1,0 +1,89 @@
+# Uniswap X direct-fill settlement for one xStock token.
+#
+# Expected position vars:
+#   label:        string   e.g. "NVDAx"
+#   xstock_token: address  xStock token delivered by or received by the Safe
+#
+# Expected config:
+#   safe_address
+#   uniswap_x_reactor
+#   aavev3_core_instance
+#   usdc_address
+
+- name: uniswap_x_buy_xstock_with_usdc_direct
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+    - ${position.xstock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/uniswap-x/execute.yaml:buy_xstock_with_usdc_direct"
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      usdc:
+        type: "address"
+        value: "${config.usdc_address}"
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"
+      xstock_token:
+        type: "address"
+        value: ${position.xstock_token}
+
+- name: uniswap_x_buy_xstock_with_usdc_from_aave
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+    - ${position.xstock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/uniswap-x/execute.yaml:buy_xstock_with_usdc_from_aave"
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      usdc:
+        type: "address"
+        value: "${config.usdc_address}"
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"
+      xstock_token:
+        type: "address"
+        value: ${position.xstock_token}
+
+- name: uniswap_x_sell_xstock_for_usdc_direct
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+    - ${position.xstock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/uniswap-x/execute.yaml:sell_xstock_for_usdc_direct"
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      usdc:
+        type: "address"
+        value: "${config.usdc_address}"
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"
+      xstock_token:
+        type: "address"
+        value: ${position.xstock_token}

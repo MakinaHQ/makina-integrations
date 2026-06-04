@@ -1,0 +1,4 @@
+name = "uniswap-x-filler"
+chain = "mainnet"
+address = "0xA032aFD73Fd42deb549698f5Ac93E8b373330B09"
+rootfiles = "github:MakinaHQ/config/machines/uniswap-x-filler/mainnet/rootfiles"
