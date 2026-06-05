@@ -89,6 +89,20 @@ class MorphoVaultV2CurationBlueprintTests(unittest.TestCase):
                 self.assertNotIn("multicall", text)
                 self.assertNotIn("multicall(bytes[])", text)
 
+    def test_abdicate_instruction_is_commented_out_until_bytes4_is_supported(self) -> None:
+        text = INSTRUCTION_FILE.read_text()
+
+        self.assertNotRegex(
+            text,
+            r'(?m)^- name: morpho_vault_v2_curator_execute_abdicate$',
+        )
+        self.assertNotRegex(
+            text,
+            r'(?m)^\s+path: "\.\./\.\./\.\./blueprints/morpho-vault-v2-curation/curator\.yaml:execute_abdicate"$',
+        )
+        self.assertIn("# - name: morpho_vault_v2_curator_execute_abdicate", text)
+        self.assertIn("prod transpiler supports bytes4 inputs", text)
+
     def test_curator_timelock_helpers_are_explicit(self) -> None:
         text = (BLUEPRINT_ROOT / "curator.yaml").read_text()
 

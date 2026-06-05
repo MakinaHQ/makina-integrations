@@ -244,17 +244,18 @@
         type: "address"
         value: ${position.vault_address}
 
-- name: morpho_vault_v2_curator_execute_abdicate
-  is_debt: false
-  instruction_type: "MANAGEMENT"
-  affected_tokens: []
-  instruction:
-    label: ${position.label}
-    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_abdicate"
-    inputs:
-      vault_address:
-        type: "address"
-        value: ${position.vault_address}
+# TODO: Re-enable once the prod transpiler supports bytes4 inputs.
+# - name: morpho_vault_v2_curator_execute_abdicate
+#   is_debt: false
+#   instruction_type: "MANAGEMENT"
+#   affected_tokens: []
+#   instruction:
+#     label: ${position.label}
+#     path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_abdicate"
+#     inputs:
+#       vault_address:
+#         type: "address"
+#         value: ${position.vault_address}
 
 - name: morpho_vault_v2_curator_execute_set_force_deallocate_penalty
   is_debt: false

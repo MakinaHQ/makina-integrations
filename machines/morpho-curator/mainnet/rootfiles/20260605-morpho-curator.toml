@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x7f55912378467a591df70b28fca163c9c1589f8f62f909d4c39ce9a27e251496
+# root: 0x93ed0603ef8d98a9095d81f76ec4845a0522dc1cb967703ea3b314b6c7801336
 
 [instructions.morpho-vault-v2-curation.accrue_interest."Dialectic WETH Test"]
 position_id = "1"
@@ -125,23 +125,6 @@ type = "Bytes"
 index = 1
 name = "relative_cap"
 type = "Uint"
-
-[instructions.morpho-vault-v2-curation.execute_abdicate."Dialectic WETH Test"]
-position_id = "1"
-description = "Morpho Vault V2 curation - Dialectic WETH Test"
-is_debt = false
-group_id = "0"
-instruction_type = 0
-affected_tokens = []
-position_tokens = []
-commands = ["0xb2e328480100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
-state = ["0x4c11fe2a708d5242b13f178422d4088cb270c488d9932765064ea92953422272"]
-bitmap = "0"
-
-[[instructions.morpho-vault-v2-curation.execute_abdicate."Dialectic WETH Test".inputs_slots]]
-index = 0
-name = "selector"
-type = "FixedBytes4"
 
 [instructions.morpho-vault-v2-curation.execute_add_adapter."Dialectic WETH Test"]
 position_id = "1"
