@@ -1,0 +1,332 @@
+protocol: "morpho-vault-v2-curation"
+
+inputs:
+  vault_address:
+    type: "address"
+
+actions:
+  submit_curator_call:
+    calls:
+      - description: "Submit a timelocked Curator call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.call_data}"
+    input_slots:
+      call_data:
+        type: "bytes"
+        description: "Exact ABI calldata for the underlying timelocked curator call"
+
+  revoke_curator_call:
+    calls:
+      - description: "Revoke a pending timelocked Curator call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.call_data}"
+    input_slots:
+      call_data:
+        type: "bytes"
+        description: "Exact ABI calldata previously submitted to the vault"
+
+  execute_add_adapter:
+    calls:
+      - description: "Execute matured addAdapter call"
+        target: "${inputs.vault_address}"
+        selector: "addAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to enable for allocations"
+
+  execute_remove_adapter:
+    calls:
+      - description: "Execute matured removeAdapter call"
+        target: "${inputs.vault_address}"
+        selector: "removeAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to disable after its allocation is zero"
+
+  execute_set_adapter_registry:
+    calls:
+      - description: "Execute matured setAdapterRegistry call"
+        target: "${inputs.vault_address}"
+        selector: "setAdapterRegistry(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter_registry}"
+    input_slots:
+      adapter_registry:
+        type: "address"
+        description: "Registry constraining which adapters may be added"
+
+  execute_set_is_allocator:
+    calls:
+      - description: "Execute matured setIsAllocator call"
+        target: "${inputs.vault_address}"
+        selector: "setIsAllocator(address,bool)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.account}"
+          - type: "bool"
+            value: "${input_slots.is_allocator}"
+    input_slots:
+      account:
+        type: "address"
+        description: "Account whose allocator role is changing"
+      is_allocator:
+        type: "bool"
+        description: "Whether the account should be an allocator"
+
+  execute_set_receive_shares_gate:
+    calls:
+      - description: "Execute matured receive-shares gate update"
+        target: "${inputs.vault_address}"
+        selector: "setReceiveSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  execute_set_send_shares_gate:
+    calls:
+      - description: "Execute matured send-shares gate update"
+        target: "${inputs.vault_address}"
+        selector: "setSendSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  execute_set_receive_assets_gate:
+    calls:
+      - description: "Execute matured receive-assets gate update"
+        target: "${inputs.vault_address}"
+        selector: "setReceiveAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  execute_set_send_assets_gate:
+    calls:
+      - description: "Execute matured send-assets gate update"
+        target: "${inputs.vault_address}"
+        selector: "setSendAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  execute_increase_absolute_cap:
+    calls:
+      - description: "Execute matured absolute cap increase"
+        target: "${inputs.vault_address}"
+        selector: "increaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  decrease_absolute_cap:
+    calls:
+      - description: "Decrease absolute cap instantly"
+        target: "${inputs.vault_address}"
+        selector: "decreaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      absolute_cap:
+        type: "uint256"
+        description: "Lower hard asset-denominated cap"
+
+  execute_increase_relative_cap:
+    calls:
+      - description: "Execute matured relative cap increase"
+        target: "${inputs.vault_address}"
+        selector: "increaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  decrease_relative_cap:
+    calls:
+      - description: "Decrease relative cap instantly"
+        target: "${inputs.vault_address}"
+        selector: "decreaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      relative_cap:
+        type: "uint256"
+        description: "Lower relative cap"
+
+  execute_set_performance_fee:
+    calls:
+      - description: "Execute matured performance fee update"
+        target: "${inputs.vault_address}"
+        selector: "setPerformanceFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.performance_fee}"
+    input_slots:
+      performance_fee:
+        type: "uint256"
+        description: "New performance fee"
+
+  execute_set_management_fee:
+    calls:
+      - description: "Execute matured management fee update"
+        target: "${inputs.vault_address}"
+        selector: "setManagementFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.management_fee}"
+    input_slots:
+      management_fee:
+        type: "uint256"
+        description: "New management fee"
+
+  execute_set_performance_fee_recipient:
+    calls:
+      - description: "Execute matured performance fee recipient update"
+        target: "${inputs.vault_address}"
+        selector: "setPerformanceFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of performance fee shares"
+
+  execute_set_management_fee_recipient:
+    calls:
+      - description: "Execute matured management fee recipient update"
+        target: "${inputs.vault_address}"
+        selector: "setManagementFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of management fee shares"
+
+  execute_increase_timelock:
+    calls:
+      - description: "Execute matured timelock increase"
+        target: "${inputs.vault_address}"
+        selector: "increaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  execute_decrease_timelock:
+    calls:
+      - description: "Execute matured timelock decrease"
+        target: "${inputs.vault_address}"
+        selector: "decreaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  execute_abdicate:
+    calls:
+      - description: "Execute matured abdication"
+        target: "${inputs.vault_address}"
+        selector: "abdicate(bytes4)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector to permanently disable"
+
+  execute_set_force_deallocate_penalty:
+    calls:
+      - description: "Execute matured force-deallocate penalty update"
+        target: "${inputs.vault_address}"
+        selector: "setForceDeallocatePenalty(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.penalty}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose force-deallocate penalty is changing"
+      penalty:
+        type: "uint256"
+        description: "New penalty"

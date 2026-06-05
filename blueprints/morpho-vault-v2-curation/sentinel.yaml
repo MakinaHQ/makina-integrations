@@ -1,0 +1,78 @@
+protocol: "morpho-vault-v2-curation"
+
+inputs:
+  vault_address:
+    type: "address"
+
+actions:
+  revoke_pending_call:
+    calls:
+      - description: "Revoke a pending timelocked call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.call_data}"
+    input_slots:
+      call_data:
+        type: "bytes"
+        description: "Exact ABI calldata previously submitted to the vault"
+
+  deallocate:
+    calls:
+      - description: "Deallocate assets from an adapter"
+        target: "${inputs.vault_address}"
+        selector: "deallocate(address,bytes,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${input_slots.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to pull assets from"
+      adapter_data:
+        type: "bytes"
+        description: "Adapter-specific market or position data"
+      assets:
+        type: "uint256"
+        description: "Asset amount to deallocate"
+
+  decrease_absolute_cap:
+    calls:
+      - description: "Decrease absolute cap instantly"
+        target: "${inputs.vault_address}"
+        selector: "decreaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      absolute_cap:
+        type: "uint256"
+        description: "Lower hard asset-denominated cap"
+
+  decrease_relative_cap:
+    calls:
+      - description: "Decrease relative cap instantly"
+        target: "${inputs.vault_address}"
+        selector: "decreaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${input_slots.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      id_data:
+        type: "bytes"
+        description: "Risk identifier data resolved by the adapter"
+      relative_cap:
+        type: "uint256"
+        description: "Lower relative cap"

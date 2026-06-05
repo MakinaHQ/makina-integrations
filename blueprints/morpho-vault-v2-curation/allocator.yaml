@@ -1,0 +1,83 @@
+protocol: "morpho-vault-v2-curation"
+
+inputs:
+  vault_address:
+    type: "address"
+
+actions:
+  allocate:
+    calls:
+      - description: "Allocate idle assets through an adapter"
+        target: "${inputs.vault_address}"
+        selector: "allocate(address,bytes,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${input_slots.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter receiving the allocation"
+      adapter_data:
+        type: "bytes"
+        description: "Adapter-specific market or position data"
+      assets:
+        type: "uint256"
+        description: "Asset amount to allocate"
+
+  deallocate:
+    calls:
+      - description: "Deallocate assets from an adapter"
+        target: "${inputs.vault_address}"
+        selector: "deallocate(address,bytes,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${input_slots.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to pull assets from"
+      adapter_data:
+        type: "bytes"
+        description: "Adapter-specific market or position data"
+      assets:
+        type: "uint256"
+        description: "Asset amount to deallocate"
+
+  set_liquidity_adapter_and_data:
+    calls:
+      - description: "Set liquidity adapter and routing data"
+        target: "${inputs.vault_address}"
+        selector: "setLiquidityAdapterAndData(address,bytes)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.liquidity_adapter}"
+          - type: "bytes"
+            value: "${input_slots.liquidity_data}"
+    input_slots:
+      liquidity_adapter:
+        type: "address"
+        description: "Adapter used for deposit forwarding and withdrawal sourcing"
+      liquidity_data:
+        type: "bytes"
+        description: "Adapter-specific routing data"
+
+  set_max_rate:
+    calls:
+      - description: "Set maximum share-price growth rate"
+        target: "${inputs.vault_address}"
+        selector: "setMaxRate(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.max_rate}"
+    input_slots:
+      max_rate:
+        type: "uint256"
+        description: "New maximum rate"

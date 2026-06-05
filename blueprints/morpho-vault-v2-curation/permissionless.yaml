@@ -1,0 +1,41 @@
+protocol: "morpho-vault-v2-curation"
+
+inputs:
+  vault_address:
+    type: "address"
+
+actions:
+  force_deallocate:
+    calls:
+      - description: "Force deallocate assets for in-kind redemption"
+        target: "${inputs.vault_address}"
+        selector: "forceDeallocate(address,bytes,uint256,address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${input_slots.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+          - type: "address"
+            value: "${input_slots.on_behalf_of}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to pull assets from"
+      adapter_data:
+        type: "bytes"
+        description: "Adapter-specific market or position data"
+      assets:
+        type: "uint256"
+        description: "Asset amount to force deallocate"
+      on_behalf_of:
+        type: "address"
+        description: "Account on whose behalf the deallocation is performed"
+
+  accrue_interest:
+    calls:
+      - description: "Accrue vault interest and mint fee shares if any"
+        target: "${inputs.vault_address}"
+        selector: "accrueInterest()"
+        parameters: []

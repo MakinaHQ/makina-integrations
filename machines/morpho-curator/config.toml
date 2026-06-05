@@ -1,0 +1,4 @@
+name = "morpho-curator"
+chain = "mainnet"
+address = "0xD57152f21aB5E5A8b3AdFf197c73aCC2Fdbd1CbD"
+rootfiles = "github:MakinaHQ/config/machines/morpho-curator/mainnet/rootfiles"

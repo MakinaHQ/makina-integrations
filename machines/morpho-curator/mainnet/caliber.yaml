@@ -1,0 +1,16 @@
+config:
+  safe_address:
+    type: "address"
+    value: "0x3470c3a0717406137dD3c94b5421C2409459b368"
+  makina_lite_module:
+    type: "address"
+    value: "0xD57152f21aB5E5A8b3AdFf197c73aCC2Fdbd1CbD"
+
+positions:
+  - id: "1"
+    group_id: "0"
+    description: "Morpho Vault V2 curation - Dialectic WETH Test"
+    instructions: !include "../../../instructions/morpho-vault-v2-curation.yaml"
+    vars:
+      label: "Dialectic WETH Test"
+      vault_address: "0xef3ac91ec3a45f3C6913bFB0C41659919EB85062"

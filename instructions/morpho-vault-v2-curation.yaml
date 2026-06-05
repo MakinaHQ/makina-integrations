@@ -1,0 +1,389 @@
+# Morpho Vault V2 curation for one vault managed by a Safe+MakinaLiteModule.
+#
+# Expected position vars:
+#   label:         string   display label for the vault
+#   vault_address: address  Morpho Vault V2 contract under curation
+
+- name: morpho_vault_v2_curator_submit_call
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:submit_curator_call"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_revoke_call
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:revoke_curator_call"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_add_adapter
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_add_adapter"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_remove_adapter
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_remove_adapter"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_adapter_registry
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_adapter_registry"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_is_allocator
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_is_allocator"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_receive_shares_gate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_receive_shares_gate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_send_shares_gate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_send_shares_gate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_receive_assets_gate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_receive_assets_gate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_send_assets_gate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_send_assets_gate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_increase_absolute_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_increase_absolute_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_decrease_absolute_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:decrease_absolute_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_increase_relative_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_increase_relative_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_decrease_relative_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:decrease_relative_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_performance_fee
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_performance_fee"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_management_fee
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_management_fee"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_performance_fee_recipient
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_performance_fee_recipient"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_management_fee_recipient
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_management_fee_recipient"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_increase_timelock
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_increase_timelock"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_decrease_timelock
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_decrease_timelock"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_abdicate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_abdicate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_curator_execute_set_force_deallocate_penalty
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/curator.yaml:execute_set_force_deallocate_penalty"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_allocator_allocate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/allocator.yaml:allocate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_allocator_deallocate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/allocator.yaml:deallocate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_allocator_set_liquidity_adapter_and_data
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/allocator.yaml:set_liquidity_adapter_and_data"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_allocator_set_max_rate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/allocator.yaml:set_max_rate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_sentinel_revoke_pending_call
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/sentinel.yaml:revoke_pending_call"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_sentinel_deallocate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/sentinel.yaml:deallocate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_sentinel_decrease_absolute_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/sentinel.yaml:decrease_absolute_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_sentinel_decrease_relative_cap
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/sentinel.yaml:decrease_relative_cap"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_permissionless_force_deallocate
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/permissionless.yaml:force_deallocate"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+
+- name: morpho_vault_v2_permissionless_accrue_interest
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-vault-v2-curation/permissionless.yaml:accrue_interest"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
