@@ -33,6 +33,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xe92f673Ca36C5E2Efd2DE7628f815f84807e803F",
+      "name": "Alphabet xStock",
+      "decimals": 18,
+      "symbol": "GOOGLx"
+    },
+    {
+      "chainId": 1,
       "address": "0x8236a87084f8B84306f72007F36F2618A5634494",
       "name": "Lombard Staked Bitcoin",
       "decimals": 8,

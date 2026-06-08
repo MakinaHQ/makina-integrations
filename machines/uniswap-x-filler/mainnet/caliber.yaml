@@ -28,3 +28,11 @@ positions:
     vars:
       label: "NVDAx"
       xstock_token: ${token_list.mainnet.NVDAx}
+
+  - id: "3"
+    group_id: "0"
+    description: "Uniswap X GOOGLx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "GOOGLx"
+      xstock_token: ${token_list.mainnet.GOOGLx}
