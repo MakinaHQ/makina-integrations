@@ -1,15 +1,256 @@
 protocol: "midas"
 
-constants: {}
+# Midas accounting blueprints.
+#
+# - account_0:                no-op accounting; returns 0. Use from deposit-only
+#                             instructions whose value is captured by the
+#                             caliber's base-token registry (depositInstant
+#                             swaps liquidity→mToken, both ERC20s).
+# - account:                  mToken Redemption Vault — values the caliber's
+#                             in-flight Pending redeem request, if any.
+#
+# Action selection is per-instruction via the `path: blueprints/midas/account.yaml:<action>`
+# binding, so deposit-only consumers can pick `account_0` and ignore the
+# redemption-specific inputs.
+#
+# ---------------------------------------------------------------------------
+# `account` (mToken Redemption) details
+# ---------------------------------------------------------------------------
+# Returns the USD-18 value of the caliber's in-flight Pending redemption request,
+# if any. The un-redeemed mToken balance is NOT included here — it is accounted
+# by the caliber's normal base-token registry. Including it would double-count.
+#
+# ## KV stores the raw requestId (no sentinel offset)
+# The KV holds the raw `requestId` we received from `redeemRequest`. KV == 0 is
+# ambiguous (could be "never written" or "tracking real id 0"), but we read the
+# Request struct on every account call and disambiguate via:
+#   in_flight  iff  request.status == Pending(0)  AND  request.sender != address(0)
+# A zero-init struct (sender == 0) is interpreted as "no tracked request" even
+# when KV happens to be 0. The withdraw blueprint applies the same check on its
+# pre-flight guard, so the two flows agree.
+#
+# ## RequestStatus enum
+# { Pending = 0, Processed = 1, Canceled = 2 }   — NO "None" variant.
+# A real Pending request requires BOTH `status == 0` AND `sender != address(0)`.
+# (Solidity zero-initialises unwritten slots, so status==0 alone is ambiguous.)
+#
+# ## Valuation
+# Returns the ESCROWED mToken amount (18 dec) directly in slot 0. The caliber's
+# base-token registry already prices mToken via its oracle path; we just need to
+# tell it how much mToken is locked in the vault on top of what's in the wallet.
+#
+# ## Housekeeping reset
+# Every accounting call writes back to KV:
+#   new_kv = tracked_request_id * is_pending_mask
+# This is a no-op in the Pending steady state (writes the same value back) but
+# resets the KV to 0 when status transitions to Processed (1) or Canceled (2).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+
+inputs:
+  redeemer_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
 
 actions:
 
-  # Account: returns 0 (no-op)
+  # Account: returns 0 (no-op) — for deposit-only instructions.
   account_0:
     calls: []
 
     reserved_slots:
       - type: "uint256"
         value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  # Account: mToken Redemption Vault — values in-flight Pending request.
+  account:
+    calls:
+      # ---- Recover the tracked request id from KV ------------------------
+      # KV holds the raw requestId. The value 0 is ambiguous in isolation
+      # (could mean "never written" or "tracking real id 0"); we resolve it
+      # below by reading the on-chain Request struct and requiring BOTH
+      # status==Pending AND sender!=0 for "real in-flight".
+      - description: "Read tracked requestId from KV (raw id; 0 is ambiguous)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "tracked_request_id"
+          type: "uint256"
+
+      # ---- Read the Request struct ---------------------------------------
+      - description: "Read redeemRequests(id) — (sender, tokenOut, status, amountMToken, mTokenRate, tokenOutRate)"
+        target: "${inputs.redeemer_address}"
+        selector: "redeemRequests(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.tracked_request_id}"
+        return:
+          name: "request_tuple"
+          type: "(address,address,uint8,uint256,uint256,uint256)"
+
+      - description: "Extract sender (index 0) as bytes32 for zero-check"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "request_sender_b32"
+          type: "bytes32"
+
+      - description: "Extract status (index 2)"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "request_status"
+          type: "uint256"
+
+      - description: "Extract amountMToken (index 3)"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "request_amount_mtoken"
+          type: "uint256"
+
+      # ---- is_pending = (status == 0) AND (sender != address(0)) ---------
+      - description: "Check status == 0 (Pending enum value)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_status}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "status_is_pending"
+          type: "bool"
+
+      - description: "Check sender == bytes32(0) (true if zero-init slot)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "eq(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${returns.request_sender_b32}"
+          - type: "bytes32"
+            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+        return:
+          name: "sender_is_zero"
+          type: "bool"
+
+      - description: "Negate to get sender != 0 (real existing request)"
+        target: "${constants.boolean_helper_address}"
+        selector: "not(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.sender_is_zero}"
+        return:
+          name: "sender_is_nonzero"
+          type: "bool"
+
+      - description: "is_pending_bool = (status == 0) AND (sender != 0)"
+        target: "${constants.boolean_helper_address}"
+        selector: "and(bool,bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.status_is_pending}"
+          - type: "bool"
+            value: "${returns.sender_is_nonzero}"
+        return:
+          name: "is_pending_bool"
+          type: "bool"
+
+      # Cast bool → uint mask (1 if pending, 0 otherwise) via ternary.
+      - description: "Convert is_pending bool to a 0/1 uint mask"
+        target: "${constants.math_helper_address}"
+        selector: "ternary(bool,uint256,uint256)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_pending_bool}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "is_pending_mask"
+          type: "uint256"
+
+      # ---- escrowed_mtoken_amount = amountMToken * mask -----------------
+      # Slot 0 will report this raw mToken amount (18 dec). The caliber prices
+      # it via its base-token oracle (same path used for unlocked mToken).
+      - description: "Apply is_pending mask: 0 if not Pending, full escrowed amount otherwise"
+        target: "${constants.math_helper_address}"
+        selector: "mul(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_amount_mtoken}"
+          - type: "uint256"
+            value: "${returns.is_pending_mask}"
+        return:
+          name: "escrowed_mtoken_amount"
+          type: "uint256"
+
+      # ---- Housekeeping: reset KV when no-longer-pending ----------------
+      # new_kv = tracked_request_id * is_pending_mask
+      # - Pending steady state: writes the same sentinel back (no-op).
+      # - Processed / Canceled / zero-init: writes 0 (resets the slot).
+      - description: "Compute new KV value: tracked_request_id * is_pending_mask"
+        target: "${constants.math_helper_address}"
+        selector: "mul(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.tracked_request_id}"
+          - type: "uint256"
+            value: "${returns.is_pending_mask}"
+        return:
+          name: "new_kv_value"
+          type: "uint256"
+
+      - description: "Write back to KV (no-op when Pending, reset to 0 otherwise)"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.new_kv_value}"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.escrowed_mtoken_amount}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"
