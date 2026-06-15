@@ -462,3 +462,12 @@ positions:
     position_tokens:
       - "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39" # fxSAVE (held)
       - "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be" # fxSP (held while redeemed/in cooldown)
+
+  # ── Pareto FalconX AA-tranche ──
+  - id: "114753234960554942361599178742666226841"
+    group_id: "0"
+    description: "Pareto FalconX (vanilla AA tranche)"
+    instructions: !include "../../../instructions/pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)

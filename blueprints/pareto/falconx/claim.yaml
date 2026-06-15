@@ -1,0 +1,34 @@
+protocol: "pareto-falconx"
+
+# Pareto FalconX (vanilla) — Withdraw Phase 2 (claim_redeem)
+#
+# SECOND of TWO non-atomic phases. Phase 1 (`withdraw.yaml`) issued the
+# requestWithdraw and credited the caliber a FalconXUSDC receipt token. This
+# phase burns that receipt and pays out USDC to the caliber.
+#
+# Phase 2 flow:
+#   1. IdleCDOEpochVariant.claimWithdrawRequest()
+#        -> burns the caliber's entire FalconXUSDC receipt
+#        -> transfers USDC to the caliber
+#
+# Readiness preconditions (revert with NotAllowed() 0x3d693ada if missed):
+#   - At least one full Pareto epoch + buffer has elapsed since requestWithdraw,
+#     AND the manager has called stopEpoch (advancing IdleCreditVault.epochNumber).
+#     Runtime check: IdleCreditVault.epochNumber() > lastWithdrawRequest(caliber).
+#   - Caliber holds a non-zero FalconXUSDC receipt (Phase 1 actually ran).
+#   - NOT keyring-gated — claim works even if the caliber's credential is revoked.
+
+constants:
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+
+inputs: {}
+
+actions:
+  claim_redeem:
+    calls:
+      - description: "Claim queued Pareto withdraw: burns FalconXUSDC receipt and pays out USDC"
+        target: "${constants.cdo_address}"
+        selector: "claimWithdrawRequest()"
+        parameters: []

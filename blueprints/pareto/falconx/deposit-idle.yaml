@@ -1,0 +1,66 @@
+protocol: "pareto-falconx"
+
+# Pareto FalconX (vanilla) — Deposit (between epochs)
+# USDC -> Pareto IdleCDOEpochVariant.depositAA -> AA tranche (held by caliber)
+#
+# When to use: epoch is NOT running (isEpochRunning() == false). The CDO is
+# unpaused between epochs so the sync mint path `depositAA` is available. The
+# companion `deposit-running.yaml` covers the mid-epoch path; mid-epoch you must
+# use depositDuringEpoch because depositAA reverts on `whenNotPaused`.
+#
+# Guard:
+#   - isEpochRunning() == false  (else use deposit-running.yaml)
+
+constants:
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      # === Guard: only run sync deposit path between epochs ===
+      - description: "Read isEpochRunning on Pareto CDO"
+        target: "${constants.cdo_address}"
+        selector: "isEpochRunning()"
+        parameters: []
+        return:
+          name: "epoch_running"
+          type: "bool"
+
+      - description: "Revert if epoch is running (use deposit-running.yaml instead)"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.epoch_running}"
+
+      # === USDC -> AA via Pareto depositAA ===
+      - description: "Approve USDC spending by Pareto IdleCDOEpochVariant"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.cdo_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+      - description: "Pareto depositAA: mints AA tranche shares to the caliber at sync price"
+        target: "${constants.cdo_address}"
+        selector: "depositAA(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.usdc_amount_to_deposit}"
+
+    input_slots:
+      usdc_amount_to_deposit:
+        type: "uint256"
+        description: "Amount of USDC to deposit (6 decimals)"
