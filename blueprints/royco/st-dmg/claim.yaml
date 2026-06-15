@@ -1,0 +1,61 @@
+protocol: "royco-st-dmg"
+
+# Royco Senior Tranche DMG Claim Blueprint (async withdraw leg 2)
+# Single transaction, run AFTER the 3-day finalization delay + off-chain keeper finalizeRequests:
+#   1. KV get(requestId_key) -> requestId
+#   2. AsyncRedeemer.claimAssets(requestId) -> USDC to caliber (NFT burned)
+#   3. KV reset(requestId_key); KV reset(pending_mt_key)
+# Clones blueprints/makina/redeem.yaml:claim_assets verbatim (only addresses differ).
+
+constants:
+  async_redeemer_address:
+    type: "address"
+    value: "0x21a9c31825fa1d8bf5f2378a3c95e823290b0637"
+
+inputs:
+  kv_store_address:
+    type: "address"
+  redemption_request_id_storage_key:
+    type: "bytes32"
+  pending_redemption_mt_storage_key:
+    type: "bytes32"
+
+actions:
+  claim_assets:
+    calls:
+      # 1. Retrieve the stored request ID
+      - description: "Retrieve the stored request ID from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      # 2. Claim the finalized redemption -> USDC
+      - description: "Claim USDC from the finalized redeem request"
+        target: "${constants.async_redeemer_address}"
+        selector: "claimAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_id}"
+        return:
+          name: "assets_received"
+          type: "uint256"
+
+      # 3. Clear both KV slots so accounting stops counting the pending MT
+      - description: "Clear the request ID from the KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.redemption_request_id_storage_key}"
+
+      - description: "Clear the pending DMG MT amount from the KV store after claiming"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_redemption_mt_storage_key}"

@@ -1,0 +1,80 @@
+# Royco Senior Tranche DMG
+# Underlying asset of the Royco ST is the DMG Makina machine SHARE TOKEN (MT), not a
+# synchronous ERC4626 vault.
+#   DEPOSIT  (1 tx, sync):  USDC -> DMG MT (DirectDepositor) -> Senior Tranche shares
+#   WITHDRAW (2 txs, async MT leg):
+#     REQUEST_REDEEM (TX1): ST.redeem -> DMG MT -> AsyncRedeemer.requestRedeem (KV persist)
+#     -- wait 3 days + off-chain keeper finalizeRequests --
+#     CLAIM          (TX2): AsyncRedeemer.claimAssets -> USDC (KV clear)
+#   ACCOUNT (unified, SUPPLY-SAFE — no seed required): live ST claim in DMG MT, computed via the
+#     kernel's previewSyncTrancheAccounting(0) (full-tranche stAssets+jtAssets, /max(totalShares,1)
+#     -> caliber pro-rata; never reverts at totalSupply==0), PLUS pending MT in the redeem NFT (KV),
+#     summed, then DMG_machine.convertToAssets -> USDC (ONE conversion). Same shape as the standard
+#     makina async-redeem accounting (live shares + pending shares -> convertToAssets). total_mt is
+#     conserved across the request step so the value is unchanged (value-loss invariant); the fee
+#     surfaces at claim where the USDC inflow gives RHS > 0. No ST.convertToAssets is used anywhere
+#     in this instruction set, so a sole/last-holder 100% exit works WITHOUT a permanent seed.
+
+# DEPOSIT: USDC -> DMG MT -> Senior Tranche shares (single tx, synchronous)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-ST-DMG"
+    path: "../../../blueprints/royco/st-dmg/deposit.yaml:deposit"
+    inputs: {}
+
+# ACCOUNT (unified): NAV on ST shares + pre-fee redemption USDC value (KV)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-ST-DMG"
+    path: "../../../blueprints/royco/st-dmg/account.yaml:account"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.st-dmg.pending-redemption-mt)}"
+
+# REQUEST_REDEEM (TX1): ST.redeem -> DMG MT -> AsyncRedeemer.requestRedeem (KV persist)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-ST-DMG"
+    path: "../../../blueprints/royco/st-dmg/request-redeem.yaml:request_redeem"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.st-dmg.redemption-request-id)}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.st-dmg.pending-redemption-mt)}"
+
+# CLAIM (TX2): AsyncRedeemer.claimAssets -> USDC (KV clear)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-ST-DMG"
+    path: "../../../blueprints/royco/st-dmg/claim.yaml:claim_assets"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.st-dmg.redemption-request-id)}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.st-dmg.pending-redemption-mt)}"
