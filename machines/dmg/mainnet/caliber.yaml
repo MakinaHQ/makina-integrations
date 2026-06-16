@@ -33,7 +33,7 @@ positions:
     instructions: !include "../../../instructions/midas-redemption.yaml"
     vars:
       label: "mGlobal Redemption"
-      redeemer_address: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+      redeemer_address: "0x1e0fd66753198c7b8bA64edEe8d41D8628Bf20D7"
       mtoken_address: ${token_list.mainnet.mGLOBAL}
       token_out_address: ${token_list.mainnet.USDC}
       kv_storage_key: "${keccak256(makina.mainnet.midas.mglobal-redemption)}"
