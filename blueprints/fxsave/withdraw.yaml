@@ -1,0 +1,231 @@
+protocol: "fxSAVE"
+
+# fxSAVE withdrawals. fxSAVE (ERC4626) redeems to fxSP (FxUSDBasePool); fxSP exits
+# to (fxUSD, USDC) either async (requestRedeem -> cooldown -> redeem, fee-free) or
+# instantly (instantRedeem, ~1% fee, no cooldown).
+#
+# - request_redeem(_relative) : fxSAVE -> fxSP, then fxSP.requestRedeem (locks fxSP
+#                    for the cooldown, redeemCoolDownPeriod = 3600s). Fee-free.
+# - claim          : after the cooldown, fxSP.redeem the locked request -> fxUSD + USDC.
+# - instant_withdraw(_relative): fxSAVE -> fxSP, then fxSP.instantRedeem -> fxUSD + USDC
+#                    now (pays instantRedeemFeeRatio, 1% as of 2026-06-02; no cooldown).
+#
+# Absolute variants take an exact fxSAVE share amount; relative variants take a
+# basis-points fraction of the caliber's fxSAVE balance (shares = balance * bps / 10000).
+# Tuple decode uses the standard caliber_helper (the in-flight request is accounted
+# by account.yaml, so no validation/revert helper is needed here).
+
+inputs:
+  fx_save_address:
+    type: "address"
+  fx_sp_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+
+actions:
+  # Async step 1: fxSAVE -> fxSP, then request stability-pool redemption (cooldown).
+  request_redeem:
+    calls:
+      - description: "Redeem fxSAVE shares to fxSP (ERC4626 redeem)"
+        target: "${inputs.fx_save_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_received"
+          type: "uint256"
+
+      - description: "Request redemption of the fxSP from the stability pool (starts cooldown)"
+        target: "${inputs.fx_sp_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_received}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of fxSAVE shares to redeem"
+
+  # Async step 1 (relative): same as request_redeem, for a bps fraction of fxSAVE balance.
+  request_redeem_relative:
+    calls:
+      - description: "Caliber fxSAVE balance"
+        target: "${inputs.fx_save_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_save_balance"
+          type: "uint256"
+
+      - description: "shares = balance * bps / 10000"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_save_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem fxSAVE shares to fxSP (ERC4626 redeem)"
+        target: "${inputs.fx_save_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_received"
+          type: "uint256"
+
+      - description: "Request redemption of the fxSP from the stability pool (starts cooldown)"
+        target: "${inputs.fx_sp_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_sp_received}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of caliber's fxSAVE balance to redeem (10000 = 100%)"
+
+  # Async step 2: after the cooldown, claim the in-flight request -> fxUSD + USDC.
+  claim:
+    calls:
+      - description: "Read the in-flight redeem request (amount, unlockAt)"
+        target: "${inputs.fx_sp_address}"
+        selector: "redeemRequests(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "redeem_request"
+          type: "(uint128,uint128)"
+
+      - description: "Extract the locked fxSP amount (element 0)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128)"
+            value: "${returns.redeem_request}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "amount_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem the matured request from fxSP -> fxUSD + USDC to the caliber"
+        target: "${inputs.fx_sp_address}"
+        selector: "redeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.amount_to_redeem}"
+
+  # Instant exit: fxSAVE -> fxSP -> fxUSD + USDC now (pays the instant-redeem fee, no cooldown).
+  instant_withdraw:
+    calls:
+      - description: "Redeem fxSAVE shares to fxSP (ERC4626 redeem)"
+        target: "${inputs.fx_save_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_received"
+          type: "uint256"
+
+      - description: "Instantly redeem fxSP from the stability pool -> fxUSD + USDC (pays fee)"
+        target: "${inputs.fx_sp_address}"
+        selector: "instantRedeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.fx_sp_received}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Amount of fxSAVE shares to redeem instantly"
+
+  # Instant exit (relative): same as instant_withdraw, for a bps fraction of fxSAVE balance.
+  instant_withdraw_relative:
+    calls:
+      - description: "Caliber fxSAVE balance"
+        target: "${inputs.fx_save_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_save_balance"
+          type: "uint256"
+
+      - description: "shares = balance * bps / 10000"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.fx_save_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem fxSAVE shares to fxSP (ERC4626 redeem)"
+        target: "${inputs.fx_save_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "fx_sp_received"
+          type: "uint256"
+
+      - description: "Instantly redeem fxSP from the stability pool -> fxUSD + USDC (pays fee)"
+        target: "${inputs.fx_sp_address}"
+        selector: "instantRedeem(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.fx_sp_received}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of caliber's fxSAVE balance to redeem instantly (10000 = 100%)"

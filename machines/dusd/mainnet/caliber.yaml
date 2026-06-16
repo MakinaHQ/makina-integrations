@@ -180,6 +180,15 @@ positions:
       label: "Sentora PYUSD"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+  - id: "244003111842323732524710741252875629950"
+    group_id: "0"
+    description: "Morpho Vault PYUSD Sentora PRIME Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"]
+    vars:
+      label: "Sentora PRIME Main PYUSD"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"
 
   # ── Morpho Vault AUSD ──────────────────────────────────────────────
   - id: "208384069883257652684922644584564420340"
@@ -389,8 +398,16 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
-
-  # -- Pareto FalconX AA-tranche --------------------------------------
+  - id: "330570121219840820532089219331590988878"
+    group_id: "0"
+    description: "Royco Junior Tranche Pareto FalconX V2"
+    instructions: !include "../../../instructions/royco-jt-pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
+      - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
+      
+  # ── Pareto FalconX AA-tranche ────────────────────────────────────
   - id: "114753234960554942361599178742666226841"
     group_id: "0"
     description: "Pareto FalconX (vanilla AA tranche)"
@@ -398,3 +415,61 @@ positions:
     position_tokens:
       - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
       - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
+  
+  # ── Re Protocol (reUSD synthetic swap) ───────────────────────────
+  # Swap in  USDC -> reUSD via the ICL (synchronous mint, caliber is KYC-approved).
+  # Swap out reUSD -> sUSDe via the RedemptionGateway instant path (atomic, while
+  # the buffer has liquidity and the active payout token is sUSDe); else exit via
+  # swap_module since reUSD is a base token. reUSD is a BASE token (addBaseToken +
+  # reUSD/USD feed route); ACCOUNTING returns 0 and swaps use affected_tokens=[].
+  - id: "24723774581854776292240868230282650037557364081183638342159551676750129660338" # keccak256("re.reusd.swap")
+    group_id: "0"
+    description: "Re Protocol reUSD Swap (synthetic)"
+    instructions: !include "../../../instructions/reusd-swap.yaml"
+    vars:
+      label: "reUSD Swap (synthetic)"
+      asset_address: ${token_list.mainnet.USDC}
+      reusd_address: ${token_list.mainnet.reUSD}
+      icl_address: "0x4691C475bE804Fa85f91c2D6D0aDf03114de3093"
+      gateway_address: "0x8aEb9453EF22Cb38abC7a3Af9c208F65C1BfE31e"
+      instant_redemption_address: "0xa31deEbb3680A3007120e74bCbDf4df36F042A40"
+
+  # ── 3Jane USD3 / sUSD3 (tranched credit money market, ERC4626) ───────
+  # USD3 (senior): deposit USDC->USD3, withdraw USD3->USDC. Synchronous ERC4626,
+  # position token valued in USDC via previewRedeem.
+  - id: "252447803558201206481473565375486988428" # keccak256("3jane.usd3")
+    group_id: "0"
+    description: "3Jane USD3 (senior)"
+    instructions: !include "../../../instructions/3jane-usd3.yaml"
+    position_tokens: ["0x056B269Eb1f75477a8666ae8C7fE01b64dD55eCc"] # USD3
+    vars:
+      label: "USD3"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: ${token_list.mainnet.USD3}
+  # sUSD3 (junior): USDC-denominated, routed USDC<->USD3<->sUSD3. Withdraw via
+  # cooldown (when active) then redeem. Position token valued in USDC via double previewRedeem.
+  - id: "106840302463434922495902263364800865375" # keccak256("3jane.susd3")
+    group_id: "0"
+    description: "3Jane sUSD3 (junior)"
+    instructions: !include "../../../instructions/3jane-susd3.yaml"
+    position_tokens: ["0xf689555121e529Ff0463e191F9Bd9d1E496164a7"] # sUSD3
+    vars:
+      label: "sUSD3"
+      asset_address: ${token_list.mainnet.USDC} # base/denomination token (sUSD3's ERC4626 asset is USD3, via intermediate_vault_address)
+      intermediate_vault_address: ${token_list.mainnet.USD3}
+      vault_address: ${token_list.mainnet.sUSD3}
+
+  # ── fxSAVE (f(x) Protocol fxUSD savings) ─────────────────────────
+  # Re-enabled on dusd with refreshed blueprints/fxsave/* (current f(x) contracts):
+  # deposit USDC -> fxSP -> fxSAVE directly; exit async (request_redeem -> claim) or
+  # instant (instant_withdraw, ~1% fee). Valued in (fxUSD, USDC) via the OracleRegistry.
+  # NOTE: this accounting reads raw fxSP.balanceOf(caliber). Do NOT also enable the
+  # convex-fx-fxsp stability-pool accounting on this caliber — it reads the same
+  # fxSP.balanceOf and the two would double-count any loose/cooldown fxSP.
+  - id: "44945688424358326878175149972352928818"
+    group_id: "0"
+    description: "fxSAVE position"
+    instructions: !include "./instructions/fxsave-usdc.yaml"
+    position_tokens:
+      - "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39" # fxSAVE (held)
+      - "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be" # fxSP (held while redeemed/in cooldown)
