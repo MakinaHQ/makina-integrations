@@ -10,15 +10,6 @@ protocol: "royco-st-dmg"
 #   5. approve mt_received -> AsyncRedeemer
 #   6. AsyncRedeemer.requestRedeem(mt_received, caliber, min_assets) -> requestId
 #   7. KV persist: set(requestId_key, requestId); set(pending_mt_key, mt_received)
-#
-# Mirrors the standard makina async-redeem request (blueprints/makina/redeem.yaml): we persist
-# the DMG MT amount placed into the redeem NFT (mt_received) as the pending term. account.yaml
-# adds that pending MT to the caliber's live ST claim and converts the sum to USDC ONCE via the
-# DMG machine. Across this request the live claim drops by ~mt_received and the pending term rises
-# by exactly mt_received, so total MT (hence the USDC value) is conserved -> value-neutral, as
-# required because the request moves no USDC (Caliber value-loss RHS == 0). The redemption fee
-# surfaces at claim, where the USDC inflow gives RHS > 0. No before/after valuation is needed
-# here: storing the conserved MT amount is sufficient (see account.yaml for the full rationale).
 
 constants:
   context_helper_address:
