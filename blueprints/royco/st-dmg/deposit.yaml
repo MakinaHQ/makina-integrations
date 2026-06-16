@@ -4,10 +4,6 @@ protocol: "royco-st-dmg"
 # Multi-step deposit: USDC -> DMG MT (makina DirectDepositor) -> Senior Tranche shares
 # 4-step flow: approve USDC -> DirectDepositor; DirectDepositor.deposit -> MT;
 #              approve MT -> ST; ST.deposit -> ST shares.
-# Mirrors blueprints/royco/st-smokehouse-usdc/deposit.yaml, but the intermediate vault
-# is the DMG machine's DirectDepositor (4-arg makina deposit returning MT shares), not a
-# standard ERC4626. TRANCHE_UNIT == DMG MT denomination (18 dec), so the MT minted feeds
-# ST.deposit 1:1.
 
 constants:
   context_helper_address:
