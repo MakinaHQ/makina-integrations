@@ -6,11 +6,13 @@ protocol: "royco-jt-pareto-falconx"
 # (one full Pareto epoch + buffer); the second phase is in `claim.yaml`.
 #
 # Phase 1 flow:
-#   1. RoycoJT.redeem(shares, caliber, caliber)
+#   1. KV guard: require no shared FalconX withdraw already pending
+#   2. RoycoJT.redeem(shares, caliber, caliber)
 #        -> kernel transfers AA tranche tokens to caliber
-#   2. IdleCDOEpochVariant.requestWithdraw(aaDelta, AATranche)
+#   3. IdleCDOEpochVariant.requestWithdraw(aaDelta, AATranche)
 #        -> burns AA from caliber
 #        -> mints FalconXUSDC receipt token (6-dec ERC20) to caliber
+#   4. KV flag: mark the shared FalconX withdraw as pending until claim clears it
 #
 # Between Phase 1 and Phase 2 the caliber holds FalconXUSDC instead of AA / JT. The
 # `account.yaml` blueprint covers all three component states.
@@ -40,6 +42,12 @@ constants:
   unsigned_math_helper_address:
     type: "address"
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
   cdo_address:
     type: "address"
     value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
@@ -50,7 +58,11 @@ constants:
     type: "address"
     value: "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d"
 
-inputs: {}
+inputs:
+  kv_store_address:
+    type: "address"
+  pending_withdraw_storage_key:
+    type: "bytes32"
 
 actions:
   request_redeem:
@@ -64,7 +76,37 @@ actions:
           name: "caliber_address"
           type: "address"
 
-      # 1. Compute share amount from bps (10000 = 100%)
+      # 1. Guard against overlapping FalconX withdraws across vanilla and Royco wrappers
+      - description: "Read shared FalconX pending withdraw flag"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_withdraw_storage_key}"
+        return:
+          name: "existing_pending_withdraw"
+          type: "uint256"
+
+      - description: "Check no shared FalconX withdraw is pending"
+        target: "${constants.caliber_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_pending_withdraw}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_pending_withdraw"
+          type: "bool"
+
+      - description: "Revert if another FalconX withdraw is already pending"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_pending_withdraw}"
+
+      # 2. Compute share amount from bps (10000 = 100%)
       - description: "Get Junior Tranche share balance"
         target: "${constants.junior_tranche_address}"
         selector: "balanceOf(address)"
@@ -89,7 +131,7 @@ actions:
           name: "shares_to_redeem"
           type: "uint256"
 
-      # 2. AA balance sandwich (capture exactly what the kernel transferred out)
+      # 3. AA balance sandwich (capture exactly what the kernel transferred out)
       - description: "Snapshot AA balance before redeem"
         target: "${constants.aa_tranche_address}"
         selector: "balanceOf(address)"
@@ -133,7 +175,7 @@ actions:
           name: "aa_delta"
           type: "uint256"
 
-      # 3. Submit AA into Pareto's withdraw queue -> mints FalconXUSDC receipt to caliber
+      # 4. Submit AA into Pareto's withdraw queue -> mints FalconXUSDC receipt to caliber
       - description: "Request withdraw on Pareto IdleCDOEpochVariant (burns AA, mints FalconXUSDC receipt)"
         target: "${constants.cdo_address}"
         selector: "requestWithdraw(uint256,address)"
@@ -142,6 +184,16 @@ actions:
             value: "${returns.aa_delta}"
           - type: "address"
             value: "${constants.aa_tranche_address}"
+
+      # 5. Mark the shared receipt as pending so no second position also counts it
+      - description: "Store shared FalconX pending withdraw flag"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_withdraw_storage_key}"
+          - type: "uint256"
+            value: "1"
 
     input_slots:
       bps_to_redeem:

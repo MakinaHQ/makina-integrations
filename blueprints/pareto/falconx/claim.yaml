@@ -10,6 +10,7 @@ protocol: "pareto-falconx"
 #   1. IdleCDOEpochVariant.claimWithdrawRequest()
 #        -> burns the caliber's entire FalconXUSDC receipt
 #        -> transfers USDC to the caliber
+#   2. KV reset: clear the shared FalconX pending-withdraw flag
 #
 # Readiness preconditions (revert with NotAllowed() 0x3d693ada if missed):
 #   - At least one full Pareto epoch + buffer has elapsed since requestWithdraw,
@@ -23,7 +24,11 @@ constants:
     type: "address"
     value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
 
-inputs: {}
+inputs:
+  kv_store_address:
+    type: "address"
+  pending_withdraw_storage_key:
+    type: "bytes32"
 
 actions:
   claim_redeem:
@@ -32,3 +37,10 @@ actions:
         target: "${constants.cdo_address}"
         selector: "claimWithdrawRequest()"
         parameters: []
+
+      - description: "Clear shared FalconX pending withdraw flag"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_withdraw_storage_key}"
