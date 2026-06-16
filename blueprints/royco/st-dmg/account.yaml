@@ -15,11 +15,6 @@ protocol: "royco-st-dmg"
 #   7. total_usdc = DMG_machine.convertToAssets(total_mt)       # MT -> USDC (6 dec), ONE conversion
 #   reserved_slots: [total_usdc, UINT256_MAX]
 #
-# Same shape as the standard makina async-redeem accounting (live shares + pending shares ->
-# convertToAssets ONCE on the sum), where the "shares" unit is DMG MT. The live leg is the
-# caliber's pro-rata ST claim in MT; the pending leg is the MT held in the AsyncRedeemer redeem
-# NFT (stored by request-redeem.yaml).
-#
 # SUPPLY-SAFE valuation (NO permanent seed needed): we do NOT call ST.convertToAssets, which
 # divides by ST.totalSupply() and reverts Panic 0x12 at totalSupply()==0 (the sole/last-holder
 # 100% exit). Instead we read the kernel's previewSyncTrancheAccounting(0) view -- which does NOT
@@ -30,12 +25,6 @@ protocol: "royco-st-dmg"
 # stAssets) to the wei. When totalShares==0 the caliber's balance is necessarily 0, so active_mt
 # = mulDiv(*, 0, 1) = 0 with no division by zero. Word indices: SyncedAccountingState is 14 static
 # words, AssetClaims (stAssets, jtAssets, nav) is words 14/15/16, totalTrancheShares is word 17.
-#
-# Value-loss invariant (async withdraw): at requestRedeem time active_mt drops by ~mt_received and
-# pending_mt rises by exactly mt_received, so total_mt is conserved and total_usdc is unchanged.
-# The re-derived claim loses <=1 wei of 18-dec MT to rounding, which floors to 0 in the 18->6-dec
-# convertToAssets (change == 0). The redemption fee surfaces at claim, where the USDC inflow gives
-# a non-zero value-loss RHS. DMG_machine.convertToAssets(0)==0, so the idle position values to 0.
 
 constants:
   context_helper_address:
