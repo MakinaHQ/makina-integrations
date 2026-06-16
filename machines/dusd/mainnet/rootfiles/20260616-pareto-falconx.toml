@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x5fefdecb0ecde062978ac5b02f97d4e7258097c665a595680a5c1a9211c4c7ad
+# root: 0x382f47dd5f99c982d136e78b99dd122992fc9811f01a6a9fe00a2fdef4534a4e
 
 [tokens."${token_list.mainnet.AUSD}"]
 chainId = 1
@@ -28,6 +28,13 @@ address = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 name = "RLUSD"
 decimals = 18
 symbol = "RLUSD"
+
+[tokens."${token_list.mainnet.USD3}"]
+chainId = 1
+address = "0x056b269eb1f75477a8666ae8c7fe01b64dd55ecc"
+name = "USD3"
+decimals = 6
+symbol = "USD3"
 
 [tokens."${token_list.mainnet.USDC}"]
 chainId = 1
@@ -85,6 +92,27 @@ name = "Electronic Dollar"
 decimals = 18
 symbol = "eUSD"
 
+[tokens."${token_list.mainnet.fxUSD}"]
+chainId = 1
+address = "0x085780639cc2cacd35e474e71f4d000e2405d8f6"
+name = "f(x) USD"
+decimals = 18
+symbol = "fxUSD"
+
+[tokens."${token_list.mainnet.reUSD}"]
+chainId = 1
+address = "0x5086bf358635b81d8c47c66d1c8b9e567db70c72"
+name = "Re Protocol Deposit Token"
+decimals = 18
+symbol = "reUSD"
+
+[tokens."${token_list.mainnet.sUSD3}"]
+chainId = 1
+address = "0xf689555121e529ff0463e191f9bd9d1e496164a7"
+name = "sUSD3"
+decimals = 6
+symbol = "sUSD3"
+
 [tokens."${token_list.mainnet.sUSDS}"]
 chainId = 1
 address = "0xa3931d71877c0e7a3148cb7eb4463524fec27fbd"
@@ -98,6 +126,261 @@ address = "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
 name = "Staked USDe"
 decimals = 18
 symbol = "sUSDe"
+
+[instructions.3jane.account.USD3]
+position_id = "252447803558201206481473565375486988428"
+description = "3Jane USD3 (senior)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0x056b269eb1f75477a8666ae8c7fe01b64dd55ecc"]
+commands = [
+  "0x70a082310102ff0000000002056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0x4cdad5060102ff0000000000056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.3jane.account_junior.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xf689555121e529ff0463e191f9bd9d1e496164a7"]
+commands = [
+  "0x70a082310102ff0000000002f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0x4cdad5060102ff0000000002f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0x4cdad5060102ff0000000000056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.3jane.deposit.USD3]
+position_id = "252447803558201206481473565375486988428"
+description = "3Jane USD3 (senior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0x89c4783cb6cc307f98e95f2d5d5d8647bdb3d4bdd087209374f187b38e098895",
+  "0x000000000000000000000000056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.3jane.deposit.USD3.inputs_slots]]
+index = 0
+name = "amount"
+type = "Uint"
+
+[instructions.3jane.deposit_junior.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010003ff00000001056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0x095ea7b3010201ff000000ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0x6e553f65010103ff000000fff689555121e529ff0463e191f9bd9d1e496164a7",
+]
+state = [
+  "0x89c4783cb6cc307f98e95f2d5d5d8647bdb3d4bdd087209374f187b38e098895",
+  "0x000000000000000000000000056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0x000000000000000000000000f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.3jane.deposit_junior.sUSD3.inputs_slots]]
+index = 0
+name = "amount"
+type = "Uint"
+
+[instructions.3jane.redeem.USD3]
+position_id = "252447803558201206481473565375486988428"
+description = "3Jane USD3 (senior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0x9f40a7b30100020201ff00ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc"]
+state = [
+  "0xaef6ebad2f600419c51031e5e45e58af020ed5fb8de0ee3168d4cf0dcbb16783",
+  "0x2cc4402cf1f28da6cc6d6f2eae1635cfa225575bc7b054bac9f79e8be4baf20d",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "42535295865117307932921825928971026432"
+
+[[instructions.3jane.redeem.USD3.inputs_slots]]
+index = 0
+name = "shares"
+type = "Uint"
+
+[[instructions.3jane.redeem.USD3.inputs_slots]]
+index = 1
+name = "max_loss_bps"
+type = "Uint"
+
+[instructions.3jane.redeem_junior.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x9f40a7b30100020201ff0003f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0x9f40a7b30103020201ff00ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0xaef6ebad2f600419c51031e5e45e58af020ed5fb8de0ee3168d4cf0dcbb16783",
+  "0x2cc4402cf1f28da6cc6d6f2eae1635cfa225575bc7b054bac9f79e8be4baf20d",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "42535295865117307932921825928971026432"
+
+[[instructions.3jane.redeem_junior.sUSD3.inputs_slots]]
+index = 0
+name = "shares"
+type = "Uint"
+
+[[instructions.3jane.redeem_junior.sUSD3.inputs_slots]]
+index = 1
+name = "max_loss_bps"
+type = "Uint"
+
+[instructions.3jane.redeem_junior_relative.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310103ff0000000004f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0xaa9a091201040002ff0000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x9f40a7b30104030301ff0004f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0x9f40a7b30104030301ff00ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x2cc4402cf1f28da6cc6d6f2eae1635cfa225575bc7b054bac9f79e8be4baf20d",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.3jane.redeem_junior_relative.sUSD3.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[[instructions.3jane.redeem_junior_relative.sUSD3.inputs_slots]]
+index = 1
+name = "max_loss_bps"
+type = "Uint"
+
+[instructions.3jane.redeem_relative.USD3]
+position_id = "252447803558201206481473565375486988428"
+description = "3Jane USD3 (senior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310103ff0000000004056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+  "0xaa9a091201040002ff0000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x9f40a7b30104030301ff00ff056b269eb1f75477a8666ae8c7fe01b64dd55ecc",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x2cc4402cf1f28da6cc6d6f2eae1635cfa225575bc7b054bac9f79e8be4baf20d",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.3jane.redeem_relative.USD3.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[[instructions.3jane.redeem_relative.USD3.inputs_slots]]
+index = 1
+name = "max_loss_bps"
+type = "Uint"
+
+[instructions.3jane.start_cooldown.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x672e1fd80100ff00000000fff689555121e529ff0463e191f9bd9d1e496164a7"]
+state = ["0xaef6ebad2f600419c51031e5e45e58af020ed5fb8de0ee3168d4cf0dcbb16783"]
+bitmap = "0"
+
+[[instructions.3jane.start_cooldown.sUSD3.inputs_slots]]
+index = 0
+name = "shares"
+type = "Uint"
+
+[instructions.3jane.start_cooldown_relative.sUSD3]
+position_id = "106840302463434922495902263364800865375"
+description = "3Jane sUSD3 (junior)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310101ff0000000001f689555121e529ff0463e191f9bd9d1e496164a7",
+  "0xaa9a091201010002ff0000013d623b199e290358416415ea7e05b635e442e3c0",
+  "0x672e1fd80101ff00000000fff689555121e529ff0463e191f9bd9d1e496164a7",
+]
+state = [
+  "0x8b6bfd4023ad55e1acef11d380f74da4a52ae9c5f94e2b09a6e3a4c4803f59de",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.3jane.start_cooldown_relative.sUSD3.inputs_slots]]
+index = 0
+name = "bps_to_cooldown"
+type = "Uint"
 
 [instructions."Aave Umbrella".account.USDC]
 position_id = "176021688445186810403025048632929053161"
@@ -1950,6 +2233,206 @@ index = 0
 name = "bps_to_redeem"
 type = "Uint"
 
+[instructions.fxSAVE.account.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+position_tokens = [
+  "0x7743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+commands = [
+  "0x70a082310103ff00000000067743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x07a2d13a0106ff00000000067743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x70a082310103ff000000000365c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x771602f7010603ff00000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0x4cdad5068103ff000000008365c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x",
+]
+bitmap = "79753679747094952374228423616820674560"
+inputs_slots = []
+
+[instructions.fxSAVE.claim.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+position_tokens = []
+commands = [
+  "0x8d158c2a8101ff000000008265c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x62de91e9018200ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x1e9a6950010102ff000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.fxSAVE.deposit.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x20e8c5650105030001ff000365c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x095ea7b3010403ff000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x6e553f65010305ff000000ff7743e50f534a7f9f1791dde7dcd89f7783eefc39",
+]
+state = [
+  "0x89c4783cb6cc307f98e95f2d5d5d8647bdb3d4bdd087209374f187b38e098895",
+  "0x9d7c2c9dbea13cc411bd98df2c2b7ec7bd29cc014ffe4f2fb4b6d54310d74fa5",
+  "0x00000000000000000000000065c9a641afceb9c0e6034e558a319488fa0fa3be",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x0000000000000000000000007743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "79753679747094952374228423616820674560"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 0
+name = "amount"
+type = "Uint"
+
+[[instructions.fxSAVE.deposit.fxSAVE.inputs_slots]]
+index = 1
+name = "min_fxsp_out"
+type = "Uint"
+
+[instructions.fxSAVE.instant_withdraw.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+position_tokens = []
+commands = [
+  "0xba08765201000101ff0000027743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x9f56f9f0010102ff000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.fxSAVE.instant_withdraw.fxSAVE.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.fxSAVE.instant_withdraw_relative.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x085780639cc2cacd35e474e71f4d000e2405d8f6",
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000037743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000037743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0x9f56f9f0010203ff000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.fxSAVE.instant_withdraw_relative.fxSAVE.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.fxSAVE.request_redeem.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xba08765201000101ff0000017743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0xaa2f892d0101ff00000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.fxSAVE.request_redeem.fxSAVE.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.fxSAVE.request_redeem_relative.fxSAVE]
+position_id = "44945688424358326878175149972352928818"
+description = "fxSAVE position"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000037743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000037743e50f534a7f9f1791dde7dcd89f7783eefc39",
+  "0xaa2f892d0103ff00000000ff65c9a641afceb9c0e6034e558a319488fa0fa3be",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.fxSAVE.request_redeem_relative.fxSAVE.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
 [instructions.infinifi.account."liUSD 1-Week"]
 position_id = "2013457072841808719642938411712424809"
 description = "InfiniFi liUSD 1-Week Lock"
@@ -2869,6 +3352,26 @@ position_tokens = ["0xd63070114470f685b75b74d60eec7c1113d33a3d"]
 commands = [
   "0x70a082310102ff0000000002d63070114470f685b75b74d60eec7c1113d33a3d",
   "0x4cdad5060102ff0000000000d63070114470f685b75b74d60eec7c1113d33a3d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0xc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+commands = [
+  "0x70a082310102ff0000000002c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0x4cdad5060102ff0000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
 ]
 state = [
   "0x",
@@ -4217,6 +4720,30 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x6e553f65010002ff000000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Sentora PRIME Main PYUSD".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
 [instructions.morpho.deposit_vault."Sentora PYUSD"]
 position_id = "273739676753663843967743313854543738189"
 description = "Morpho Vault PYUSD Sentora"
@@ -4485,6 +5012,25 @@ commands = [
 ]
 state = [
   "0x00000000000000000000000032401b9fb79065bc15949de0bd43927492f02f0c",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0x000000000000000000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
   "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
 ]
 bitmap = "255211775190703847597530955573826158592"
@@ -5499,6 +6045,26 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Sentora PRIME Main PYUSD".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
 [instructions.morpho.redeem_vault."Sentora PYUSD"]
 position_id = "273739676753663843967743313854543738189"
 description = "Morpho Vault PYUSD Sentora"
@@ -5725,6 +6291,32 @@ state = [
 bitmap = "127605887595351923798765477786913079296"
 
 [[instructions.morpho.redeem_vault_relative."MEV Capital USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0xaa9a091201030001ff000003836c9007dbd73fcfc473190304c72b7e39babb91",
+  "0xba08765201030202ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Sentora PRIME Main PYUSD".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
 type = "Uint"
@@ -6929,6 +7521,26 @@ index = 0
 name = "assets_to_withdraw"
 type = "Uint"
 
+[instructions.morpho.withdraw_vault."Sentora PRIME Main PYUSD"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault PYUSD Sentora PRIME Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Sentora PRIME Main PYUSD".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
 [instructions.morpho.withdraw_vault."Sentora PYUSD"]
 position_id = "273739676753663843967743313854543738189"
 description = "Morpho Vault PYUSD Sentora"
@@ -7150,6 +7762,268 @@ state = [
 bitmap = "127605887595351923798765477786913079296"
 
 [[instructions.pareto-falconx.request_redeem."Pareto-FalconX (request)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.re.account_0."reUSD Swap (synthetic)"]
+position_id = "24723774581854776292240868230282650037557364081183638342159551676750129660338"
+description = "Re Protocol reUSD Swap (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x5086bf358635b81d8c47c66d1c8b9e567db70c72"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.re.redeem."reUSD Swap (synthetic)"]
+position_id = "24723774581854776292240868230282650037557364081183638342159551676750129660338"
+description = "Re Protocol reUSD Swap (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ff5086bf358635b81d8c47c66d1c8b9e567db70c72",
+  "0xfbc3b807010001ff000000ff8aeb9453ef22cb38abc7a3af9c208f65c1bfe31e",
+]
+state = [
+  "0xa53437cdd15ae281568bafe0517e67ed820999d0ed7ca29abbfa452c466e1820",
+  "0xfe3a97aabe54dba17fc068890d2dca62084af219ff9162736e8a708c01f4d3f2",
+  "0x000000000000000000000000a31deebb3680a3007120e74bcbdf4df36f042a40",
+]
+bitmap = "42535295865117307932921825928971026432"
+
+[[instructions.re.redeem."reUSD Swap (synthetic)".inputs_slots]]
+index = 0
+name = "amount_shares"
+type = "Uint"
+
+[[instructions.re.redeem."reUSD Swap (synthetic)".inputs_slots]]
+index = 1
+name = "min_payout"
+type = "Uint"
+
+[instructions.re.redeem_relative."reUSD Swap (synthetic)"]
+position_id = "24723774581854776292240868230282650037557364081183638342159551676750129660338"
+description = "Re Protocol reUSD Swap (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000025086bf358635b81d8c47c66d1c8b9e567db70c72",
+  "0xaa9a091201020003ff0000023d623b199e290358416415ea7e05b635e442e3c0",
+  "0x095ea7b3010402ff000000ff5086bf358635b81d8c47c66d1c8b9e567db70c72",
+  "0xfbc3b807010201ff000000ff8aeb9453ef22cb38abc7a3af9c208f65c1bfe31e",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0xfe3a97aabe54dba17fc068890d2dca62084af219ff9162736e8a708c01f4d3f2",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000a31deebb3680a3007120e74bcbdf4df36f042a40",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.re.redeem_relative."reUSD Swap (synthetic)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[[instructions.re.redeem_relative."reUSD Swap (synthetic)".inputs_slots]]
+index = 1
+name = "min_payout"
+type = "Uint"
+
+[instructions.re.swap_asset_for_reusd."reUSD Swap (synthetic)"]
+position_id = "24723774581854776292240868230282650037557364081183638342159551676750129660338"
+description = "Re Protocol reUSD Swap (synthetic)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x0efe6a8b01030001ff0000ff4691c475be804fa85f91c2d6d0adf03114de3093",
+]
+state = [
+  "0x7373e813b271fa34d6ee6ba052fd3c8ff5caba8ef5e78aae732dc62bea5eb921",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x0000000000000000000000004691c475be804fa85f91c2d6d0adf03114de3093",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.re.swap_asset_for_reusd."reUSD Swap (synthetic)".inputs_slots]]
+index = 0
+name = "asset_amount"
+type = "Uint"
+
+[[instructions.re.swap_asset_for_reusd."reUSD Swap (synthetic)".inputs_slots]]
+index = 1
+name = "min_shares"
+type = "Uint"
+
+[instructions.royco-jt-pareto-falconx.account.ROY-JT-Pareto-FalconX]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = [
+  "0xc26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x17e9ab2992dfecbe779a06a92a6cdb9fe6aeeef3",
+  "0x8e0ec43e51b88aa2324102e1a3d667822be51a6d",
+]
+commands = [
+  "0xd737d0c701ff0000000000060f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x9c8e2dc001ff0000000000ff15bb63c07740ff972f76716cacc5766f0c641791",
+  "0x70a082310106ff00000000078e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0x07a2d13a8107ff00000000878e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0x0f8be3fc018702ff0000000274dc739b8f98ad0f76cd8900695dd8d5083e45d3",
+  "0x0f8be3fc018703ff0000000774dc739b8f98ad0f76cd8900695dd8d5083e45d3",
+  "0x771602f7010207ff000000073d623b199e290358416415ea7e05b635e442e3c0",
+  "0x9290d4270104ff0000000004433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0xaa9a091201070405ff0000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x70a082310106ff000000000617e9ab2992dfecbe779a06a92a6cdb9fe6aeeef3",
+  "0x771602f7010406ff000000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+  "0x",
+  "0x",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.royco-jt-pareto-falconx.claim_redeem."ROY-JT-Pareto-FalconX (claim)"]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0x33986ffa01ff0000000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d"]
+state = []
+bitmap = "0"
+inputs_slots = []
+
+[instructions.royco-jt-pareto-falconx.deposit."ROY-JT-Pareto-FalconX (between epochs)"]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000030f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xc5c7509801ff000000000004433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0xd2f46b650104ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x70a082310103ff0000000001c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xb450dfce0100ff00000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0x70a082310103ff0000000004c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xb67d77c5010401ff000000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x095ea7b3010204ff000000ffc26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x6e553f65010403ff000000ff8e0ec43e51b88aa2324102e1a3d667822be51a6d",
+]
+state = [
+  "0xf15015d145f0dfeb1a7c93238d7b9427ecaddd044e1f499973167041ffaf9f51",
+  "0x000000000000000000000000433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0x0000000000000000000000008e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0x",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.royco-jt-pareto-falconx.deposit."ROY-JT-Pareto-FalconX (between epochs)".inputs_slots]]
+index = 0
+name = "usdc_amount_to_deposit"
+type = "Uint"
+
+[instructions.royco-jt-pareto-falconx.deposit."ROY-JT-Pareto-FalconX (mid-epoch)"]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000040f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0xc5c7509801ff000000000005433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0x711ecf590105ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x5f0b472a01ff000000000005433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0xd2f46b650105ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x70a082310104ff0000000001c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xc61e3faa010002ff000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0x70a082310104ff0000000002c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xb67d77c5010201ff000000023d623b199e290358416415ea7e05b635e442e3c0",
+  "0x095ea7b3010302ff000000ffc26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x6e553f65010204ff000000ff8e0ec43e51b88aa2324102e1a3d667822be51a6d",
+]
+state = [
+  "0xf15015d145f0dfeb1a7c93238d7b9427ecaddd044e1f499973167041ffaf9f51",
+  "0x000000000000000000000000433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0x000000000000000000000000c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x0000000000000000000000008e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0x",
+  "0x",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.royco-jt-pareto-falconx.deposit."ROY-JT-Pareto-FalconX (mid-epoch)".inputs_slots]]
+index = 0
+name = "usdc_amount_to_deposit"
+type = "Uint"
+
+[instructions.royco-jt-pareto-falconx.request_redeem."ROY-JT-Pareto-FalconX (request)"]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000030f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310103ff00000000048e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0xaa9a091201040001ff0000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x70a082310103ff0000000001c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xba08765201040303ff0000ff8e0ec43e51b88aa2324102e1a3d667822be51a6d",
+  "0x70a082310103ff0000000003c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0xb67d77c5010301ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xccc143b8010302ff000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000c26a6fa2c37b38e549a4a1807543801db684f99c",
+  "0x",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.royco-jt-pareto-falconx.request_redeem."ROY-JT-Pareto-FalconX (request)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
 type = "Uint"

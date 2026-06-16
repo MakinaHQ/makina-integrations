@@ -406,7 +406,7 @@ positions:
       - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
       - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
       - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
-      
+
   # ── Pareto FalconX AA-tranche ────────────────────────────────────
   - id: "114753234960554942361599178742666226841"
     group_id: "0"
@@ -415,7 +415,7 @@ positions:
     position_tokens:
       - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
       - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
-  
+
   # ── Re Protocol (reUSD synthetic swap) ───────────────────────────
   # Swap in  USDC -> reUSD via the ICL (synchronous mint, caliber is KYC-approved).
   # Swap out reUSD -> sUSDe via the RedemptionGateway instant path (atomic, while
