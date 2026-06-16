@@ -1,0 +1,100 @@
+# Pareto FalconX — Vanilla AA Tranche Exposure (USDC)
+#
+# Direct exposure to the Pareto Credit FalconX USDC vault AA tranche. The caliber
+# holds the Pareto AA tranche token (0xC26A...F99C) DIRECTLY — there is NO Royco
+# senior/junior tranche wrapper and NO Royco kernel. This is the strict subset of
+# the shipped royco-st / royco-jt Pareto FalconX integrations that stops at the
+# Pareto layer.
+#
+# Generic instruction (no machine-specific addresses; helper/token addresses are
+# global deployments hardcoded in the blueprints). Intended for the DUSD machine
+# on mainnet but reusable by any caliber that holds a Pareto Keyring policy-18
+# credential.
+#
+# Shared middleware (same as the royco siblings):
+#   Pareto IdleCDOEpochVariant 0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d
+#   AA tranche (position)      0xC26A6Fa2C37b38E549a4a1807543801Db684f99C
+#   FalconXUSDC receipt        0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3
+#   Keyring (policy 18)        0x6a6a91c7c7c05f9f6b8bc9f6e5ea231e460450e3
+#
+# Deposit (atomic): USDC -> Pareto IdleCDOEpochVariant -> AA tranche (kept by caliber).
+#   Two variants because the entry call differs by epoch state (incompatible
+#   signatures, so weiroll cannot dispatch in one blueprint):
+#     - deposit-running.yaml -> mid-epoch (depositDuringEpoch). Guarded to revert
+#                                if epoch not running OR mid-epoch deposits disabled.
+#     - deposit-idle.yaml    -> between-epoch (depositAA). Guarded to revert if
+#                                epoch is running (depositAA is whenNotPaused).
+#   The operator picks whichever matches isEpochRunning() at submit time.
+#
+# Two-phase queued withdraw (~32-65 days end-to-end):
+#   Phase 1: requestWithdraw on the caliber's AA balance -> FalconXUSDC receipt
+#            (between epochs only; bps sizes the AA amount). No Royco redeem.
+#   Phase 2: claimWithdrawRequest() -> burns receipt, pays USDC
+#            (NOT keyring-gated; gated only on epoch advance).
+#
+# Asset-space accounting:
+#   total_usdc = AA.balanceOf(caliber) * virtualPrice(AA) / 1e18
+#              + FalconXUSDC.balanceOf(caliber)
+#
+# Prerequisites (NOT blueprint guards):
+#   - Pareto Keyring policy-18 credential on the caliber. Required for
+#     depositAA / depositDuringEpoch / requestWithdraw. NOT required for
+#     claimWithdrawRequest. (The DUSD caliber already holds this from the
+#     royco-jt-pareto-falconx setup.)
+#   - NO Royco AccessManager grants are needed (vanilla never calls a
+#     Royco-gated selector).
+#
+# Operator runbook concerns (NOT blueprint guards):
+#   - Pareto epoch cadence: stopEpoch / startEpoch run on Pareto's ~32d schedule.
+#     Phase 2 gates on IdleCreditVault.epochNumber() > lastWithdrawRequest(caliber).
+#     The caliber cannot trigger stopEpoch.
+
+# DEPOSIT (mid-epoch): USDC -> depositDuringEpoch -> AA (kept by caliber)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "Pareto-FalconX (mid-epoch)"
+    path: "../../../blueprints/pareto/falconx/deposit-running.yaml:deposit"
+    inputs: {}
+
+# DEPOSIT (between epochs): USDC -> depositAA -> AA (kept by caliber)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "Pareto-FalconX (between epochs)"
+    path: "../../../blueprints/pareto/falconx/deposit-idle.yaml:deposit"
+    inputs: {}
+
+# WITHDRAW Phase 1: requestWithdraw on caliber AA -> FalconXUSDC receipt (between epochs only)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "Pareto-FalconX (request)"
+    path: "../../../blueprints/pareto/falconx/withdraw.yaml:request_redeem"
+    inputs: {}
+
+# WITHDRAW Phase 2: claimWithdrawRequest() -> burn FalconXUSDC, payout USDC
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "Pareto-FalconX (claim)"
+    path: "../../../blueprints/pareto/falconx/claim.yaml:claim_redeem"
+    inputs: {}
+
+# ACCOUNTING: AA.balanceOf * virtualPrice(AA) / 1e18 + FalconXUSDC.balanceOf
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "Pareto-FalconX"
+    path: "../../../blueprints/pareto/falconx/account.yaml:account"
+    inputs: {}

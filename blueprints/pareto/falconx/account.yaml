@@ -1,0 +1,118 @@
+protocol: "pareto-falconx"
+
+# Pareto FalconX (vanilla) — Account (asset-space)
+#
+# AA-tranche exposure: the caliber holds the AA tranche token
+# directly, so accounting is just the AA balance priced into USDC plus any
+# pending FalconXUSDC withdraw receipt.
+#
+# Algorithm:
+#   1. caliber_address = ContextHelper.msgSender()
+#   2. aa_balance      = AA.balanceOf(caliber)                 [18 dec]
+#   3. tranche_price   = IdleCDOEpochVariant.virtualPrice(AA)  [USDC 6-dec per 1e18 AA]
+#   4. usdc_from_aa    = aa_balance * tranche_price / 1e18     [USDC 6-dec]
+#   5. pending_usdc    = FalconXUSDC.balanceOf(caliber)        [USDC 6-dec]
+#   6. total_usdc      = usdc_from_aa + pending_usdc
+#
+# Using virtualPrice (live mark-to-market) per Pareto integrator guidance; it is
+# numerically equal to tranchePrice during an active epoch. The pending-receipt
+# term keeps the value correct during the multi-week withdraw window, when the
+# AA balance is 0 and the caliber holds FalconXUSDC instead.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+  aa_tranche_address:
+    type: "address"
+    value: "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C"
+  falconx_usdc_address:
+    type: "address"
+    value: "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3"
+
+inputs: {}
+
+actions:
+  account:
+    calls:
+      # 1. caliber address
+      - description: "Get caliber's address"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # 2. AA tranche balance (the position, 18 dec)
+      - description: "Get caliber AA tranche balance"
+        target: "${constants.aa_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "aa_balance"
+          type: "uint256"
+
+      # 3. virtualPrice(AA) — USDC 6-dec per 1e18 AA
+      - description: "Read Pareto AA virtual price (USDC 6-dec per 1e18 AA)"
+        target: "${constants.cdo_address}"
+        selector: "virtualPrice(address)"
+        parameters:
+          - type: "address"
+            value: "${constants.aa_tranche_address}"
+        return:
+          name: "tranche_price"
+          type: "uint256"
+
+      # 4. usdc_from_aa = aa_balance * tranche_price / 1e18
+      - description: "Convert AA balance to USDC: (aa_balance * tranche_price) / 1e18"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.aa_balance}"
+          - type: "uint256"
+            value: "${returns.tranche_price}"
+          - type: "uint256"
+            value: "1000000000000000000"
+        return:
+          name: "usdc_from_aa"
+          type: "uint256"
+
+      # 5. pending_usdc = FalconXUSDC.balanceOf(caliber) (6-dec USDC, principal-only)
+      - description: "Get pending FalconXUSDC withdraw receipt (USDC 6-dec)"
+        target: "${constants.falconx_usdc_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "pending_usdc"
+          type: "uint256"
+
+      # 6. total_usdc = usdc_from_aa + pending_usdc
+      - description: "Sum usdc_from_aa + pending_usdc"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usdc_from_aa}"
+          - type: "uint256"
+            value: "${returns.pending_usdc}"
+        return:
+          name: "total_usdc"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_usdc}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

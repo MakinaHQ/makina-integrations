@@ -389,3 +389,12 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+
+  # -- Pareto FalconX AA-tranche --------------------------------------
+  - id: "114753234960554942361599178742666226841"
+    group_id: "0"
+    description: "Pareto FalconX (vanilla AA tranche)"
+    instructions: !include "../../../instructions/pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
