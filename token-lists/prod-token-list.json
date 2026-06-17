@@ -5,10 +5,31 @@
   "tokens": [
     {
       "chainId": 1,
+      "address": "0x9d275685dC284C8eB1C79f6ABA7a63Dc75ec890a",
+      "name": "Apple xStock",
+      "decimals": 18,
+      "symbol": "AAPLx"
+    },
+    {
+      "chainId": 1,
+      "address": "0x3557Ba345B01EFa20A1bdDC61F573BFD87195081",
+      "name": "Amazon.com xStock",
+      "decimals": 18,
+      "symbol": "AMZNx"
+    },
+    {
+      "chainId": 1,
       "address": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
       "name": "AUSD",
       "decimals": 6,
       "symbol": "AUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0x364f210f430eC2448Fc68A49203040F6124096F0",
+      "name": "Coinbase xStock",
+      "decimals": 18,
+      "symbol": "COINx"
     },
     {
       "chainId": 1,
@@ -40,10 +61,38 @@
     },
     {
       "chainId": 1,
+      "address": "0xE1385FDd5ffB10081Cd52C56584F25EFa9084015",
+      "name": "Robinhood xStock",
+      "decimals": 18,
+      "symbol": "HOODx"
+    },
+    {
+      "chainId": 1,
+      "address": "0xf8A80D1cb9cFD70D03D655D9dF42339846F3B3C8",
+      "name": "Intel xStock",
+      "decimals": 18,
+      "symbol": "INTCx"
+    },
+    {
+      "chainId": 1,
       "address": "0x8236a87084f8B84306f72007F36F2618A5634494",
       "name": "Lombard Staked Bitcoin",
       "decimals": 8,
       "symbol": "LBTC"
+    },
+    {
+      "chainId": 1,
+      "address": "0xAE2f842EF90C0d5213259Ab82639D5BBF649b08E",
+      "name": "MicroStrategy xStock",
+      "decimals": 18,
+      "symbol": "MSTRx"
+    },
+    {
+      "chainId": 1,
+      "address": "0xA6a65AC27E76cD53cB790473E4345c46e5eBf961",
+      "name": "Netflix xStock",
+      "decimals": 18,
+      "symbol": "NFLXx"
     },
     {
       "chainId": 1,
@@ -65,6 +114,20 @@
       "name": "RLUSD",
       "decimals": 18,
       "symbol": "RLUSD"
+    },
+    {
+      "chainId": 1,
+      "address": "0x68fa48B1C2FE52b3D776E1953e0E782b5044Ce28",
+      "name": "SpaceX xStock",
+      "decimals": 18,
+      "symbol": "SPCXx"
+    },
+    {
+      "chainId": 1,
+      "address": "0x8aD3c73F833d3F9A523aB01476625F269aEB7Cf0",
+      "name": "Tesla xStock",
+      "decimals": 18,
+      "symbol": "TSLAx"
     },
     {
       "chainId": 1,

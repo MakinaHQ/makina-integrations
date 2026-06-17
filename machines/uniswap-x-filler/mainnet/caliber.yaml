@@ -36,3 +36,75 @@ positions:
     vars:
       label: "GOOGLx"
       xstock_token: ${token_list.mainnet.GOOGLx}
+
+  - id: "4"
+    group_id: "0"
+    description: "Uniswap X SPCXx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "SPCXx"
+      xstock_token: ${token_list.mainnet.SPCXx}
+
+  - id: "5"
+    group_id: "0"
+    description: "Uniswap X HOODx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "HOODx"
+      xstock_token: ${token_list.mainnet.HOODx}
+
+  - id: "6"
+    group_id: "0"
+    description: "Uniswap X INTCx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "INTCx"
+      xstock_token: ${token_list.mainnet.INTCx}
+
+  - id: "7"
+    group_id: "0"
+    description: "Uniswap X COINx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "COINx"
+      xstock_token: ${token_list.mainnet.COINx}
+
+  - id: "8"
+    group_id: "0"
+    description: "Uniswap X AAPLx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "AAPLx"
+      xstock_token: ${token_list.mainnet.AAPLx}
+
+  - id: "9"
+    group_id: "0"
+    description: "Uniswap X TSLAx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "TSLAx"
+      xstock_token: ${token_list.mainnet.TSLAx}
+
+  - id: "10"
+    group_id: "0"
+    description: "Uniswap X AMZNx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "AMZNx"
+      xstock_token: ${token_list.mainnet.AMZNx}
+
+  - id: "11"
+    group_id: "0"
+    description: "Uniswap X NFLXx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "NFLXx"
+      xstock_token: ${token_list.mainnet.NFLXx}
+
+  - id: "12"
+    group_id: "0"
+    description: "Uniswap X MSTRx filler settlement"
+    instructions: !include "../../../instructions/uniswap-x.yaml"
+    vars:
+      label: "MSTRx"
+      xstock_token: ${token_list.mainnet.MSTRx}
