@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0xdcac9db511222a058207fea52542bb2c783090c0919ac788bcd9320b67b30249
+# root: 0xb5bf2eec047a5012032ecd9979231880a7314a224190dafc5c87b458dc4230e8
 
 [tokens."${token_list.mainnet.AUSD}"]
 chainId = 1
@@ -7669,6 +7669,38 @@ state = [
   "0x",
 ]
 bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.pareto-falconx.claim_instant_redeem."Pareto-FalconX (claim instant)"]
+position_id = "114753234960554942361599178742666226841"
+description = "Pareto FalconX (vanilla AA tranche)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x991052b701ff0000000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0xed3c7d400100ff00000000ffa81fc382489f9560211ab15ad87f001b98c92e91",
+]
+state = ["0x61bac84522627f33f8f1816ec96ed238658bf6eb50226da4afa6a219153e76a7"]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.pareto-falconx.claim_instant_redeem."ROY-JT-Pareto-FalconX (claim instant)"]
+position_id = "330570121219840820532089219331590988878"
+description = "Royco Junior Tranche Pareto FalconX V2"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x991052b701ff0000000000ff433d5b175148da32ffe1e1a37a939e1b7e79be4d",
+  "0xed3c7d400100ff00000000ffa81fc382489f9560211ab15ad87f001b98c92e91",
+]
+state = ["0x61bac84522627f33f8f1816ec96ed238658bf6eb50226da4afa6a219153e76a7"]
+bitmap = "170141183460469231731687303715884105728"
 inputs_slots = []
 
 [instructions.pareto-falconx.claim_redeem."Pareto-FalconX (claim)"]

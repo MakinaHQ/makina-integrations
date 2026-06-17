@@ -1,14 +1,22 @@
 protocol: "pareto-falconx"
 
-# Pareto FalconX (vanilla) — Withdraw Phase 2 (claim_redeem)
+# Pareto FalconX (vanilla) — Withdraw Phase 2 (claim_redeem / claim_instant_redeem)
 #
 # SECOND of TWO non-atomic phases. Phase 1 (`withdraw.yaml`) issued the
 # requestWithdraw and credited the caliber a FalconXUSDC receipt token. This
-# phase burns that receipt and pays out USDC to the caliber.
+# phase burns that receipt and pays out USDC to the caliber. `requestWithdraw`
+# can be routed by Pareto into either a normal withdraw request or an instant
+# withdraw request depending on APR/buffer state; expose both claim entrypoints.
 #
-# Phase 2 flow:
+# Normal phase 2 flow:
 #   1. IdleCDOEpochVariant.claimWithdrawRequest()
 #        -> burns the caliber's entire FalconXUSDC receipt
+#        -> transfers USDC to the caliber
+#   2. KV reset: clear the shared FalconX pending-withdraw flag
+#
+# Instant phase 2 flow:
+#   1. IdleCDOEpochVariant.claimInstantWithdrawRequest()
+#        -> burns the caliber's instant FalconXUSDC receipt
 #        -> transfers USDC to the caliber
 #   2. KV reset: clear the shared FalconX pending-withdraw flag
 #
@@ -18,6 +26,9 @@ protocol: "pareto-falconx"
 #     Runtime check: IdleCreditVault.epochNumber() > lastWithdrawRequest(caliber).
 #   - Caliber holds a non-zero FalconXUSDC receipt (Phase 1 actually ran).
 #   - NOT keyring-gated — claim works even if the caliber's credential is revoked.
+#
+# Instant claim readiness:
+#   - IdleCDOEpochVariant.allowInstantWithdraw() == true.
 
 constants:
   cdo_address:
@@ -36,6 +47,20 @@ actions:
       - description: "Claim queued Pareto withdraw: burns FalconXUSDC receipt and pays out USDC"
         target: "${constants.cdo_address}"
         selector: "claimWithdrawRequest()"
+        parameters: []
+
+      - description: "Clear shared FalconX pending withdraw flag"
+        target: "${inputs.kv_store_address}"
+        selector: "reset(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.pending_withdraw_storage_key}"
+
+  claim_instant_redeem:
+    calls:
+      - description: "Claim instant Pareto withdraw: burns instant FalconXUSDC receipt and pays out USDC"
+        target: "${constants.cdo_address}"
+        selector: "claimInstantWithdrawRequest()"
         parameters: []
 
       - description: "Clear shared FalconX pending withdraw flag"
