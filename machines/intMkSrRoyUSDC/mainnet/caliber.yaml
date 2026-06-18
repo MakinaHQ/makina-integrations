@@ -140,3 +140,10 @@ positions:
       - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # AA tranche
       - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
       - "0x694ADB3077BBecE31882B6d6A74fc4A4fA6a754b" # ST-Pareto-FalconX
+  - id: "11982404669153264769163325022811149313"
+    group_id: "0"
+    description: "Royco Senior Tranche DMG"
+    instructions: !include "../../../instructions/royco-st-dmg.yaml"
+    position_tokens:
+      - "0x761c3b16A5afDD7a1869c4b979cFF3383d5fE98b" # DMG MT
+      - "0xaC9CF7e8f83C471cA596F4371fF002cdaF9573e6" # ST-DMG
