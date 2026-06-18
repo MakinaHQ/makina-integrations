@@ -30,6 +30,11 @@
 #             non-coverage-gated ST.redeem — runbook concern, not a blueprint guard)
 #   Phase 2: claimWithdrawRequest()  -> burns receipt, pays USDC
 #            (NOT keyring-checked, NOT role-gated; gated only on epoch advance)
+#   Instant Phase 2: claimInstantWithdrawRequest() -> burns instant receipt,
+#            pays USDC when Pareto routes requestWithdraw into instant withdraw.
+#   A shared KV pending-withdraw flag prevents this Royco wrapper and the vanilla
+#   Pareto FalconX position from opening overlapping FalconX withdraw receipts
+#   that both accounting paths would otherwise count.
 #
 # Asset-space accounting (mirrors the JT-syrupUSDC / JT-stcUSD sibling pattern of
 # summing BOTH layer accumulators, then converting to USDC):
@@ -105,7 +110,13 @@
   instruction:
     label: "ROY-JT-Pareto-FalconX (request)"
     path: "../../../blueprints/royco/jt-pareto-falconx/withdraw.yaml:request_redeem"
-    inputs: {}
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_withdraw_storage_key:
+        type: "bytes32"
+        value: "${keccak256(pareto.mainnet.falconx.pending-withdraw)}"
 
 # WITHDRAW Phase 2: claimWithdrawRequest() -> burn FalconXUSDC, payout USDC
 - is_debt: false
@@ -114,8 +125,30 @@
     - "${token_list.mainnet.USDC}" # USDC
   instruction:
     label: "ROY-JT-Pareto-FalconX (claim)"
-    path: "../../../blueprints/royco/jt-pareto-falconx/claim.yaml:claim_redeem"
-    inputs: {}
+    path: "../../../blueprints/pareto/falconx/claim.yaml:claim_redeem"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_withdraw_storage_key:
+        type: "bytes32"
+        value: "${keccak256(pareto.mainnet.falconx.pending-withdraw)}"
+
+# WITHDRAW Instant Phase 2: claimInstantWithdrawRequest() -> burn instant FalconXUSDC, payout USDC
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC
+  instruction:
+    label: "ROY-JT-Pareto-FalconX (claim instant)"
+    path: "../../../blueprints/pareto/falconx/claim.yaml:claim_instant_redeem"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_withdraw_storage_key:
+        type: "bytes32"
+        value: "${keccak256(pareto.mainnet.falconx.pending-withdraw)}"
 
 # ACCOUNTING: asset-space full (jt_aa + stranded_aa) * virtualPrice(AA) + FalconXUSDC
 # Sums slot 0 (stAssets) + slot 1 (jtAssets) — both accumulators carry the JT pro-rata claim. See header.

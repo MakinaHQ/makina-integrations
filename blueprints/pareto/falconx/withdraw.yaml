@@ -1,39 +1,27 @@
-protocol: "royco-jt-pareto-falconx"
+protocol: "pareto-falconx"
 
-# Royco Junior Tranche over Pareto FalconX — Withdraw Phase 1 (request_redeem)
+# Pareto FalconX (vanilla) — Withdraw Phase 1 (request_redeem)
 #
-# This is the FIRST of TWO non-atomic phases. The two phases are separated by ~32-65 days
-# (one full Pareto epoch + buffer); the second phase is in `claim.yaml`.
+# This is the FIRST of TWO non-atomic phases, separated by ~32-65 days (one full
+# Pareto epoch + buffer). Phase 2 is in `claim.yaml`.
 #
 # Phase 1 flow:
 #   1. KV guard: require no shared FalconX withdraw already pending
-#   2. RoycoJT.redeem(shares, caliber, caliber)
-#        -> kernel transfers AA tranche tokens to caliber
-#   3. IdleCDOEpochVariant.requestWithdraw(aaDelta, AATranche)
-#        -> burns AA from caliber
-#        -> mints FalconXUSDC receipt token (6-dec ERC20) to caliber
-#   4. KV flag: mark the shared FalconX withdraw as pending until claim clears it
-#
-# Between Phase 1 and Phase 2 the caliber holds FalconXUSDC instead of AA / JT. The
-# `account.yaml` blueprint covers all three component states.
+#   2. aa_balance = AA.balanceOf(caliber)
+#   3. aa_to_withdraw = aa_balance * bps_to_redeem / 10000
+#   4. IdleCDOEpochVariant.requestWithdraw(aa_to_withdraw, AATranche)
+#        -> burns AA from the caliber
+#        -> mints FalconXUSDC receipt token (6-dec ERC20) to the caliber
+#   5. KV flag: mark the shared FalconX withdraw as pending until claim clears it
 #
 # Hard preconditions (revert if missed):
 #   - isEpochRunning() == false                (Pareto rejects requestWithdraw mid-epoch)
 #   - allowAAWithdrawRequest() == true         (only true between epochs)
-#   - Caliber has Royco grant for (JT, redeem selector) — same JT_LP role as JT.deposit
-#   - Caliber has Pareto Keyring policy 18 credential
+#   - Caliber has Pareto Keyring policy-18 credential
 #   - defaulted() == false                     (else withdrawals partial / blocked)
 #
-# Coverage-gate caveat (divergence from ST.redeem which is NOT coverage-gated):
-#   JT.redeem CAN revert with the accountant's coverage error if the redeem size would
-#   leave coverage below `coverageWAD` or utilization above `liquidationUtilizationWAD`.
-#   The operator should size redemptions accordingly; the bps_to_redeem input is the
-#   only operator control here.
-#
-# Approval requirement: NONE.
-#   - JT.redeem burns the caliber's own JT shares (no allowance from caliber needed).
-#   - requestWithdraw is called by the AA owner (the caliber); the AA is burned by
-#     the CDO via _burn(msg.sender, _amount). No allowance to set.
+# Approval requirement: NONE. requestWithdraw is called by the AA owner (the
+# caliber); the CDO burns the AA via _burn(msg.sender, _amount).
 
 constants:
   context_helper_address:
@@ -54,9 +42,6 @@ constants:
   aa_tranche_address:
     type: "address"
     value: "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C"
-  junior_tranche_address:
-    type: "address"
-    value: "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d"
 
 inputs:
   kv_store_address:
@@ -106,73 +91,30 @@ actions:
           - type: "bool"
             value: "${returns.no_pending_withdraw}"
 
-      # 2. Compute share amount from bps (10000 = 100%)
-      - description: "Get Junior Tranche share balance"
-        target: "${constants.junior_tranche_address}"
+      # 2. Read the caliber's AA tranche balance (the position)
+      - description: "Get caliber AA tranche balance"
+        target: "${constants.aa_tranche_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
             value: "${returns.caliber_address}"
         return:
-          name: "jt_shares"
+          name: "aa_balance"
           type: "uint256"
 
-      - description: "Calculate shares to redeem from basis points"
+      # 3. Size the withdraw from basis points (10000 = 100%)
+      - description: "Calculate AA amount to withdraw from basis points"
         target: "${constants.unsigned_math_helper_address}"
         selector: "mulDiv(uint256,uint256,uint256)"
         parameters:
           - type: "uint256"
-            value: "${returns.jt_shares}"
+            value: "${returns.aa_balance}"
           - type: "uint256"
             value: "${input_slots.bps_to_redeem}"
           - type: "uint256"
             value: "10000"
         return:
-          name: "shares_to_redeem"
-          type: "uint256"
-
-      # 3. AA balance sandwich (capture exactly what the kernel transferred out)
-      - description: "Snapshot AA balance before redeem"
-        target: "${constants.aa_tranche_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${returns.caliber_address}"
-        return:
-          name: "aa_before"
-          type: "uint256"
-
-      - description: "Redeem JT shares to receive AA tranche tokens"
-        target: "${constants.junior_tranche_address}"
-        selector: "redeem(uint256,address,address)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.shares_to_redeem}"
-          - type: "address"
-            value: "${returns.caliber_address}"
-          - type: "address"
-            value: "${returns.caliber_address}"
-
-      - description: "Snapshot AA balance after redeem"
-        target: "${constants.aa_tranche_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${returns.caliber_address}"
-        return:
-          name: "aa_after"
-          type: "uint256"
-
-      - description: "Compute aa_delta = aa_after - aa_before"
-        target: "${constants.unsigned_math_helper_address}"
-        selector: "sub(uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.aa_after}"
-          - type: "uint256"
-            value: "${returns.aa_before}"
-        return:
-          name: "aa_delta"
+          name: "aa_to_withdraw"
           type: "uint256"
 
       # 4. Submit AA into Pareto's withdraw queue -> mints FalconXUSDC receipt to caliber
@@ -181,7 +123,7 @@ actions:
         selector: "requestWithdraw(uint256,address)"
         parameters:
           - type: "uint256"
-            value: "${returns.aa_delta}"
+            value: "${returns.aa_to_withdraw}"
           - type: "address"
             value: "${constants.aa_tranche_address}"
 
@@ -198,4 +140,4 @@ actions:
     input_slots:
       bps_to_redeem:
         type: "uint256"
-        description: "Basis points of JT shares to redeem (10000 = 100%)"
+        description: "Basis points of the caliber's AA tranche balance to withdraw (10000 = 100%)"
