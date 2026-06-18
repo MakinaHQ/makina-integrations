@@ -2,6 +2,9 @@ config:
   caliber_address:
     type: "address"
     value: "0xd36f095556d5717fd9231a2091e8e98beb7cb621"
+  key_value_store_address:
+    type: "address"
+    value: "0x22b0214F224ccc1Ae6026A034929325A560423f6"
   caliber_helper_address:
     type: "address"
     value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
@@ -23,6 +26,17 @@ positions:
       asset_address: ${token_list.mainnet.USDC}
       mtoken_address: ${token_list.mainnet.mGLOBAL}
       depositor_address: "0xCe29c36c6D4556f2d01d79414C1354B968dDDEf1"
+
+  - id: "107105013984227281719889157995306791019993505899505825798563134321379102701416" # keccak256("midas.mglobal.redemption")
+    group_id: "0"
+    description: "Midas mGlobal Redemption (async)"
+    instructions: !include "../../../instructions/midas-redemption.yaml"
+    vars:
+      label: "mGlobal Redemption"
+      redeemer_address: "0x1e0fd66753198c7b8bA64edEe8d41D8628Bf20D7"
+      mtoken_address: ${token_list.mainnet.mGLOBAL}
+      token_out_address: ${token_list.mainnet.USDC}
+      kv_storage_key: "${keccak256(makina.mainnet.midas.mglobal-redemption)}"
 
   # ── Morpho mGLOBAL/USDC (market: 0xfd40...50cd) ──────────────────
   - id: "230532716052901966686540582198773421275"
