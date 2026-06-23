@@ -473,3 +473,19 @@ positions:
     position_tokens:
       - "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39" # fxSAVE (held)
       - "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be" # fxSP (held while redeemed/in cooldown)
+
+  # ── Makina DMG Machine ────────────────────────────────────────────
+  - id: "192251226307927011616793379882563103500"
+    group_id: "0"
+    description: "Makina DMG Machine"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0x761C3B16a5Afdd7A1869C4B979cFF3383d5Fe98B"] # DMG share token
+    vars:
+      label: "DMG"
+      machine_token: "0x761C3B16a5Afdd7A1869C4B979cFF3383d5Fe98B"
+      machine: "0xc4ffab8540ac27e40d4e2930517aa711e9c00c5b"
+      depositor: "0xc07b6B56561Ef8E842f36f74a04842284E94BF92"
+      redeemer: "0x21a9C31825FA1D8Bf5F2378A3C95E823290B0637"
+      accounting_token: ${token_list.mainnet.USDC}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dmg.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmg.pending_redemption_share_amount")}
