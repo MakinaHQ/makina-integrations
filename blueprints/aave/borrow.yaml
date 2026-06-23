@@ -1,11 +1,8 @@
 protocol: "aavev3"
 
-constants:
-  aave_pool:
-    type: "address"
-    value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
-
 inputs:
+  aave_pool_instance:
+    type: "address"
   token:
     type: "address"
   interest_rate_mode:
@@ -19,7 +16,7 @@ actions:
   borrow_asset:
     calls:
       - description: "Borrow an asset from the Aave pool"
-        target: ${constants.aave_pool}
+        target: ${inputs.aave_pool_instance}
         selector: "borrow(address,uint256,uint256,uint16,address)"
         parameters:
           - type: "address"

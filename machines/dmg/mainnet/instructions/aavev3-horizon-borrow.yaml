@@ -1,13 +1,13 @@
-# AaveV3 Borrow — borrow, repay, and account for a borrowed (debt) asset.
+# AaveV3 Horizon Borrow - borrow, repay, and account for a borrowed asset.
 #
 # Expected caliber vars:
-#   label:         string   — token name (e.g. "USDC", "WETH")
-#   asset_address: address  — underlying token address
-#   debt_token:    address  — variableDebtToken address (for accounting balanceOf)
+#   label:         string   - token name (e.g. "RLUSD - Borrow")
+#   asset_address: address  - underlying token address
+#   debt_token:    address  - Horizon variableDebtToken address
 #
 # Expected config:
 #   caliber_address
-#   aavev3_core_instance
+#   aavev3_horizon_instance
 
 - is_debt: true
   instruction_type: "MANAGEMENT"
@@ -19,7 +19,7 @@
     inputs:
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${config.aavev3_horizon_instance}"
       token:
         type: "address"
         value: ${position.asset_address}
@@ -46,7 +46,7 @@
         value: ${position.asset_address}
       pool_address:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${config.aavev3_horizon_instance}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
