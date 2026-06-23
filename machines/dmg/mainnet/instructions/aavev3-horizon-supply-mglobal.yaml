@@ -1,0 +1,94 @@
+# AaveV3 Horizon mGLOBAL Supply with E-Mode activation/deactivation.
+#
+# Expected caliber vars:
+#   label:         string   - position label
+#   asset_address: address  - mGLOBAL token address
+#   aave_token:    address  - Horizon aToken address for mGLOBAL
+#
+# Expected config:
+#   caliber_address
+#   aavev3_horizon_instance
+
+# 1/5 - Activate Horizon mGLOBAL/Stablecoins E-Mode (category 5)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "mGLOBAL Stablecoins E-Mode - Activate"
+    path: "../../../blueprints/aave/deposit.yaml:set_e_mode"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_horizon_instance}"
+      e_mode:
+        type: "uint8"
+        value: "5"
+
+# 2/5 - Supply mGLOBAL as collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_horizon_instance}"
+
+# 3/5 - Withdraw mGLOBAL collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_horizon_instance}"
+
+# 4/5 - Deactivate E-Mode (category 0)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "mGLOBAL Stablecoins E-Mode - Deactivate"
+    path: "../../../blueprints/aave/deposit.yaml:set_e_mode"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_horizon_instance}"
+      e_mode:
+        type: "uint8"
+        value: "0"
+
+# 5/5 - Accounting
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: ${position.aave_token}
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
