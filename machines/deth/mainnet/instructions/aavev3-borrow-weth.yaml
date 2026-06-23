@@ -6,6 +6,9 @@
     label: "WETH"
     path: "../../../blueprints/aave/borrow.yaml:borrow_asset"
     inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
       token:
         type: "address"
         value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
