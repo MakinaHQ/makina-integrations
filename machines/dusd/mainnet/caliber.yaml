@@ -406,6 +406,15 @@ positions:
   #     - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
   #     - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
   #     - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
+  # JT on the Makina DMG machine: TRANCHE_UNIT is DMG MT (18 dec), valued via
+  # DMG_machine.convertToAssets -> USDC. Async withdraw (request-redeem + claim) like the ST sibling.
+  - id: "335772134702432832947493967330354731301"
+    group_id: "0"
+    description: "Royco Junior Tranche DMG (Makina DMG machine)"
+    instructions: !include "../../../instructions/royco-jt-dmg.yaml"
+    position_tokens:
+      - "0x761C3B16a5Afdd7A1869C4B979cFF3383d5Fe98B" # DMG MT
+      - "0xC0378C1eB87421FF42539Ea98Be2700fc8d44B23" # JT-DMG
 
   # ── Pareto FalconX AA-tranche ────────────────────────────────────
   - id: "114753234960554942361599178742666226841"
