@@ -1,0 +1,2183 @@
+# this is a generated file - do not edit manually
+# root: 0x7fd56ffd9211f3ed1107cf67cea9a0d6178e1412366d3e555885b20e1accdaea
+
+[instructions.morpho-vault-v2-curation.accrue_interest."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xa6afed9501ff0000000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = []
+bitmap = "0"
+inputs_slots = []
+
+[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4d8839ed010102030405ff87be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x5c9ce04d01008706ff0000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "assets"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.allocate_morpho_vault_v1_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6a5967df01ff000000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x5c9ce04d01008201ff0000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.allocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "assets"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4d8839ed010102030405ff87be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x4b219d1601008706ff0000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "assets"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.deallocate_morpho_vault_v1_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6a5967df01ff000000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x4b219d1601008201ff0000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.deallocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "assets"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_absolute_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x9eeb57c50100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x8c54519b018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x501c62de0100010203040587be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x8c54519b018706ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_absolute_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xfc8485fe0100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x8c54519b018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_relative_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x9eeb57c50100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x57975270018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x501c62de0100010203040587be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x57975270018706ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.decrease_relative_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xfc8485fe0100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x57975270018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.decrease_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_add_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x60d54d410100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_add_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x9eeb57c50100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xf6f98fd5018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x501c62de0100010203040587be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xf6f98fd5018706ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xfc8485fe0100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xf6f98fd5018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x9eeb57c50100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x2438525b018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x501c62de0100010203040587be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x2438525b018706ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xfc8485fe0100ff0000000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x2438525b018201ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_remove_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x585cd34b0100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_remove_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_adapter_registry."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x5b34b8230100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x9bd8294ed3f1436af0f2b2711f45504382babf22c8a6bbfc5d610d49eddb5866"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_adapter_registry."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter_registry"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_force_deallocate_penalty."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x3e9d2ac7010001ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x8b5e0ca2270a00e7808f280a18678fa9e12a0f83d8f26b89a28e5cd82759e688",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "penalty"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_set_is_allocator."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xb192a84a010001ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = [
+  "0xd844bb55167ab332117049e2ccd3d8863d241bcc80f46302310a6d942a90e851",
+  "0x0e9be8047db13ed2729f9f8823139b28ae204411e0fc2a11c005794489de3ea5",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "account"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.execute_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "is_allocator"
+type = "Bool"
+
+[instructions.morpho-vault-v2-curation.execute_set_management_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xfe56e2320100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x899e7a508bce7c12b313438974068e5704bbb984b208c38a9f00694f286caaf8"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_management_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "management_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_set_management_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x9faae4640100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_management_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_performance_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x70897b230100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0xb7e05804e4bf2688bcd8555a52a5a318aaae9f35fadedcf4692841be3ecdcd63"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_performance_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "performance_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.execute_set_performance_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x6a5f1aa20100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_performance_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_receive_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x04dbf0ce0100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_receive_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_receive_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x2cb19f980100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_receive_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_send_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x871c979c0100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_send_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.execute_set_send_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xc21ad0280100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.execute_set_send_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4d8839ed010102030405ff88be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xe4d38cd80100880607ff00ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0xc31aa53995d9dc92d78082e3b94f124a8689a842452829e72fb73b918f5e93a4",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "assets"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 7
+name = "on_behalf_of"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.force_deallocate_morpho_vault_v1_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6a5967df01ff000000000083be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xe4d38cd80100830102ff00ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x2d38f6ec5addb618b9af47e62058bdfa755849eca9a4080b9b0c6f8613d40cea",
+  "0xc31aa53995d9dc92d78082e3b94f124a8689a842452829e72fb73b918f5e93a4",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "assets"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.force_deallocate_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "on_behalf_of"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_add_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x220f5dc90100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_add_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xff9a7ad0010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x84ef53ea4100000000000087be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x00010203040506ff000000000000000000000000000000000000000000000000",
+  "0x0b467b9b0187ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x0a91e522010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x7fcfe0d3010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x64af70644100000000000087be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x00010203040506ff000000000000000000000000000000000000000000000000",
+  "0x0b467b9b0187ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4e6650b1010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_remove_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5fb8ab7f0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_remove_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_adapter_registry."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6ad2740a0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x9bd8294ed3f1436af0f2b2711f45504382babf22c8a6bbfc5d610d49eddb5866",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_adapter_registry."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter_registry"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_force_deallocate_penalty."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x490ff2b1010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x8b5e0ca2270a00e7808f280a18678fa9e12a0f83d8f26b89a28e5cd82759e688",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "penalty"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_set_is_allocator."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xde33de2a010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xd844bb55167ab332117049e2ccd3d8863d241bcc80f46302310a6d942a90e851",
+  "0x0e9be8047db13ed2729f9f8823139b28ae204411e0fc2a11c005794489de3ea5",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "account"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "is_allocator"
+type = "Bool"
+
+[instructions.morpho-vault-v2-curation.revoke_set_management_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x38b279030100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x899e7a508bce7c12b313438974068e5704bbb984b208c38a9f00694f286caaf8",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_management_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "management_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_set_management_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6aff9b130100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_management_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_performance_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xe556bead0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xb7e05804e4bf2688bcd8555a52a5a318aaae9f35fadedcf4692841be3ecdcd63",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_performance_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "performance_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.revoke_set_performance_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x43012c8d0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_performance_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_receive_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6c6306b70100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_receive_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_receive_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x327ba8010100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_receive_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_send_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x1bce34380100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_send_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.revoke_set_send_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5f4b1bb30100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x0b467b9b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.revoke_set_send_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4d8839ed010102030405ff86be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x7fb6caad010086ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_vault_v1_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6a5967df01ff000000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x7fb6caad010081ff000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.set_liquidity_adapter_and_data_morpho_vault_v1_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.set_max_rate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0xaa4abe7f0100ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062"]
+state = ["0x74e088ecd5646fea54cad3e9fa151b19008d9bdec125389cc03ec868e2ad2f9d"]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.set_max_rate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "max_rate"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_add_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x220f5dc90100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_add_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xff9a7ad0010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x84ef53ea4100000000000087be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x00010203040506ff000000000000000000000000000000000000000000000000",
+  "0xef7fa71b0187ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x0a91e522010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x0317a3e85d8bf1d07f99adfd6803fc5417d426160ed84a7a2e22d8bf423e5eef",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_absolute_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "absolute_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_collateral_token."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x7fcfe0d3010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_collateral_token."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x64af70644100000000000087be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0x00010203040506ff000000000000000000000000000000000000000000000000",
+  "0xef7fa71b0187ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xd95eb99d037d92b3ceb41b48aeb555f7633589d418d38e3ceee30a2207f9f9ed",
+  "0x2af4fd6ce3c328505d95b555d1a2c14e598abea13e4c001d374aa032527c318e",
+  "0x89cbf5af14e0328a3cd3a734f92c3832d729d431da79b7873a62cbeebd37beb6",
+  "0xdc34f34fc81bcd602b15b2212410f27d1ca9bc528992a1caa8d1851f20897c82",
+  "0xd886ac3808fcfdd6986250ac017a5ce6be4086635db0fa71f06942a911638666",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "loan_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 2
+name = "collateral_token"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 3
+name = "oracle"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 4
+name = "irm"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 5
+name = "lltv"
+type = "Uint"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_morpho_market_v1_adapter_v2."Dialectic WETH Test".inputs_slots]]
+index = 6
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_this."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x4e6650b1010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0xe03a5cc44f17e7ed285d761dbba18a3164ad67fa7b182c0a797c87ef031b1dce",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_increase_relative_cap_this."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "relative_cap"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_remove_adapter."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5fb8ab7f0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_remove_adapter."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_adapter_registry."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6ad2740a0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x9bd8294ed3f1436af0f2b2711f45504382babf22c8a6bbfc5d610d49eddb5866",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_adapter_registry."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter_registry"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_force_deallocate_penalty."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x490ff2b1010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x2b806c17d92e438548731a698c926786236ec7ffde76cc83302e3d96eccc8e95",
+  "0x8b5e0ca2270a00e7808f280a18678fa9e12a0f83d8f26b89a28e5cd82759e688",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "adapter"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_set_force_deallocate_penalty."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "penalty"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_set_is_allocator."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xde33de2a010001ff00000082be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0182ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xd844bb55167ab332117049e2ccd3d8863d241bcc80f46302310a6d942a90e851",
+  "0x0e9be8047db13ed2729f9f8823139b28ae204411e0fc2a11c005794489de3ea5",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "account"
+type = "Address"
+
+[[instructions.morpho-vault-v2-curation.submit_set_is_allocator."Dialectic WETH Test".inputs_slots]]
+index = 1
+name = "is_allocator"
+type = "Bool"
+
+[instructions.morpho-vault-v2-curation.submit_set_management_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x38b279030100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x899e7a508bce7c12b313438974068e5704bbb984b208c38a9f00694f286caaf8",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_management_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "management_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_set_management_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6aff9b130100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_management_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_performance_fee."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0xe556bead0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xb7e05804e4bf2688bcd8555a52a5a318aaae9f35fadedcf4692841be3ecdcd63",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_performance_fee."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "performance_fee"
+type = "Uint"
+
+[instructions.morpho-vault-v2-curation.submit_set_performance_fee_recipient."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x43012c8d0100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0x811085f5b5d1b29598e73ca51de3d712f5d3103ad50e22dc1f4d3ff1559d5115",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_performance_fee_recipient."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "recipient"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_receive_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x6c6306b70100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_receive_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_receive_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x327ba8010100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_receive_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_send_assets_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x1bce34380100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_send_assets_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"
+
+[instructions.morpho-vault-v2-curation.submit_set_send_shares_gate."Dialectic WETH Test"]
+position_id = "1"
+description = "Morpho Vault V2 curation - Dialectic WETH Test"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x5f4b1bb30100ff0000000081be679ecaeb4320c1f10d3b557dddc43456618e7b",
+  "0xef7fa71b0181ff00000000ffef3ac91ec3a45f3c6913bfb0c41659919eb85062",
+]
+state = [
+  "0xe8905d90899652c3e8c6dcafbac24e798be1f1b7e6e4dad28b4cbf776d0b66e9",
+  "0x",
+]
+bitmap = "0"
+
+[[instructions.morpho-vault-v2-curation.submit_set_send_shares_gate."Dialectic WETH Test".inputs_slots]]
+index = 0
+name = "gate"
+type = "Address"

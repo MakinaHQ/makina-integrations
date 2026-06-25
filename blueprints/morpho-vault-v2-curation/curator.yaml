@@ -3,33 +3,1229 @@ protocol: "morpho-vault-v2-curation"
 inputs:
   vault_address:
     type: "address"
+  vault_v2_calldata_encoder:
+    type: "address"
 
 actions:
-  submit_curator_call:
+  submit_add_adapter:
     calls:
-      - description: "Submit a timelocked Curator call"
+      - description: "Encode addAdapter calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeAddAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked addAdapter call"
         target: "${inputs.vault_address}"
         selector: "submit(bytes)"
         parameters:
           - type: "bytes"
-            value: "${input_slots.call_data}"
+            value: "${returns.call_data}"
     input_slots:
-      call_data:
-        type: "bytes"
-        description: "Exact ABI calldata for the underlying timelocked curator call"
+      adapter:
+        type: "address"
+        description: "Adapter to enable for allocations"
 
-  revoke_curator_call:
+  revoke_add_adapter:
     calls:
-      - description: "Revoke a pending timelocked Curator call"
+      - description: "Encode addAdapter calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeAddAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked addAdapter call"
         target: "${inputs.vault_address}"
         selector: "revoke(bytes)"
         parameters:
           - type: "bytes"
-            value: "${input_slots.call_data}"
+            value: "${returns.call_data}"
     input_slots:
-      call_data:
-        type: "bytes"
-        description: "Exact ABI calldata previously submitted to the vault"
+      adapter:
+        type: "address"
+        description: "Adapter to enable for allocations"
+
+  submit_remove_adapter:
+    calls:
+      - description: "Encode removeAdapter calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeRemoveAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked removeAdapter call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to disable after its allocation is zero"
+
+  revoke_remove_adapter:
+    calls:
+      - description: "Encode removeAdapter calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeRemoveAdapter(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked removeAdapter call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter to disable after its allocation is zero"
+
+  submit_set_adapter_registry:
+    calls:
+      - description: "Encode setAdapterRegistry calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetAdapterRegistry(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter_registry}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setAdapterRegistry call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter_registry:
+        type: "address"
+        description: "Registry constraining which adapters may be added"
+
+  revoke_set_adapter_registry:
+    calls:
+      - description: "Encode setAdapterRegistry calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetAdapterRegistry(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter_registry}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setAdapterRegistry call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter_registry:
+        type: "address"
+        description: "Registry constraining which adapters may be added"
+
+  submit_set_is_allocator:
+    calls:
+      - description: "Encode setIsAllocator calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetIsAllocator(address,bool)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.account}"
+          - type: "bool"
+            value: "${input_slots.is_allocator}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setIsAllocator call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      account:
+        type: "address"
+        description: "Account whose allocator role is changing"
+      is_allocator:
+        type: "bool"
+        description: "Whether the account should be an allocator"
+
+  revoke_set_is_allocator:
+    calls:
+      - description: "Encode setIsAllocator calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetIsAllocator(address,bool)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.account}"
+          - type: "bool"
+            value: "${input_slots.is_allocator}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setIsAllocator call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      account:
+        type: "address"
+        description: "Account whose allocator role is changing"
+      is_allocator:
+        type: "bool"
+        description: "Whether the account should be an allocator"
+
+  submit_set_receive_shares_gate:
+    calls:
+      - description: "Encode setReceiveSharesGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetReceiveSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setReceiveSharesGate call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  revoke_set_receive_shares_gate:
+    calls:
+      - description: "Encode setReceiveSharesGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetReceiveSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setReceiveSharesGate call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  submit_set_send_shares_gate:
+    calls:
+      - description: "Encode setSendSharesGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetSendSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setSendSharesGate call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  revoke_set_send_shares_gate:
+    calls:
+      - description: "Encode setSendSharesGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetSendSharesGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setSendSharesGate call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  submit_set_receive_assets_gate:
+    calls:
+      - description: "Encode setReceiveAssetsGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetReceiveAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setReceiveAssetsGate call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  revoke_set_receive_assets_gate:
+    calls:
+      - description: "Encode setReceiveAssetsGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetReceiveAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setReceiveAssetsGate call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  submit_set_send_assets_gate:
+    calls:
+      - description: "Encode setSendAssetsGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetSendAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setSendAssetsGate call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  revoke_set_send_assets_gate:
+    calls:
+      - description: "Encode setSendAssetsGate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetSendAssetsGate(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.gate}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setSendAssetsGate call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      gate:
+        type: "address"
+        description: "Gate contract, or zero address to unset"
+
+  submit_set_performance_fee:
+    calls:
+      - description: "Encode setPerformanceFee calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetPerformanceFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.performance_fee}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setPerformanceFee call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      performance_fee:
+        type: "uint256"
+        description: "New performance fee"
+
+  revoke_set_performance_fee:
+    calls:
+      - description: "Encode setPerformanceFee calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetPerformanceFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.performance_fee}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setPerformanceFee call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      performance_fee:
+        type: "uint256"
+        description: "New performance fee"
+
+  submit_set_management_fee:
+    calls:
+      - description: "Encode setManagementFee calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetManagementFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.management_fee}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setManagementFee call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      management_fee:
+        type: "uint256"
+        description: "New management fee"
+
+  revoke_set_management_fee:
+    calls:
+      - description: "Encode setManagementFee calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetManagementFee(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.management_fee}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setManagementFee call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      management_fee:
+        type: "uint256"
+        description: "New management fee"
+
+  submit_set_performance_fee_recipient:
+    calls:
+      - description: "Encode setPerformanceFeeRecipient calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetPerformanceFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setPerformanceFeeRecipient call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of performance fee shares"
+
+  revoke_set_performance_fee_recipient:
+    calls:
+      - description: "Encode setPerformanceFeeRecipient calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetPerformanceFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setPerformanceFeeRecipient call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of performance fee shares"
+
+  submit_set_management_fee_recipient:
+    calls:
+      - description: "Encode setManagementFeeRecipient calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetManagementFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setManagementFeeRecipient call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of management fee shares"
+
+  revoke_set_management_fee_recipient:
+    calls:
+      - description: "Encode setManagementFeeRecipient calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetManagementFeeRecipient(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.recipient}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setManagementFeeRecipient call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      recipient:
+        type: "address"
+        description: "Recipient of management fee shares"
+
+  submit_increase_timelock:
+    calls:
+      - description: "Encode increaseTimelock calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increaseTimelock call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  revoke_increase_timelock:
+    calls:
+      - description: "Encode increaseTimelock calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increaseTimelock call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  submit_decrease_timelock:
+    calls:
+      - description: "Encode decreaseTimelock calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeDecreaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked decreaseTimelock call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  revoke_decrease_timelock:
+    calls:
+      - description: "Encode decreaseTimelock calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeDecreaseTimelock(bytes4,uint256)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+          - type: "uint256"
+            value: "${input_slots.duration}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked decreaseTimelock call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector whose timelock is changing"
+      duration:
+        type: "uint256"
+        description: "New timelock duration in seconds"
+
+  submit_abdicate:
+    calls:
+      - description: "Encode abdicate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeAbdicate(bytes4)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked abdicate call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector to permanently disable"
+
+  revoke_abdicate:
+    calls:
+      - description: "Encode abdicate calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeAbdicate(bytes4)"
+        parameters:
+          - type: "bytes4"
+            value: "${input_slots.selector}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked abdicate call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      selector:
+        type: "bytes4"
+        description: "Function selector to permanently disable"
+
+  submit_set_force_deallocate_penalty:
+    calls:
+      - description: "Encode setForceDeallocatePenalty calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetForceDeallocatePenalty(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.penalty}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked setForceDeallocatePenalty call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose force-deallocate penalty is changing"
+      penalty:
+        type: "uint256"
+        description: "New penalty"
+
+  revoke_set_force_deallocate_penalty:
+    calls:
+      - description: "Encode setForceDeallocatePenalty calldata"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeSetForceDeallocatePenalty(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.penalty}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked setForceDeallocatePenalty call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose force-deallocate penalty is changing"
+      penalty:
+        type: "uint256"
+        description: "New penalty"
+
+  submit_increase_absolute_cap_this:
+    calls:
+      - description: "Encode increase_absolute_cap for adapter id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapThis(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  revoke_increase_absolute_cap_this:
+    calls:
+      - description: "Encode increase_absolute_cap for adapter id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapThis(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  submit_increase_relative_cap_this:
+    calls:
+      - description: "Encode increase_relative_cap for adapter id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapThis(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  revoke_increase_relative_cap_this:
+    calls:
+      - description: "Encode increase_relative_cap for adapter id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapThis(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  submit_increase_absolute_cap_collateral_token:
+    calls:
+      - description: "Encode increase_absolute_cap for collateral token id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapCollateralToken(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  revoke_increase_absolute_cap_collateral_token:
+    calls:
+      - description: "Encode increase_absolute_cap for collateral token id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapCollateralToken(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  submit_increase_relative_cap_collateral_token:
+    calls:
+      - description: "Encode increase_relative_cap for collateral token id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapCollateralToken(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  revoke_increase_relative_cap_collateral_token:
+    calls:
+      - description: "Encode increase_relative_cap for collateral token id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapCollateralToken(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  submit_increase_absolute_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode increase_absolute_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapMorphoMarketV1AdapterV2(address,(address,address,address,address,uint256),uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  revoke_increase_absolute_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode increase_absolute_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseAbsoluteCapMorphoMarketV1AdapterV2(address,(address,address,address,address,uint256),uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_absolute_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  submit_increase_relative_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode increase_relative_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapMorphoMarketV1AdapterV2(address,(address,address,address,address,uint256),uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Submit pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "submit(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  revoke_increase_relative_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode increase_relative_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeIncreaseRelativeCapMorphoMarketV1AdapterV2(address,(address,address,address,address,uint256),uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+        return:
+          name: "call_data"
+          type: "bytes"
+
+      - description: "Revoke pending timelocked increase_relative_cap call"
+        target: "${inputs.vault_address}"
+        selector: "revoke(bytes)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.call_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
 
   execute_add_adapter:
     calls:
@@ -139,78 +1335,6 @@ actions:
       gate:
         type: "address"
         description: "Gate contract, or zero address to unset"
-
-  execute_increase_absolute_cap:
-    calls:
-      - description: "Execute matured absolute cap increase"
-        target: "${inputs.vault_address}"
-        selector: "increaseAbsoluteCap(bytes,uint256)"
-        parameters:
-          - type: "bytes"
-            value: "${input_slots.id_data}"
-          - type: "uint256"
-            value: "${input_slots.absolute_cap}"
-    input_slots:
-      id_data:
-        type: "bytes"
-        description: "Risk identifier data resolved by the adapter"
-      absolute_cap:
-        type: "uint256"
-        description: "New hard asset-denominated cap"
-
-  decrease_absolute_cap:
-    calls:
-      - description: "Decrease absolute cap instantly"
-        target: "${inputs.vault_address}"
-        selector: "decreaseAbsoluteCap(bytes,uint256)"
-        parameters:
-          - type: "bytes"
-            value: "${input_slots.id_data}"
-          - type: "uint256"
-            value: "${input_slots.absolute_cap}"
-    input_slots:
-      id_data:
-        type: "bytes"
-        description: "Risk identifier data resolved by the adapter"
-      absolute_cap:
-        type: "uint256"
-        description: "Lower hard asset-denominated cap"
-
-  execute_increase_relative_cap:
-    calls:
-      - description: "Execute matured relative cap increase"
-        target: "${inputs.vault_address}"
-        selector: "increaseRelativeCap(bytes,uint256)"
-        parameters:
-          - type: "bytes"
-            value: "${input_slots.id_data}"
-          - type: "uint256"
-            value: "${input_slots.relative_cap}"
-    input_slots:
-      id_data:
-        type: "bytes"
-        description: "Risk identifier data resolved by the adapter"
-      relative_cap:
-        type: "uint256"
-        description: "New relative cap"
-
-  decrease_relative_cap:
-    calls:
-      - description: "Decrease relative cap instantly"
-        target: "${inputs.vault_address}"
-        selector: "decreaseRelativeCap(bytes,uint256)"
-        parameters:
-          - type: "bytes"
-            value: "${input_slots.id_data}"
-          - type: "uint256"
-            value: "${input_slots.relative_cap}"
-    input_slots:
-      id_data:
-        type: "bytes"
-        description: "Risk identifier data resolved by the adapter"
-      relative_cap:
-        type: "uint256"
-        description: "Lower relative cap"
 
   execute_set_performance_fee:
     calls:
@@ -330,3 +1454,447 @@ actions:
       penalty:
         type: "uint256"
         description: "New penalty"
+
+  execute_increase_absolute_cap_this:
+    calls:
+      - description: "Encode adapter id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeThisIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_absolute_cap for adapter id"
+        target: "${inputs.vault_address}"
+        selector: "increaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  execute_increase_relative_cap_this:
+    calls:
+      - description: "Encode adapter id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeThisIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_relative_cap for adapter id"
+        target: "${inputs.vault_address}"
+        selector: "increaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  execute_increase_absolute_cap_collateral_token:
+    calls:
+      - description: "Encode collateral token id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeCollateralTokenIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_absolute_cap for collateral token id"
+        target: "${inputs.vault_address}"
+        selector: "increaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  execute_increase_relative_cap_collateral_token:
+    calls:
+      - description: "Encode collateral token id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeCollateralTokenIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_relative_cap for collateral token id"
+        target: "${inputs.vault_address}"
+        selector: "increaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  execute_increase_absolute_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode Morpho Market V1 Adapter V2 market id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2IdData(address,(address,address,address,address,uint256))"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_absolute_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_address}"
+        selector: "increaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      absolute_cap:
+        type: "uint256"
+        description: "New hard asset-denominated cap"
+
+  execute_increase_relative_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode Morpho Market V1 Adapter V2 market id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2IdData(address,(address,address,address,address,uint256))"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Execute matured increase_relative_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_address}"
+        selector: "increaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      relative_cap:
+        type: "uint256"
+        description: "New relative cap"
+
+  decrease_absolute_cap_this:
+    calls:
+      - description: "Encode adapter id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeThisIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_absolute_cap for adapter id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "Lower hard asset-denominated cap"
+
+  decrease_relative_cap_this:
+    calls:
+      - description: "Encode adapter id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeThisIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_relative_cap for adapter id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "Adapter whose own id is capped"
+      relative_cap:
+        type: "uint256"
+        description: "Lower relative cap"
+
+  decrease_absolute_cap_collateral_token:
+    calls:
+      - description: "Encode collateral token id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeCollateralTokenIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_absolute_cap for collateral token id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      absolute_cap:
+        type: "uint256"
+        description: "Lower hard asset-denominated cap"
+
+  decrease_relative_cap_collateral_token:
+    calls:
+      - description: "Encode collateral token id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeCollateralTokenIdData(address)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.collateral_token}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_relative_cap for collateral token id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      collateral_token:
+        type: "address"
+        description: "Collateral token whose aggregate exposure is capped"
+      relative_cap:
+        type: "uint256"
+        description: "Lower relative cap"
+
+  decrease_absolute_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode Morpho Market V1 Adapter V2 market id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2IdData(address,(address,address,address,address,uint256))"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_absolute_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseAbsoluteCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.absolute_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      absolute_cap:
+        type: "uint256"
+        description: "Lower hard asset-denominated cap"
+
+  decrease_relative_cap_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode Morpho Market V1 Adapter V2 market id idData"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2IdData(address,(address,address,address,address,uint256))"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "id_data"
+          type: "bytes"
+
+      - description: "Decrease decrease_relative_cap for Morpho Market V1 Adapter V2 market id"
+        target: "${inputs.vault_address}"
+        selector: "decreaseRelativeCap(bytes,uint256)"
+        parameters:
+          - type: "bytes"
+            value: "${returns.id_data}"
+          - type: "uint256"
+            value: "${input_slots.relative_cap}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      relative_cap:
+        type: "uint256"
+        description: "Lower relative cap"

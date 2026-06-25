@@ -3,71 +3,248 @@ protocol: "morpho-vault-v2-curation"
 inputs:
   vault_address:
     type: "address"
+  vault_v2_calldata_encoder:
+    type: "address"
 
 actions:
-  allocate:
+  allocate_morpho_vault_v1_adapter:
     calls:
-      - description: "Allocate idle assets through an adapter"
+      - description: "Encode MorphoVaultV1Adapter adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoVaultV1AdapterData()"
+        parameters: []
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Allocate idle assets via MorphoVaultV1Adapter"
         target: "${inputs.vault_address}"
         selector: "allocate(address,bytes,uint256)"
         parameters:
           - type: "address"
             value: "${input_slots.adapter}"
           - type: "bytes"
-            value: "${input_slots.adapter_data}"
+            value: "${returns.adapter_data}"
           - type: "uint256"
             value: "${input_slots.assets}"
     input_slots:
       adapter:
         type: "address"
-        description: "Adapter receiving the allocation"
-      adapter_data:
-        type: "bytes"
-        description: "Adapter-specific market or position data"
+        description: "MorphoVaultV1Adapter address"
       assets:
         type: "uint256"
         description: "Asset amount to allocate"
 
-  deallocate:
+  deallocate_morpho_vault_v1_adapter:
     calls:
-      - description: "Deallocate assets from an adapter"
+      - description: "Encode MorphoVaultV1Adapter adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoVaultV1AdapterData()"
+        parameters: []
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Deallocate assets via MorphoVaultV1Adapter"
         target: "${inputs.vault_address}"
         selector: "deallocate(address,bytes,uint256)"
         parameters:
           - type: "address"
             value: "${input_slots.adapter}"
           - type: "bytes"
-            value: "${input_slots.adapter_data}"
+            value: "${returns.adapter_data}"
           - type: "uint256"
             value: "${input_slots.assets}"
     input_slots:
       adapter:
         type: "address"
-        description: "Adapter to pull assets from"
-      adapter_data:
-        type: "bytes"
-        description: "Adapter-specific market or position data"
+        description: "MorphoVaultV1Adapter address"
       assets:
         type: "uint256"
         description: "Asset amount to deallocate"
 
-  set_liquidity_adapter_and_data:
+  set_liquidity_adapter_and_data_morpho_vault_v1_adapter:
     calls:
-      - description: "Set liquidity adapter and routing data"
+      - description: "Encode MorphoVaultV1Adapter adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoVaultV1AdapterData()"
+        parameters: []
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Set liquidity adapter and routing data via MorphoVaultV1Adapter"
         target: "${inputs.vault_address}"
         selector: "setLiquidityAdapterAndData(address,bytes)"
         parameters:
           - type: "address"
-            value: "${input_slots.liquidity_adapter}"
+            value: "${input_slots.adapter}"
           - type: "bytes"
-            value: "${input_slots.liquidity_data}"
+            value: "${returns.adapter_data}"
     input_slots:
-      liquidity_adapter:
+      adapter:
         type: "address"
-        description: "Adapter used for deposit forwarding and withdrawal sourcing"
-      liquidity_data:
-        type: "bytes"
-        description: "Adapter-specific routing data"
+        description: "MorphoVaultV1Adapter address"
+
+  allocate_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode MorphoMarketV1AdapterV2 adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2Data((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Allocate idle assets via MorphoMarketV1AdapterV2"
+        target: "${inputs.vault_address}"
+        selector: "allocate(address,bytes,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${returns.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      assets:
+        type: "uint256"
+        description: "Asset amount to allocate"
+
+  deallocate_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode MorphoMarketV1AdapterV2 adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2Data((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Deallocate assets via MorphoMarketV1AdapterV2"
+        target: "${inputs.vault_address}"
+        selector: "deallocate(address,bytes,uint256)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${returns.adapter_data}"
+          - type: "uint256"
+            value: "${input_slots.assets}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
+      assets:
+        type: "uint256"
+        description: "Asset amount to deallocate"
+
+  set_liquidity_adapter_and_data_morpho_market_v1_adapter_v2:
+    calls:
+      - description: "Encode MorphoMarketV1AdapterV2 adapter data"
+        target: "${inputs.vault_v2_calldata_encoder}"
+        selector: "encodeMorphoMarketV1AdapterV2Data((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${input_slots.loan_token}"
+              - type: "address"
+                value: "${input_slots.collateral_token}"
+              - type: "address"
+                value: "${input_slots.oracle}"
+              - type: "address"
+                value: "${input_slots.irm}"
+              - type: "uint256"
+                value: "${input_slots.lltv}"
+        return:
+          name: "adapter_data"
+          type: "bytes"
+
+      - description: "Set liquidity adapter and routing data via MorphoMarketV1AdapterV2"
+        target: "${inputs.vault_address}"
+        selector: "setLiquidityAdapterAndData(address,bytes)"
+        parameters:
+          - type: "address"
+            value: "${input_slots.adapter}"
+          - type: "bytes"
+            value: "${returns.adapter_data}"
+    input_slots:
+      adapter:
+        type: "address"
+        description: "MorphoMarketV1AdapterV2 address"
+      loan_token:
+        type: "address"
+        description: "Morpho market loan token"
+      collateral_token:
+        type: "address"
+        description: "Morpho market collateral token"
+      oracle:
+        type: "address"
+        description: "Morpho market oracle"
+      irm:
+        type: "address"
+        description: "Morpho market IRM"
+      lltv:
+        type: "uint256"
+        description: "Morpho market LLTV"
 
   set_max_rate:
     calls:

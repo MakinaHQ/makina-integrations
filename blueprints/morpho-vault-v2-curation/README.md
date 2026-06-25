@@ -5,61 +5,53 @@ Linear `DIA-502`. The files are partitioned by the authority required to use
 the action:
 
 - `curator.yaml`: Curator timelock lifecycle helpers, timelocked target calls,
-  and Curator/Sentinel instant cap decreases.
+  matured timelock execution calls, and Curator instant cap decreases.
 - `allocator.yaml`: instant Allocator actions.
-- `sentinel.yaml`: instant Sentinel de-risking actions.
+- `sentinel.yaml`: Sentinel revoke and instant de-risking actions.
 - `permissionless.yaml`: calls any address may execute.
 
 Owner actions are intentionally not included: `setOwner`, `setCurator`,
 `setIsSentinel`, `setName`, and `setSymbol`.
 
-## Timelocked Curator Flow
+## Encoder Model
 
-Most Curator setters are timelocked. The blueprint DSL can encode the call it is
-currently making, but it does not have a helper for `abi.encodeCall(...)` of a
-different function. For that reason the submit/revoke helpers take pre-encoded
-calldata:
+Every operator-facing action uses typed inputs. Raw `bytes` values required by
+Vault V2 are produced on-chain by `VaultV2CalldataEncoder` and passed through
+Weiroll return values.
 
-| Step | Action                                        | Caller                   | Notes                                                            |
-| ---- | --------------------------------------------- | ------------------------ | ---------------------------------------------------------------- |
-| 1    | `submit_curator_call`                         | Curator                  | `call_data` is the exact ABI calldata for the target setter.     |
-| 2    | matching `execute_*` action                   | Any address after expiry | Calls the target setter directly and consumes the pending entry. |
-| 3    | `revoke_curator_call` / `revoke_pending_call` | Curator or Sentinel      | Cancels the same `call_data` before execution.                   |
+There are two helper patterns:
 
-Instruction wrappers should define one path per target action and keep the
-off-chain params encoder in lockstep with the target selector and slot order.
-That mirrors the `uniswap-x-filler` pattern where dynamic bytes are supplied by
-the service.
+| Flow                               | Blueprint pattern                                                                                    |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Submit/revoke timelocked calls     | Encode full target calldata, then call `submit(bytes)` or `revoke(bytes)`.                           |
+| Execute/direct bytes-bearing calls | Encode only the argument payload (`idData` or adapter `data`), then call the real Vault V2 function. |
 
-The operator-facing app is responsible for ABI encoding each target call into
-`call_data` before invoking `submit_curator_call` or `revoke_curator_call`.
-Blueprints intentionally treat that value as opaque `bytes`.
+Vault V2 execution is not `execute(bytes)`: once a timelock matures, the caller
+executes by calling the original Vault V2 function with the same arguments that
+were submitted.
 
-## Curator Target Calls
+## Typed Payload Coverage
 
-The `execute_*` naming means "execute the underlying timelocked call after it
-has been submitted and matured". These actions are not submit wrappers.
+Cap actions are split by the supported Vault V2 allocation id schema:
 
-| Action                                  | Target selector                              | Slots                     |
-| --------------------------------------- | -------------------------------------------- | ------------------------- |
-| `execute_add_adapter`                   | `addAdapter(address)`                        | `adapter`                 |
-| `execute_remove_adapter`                | `removeAdapter(address)`                     | `adapter`                 |
-| `execute_set_adapter_registry`          | `setAdapterRegistry(address)`                | `adapter_registry`        |
-| `execute_set_is_allocator`              | `setIsAllocator(address,bool)`               | `account`, `is_allocator` |
-| `execute_set_receive_shares_gate`       | `setReceiveSharesGate(address)`              | `gate`                    |
-| `execute_set_send_shares_gate`          | `setSendSharesGate(address)`                 | `gate`                    |
-| `execute_set_receive_assets_gate`       | `setReceiveAssetsGate(address)`              | `gate`                    |
-| `execute_set_send_assets_gate`          | `setSendAssetsGate(address)`                 | `gate`                    |
-| `execute_increase_absolute_cap`         | `increaseAbsoluteCap(bytes,uint256)`         | `id_data`, `absolute_cap` |
-| `execute_increase_relative_cap`         | `increaseRelativeCap(bytes,uint256)`         | `id_data`, `relative_cap` |
-| `execute_set_performance_fee`           | `setPerformanceFee(uint256)`                 | `performance_fee`         |
-| `execute_set_management_fee`            | `setManagementFee(uint256)`                  | `management_fee`          |
-| `execute_set_performance_fee_recipient` | `setPerformanceFeeRecipient(address)`        | `recipient`               |
-| `execute_set_management_fee_recipient`  | `setManagementFeeRecipient(address)`         | `recipient`               |
-| `execute_increase_timelock`             | `increaseTimelock(bytes4,uint256)`           | `selector`, `duration`    |
-| `execute_decrease_timelock`             | `decreaseTimelock(bytes4,uint256)`           | `selector`, `duration`    |
-| `execute_abdicate`                      | `abdicate(bytes4)`                           | `selector`                |
-| `execute_set_force_deallocate_penalty`  | `setForceDeallocatePenalty(address,uint256)` | `adapter`, `penalty`      |
+- `*_this`: `abi.encode("this", adapter)`
+- `*_collateral_token`: `abi.encode("collateralToken", collateralToken)`
+- `*_morpho_market_v1_adapter_v2`: `abi.encode("this/marketParams", adapter, marketParams)`
 
-Instant cap decreases are provided in both `curator.yaml` and `sentinel.yaml`
-because both roles may de-risk.
+Adapter data actions are split by adapter data schema:
+
+- `*_morpho_vault_v1_adapter`: empty adapter data (`hex""`)
+- `*_morpho_market_v1_adapter_v2`: `abi.encode(MarketParams)`
+
+The helper is intentionally scoped to Vault V2-level curation. The separate
+internal timelock on `MorphoMarketV1AdapterV2` is out of scope for these
+blueprints.
+
+## Instructions
+
+The instruction wrappers require a `vault_v2_calldata_encoder` config value.
+The `morpho-curator` mainnet machine config points at the deployed helper.
+
+Instruction wrappers that require `bytes4` selector inputs are commented out
+until the production crate supports them. This currently affects
+selector-level timelock settings and abdication.

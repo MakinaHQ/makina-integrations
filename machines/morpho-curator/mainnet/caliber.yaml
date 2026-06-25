@@ -5,6 +5,9 @@ config:
   makina_lite_module:
     type: "address"
     value: "0xD57152f21aB5E5A8b3AdFf197c73aCC2Fdbd1CbD"
+  vault_v2_calldata_encoder:
+    type: "address"
+    value: "0xBe679EcAEB4320c1f10d3b557Dddc43456618E7b"
 
 positions:
   - id: "1"
