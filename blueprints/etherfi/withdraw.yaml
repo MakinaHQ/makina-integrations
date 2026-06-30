@@ -1,0 +1,309 @@
+protocol: "etherfi"
+
+# EtherFi Async Redemption Blueprint
+#
+# Accounting-only redeemer architecture: the caliber retains custody of
+# every WithdrawRequestNFT for its full lifecycle. The redeemer is a
+# bookkeeping + claim-processor helper that:
+#   - tracks a set of registered request ids so the caliber can mark its
+#     pending etherfi position to market via `totalValueInWETH()`;
+#   - acts as the atomic claim trigger via `onERC721Received` — when the
+#     caliber pushes a finalized NFT in via `safeTransferFrom`, the hook
+#     burns the NFT against etherfi, wraps the ETH, and transfers WETH
+#     back to the caliber, all in one transaction.
+#
+# Lifecycle (caliber-side):
+#
+#   1. request_redemption        — approve weETH to the WeETHWithdrawAdapter,
+#                                  call requestWithdraw(amount, caliber)
+#                                  (mints WithdrawRequestNFT to caliber),
+#                                  then asyncRedeemer.registerRedemption(reqId)
+#                                  to add it to the redeemer's accounting set.
+#                                  The NFT remains at the caliber.
+#
+#   2. claim_redemption          — once etherfi finalizes the request,
+#                                  WRNFT.safeTransferFrom(caliber, redeemer, reqId).
+#                                  Redeemer's onERC721Received atomically:
+#                                  removes id from set → claimWithdraw on
+#                                  etherfi → wraps received ETH → forwards
+#                                  WETH to caliber. NFT is consumed.
+#
+#   3. unregister_redemption     — cleanup: drop a stale id from the set.
+#                                  Required after any out-of-band NFT move
+#                                  (transfer out, direct etherfi claim).
+#                                  Pure bookkeeping; never touches the NFT.
+#
+#   recover_nft / recover_funds  — circuit-breaker primitives. Sweep any
+#                                  stray NFT (non-safe transfer into the
+#                                  redeemer) or stray ETH/WETH back to
+#                                  the caliber.
+#
+# The redeemer is per-caliber (immutable at deploy time). The caliber
+# operates entirely in weETH — never holds eETH and never touches the
+# etherfi LiquidityPool directly. The WeETHWithdrawAdapter handles the
+# weETH→eETH→requestWithdraw plumbing internally and mints the same
+# canonical WithdrawRequestNFT (0x7d5706f6...) the redeemer expects.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  weeth_address:
+    type: "address"
+    value: "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee"
+  weeth_withdraw_adapter_address:
+    type: "address"
+    value: "0xFbfe6b9cEe0E555Bad7e2E7309EFFC75200cBE38"
+  withdraw_request_nft_address:
+    type: "address"
+    value: "0x7d5706f6ef3F89B3951E23e557CDFBC3239D4E2c"
+  # wstETH (Lido wrapped stETH) — the base token the caliber swaps into
+  # before redeeming through etherfi.
+  wsteth_address:
+    type: "address"
+    value: "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  # EtherFi deposit adapter: wstETH/wETH -> weETH. We use its
+  # depositWstETHForWeETHWithPermit entrypoint with a dummy permit (see
+  # request_redemption_from_wsteth below).
+  etherfi_deposit_adapter_address:
+    type: "address"
+    value: "0xcfC6d9Bd7411962Bfe7145451A7EF71A24b6A7A2"
+
+inputs:
+  async_redeemer_address:
+    type: "address"
+
+actions:
+  # ─── Stage 1 (wstETH entry): wrap wstETH→weETH, then open + register ──
+  # Atomic "wstETH redemption". The caliber holds wstETH (a base token it
+  # swapped into); this action turns it into a pending etherfi redemption
+  # in a single transaction:
+  #
+  #   1. wstETH.approve(depositAdapter, amount)
+  #   2. depositAdapter.depositWstETHForWeETHWithPermit(amount, 0, permit)
+  #        -> weETH to caliber. The adapter's permit() is best-effort
+  #           (try/catch): the caliber is a contract and cannot ECDSA-sign
+  #           Lido's permit, so we pass a DUMMY permit whose only live
+  #           field is `deadline = blockTimestamp()`. permit() reverts on
+  #           the bad signature, the catch sees deadline >= now (equal, as
+  #           both read the same block) so it does NOT re-revert, and the
+  #           adapter falls through to transferFrom against the approval
+  #           set in step 1.
+  #   3. weETH.approve(weEthWithdrawAdapter, weEthReceived)
+  #   4. weEthWithdrawAdapter.requestWithdraw(weEthReceived, caliber)
+  #        -> mints WithdrawRequestNFT to the caliber.
+  #   5. asyncRedeemer.registerRedemption(reqId)
+  #        -> adds the id to the redeemer's accounting set; NFT stays put.
+  #
+  # The pending position is then claimed later via `claim_redemption` and
+  # valued via `account_pending_redemption`, exactly like the weETH-entry
+  # `request_redemption` flow below.
+  request_redemption_from_wsteth:
+    calls:
+      - description: "Get caliber's address"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Get current block timestamp — used as the permit deadline"
+        target: "${constants.context_helper_address}"
+        selector: "blockTimestamp()"
+        parameters: []
+        return:
+          name: "permit_deadline"
+          type: "uint256"
+
+      - description: "Approve etherfi deposit adapter to pull wstETH"
+        target: "${constants.wsteth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.etherfi_deposit_adapter_address}"
+          - type: "uint256"
+            value: "${input_slots.wsteth_amount}"
+
+      - description: "Deposit wstETH for weETH — dummy permit, relies on approval above (deadline = block.timestamp)"
+        target: "${constants.etherfi_deposit_adapter_address}"
+        selector: "depositWstETHForWeETHWithPermit(uint256,address,(uint256,uint256,uint8,bytes32,bytes32))"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.wsteth_amount}"
+          - type: "address"
+            value: "0x0000000000000000000000000000000000000000" # referral
+          - type: "(uint256,uint256,uint8,bytes32,bytes32)"
+            value:
+              - type: "uint256"
+                value: "0" # permit.value — irrelevant, permit() is expected to revert
+              - type: "uint256"
+                value: "${returns.permit_deadline}" # >= block.timestamp so catch does not re-revert
+              - type: "uint8"
+                value: "0" # v
+              - type: "bytes32"
+                value: "0x0000000000000000000000000000000000000000000000000000000000000000" # r
+              - type: "bytes32"
+                value: "0x0000000000000000000000000000000000000000000000000000000000000000" # s
+        return:
+          name: "weeth_received"
+          type: "uint256"
+
+      - description: "Approve WeETHWithdrawAdapter to pull the weETH just received"
+        target: "${constants.weeth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.weeth_withdraw_adapter_address}"
+          - type: "uint256"
+            value: "${returns.weeth_received}"
+
+      - description: "Request etherfi withdrawal — adapter unwraps weETH and mints WithdrawRequestNFT to caliber"
+        target: "${constants.weeth_withdraw_adapter_address}"
+        selector: "requestWithdraw(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.weeth_received}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      - description: "Register request id in async redeemer accounting set (NFT stays at caliber)"
+        target: "${inputs.async_redeemer_address}"
+        selector: "registerRedemption(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+    input_slots:
+      wsteth_amount:
+        type: "uint256"
+        description: "Amount of wstETH to redeem via etherfi (in 18 decimals)"
+
+  # ─── Stage 1: open + register a pending redemption ───────────────────
+  # Approve weETH to the adapter, request withdrawal (mints NFT to
+  # caliber), then register the resulting request id in the redeemer's
+  # accounting set. The NFT stays at the caliber.
+  request_redemption:
+    calls:
+      - description: "Get caliber's address"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Approve WeETHWithdrawAdapter to pull weETH"
+        target: "${constants.weeth_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.weeth_withdraw_adapter_address}"
+          - type: "uint256"
+            value: "${input_slots.weeth_amount}"
+
+      - description: "Request etherfi withdrawal — adapter unwraps weETH and mints WithdrawRequestNFT to caliber"
+        target: "${constants.weeth_withdraw_adapter_address}"
+        selector: "requestWithdraw(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.weeth_amount}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      - description: "Register request id in async redeemer accounting set (NFT stays at caliber)"
+        target: "${inputs.async_redeemer_address}"
+        selector: "registerRedemption(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+    input_slots:
+      weeth_amount:
+        type: "uint256"
+        description: "Amount of weETH to redeem (in 18 decimals)"
+
+  # ─── Stage 2: claim a finalized redemption ───────────────────────────
+  # safeTransferFrom triggers the redeemer's onERC721Received hook, which
+  # atomically removes the id from the set, calls claimWithdraw on etherfi,
+  # wraps the received ETH, and forwards WETH to the caliber. The NFT is
+  # burned by claimWithdraw; the entire flow runs inside a single
+  # safeTransferFrom call. Reverts cleanly (NFT stays at caliber) if etherfi
+  # has not finalized the request yet.
+  claim_redemption:
+    calls:
+      - description: "Get caliber's address"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Push finalized NFT to redeemer — hook claims, wraps, and forwards WETH back atomically"
+        target: "${constants.withdraw_request_nft_address}"
+        selector: "safeTransferFrom(address,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${inputs.async_redeemer_address}"
+          - type: "uint256"
+            value: "${input_slots.request_id}"
+
+    input_slots:
+      request_id:
+        type: "uint256"
+        description: "Etherfi WithdrawRequestNFT id to claim — must be finalized"
+
+  # ─── Cleanup: drop a stale registration ──────────────────────────────
+  # Used after any out-of-band NFT move (e.g. caliber transferred the NFT
+  # to a third party, or claimed it directly via etherfi). NAV's defensive
+  # ownerOf skip already returns 0 for such ids, but this primitive
+  # actually removes the entry so the set doesn't grow unbounded and the
+  # NAV-read gas cost stays tight.
+  unregister_redemption:
+    calls:
+      - description: "Remove stale request id from async redeemer accounting set"
+        target: "${inputs.async_redeemer_address}"
+        selector: "unregisterRedemption(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.request_id}"
+
+    input_slots:
+      request_id:
+        type: "uint256"
+        description: "Etherfi WithdrawRequestNFT id to unregister"
+
+  # ─── Circuit-breaker: pull a stray NFT off the redeemer ──────────────
+  # Steady-state the redeemer holds no NFTs. This handles the case where
+  # someone calls plain `transferFrom` (no hook) into the redeemer.
+  recover_nft:
+    calls:
+      - description: "Recover stray NFT from async redeemer back to caliber"
+        target: "${inputs.async_redeemer_address}"
+        selector: "recoverNFT(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.request_id}"
+
+    input_slots:
+      request_id:
+        type: "uint256"
+        description: "Etherfi WithdrawRequestNFT id to recover"
+
+  # ─── Circuit-breaker: sweep any stray ETH/WETH on the redeemer ───────
+  # Idempotent — safe to call when redeemer holds nothing.
+  recover_funds:
+    calls:
+      - description: "Sweep ETH+WETH on async redeemer to caliber as WETH"
+        target: "${inputs.async_redeemer_address}"
+        selector: "recoverFunds()"
+        parameters: []

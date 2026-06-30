@@ -1,0 +1,131 @@
+# EtherFi Async Redemption — general instruction file
+#
+# Wires the etherfi blueprints (`blueprints/etherfi/`) into a caliber that
+# wants to operate the weETH → WETH async-redemption strategy through a
+# per-caliber `EtherfiAsyncRedeemer` deployment.
+#
+# Caliber-side flow:
+#   1. (off-blueprint) Caliber acquires weETH (e.g. via the swap module
+#      buying weETH from WETH at a discount).
+#   2. `request_redemption` — atomically: weETH.approve(adapter), call
+#      WeETHWithdrawAdapter.requestWithdraw (mints WithdrawRequestNFT to
+#      caliber), redeemer.registerRedemption(reqId). NFT stays at the
+#      caliber.
+#   3. (offchain) Wait for etherfi to finalize the request (typically
+#      several days, batch-controlled by etherfi admin).
+#   4. `claim_redemption` — push the finalized NFT into the redeemer via
+#      WRNFT.safeTransferFrom; the redeemer's onERC721Received atomically
+#      claims, wraps, and forwards WETH back to the caliber.
+#
+# Operational hygiene:
+#   - `unregister_redemption` — required cleanup whenever an NFT leaves
+#     the caliber's custody by any path other than the claim hook (direct
+#     etherfi claim, transfer to a third party, etc.). The redeemer's
+#     defensive ownerOf skip keeps NAV honest in the meantime, but stale
+#     ids cost gas on every accounting read.
+#   - `recover_nft` / `recover_funds` — circuit breakers; only needed if
+#     someone non-safely-transferred an NFT into the redeemer or stray
+#     ETH/WETH ends up there.
+#
+# Position vars (set in caliber.yaml):
+#   - label              — human-readable label propagated to every action
+#   - weeth_address      — weETH address on the chain (for affected_tokens)
+#   - weth_address       — WETH address on the chain (for affected_tokens)
+#   - wsteth_address     — wstETH address (for the wstETH-entry redemption)
+#
+# Config vars consumed:
+#   - etherfi_async_redeemer_address — per-caliber redeemer deployment
+
+# ─── Stage 1 (wstETH entry): wrap wstETH→weETH, then open + register ──
+# Atomic "wstETH redemption": approve wstETH to the etherfi deposit
+# adapter, depositWstETHForWeETHWithPermit (dummy permit, deadline =
+# blockTimestamp()), then requestWithdraw + registerRedemption on the
+# resulting weETH. Use this when the caliber holds wstETH; use
+# request_redemption below when it already holds weETH.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.wsteth_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:request_redemption_from_wsteth"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Stage 1: open + register a pending redemption ────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.weeth_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:request_redemption"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Stage 2: claim a finalized redemption ────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.weth_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:claim_redemption"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Cleanup: drop a stale registration after out-of-band NFT move ────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:unregister_redemption"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Circuit breaker: pull a stray NFT off the redeemer ───────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:recover_nft"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Circuit breaker: sweep stray ETH/WETH off the redeemer ───────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.weth_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/withdraw.yaml:recover_funds"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"
+
+# ─── Accounting: WETH-denominated value of all pending redemptions ────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.weth_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/etherfi/account.yaml:account_pending_redemption"
+    inputs:
+      async_redeemer_address:
+        type: "address"
+        value: "${config.etherfi_async_redeemer_address}"

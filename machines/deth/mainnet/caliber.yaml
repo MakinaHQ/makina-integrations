@@ -86,6 +86,20 @@ positions:
       redemption_request_id_key: "0x8134214dae542e89e9da9bf898cce9ad9d0bd9a3c9c8bc487ebc62a4e916fd3d"
       # keccak256("makina.mainnet.dusd.pending_redemption_share_amount")
       pending_redemption_share_amount_key: "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef"
+  - id: "299927329358125448653679819752595611347"
+    group_id: "0"
+    description: "Makina DQAeETH Machine"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0x2b24dFcE3a6AEF36E147C692Fa32d484ec538FC1"] # DQAeETH share token
+    vars:
+      label: "DQAeETH"
+      machine_token: "0x2b24dFcE3a6AEF36E147C692Fa32d484ec538FC1"
+      machine: "0x165afd0b156355D9D51e9E6Ab317a96787Fb6271"
+      depositor: "0x51ffd9806E72822d786AE63455c0f4FdDe49A7B0"
+      redeemer: "0x2237919da69562e47fd2917e933330c87634E61E"
+      accounting_token: ${token_list.mainnet.WETH}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dqaeeth.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dqaeeth.pending_redemption_share_amount")}
 
   # AaveV3 positions
   - id: "132834842824704009878878367726033477050"

@@ -1,27 +1,26 @@
 config:
   caliber_address:
     type: "address"
-    value: "0xCb8AcA2f661f41200B863A2Abac54c2E6d2dAB07"
+    value: "0xD1A557Fe9d49D047A2318c05a13523e4B9E56e09"
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
   etherfi_async_redeemer_address:
     type: "address"
-    value: "0x9C41D1CE48b6118331fAa79AD403C2Ce9c6eE45F" # THIS IS TEST CONTRACT AND NOT AUDITED
+    value: "0x4aDcf7Ef16358da8EAA26038dB331AF49dEb7962" # DQAeETH-specific unaudited contract
 
 positions:
   # EtherFi Async Redemption
-  # id = uint128(sha256("makina.mainnet.tstETH2.etherfi.async-redemption"))
-  #     = 0xf247f7282a3fbdec819c60ef2922c8c5
+  # id = uint128(sha256("makina.mainnet.dqaeeth.etherfi.async-redemption"))
+  #     = 0xe3c9459a09e2bb7c1dc9085b3984e5c8
   - id: "322046840994279646166683717130453698757"
     group_id: "0"
-    description: "EtherFi Async Redemption (weETH/wstETH → WETH)"
-    instructions: !include "../../../instructions/etherfi-async-redemption.yaml"
+    description: "EtherFi Async Redemption (weETH -> WETH)"
+    instructions: !include "../../../instructions/etherfi-async-redemption-weeth.yaml"
     vars:
       label: "EtherFi Async Redemption"
       weeth_address: ${token_list.mainnet.weETH}
       weth_address: ${token_list.mainnet.WETH}
-      wsteth_address: ${token_list.mainnet.wstETH}
 
   # AaveV3 Supply WETH
   - id: "132834842824704009878878367726033477050"

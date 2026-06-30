@@ -10,7 +10,7 @@ positions:
   - id: "6752832539412929551864840485300530764"
     group_id: "0"
     description: "EtherFi Async Redemption (weETH → WETH)"
-    instructions: !include "../../../instructions/.testing/etherfi-async-redemption.yaml"
+    instructions: !include "../../../instructions/etherfi-async-redemption-weeth.yaml"
     vars:
       label: "EtherFi Async Redemption"
       weeth_address: ${token_list.mainnet.weETH}
