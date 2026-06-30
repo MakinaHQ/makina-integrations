@@ -17,3 +17,10 @@ positions:
     vars:
       label: "Dialectic WETH Test"
       vault_address: "0xef3ac91ec3a45f3C6913bFB0C41659919EB85062"
+  - id: "2"
+    group_id: "0"
+    description: "Morpho Vault V2 curation - Dialectic AUSD RWA"
+    instructions: !include "../../../instructions/morpho-vault-v2-curation.yaml"
+    vars:
+      label: "Dialectic AUSD RWA"
+      vault_address: "0x2C4BC0EC9fdD2b1F38eD5120184d62288d3e9DCe"
