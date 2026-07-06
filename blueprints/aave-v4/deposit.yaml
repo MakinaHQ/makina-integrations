@@ -1,0 +1,51 @@
+protocol: "aavev4"
+
+# Aave V4 (Hub & Spoke) — supply an asset to a Spoke reserve.
+#
+# Aave V4 markets are identified by a numeric `reserve_id` on the Spoke contract
+# (not by asset address like V3). The Spoke pulls the underlying from the caller
+# and forwards it to the Hub; the supplied balance is tracked per-(reserveId, user)
+# in Spoke storage — no aToken is minted.
+#
+# Expected inputs:
+#   spoke_address: Aave V4 Spoke (supply target + approval spender)
+#   reserve_id:    numeric reserve id of the asset on the Spoke
+#   asset_address: underlying token being supplied
+#   on_behalf_of:  position owner (the caliber)
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  asset_address:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+
+actions:
+  supply:
+    calls:
+      - description: "Approve the Aave V4 Spoke to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.spoke_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+
+      - description: "Supply the asset to the Aave V4 reserve"
+        target: ${inputs.spoke_address}
+        selector: "supply(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of the underlying asset to supply"

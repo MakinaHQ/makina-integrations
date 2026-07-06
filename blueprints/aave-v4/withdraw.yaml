@@ -1,0 +1,38 @@
+protocol: "aavev4"
+
+# Aave V4 (Hub & Spoke) — withdraw a previously supplied asset from a Spoke reserve.
+#
+# `withdraw(reserveId, amount, onBehalfOf)` reduces the onBehalfOf position and
+# returns the underlying to the caller. For a self-custodied caliber position
+# caliber == onBehalfOf == recipient.
+#
+# Expected inputs:
+#   spoke_address: Aave V4 Spoke
+#   reserve_id:    numeric reserve id of the asset on the Spoke
+#   on_behalf_of:  position owner (the caliber)
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  on_behalf_of:
+    type: "address"
+
+actions:
+  withdraw:
+    calls:
+      - description: "Withdraw the supplied asset from the Aave V4 reserve"
+        target: ${inputs.spoke_address}
+        selector: "withdraw(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "uint256"
+            value: ${input_slots.amount_to_withdraw}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "The amount of the underlying asset to withdraw"
