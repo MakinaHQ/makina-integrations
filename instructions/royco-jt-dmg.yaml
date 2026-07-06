@@ -1,0 +1,102 @@
+# Royco Junior Tranche DMG
+# Underlying asset of the Royco JT is the DMG Makina machine SHARE TOKEN (MT), not a
+# synchronous ERC4626 vault.
+#   DEPOSIT  (1 tx, sync):  USDC -> DMG MT (DirectDepositor) -> Junior Tranche shares
+#   WITHDRAW (2 txs, async MT leg):
+#     REQUEST_REDEEM (TX1): JT.redeem -> DMG MT -> AsyncRedeemer.requestRedeem (KV persist)
+#     -- wait 3 days + off-chain keeper finalizeRequests --
+#     CLAIM          (TX2): AsyncRedeemer.claimAssets -> USDC (KV clear)
+#   ACCOUNT (unified, SUPPLY-SAFE — no seed required): live JT claim in DMG MT, computed via the
+#     kernel's previewSyncTrancheAccounting(1) (full-tranche stAssets+jtAssets, /max(totalShares,1)
+#     -> caliber pro-rata; never reverts at totalSupply==0), PLUS pending MT in the redeem NFT (KV),
+#     summed, then DMG_machine.convertToAssets -> USDC (ONE conversion). Same shape as the standard
+#     makina async-redeem accounting (live shares + pending shares -> convertToAssets). total_mt is
+#     conserved across the request step so the value is unchanged (value-loss invariant); the fee
+#     surfaces at claim where the USDC inflow gives RHS > 0. No JT.convertToAssets is used anywhere
+#     in this instruction set, so a sole/last-holder 100% exit works WITHOUT a permanent seed.
+#
+# Mirrors instructions/royco-st-dmg.yaml (the senior sibling on the same DMG market / kernel /
+# DirectDepositor / AsyncRedeemer); only the tranche address, the previewSyncTrancheAccounting
+# index (1, not 0), and the KV key namespace (jt-dmg, not st-dmg) differ.
+#
+# Prerequisite: the caliber must hold the Royco AccessManager (0x7cC6fB28...) deposit/redeem role
+# `9623252227852051139` and the kernel sync role `15053450870919821405` (both market-agnostic;
+# same roles as the ST sibling). Without the sync role the ACCOUNTING entry reverts.
+#
+# Coexistence with the vanilla "Makina DMG Machine" position (dusd holds BOTH): no double-count and
+# no redemption interference — the two value DISJOINT things:
+#   - Vanilla DMG accounting reads DMG_MT.balanceOf(caliber) + its OWN KV pending. JT-DMG's MT is
+#     locked inside the Royco kernel (NOT in the caliber's DMG_MT balance), and JT-DMG never leaves
+#     loose DMG MT at rest (deposit and request-redeem are each a single atomic tx), so balanceOf
+#     sees only the vanilla position's MT.
+#   - JT-DMG accounting reads the JT pro-rata claim via previewSyncTrancheAccounting(1) (NEVER
+#     DMG_MT.balanceOf) + its own KV pending. The two positions use separate KV namespaces
+#     (makina.mainnet.dmg.* vs royco.mainnet.jt-dmg.*), so the pending legs never overlap.
+#   - Both redeem DMG MT via the same AsyncRedeemer (ERC721 "Makina Redeem Queue NFT"): each request
+#     is a distinct NFT/requestId, so concurrent requests from the two positions are independent and
+#     each is claimed by its own stored requestId. No per-owner singleton constraint.
+# Same shape as the Pareto FalconX vanilla + JT pair already coexisting in this caliber.
+
+# DEPOSIT: USDC -> DMG MT -> Junior Tranche shares (single tx, synchronous)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-JT-DMG"
+    path: "../../../blueprints/royco/jt-dmg/deposit.yaml:deposit"
+    inputs: {}
+
+# ACCOUNT (unified): NAV on JT shares + pre-fee redemption USDC value (KV)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-JT-DMG"
+    path: "../../../blueprints/royco/jt-dmg/account.yaml:account"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.jt-dmg.pending-redemption-mt)}"
+
+# REQUEST_REDEEM (TX1): JT.redeem -> DMG MT -> AsyncRedeemer.requestRedeem (KV persist)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-JT-DMG"
+    path: "../../../blueprints/royco/jt-dmg/request-redeem.yaml:request_redeem"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.jt-dmg.redemption-request-id)}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.jt-dmg.pending-redemption-mt)}"
+
+# CLAIM (TX2): AsyncRedeemer.claimAssets -> USDC (KV clear)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+  instruction:
+    label: "ROY-JT-DMG"
+    path: "../../../blueprints/royco/jt-dmg/claim.yaml:claim_assets"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      redemption_request_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.jt-dmg.redemption-request-id)}"
+      pending_redemption_mt_storage_key:
+        type: "bytes32"
+        value: "${keccak256(royco.mainnet.jt-dmg.pending-redemption-mt)}"
