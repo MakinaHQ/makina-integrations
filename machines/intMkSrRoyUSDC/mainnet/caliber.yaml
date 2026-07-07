@@ -86,6 +86,39 @@ positions:
       asset_address: ${token_list.mainnet.USDtb}
       aave_token: "0xEc4ef66D4fCeEba34aBB4dE69dB391Bc5476ccc8"
 
+  # ── AaveV4 Supply (Hub & Spoke, group_id: 2) ──────────────────────
+  # Aave V4 Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485; reserves are keyed
+  # by numeric reserve_id. No aToken is minted — the position is tracked in Spoke
+  # storage and accounted via getUserSuppliedAssets, hence no position_tokens.
+  #
+  # group_id 2 is dedicated to this exact Spoke address. It is the liquidation
+  # bucket for this Spoke: one health factor per user across all its reserves, and
+  # liquidationCall can cross any collateral reserve against any debt reserve.
+  # Supply-only today (no debt → nothing is liquidatable, so group 0 would also be
+  # valid), but pre-allocated to group 2 so that when a borrow is opened on this
+  # Spoke its collateral + debt already share a group. A different Spoke address
+  # must get its own group_id.
+  - id: "102356596921134877304003836794819117820"
+    # group_id 2 maps to Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485.
+    group_id: "2"
+    description: "AaveV4 Supply USDG"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "USDG"
+      asset_address: ${token_list.mainnet.USDG}
+      spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
+      reserve_id: "11"
+  - id: "64048496748963625189377001215830228790"
+    # group_id 2 maps to Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485.
+    group_id: "2"
+    description: "AaveV4 Supply frxUSD"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "frxUSD"
+      asset_address: ${token_list.mainnet.frxUSD}
+      spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
+      reserve_id: "12"
+
   # ── Securitize Treasury Funds (group_id: 0) ──────────────────────
   - id: "309722523608876619470540797402857939247"
     group_id: "0"

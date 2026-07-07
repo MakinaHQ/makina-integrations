@@ -1,0 +1,40 @@
+protocol: "aave-v4"
+
+# Aave V4 (Hub & Spoke) — account a supplied (non-debt) position.
+#
+# `getUserSuppliedAssets(reserveId, user)` returns the user's supplied balance
+# already denominated in the underlying asset (interest-inclusive), so no share
+# conversion is needed.
+#
+# Expected inputs:
+#   spoke_address: Aave V4 Spoke
+#   reserve_id:    numeric reserve id of the asset on the Spoke
+#   account:       position owner (the caliber)
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  account:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Read the supplied balance (in underlying) for the account"
+        target: ${inputs.spoke_address}
+        selector: "getUserSuppliedAssets(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "address"
+            value: ${inputs.account}
+        return:
+          name: "supplied_assets"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.supplied_assets}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}

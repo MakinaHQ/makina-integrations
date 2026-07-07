@@ -1,0 +1,71 @@
+# AaveV4 Supply — deposit, withdraw, and account for a supplied (non-debt) asset
+# on an Aave V4 Spoke (Hub & Spoke architecture).
+#
+# Expected caliber vars:
+#   label:         string   — token name (e.g. "USDG", "frxUSD")
+#   asset_address: address  — underlying token address
+#   spoke_address: address  — Aave V4 Spoke for this reserve / risk domain
+#   reserve_id:    uint256  — the asset's reserve id on the Spoke
+#
+# The Spoke is a position var because Aave V4 can have multiple Spokes, and each
+# Spoke is its own user-facing reserve and liquidation domain.
+#
+# Expected config:
+#   caliber_address
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/deposit.yaml:supply"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/withdraw.yaml:withdraw"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/account.yaml:account"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      account:
+        type: "address"
+        value: ${config.caliber_address}
