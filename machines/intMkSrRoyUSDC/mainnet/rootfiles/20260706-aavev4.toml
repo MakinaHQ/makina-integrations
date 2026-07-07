@@ -64,6 +64,134 @@ name = "Frax USD"
 decimals = 18
 symbol = "frxUSD"
 
+[instructions.aave-v4.account.USDG]
+position_id = "102356596921134877304003836794819117820"
+description = "AaveV4 Supply USDG"
+is_debt = false
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
+position_tokens = []
+commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000000000000000000000000000000000000000000b",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aave-v4.account.frxUSD]
+position_id = "64048496748963625189377001215830228790"
+description = "AaveV4 Supply frxUSD"
+is_debt = false
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
+position_tokens = []
+commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000000000000000000000000000000000000000000c",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aave-v4.supply.USDG]
+position_id = "102356596921134877304003836794819117820"
+description = "AaveV4 Supply USDG"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffe343167631d89b6ffc58b88d6b7fb0228795491d",
+  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
+  "0x000000000000000000000000000000000000000000000000000000000000000b",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.aave-v4.supply.USDG.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aave-v4.supply.frxUSD]
+position_id = "64048496748963625189377001215830228790"
+description = "AaveV4 Supply frxUSD"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffcacd6fd266af91b8aed52accc382b4e165586e29",
+  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
+  "0x000000000000000000000000000000000000000000000000000000000000000c",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.aave-v4.supply.frxUSD.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aave-v4.withdraw.USDG]
+position_id = "102356596921134877304003836794819117820"
+description = "AaveV4 Supply USDG"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
+position_tokens = []
+commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x000000000000000000000000000000000000000000000000000000000000000b",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aave-v4.withdraw.USDG.inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.aave-v4.withdraw.frxUSD]
+position_id = "64048496748963625189377001215830228790"
+description = "AaveV4 Supply frxUSD"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
+position_tokens = []
+commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x000000000000000000000000000000000000000000000000000000000000000c",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aave-v4.withdraw.frxUSD.inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
 [instructions.aavev3.account."RLUSD - Lend"]
 position_id = "127941166575521302841184731003311232234"
 description = "AaveV3 Supply RLUSD"
@@ -318,134 +446,6 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aavev3.withdraw_collateral."USDtb - Lend".inputs_slots]]
 index = 0
 name = "amount_collateral_to_withdraw"
-type = "Uint"
-
-[instructions.aavev4.account.USDG]
-position_id = "102356596921134877304003836794819117820"
-description = "AaveV4 Supply USDG"
-is_debt = false
-group_id = "2"
-instruction_type = 1
-affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
-position_tokens = []
-commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
-state = [
-  "0x",
-  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "0x000000000000000000000000000000000000000000000000000000000000000b",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "148873535527910577765226390751398592512"
-inputs_slots = []
-
-[instructions.aavev4.account.frxUSD]
-position_id = "64048496748963625189377001215830228790"
-description = "AaveV4 Supply frxUSD"
-is_debt = false
-group_id = "2"
-instruction_type = 1
-affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
-position_tokens = []
-commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
-state = [
-  "0x",
-  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "0x000000000000000000000000000000000000000000000000000000000000000c",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "148873535527910577765226390751398592512"
-inputs_slots = []
-
-[instructions.aavev4.supply.USDG]
-position_id = "102356596921134877304003836794819117820"
-description = "AaveV4 Supply USDG"
-is_debt = false
-group_id = "2"
-instruction_type = 0
-affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
-position_tokens = []
-commands = [
-  "0x095ea7b3010100ff000000ffe343167631d89b6ffc58b88d6b7fb0228795491d",
-  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
-]
-state = [
-  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
-  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
-  "0x000000000000000000000000000000000000000000000000000000000000000b",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "148873535527910577765226390751398592512"
-
-[[instructions.aavev4.supply.USDG.inputs_slots]]
-index = 0
-name = "amount_to_deposit"
-type = "Uint"
-
-[instructions.aavev4.supply.frxUSD]
-position_id = "64048496748963625189377001215830228790"
-description = "AaveV4 Supply frxUSD"
-is_debt = false
-group_id = "2"
-instruction_type = 0
-affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
-position_tokens = []
-commands = [
-  "0x095ea7b3010100ff000000ffcacd6fd266af91b8aed52accc382b4e165586e29",
-  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
-]
-state = [
-  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
-  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
-  "0x000000000000000000000000000000000000000000000000000000000000000c",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "148873535527910577765226390751398592512"
-
-[[instructions.aavev4.supply.frxUSD.inputs_slots]]
-index = 0
-name = "amount_to_deposit"
-type = "Uint"
-
-[instructions.aavev4.withdraw.USDG]
-position_id = "102356596921134877304003836794819117820"
-description = "AaveV4 Supply USDG"
-is_debt = false
-group_id = "2"
-instruction_type = 0
-affected_tokens = ["0xe343167631d89b6ffc58b88d6b7fb0228795491d"]
-position_tokens = []
-commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
-state = [
-  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
-  "0x000000000000000000000000000000000000000000000000000000000000000b",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "127605887595351923798765477786913079296"
-
-[[instructions.aavev4.withdraw.USDG.inputs_slots]]
-index = 0
-name = "amount_to_withdraw"
-type = "Uint"
-
-[instructions.aavev4.withdraw.frxUSD]
-position_id = "64048496748963625189377001215830228790"
-description = "AaveV4 Supply frxUSD"
-is_debt = false
-group_id = "2"
-instruction_type = 0
-affected_tokens = ["0xcacd6fd266af91b8aed52accc382b4e165586e29"]
-position_tokens = []
-commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
-state = [
-  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
-  "0x000000000000000000000000000000000000000000000000000000000000000c",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-]
-bitmap = "127605887595351923798765477786913079296"
-
-[[instructions.aavev4.withdraw.frxUSD.inputs_slots]]
-index = 0
-name = "amount_to_withdraw"
 type = "Uint"
 
 [instructions.merkl.harvest.Merkl]

@@ -1,4 +1,4 @@
-protocol: "aavev4"
+protocol: "aave-v4"
 
 # Aave V4 (Hub & Spoke) — account a supplied (non-debt) position.
 #
