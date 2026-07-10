@@ -203,6 +203,17 @@ positions:
     tags:
       - "228339:emergency_redeem_vault_v2"
 
+  # ── Morpho Vault 3Jane ────────────────────────────────────────────
+  - id: "319028358984478431816090771761707097811"
+    group_id: "0"
+    description: "Morpho Vault 3Jane Ecosystem"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xe05faDf242331808f504661BEA65972594869826"]
+    vars:
+      label: "3Jane Ecosystem Vault"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xe05faDf242331808f504661BEA65972594869826"
+
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "233812392305217120018639900280612878694"
     group_id: "0"
@@ -212,6 +223,14 @@ positions:
       label: "srRoyUSDC/USDC (0xacc4...2c67)"
       market_id: "0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67"
       loan_token: ${token_list.mainnet.USDC}
+  - id: "113449663964260328783737869496305528290"
+    group_id: "0"
+    description: "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"
