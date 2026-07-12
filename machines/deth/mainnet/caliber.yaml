@@ -11,6 +11,9 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
   key_value_store_address:
     type: "address"
     value: "0xF5B4dF5E5a446a64c89294fD4a6a1cAA56E77437"
@@ -68,6 +71,15 @@ positions:
     description: "Aave Umbrella WETH"
     instructions: !include "./instructions/aave-umbrella-weth.yaml"
     position_tokens: ["0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce"]
+  - id: "319028358984478431816090771761707097811"
+    group_id: "0"
+    description: "Morpho Vault 3Jane Ecosystem"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xe05faDf242331808f504661BEA65972594869826"]
+    vars:
+      label: "3Jane Ecosystem Vault"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xe05faDf242331808f504661BEA65972594869826"
 
   # ── Makina ───────────────────────────────────────────────────────
   - id: "257907866263469253975271928750178105060"
@@ -191,3 +203,67 @@ positions:
       label: "wstETH/WETH (0xd0e5...ec5d)"
       market_id: "0xd0e50cdac92fe2172043f5e0c36532c6369d24947e40968f34a5e8819ca9ec5d"
       loan_token: ${token_list.mainnet.WETH}
+  - id: "234056643176152780215030792645294081596"
+    group_id: "8"
+    description: "Morpho weETH collateral (market: 0x85d5...212c)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "weETH/PYUSD (0x85d5...212c)"
+      market_id: "0x85d59152eeeab7ca024804895b358868d8dd1e134171be400d7792d5604a212c"
+      collateral_token: ${token_list.mainnet.weETH}
+  - id: "46161668225856735715809817413672175578"
+    group_id: "8"
+    description: "Morpho PYUSD debt (market: 0x85d5...212c)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "weETH/PYUSD (0x85d5...212c)"
+      market_id: "0x85d59152eeeab7ca024804895b358868d8dd1e134171be400d7792d5604a212c"
+      loan_token: ${token_list.mainnet.PYUSD}
+  - id: "257979155286564265784886542987385982045"
+    group_id: "9"
+    description: "Morpho weETH collateral (market: 0xc2c5...a8f6)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "weETH/USDT (0xc2c5...a8f6)"
+      market_id: "0xc2c53d2b868e163da71de14a5113cc2743fc9b5ad7488334720ed2846566a8f6"
+      collateral_token: ${token_list.mainnet.weETH}
+  - id: "117897999589525498285498123941856654865"
+    group_id: "9"
+    description: "Morpho USDT debt (market: 0xc2c5...a8f6)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "weETH/USDT (0xc2c5...a8f6)"
+      market_id: "0xc2c53d2b868e163da71de14a5113cc2743fc9b5ad7488334720ed2846566a8f6"
+      loan_token: ${token_list.mainnet.USDT}
+  - id: "206455271149408088518840450283480120566"
+    group_id: "10"
+    description: "Morpho weETH collateral (market: 0x3437...c5dd)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "weETH/USDC (0x3437...c5dd)"
+      market_id: "0x34377fc4f617c51818e92c79df31ff270c6a91bc94ad32e367fdf59b9f4ac5dd"
+      collateral_token: ${token_list.mainnet.weETH}
+  - id: "304839825226858859869599824775632331565"
+    group_id: "10"
+    description: "Morpho USDC debt (market: 0x3437...c5dd)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "weETH/USDC (0x3437...c5dd)"
+      market_id: "0x34377fc4f617c51818e92c79df31ff270c6a91bc94ad32e367fdf59b9f4ac5dd"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "163478601671182982890720206633991340782"
+    group_id: "11"
+    description: "Morpho wstETH collateral (market: 0xf5c5...4d27)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "wstETH/PYUSD (0xf5c5...4d27)"
+      market_id: "0xf5c5df23559b0fb56560a7578ea17d81e245153ba64b8132df026c9358864d27"
+      collateral_token: ${token_list.mainnet.wstETH}
+  - id: "36824776297893515328125497271945688587"
+    group_id: "11"
+    description: "Morpho PYUSD debt (market: 0xf5c5...4d27)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "wstETH/PYUSD (0xf5c5...4d27)"
+      market_id: "0xf5c5df23559b0fb56560a7578ea17d81e245153ba64b8132df026c9358864d27"
+      loan_token: ${token_list.mainnet.PYUSD}

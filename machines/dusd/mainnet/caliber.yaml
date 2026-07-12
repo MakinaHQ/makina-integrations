@@ -52,8 +52,8 @@ positions:
     position_tokens: ["0x625E92624Bc2D88619ACCc1788365A69767f6200"]
     vars:
       label: "PYUSD/crvUSD"
-      tokena_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.PYUSD}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       pool_address: "0x625E92624Bc2D88619ACCc1788365A69767f6200"
       gauge_address: "0xf69Fb60B79E463384b40dbFDFB633AB5a863C9A2"
       coin0_scale_factor: "1000000"
@@ -64,8 +64,8 @@ positions:
     position_tokens: ["0xd001ae433f254283fece51d4acce8c53263aa186"]
     vars:
       label: "USDC/RLUSD"
-      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-      tokenb_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      tokena_address: ${token_list.mainnet.USDC}
+      tokenb_address: ${token_list.mainnet.RLUSD}
       pool_address: "0xd001ae433f254283fece51d4acce8c53263aa186"
       gauge_address: "0xfc3212bd9ad9a28da6b2bd50a2918969c126894f"
       coin0_scale_factor: "1000000"
@@ -78,8 +78,8 @@ positions:
     position_tokens: ["0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"]
     vars:
       label: "USDC/crvUSD"
-      tokena_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.USDC}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       curve_pool_address: "0x4DEcE678ceceb27446b35C672dC7d61F30bAD69E"
       convex_pool_id: "182"
       convex_reward_pool: "0x44D8FaB7CD8b7877D5F79974c2F501aF6E65AbBA"
@@ -91,8 +91,8 @@ positions:
     position_tokens: ["0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"]
     vars:
       label: "USDT/crvUSD"
-      tokena_address: "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-      tokenb_address: "0xf939E0A03FB07F59A73314E73794Be0E57ac1b4E"
+      tokena_address: ${token_list.mainnet.USDT}
+      tokenb_address: ${token_list.mainnet.crvUSD}
       curve_pool_address: "0x390f3595bCa2Df7d23783dFd126427CCeb997BF4"
       convex_pool_id: "179"
       convex_reward_pool: "0xD1DdB0a0815fD28932fBb194C84003683AF8a824"
@@ -106,7 +106,7 @@ positions:
     position_tokens: ["0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"]
     vars:
       label: "Steakhouse PYUSD"
-      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xbEEF02e5E13584ab96848af90261f0C8Ee04722a"
   - id: "30651621090656837837542443694366525060"
     group_id: "0"
@@ -115,7 +115,7 @@ positions:
     position_tokens: ["0xd63070114470f685b75B74D60EEc7c1113d33a3D"]
     vars:
       label: "MEV Capital USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xd63070114470f685b75B74D60EEc7c1113d33a3D"
   - id: "287972541400220405479010366660803291000"
     group_id: "0"
@@ -124,7 +124,7 @@ positions:
     position_tokens: ["0xc080f56504e0278828A403269DB945F6c6D6E014"]
     vars:
       label: "Gauntlet eUSD Core"
-      asset_address: "0xA0d69E286B938e21CBf7E51D71F6A4c8918f482F"
+      asset_address: ${token_list.mainnet.eUSD}
       vault_address: "0xc080f56504e0278828A403269DB945F6c6D6E014"
   - id: "77590748279218246310796884579338401703"
     group_id: "0"
@@ -133,7 +133,7 @@ positions:
     position_tokens: ["0xBEeFFF209270748ddd194831b3fa287a5386f5bC"]
     vars:
       label: "Smokehouse USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
   - id: "11232424494326814282538250204373920286"
     group_id: "0"
@@ -142,7 +142,7 @@ positions:
     position_tokens: ["0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"]
     vars:
       label: "Gauntlet USDC Frontier"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xc582F04d8a82795aa2Ff9c8bb4c1c889fe7b754e"
   - id: "188442457890402398659043284211703237226"
     group_id: "0"
@@ -151,7 +151,7 @@ positions:
     position_tokens: ["0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"]
     vars:
       label: "Gauntlet USDC Core"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458"
   - id: "128264429154381135287798106504544985667"
     group_id: "0"
@@ -160,7 +160,7 @@ positions:
     position_tokens: ["0xbeEF346d7099865208Ff331e4f648f4154DDAa05"]
     vars:
       label: "Smokehouse Reservoir USDC"
-      asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      asset_address: ${token_list.mainnet.USDC}
       vault_address: "0xbeEF346d7099865208Ff331e4f648f4154DDAa05"
   - id: "101479911391298992514073662718338576961"
     group_id: "0"
@@ -169,7 +169,7 @@ positions:
     position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
     vars:
       label: "Sentora RLUSD"
-      asset_address: "0x8292Bb45bf1Ee4d140127049757c2E0fF06317ed"
+      asset_address: ${token_list.mainnet.RLUSD}
       vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
@@ -178,7 +178,7 @@ positions:
     position_tokens: ["0xb576765fB15505433aF24FEe2c0325895C559FB2"]
     vars:
       label: "Sentora PYUSD"
-      asset_address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
   - id: "244003111842323732524710741252875629950"
     group_id: "0"
@@ -203,6 +203,17 @@ positions:
     tags:
       - "228339:emergency_redeem_vault_v2"
 
+  # ── Morpho Vault 3Jane ────────────────────────────────────────────
+  - id: "319028358984478431816090771761707097811"
+    group_id: "0"
+    description: "Morpho Vault 3Jane Ecosystem"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xe05faDf242331808f504661BEA65972594869826"]
+    vars:
+      label: "3Jane Ecosystem Vault"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xe05faDf242331808f504661BEA65972594869826"
+
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "233812392305217120018639900280612878694"
     group_id: "0"
@@ -212,23 +223,31 @@ positions:
       label: "srRoyUSDC/USDC (0xacc4...2c67)"
       market_id: "0xacc49fbf58feb1ac971acce68f8adc177c43682d6a7087bbd4991a05cb7a2c67"
       loan_token: ${token_list.mainnet.USDC}
+  - id: "113449663964260328783737869496305528290"
+    group_id: "0"
+    description: "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
-  # - id: "176021688445186810403025048632929053161"
-  #   group_id: "0"
-  #   description: "Aave Umbrella USDC"
-  #   instructions: !include "./instructions/aave-umbrella-usdc.yaml"
-  #   position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
+  - id: "176021688445186810403025048632929053161"
+    group_id: "0"
+    description: "Aave Umbrella USDC"
+    instructions: !include "./instructions/aave-umbrella-usdc.yaml"
+    position_tokens: ["0x6bf183243FdD1e306ad2C4450BC7dcf6f0bf8Aa6"]
   - id: "293691712937964969352275672791079139559"
     group_id: "0"
     description: "Aave Umbrella USDT"
     instructions: !include "./instructions/aave-umbrella-usdt.yaml"
     position_tokens: ["0xA484Ab92fe32B143AEE7019fC1502b1dAA522D31"]
-  # - id: "229457643934747132111107431329088218367"
-  #   group_id: "0"
-  #   description: "Aave Umbrella GHO"
-  #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
-  #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
+  - id: "229457643934747132111107431329088218367"
+    group_id: "0"
+    description: "Aave Umbrella GHO"
+    instructions: !include "./instructions/aave-umbrella-gho.yaml"
+    position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
   - id: "107031348711587941411569515464890863894"
     group_id: "0"
     description: "Aave Savings GHO"
@@ -283,6 +302,7 @@ positions:
     group_id: "1"
     description: "AaveV3 Borrow USDC (sUSDe E-Mode)"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x72E95b8931767C79bA4EeE721354d6E99a61D004"]
     vars:
       label: "USDC - Borrow"
       asset_address: ${token_list.mainnet.USDC}
@@ -291,6 +311,7 @@ positions:
     group_id: "1"
     description: "AaveV3 Borrow USDT (sUSDe E-Mode)"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"]
     vars:
       label: "USDT - Borrow"
       asset_address: ${token_list.mainnet.USDT}
@@ -355,7 +376,7 @@ positions:
     instructions: !include "../../../instructions/morpho-loop-swap.yaml"
     vars:
       label: "sUSDS/USDT Morpho Loop"
-      collateral_token: "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD" # sUSDS
+      collateral_token: ${token_list.mainnet.sUSDS}
       loan_token: ${token_list.mainnet.USDT}
       morpho_market_id: "0x3274643db77a064abd3bc851de77556a4ad2e2f502f4f0c80845fa8f909ecf0b"
       oracle_address: "0x0C426d174FC88B7A25d59945Ab2F7274Bf7B4C79"
@@ -429,14 +450,16 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
-  - id: "330570121219840820532089219331590988878"
-    group_id: "0"
-    description: "Royco Junior Tranche Pareto FalconX V2"
-    instructions: !include "../../../instructions/royco-jt-pareto-falconx.yaml"
-    position_tokens:
-      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
-      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
-      - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
+  # - id: "330570121219840820532089219331590988878"
+  #   group_id: "0"
+  #   description: "Royco Junior Tranche Pareto FalconX V2"
+  #   instructions: !include "../../../instructions/royco-jt-pareto-falconx.yaml"
+  #   position_tokens:
+  #     - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
+  #     - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
+  #     - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
+  # JT on the Makina DMG machine: TRANCHE_UNIT is DMG MT (18 dec), valued via
+  # DMG_machine.convertToAssets -> USDC. Async withdraw (request-redeem + claim) like the ST sibling.
   - id: "335772134702432832947493967330354731301"
     group_id: "0"
     description: "Royco Junior Tranche DMG (Makina DMG machine)"
@@ -444,6 +467,15 @@ positions:
     position_tokens:
       - "0x761C3B16a5Afdd7A1869C4B979cFF3383d5Fe98B" # DMG MT
       - "0xC0378C1eB87421FF42539Ea98Be2700fc8d44B23" # JT-DMG
+
+  # ── Pareto FalconX AA-tranche ────────────────────────────────────
+  - id: "114753234960554942361599178742666226841"
+    group_id: "0"
+    description: "Pareto FalconX (vanilla AA tranche)"
+    instructions: !include "../../../instructions/pareto-falconx.yaml"
+    position_tokens:
+      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
+      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
 
   # ── Re Protocol (reUSD synthetic swap) ───────────────────────────
   # Swap in  USDC -> reUSD via the ICL (synchronous mint, caliber is KYC-approved).
@@ -502,15 +534,6 @@ positions:
     position_tokens:
       - "0x7743e50F534a7f9F1791DdE7dCD89F7783Eefc39" # fxSAVE (held)
       - "0x65C9A641afCEB9C0E6034e558A319488FA0FA3be" # fxSP (held while redeemed/in cooldown)
-
-  # ── Pareto FalconX AA-tranche ──
-  - id: "114753234960554942361599178742666226841"
-    group_id: "0"
-    description: "Pareto FalconX (vanilla AA tranche)"
-    instructions: !include "../../../instructions/pareto-falconx.yaml"
-    position_tokens:
-      - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
-      - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
 
   # ── Makina DMG Machine ────────────────────────────────────────────
   - id: "192251226307927011616793379882563103500"
