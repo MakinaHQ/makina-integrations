@@ -35,6 +35,17 @@ decimals = 6
 name = "USD Coin"
 symbol = "USDC"
 
+[calibers.monad]
+address = "0xd1a1c248b253f1fc60eacd90777b9a63f8c8c1bc"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dusd/monad/rootfiles"
+
+[calibers.monad.accounting_token]
+address = "0x754704Bc059F8C67012fEd69BC8A327a5aafb603"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
+
 [ntt.mainnet]
 token = "0x1e33e98af620f1d563fcd3cfd3c75ace841204ef"
 manager = "0xaBa79e9b4238e85B75A5812CeD64B4f6527E9ADB"
