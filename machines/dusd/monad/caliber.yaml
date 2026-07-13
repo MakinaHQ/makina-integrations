@@ -6,7 +6,7 @@ config:
     type: "address"
     value: "0x69a5F9AD4f96ebf0a0C792dD42a01cC5C0102fef"
 
-positions:
+positions: []
   # # ── Harvest-only ──────────────────────────────────────────────────
   # - id: "777"
   #   group_id: "0"
