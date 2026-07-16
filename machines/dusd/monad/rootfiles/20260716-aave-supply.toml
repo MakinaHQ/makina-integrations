@@ -4,7 +4,7 @@
 [tokens."${token_list.monad.USDC}"]
 chainId = 143
 address = "0x754704bc059f8c67012fed69bc8a327a5aafb603"
-name = "USD Coin"
+name = "USDC"
 decimals = 6
 symbol = "USDC"
 
