@@ -436,6 +436,27 @@
       "name": "Arbitrum tBTC v2",
       "decimals": 18,
       "symbol": "tBTC"
+    },
+    {
+      "chainId": 143,
+      "address": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+      "name": "AUSD",
+      "decimals": 6,
+      "symbol": "AUSD"
+    },
+    {
+      "chainId": 143,
+      "address": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+      "name": "USD Coin",
+      "decimals": 6,
+      "symbol": "USDC"
+    },
+    {
+      "chainId": 143,
+      "address": "0xe7cd86e13AC4309349F30B3435a9d337750fC82D",
+      "name": "USDT0",
+      "decimals": 6,
+      "symbol": "USDT0"
     }
   ]
 }

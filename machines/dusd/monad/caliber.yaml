@@ -6,24 +6,24 @@ config:
     type: "address"
     value: "0x69a5F9AD4f96ebf0a0C792dD42a01cC5C0102fef"
 
-positions: []
-# # ── Harvest-only ──────────────────────────────────────────────────
-# - id: "777"
-#   group_id: "0"
-#   description: "Merkl Harvest"
-#   instructions: !include "./instructions/merkl.yaml"
+positions:
+# ── Harvest-only ──────────────────────────────────────────────────
+- id: "777"
+  group_id: "0"
+  description: "Merkl Harvest"
+  instructions: !include "./instructions/merkl.yaml"
 
-# # ── AaveV3 (group_id: 1) ──────────────────────────────────
-# - id: "226666382788514932918636686861146238730"
-#   group_id: "1"
-#   description: "AaveV3 Supply USDC"
-#   instructions: !include "../../../instructions/aavev3-supply.yaml"
-#   position_tokens: ["0x35a73BAcb179d3740395A3ceCc87FF2e581d6042"]
-#   vars:
-#     label: "USDC"
-#     asset_address: ${token_list.monad.USDC}
-#     aave_token: "0x35a73BAcb179d3740395A3ceCc87FF2e581d6042"
-#     aave_pool_instance: ${config.aavev3_core_instance}
+# ── AaveV3 (group_id: 1) ──────────────────────────────────
+- id: "226666382788514932918636686861146238730"
+  group_id: "1"
+  description: "AaveV3 Supply USDC"
+  instructions: !include "../../../instructions/aavev3-supply.yaml"
+  position_tokens: ["0x35a73BAcb179d3740395A3ceCc87FF2e581d6042"]
+  vars:
+    label: "USDC"
+    asset_address: ${token_list.monad.USDC}
+    aave_token: "0x35a73BAcb179d3740395A3ceCc87FF2e581d6042"
+    aave_pool_instance: ${config.aavev3_core_instance}
 # - id: "18883279859232606921081666227395984506"
 #   group_id: "1"
 #   description: "AaveV3 Supply AUSD"
