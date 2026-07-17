@@ -25,10 +25,10 @@
 # production OracleRegistry before go-live (see
 # scripts-factory/noon/base/.../oracle-setup.md).
 #
-# GO-LIVE TODO: replace otc_counterparty below with the real OTC EOA we control on
-# Base. It is an anchored value in THIS instruction file (per repo rule:
-# protocol/position-specific addresses stay out of caliber.yaml config). The EOA must
-# approve the caliber to spend its sUSN (buy leg) and its USDC (sell leg).
+# otc_counterparty is the OTC EOA we control on Base, anchored below in THIS instruction
+# file (per repo rule: protocol/position-specific addresses stay out of caliber.yaml
+# config). GO-LIVE: the EOA must approve the caliber to spend its sUSN (buy leg) and its
+# USDC (sell leg) before either leg can settle.
 
 # ── BUY sUSN: caliber pays USDC to the EOA, pulls sUSN from the EOA ────────────
 - is_debt: false
@@ -47,7 +47,7 @@
         value: "${token_list.base.sUSN}"
       otc_counterparty:
         type: "address"
-        value: "0x0000000000000000000000000000000000000000" # TODO: real OTC EOA on Base
+        value: "0x9b75A61a513686A4AA42c6113b3E85a341228D2c" # OTC EOA (Base) — must approve the caliber for sUSN + USDC
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -91,7 +91,7 @@
         value: "${token_list.base.sUSN}"
       otc_counterparty:
         type: "address"
-        value: "0x0000000000000000000000000000000000000000" # TODO: real OTC EOA on Base
+        value: "0x9b75A61a513686A4AA42c6113b3E85a341228D2c" # OTC EOA (Base) — must approve the caliber for sUSN + USDC
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
