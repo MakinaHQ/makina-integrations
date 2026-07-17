@@ -64,6 +64,23 @@ When invoked, you will receive:
 
 The `manage-position` command requires all these env vars for transaction simulation.
 
+### Fork Backend: Tenderly MCP OR Local Anvil
+
+There are TWO interchangeable fork backends. If the claude.ai **Tenderly MCP connector token expires** (symptom: every `mcp__...tenderly` call returns Unauthorized) or the MCP is otherwise down, do NOT stall — fall back to a **local anvil fork** (foundry is installed):
+
+```bash
+anvil --fork-url "$MAINNET_RPC_URL"   # serves http://127.0.0.1:8545
+```
+
+Anvil needs no connector and supports the same cheats:
+- `anvil_impersonateAccount <addr>` — impersonate timelock/admin (replaces Tenderly impersonation)
+- `anvil_setBalance <addr> <weiHex>` — fund ETH for gas (replaces fund_address for ETH)
+- `evm_increaseTime` / `evm_setNextBlockTimestamp` — time control
+- `forge create` — deploy contracts
+- ERC-20 funding: impersonate a whale and `cast send <token> "transfer(address,uint256)" ...`, or override balances with `anvil_setStorageAt`
+
+Point spellcaster and every `cast` call at `http://127.0.0.1:8545` instead of the Tenderly `DEV_*_RPC_URL`. Everything else in this workflow (compile, dev-update-root, manage-position, display-positions) is identical.
+
 ### Rootfile Directory Requirements
 - Spellcaster loads ALL caliber configs (mainnet, arbitrum, base, polygon) when starting
 - Each caliber's `rootfiles/` directory must contain at least one valid rootfile
@@ -81,6 +98,10 @@ state = []
 bitmap = "0"
 inputs_slots = []
 ```
+
+### Runtime expectations (do not mistake slow for stuck)
+
+A cold `cargo build` of spellcaster plus fork spin-up genuinely takes **20-40 min** — this is NOT a hang. Run long e2e steps **synchronously** (or launch-and-yield); do NOT poll a backgrounded build/run in a tight loop. Background work only advances while the main loop is idle, so repeated status checks starve it and make it look stuck. State the ~20-40 min expectation up front and let the step run.
 
 ## Workflow
 
@@ -108,12 +129,29 @@ Copy the `config` section from the main `caliber.yaml` and include only the inst
 
 ### Step 1: Compile Instruction to Rootfile
 
-Run the transpiler to generate a rootfile:
+The transpiler is a **separately-installed binary — it is NOT on your PATH and NOT in the local makina-rs checkout** (that repo's `calldata` crate is an HTTP API server, not the transpiler; and branches like `abu` lack the transpiler crate entirely). Resolve it from `TRANSPILER_PATH` in `.claude/settings.local.json`; the known-good build is:
+
+```
+/Users/augustin/.cargo/git/checkouts/transpiler-11f55d1751042103/9471437/target/debug/transpiler
+```
+
+CLI: subcommands `transpile | check | root`; flags `-i/--input-file`, `-o/--output-file`, `-t/--token-list`, `--helpers`. **`check` and `transpile` BOTH REQUIRE `--token-list`** because instructions reference `${token_list.*}` — omitting it fails. Run from the config repo root:
 
 ```bash
-transpiler -- \
-  --input-file=${ROOTFILES_PATH}/machines/{machine}/{network}/caliber-test.yaml \
-  --output-file=${ROOTFILES_PATH}/machines/{machine}/{network}/rootfiles/test-output.toml
+TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-11f55d1751042103/9471437/target/debug/transpiler}"
+
+# Validate only (fast, no output file):
+"$TRANSPILER" \
+  --input-file machines/{machine}/{network}/caliber-test.yaml \
+  --token-list token-lists/prod-token-list.json \
+  check
+
+# Compile to a rootfile:
+"$TRANSPILER" \
+  --input-file machines/{machine}/{network}/caliber-test.yaml \
+  --token-list token-lists/prod-token-list.json \
+  --output-file machines/{machine}/{network}/rootfiles/test-output.toml \
+  transpile
 ```
 
 ### Step 2: Setup Local Config
@@ -131,6 +169,24 @@ config = "local:${ROOTFILES_PATH}/machines/{machine}/config-local.toml"
 [calibers.{network}]
 rootfiles = "local:${ROOTFILES_PATH}/machines/{machine}/{network}/rootfiles"
 ```
+
+#### Config-repo-only calibers (cross-repo plumbing)
+
+Some calibers (e.g. `intMkSrRoyUSDC`) exist ONLY in the **config repo**, not the rootfiles/makina-rs repo. spellcaster still runs from the makina-rs checkout, so you must wire the config-repo caliber in with **absolute** paths:
+
+**machines-local.toml** (referenced by spellcaster's `--machines-path`/`--config`):
+```toml
+[{machine}]
+config = "local:/Users/augustin/Desktop/makina/config/machines/{machine}/config-local.toml"
+```
+
+**/Users/augustin/Desktop/makina/config/machines/{machine}/config-local.toml**:
+```toml
+[calibers.{network}]
+rootfiles = "local:/Users/augustin/Desktop/makina/config/machines/{machine}/{network}/rootfiles"
+```
+
+Then invoke: `cargo run -p spellcaster -- --machines-path <path-to-that-machines-local.toml> --dev ...` (older builds use `--config` instead of `--machines-path`). Do this wiring BEFORE dev-update-root, or the caliber won't be found.
 
 ### Step 3: Get Testnet Credentials
 
@@ -427,6 +483,33 @@ spellcaster -- \
 Summary of all test results.
 ```
 
+### Step 9: Format generated files (CI gate)
+
+CI runs a `formatting` (dprint) check that FAILS the PR on any unformatted committed markdown/yaml. After writing `test-report.md` and any `caliber-test.yaml` / `config-local.toml`, run from the config repo root:
+
+```bash
+dprint fmt
+```
+
+It reflows markdown tables and yaml. Excludes: `.claude/`, `CLAUDE.md`, `protocol_specs/` — so agent files are untouched, but the test-report (under `scripts-factory/`) and instruction/caliber yaml ARE reformatted. Run it before those files are committed.
+
+## Validating affected_tokens & Loss Reconciliation
+
+Before running the e2e, validate the instruction's `affected_tokens`. `_checkPositionMinDelta` bounds the signed position-value change per leg, and **every `affected_tokens` entry of a MANAGEMENT instruction MUST be a REGISTERED BASE TOKEN** — else the caliber reverts with `InvalidAffectedToken`.
+
+Two accounting archetypes:
+
+1. **Position model** — `position_tokens` + accounting = active (`convertToAssets`/`previewRedeem`) + pending. Only the underlying/denomination needs an oracle feed; the held share token is NOT a base token.
+
+2. **Base-token model** (precedents: `blueprints/re` reUSD, `blueprints/midas` mGLOBAL, `blueprints/securitize` VBILL, `blueprints/etherfi` async redemption) — the held token IS a base token (`addBaseToken` + its OWN feed) and accounting is **PENDING-ONLY** (0 when idle) so the held value isn't double-counted. `affected_tokens` per action:
+   - deposit = `[]` (synthetic swap between base tokens)
+   - async request = `[the base token burned / leaving]`
+   - claim = `[the base token arriving]`
+   - account = `[denomination]`
+   For an async cooldown, the base-token model still needs a **KV-tracked pending term** to keep NAV continuous across request -> claim.
+
+Checks: confirm each `affected_tokens` address is `addBaseToken`-registered AND has a feed route; after each leg confirm `display-positions` NAV is continuous across the request->claim boundary (no gap, no double-count).
+
 ## Troubleshooting
 
 | Error | Cause | Solution |
@@ -451,7 +534,17 @@ mcp__tenderly__create_tenderly_testnet(chain="eth")  # Returns testnet ID and RP
 
 After creating a fresh testnet, update the `.env` file or use the returned RPC URLs directly.
 
+> **Verify signatures against DEPLOYED bytecode, not local makina-core `main` source.** Deployed contracts lag `main`. On the deployed OracleRegistry the working functions are `setFeedRoute`/`getFeedRoute` — the local source's `setTokenFeedData`/`getTokenFeedData` REVERT on-chain. The deployed Caliber uses the **1-arg** `addBaseToken(address)` from the riskManagerTimelock; local `main` has a newer **2-arg** `addBaseToken(address,uint256)`. Wrong signature -> empty `0x` revert. Always confirm the selector against etherscan/ABI or a prior test-report before sending.
+
 ### Adding Base Tokens to Caliber
+
+> **ORDER MATTERS: register the oracle feed route FIRST.** `addBaseToken` REVERTS (empty `0x`) if the token has no feed route in the OracleRegistry. Run **'Setting Up Oracle Routes' (below) BEFORE this step.**
+
+On the deployed Caliber `addBaseToken` is the **1-arg** `addBaseToken(address)` called from the riskManagerTimelock:
+
+```
+RISK_MANAGER_TIMELOCK="0x7c405bbd131e42af506d14e752f2e59b19d49997"  # intMkSrRoyUSDC / dusd mainnet; verify with cast call $CALIBER_ADDRESS "riskManagerTimelock()(address)"
+```
 
 If the instruction uses a token that isn't already configured as a base token in the caliber, you need to add it via the `riskManagerTimelock`:
 
@@ -509,7 +602,8 @@ cast logs --from-block 0 --to-block latest \
   "RoleGranted(uint64,address,uint32,uint48,bool)" \
   0x0000000000000000000000000000000000000000000000000000000000000000 \
   --rpc-url "$RPC_URL"
-# Known admin (role 0): 0x62244c74e1d09b3d86ef7342d354b5d7770bde10 (dusd mainnet)
+# ZERO-DELAY admin (role 0): 0x8d28a69328561ef9f171c58996fecb9f494e070c
+# WARNING: 0x62244c74e1d09b3d86ef7342d354b5d7770bde10 is the DELAYED Safe admin — grantRole from it does NOT take effect immediately. Use the zero-delay admin above.
 ```
 
 #### Step 3: Grant Role 1 to Your Caller
@@ -517,7 +611,7 @@ cast logs --from-block 0 --to-block latest \
 The caller for `setFeedRoute` needs role 1. Use the riskManagerTimelock or another suitable address:
 
 ```bash
-ADMIN="0x62244c74e1d09b3d86ef7342d354b5d7770bde10"
+ADMIN="0x8d28a69328561ef9f171c58996fecb9f494e070c"  # zero-delay admin (role 0). Grant role 1 to your own EOA, then setFeedRoute from it.
 RISK_MANAGER_TIMELOCK=$(cast call $CALIBER_ADDRESS "riskManagerTimelock()(address)" --rpc-url "$RPC_URL")
 
 # Fund admin with ETH for gas (Tenderly only)
@@ -536,7 +630,7 @@ mcp__tenderly__fund_address(chain, RISK_MANAGER_TIMELOCK, "0x0", 100000000000000
 
 # setFeedRoute(address token, address feed1, uint256 staleness1, address feed2, uint256 staleness2)
 CALLDATA=$(cast calldata "setFeedRoute(address,address,uint256,address,uint256)" \
-  "$TOKEN_ADDRESS" "$ORACLE_ADDRESS" "86400" \
+  "$TOKEN_ADDRESS" "$ORACLE_ADDRESS" "315360000"  # 10y; large staleness up-front survives time-warps \
   "0x0000000000000000000000000000000000000000" "0")
 
 mcp__tenderly__send_transaction(chain, from_address=RISK_MANAGER_TIMELOCK, to_address=ORACLE_REGISTRY, data=CALLDATA)
@@ -547,7 +641,8 @@ mcp__tenderly__send_transaction(chain, from_address=RISK_MANAGER_TIMELOCK, to_ad
 |---------|-------|
 | OracleRegistry | `0xC388B72AB90Be82B230D919F9C05c87F9397f485` |
 | AccessManager | `0x0fcefa3f1047f35521a49cd8b06fabd588665d7f` |
-| Admin (role 0) | `0x62244c74e1d09b3d86ef7342d354b5d7770bde10` |
+| Admin (role 0, ZERO-DELAY) | `0x8d28a69328561ef9f171c58996fecb9f494e070c` |
+| Admin (role 0, DELAYED Safe — do NOT use) | `0x62244c74e1d09b3d86ef7342d354b5d7770bde10` |
 | riskManagerTimelock | Query from caliber: `riskManagerTimelock()` |
 
 ### Time-Warping Tenderly Testnets
@@ -634,7 +729,9 @@ mcp__tenderly__send_transaction(chain, from_address=RISK_MANAGER_TIMELOCK, to_ad
 
 **Important**: You need to extend staleness for ALL feeds in the accounting chain, not just the deposit token. For example, for iUSD→USDC accounting, extend both:
 - The iUSD feed (token-specific oracle)
-- The USDC feed (if it has a separate Chainlink feed configured)
+- The shared USDC quote feed `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6` — extend its staleness too, or getPrice reverts PriceFeedStale on the quote leg even when the token feed is fresh.
+
+`setFeedStaleThreshold` is likewise **role 1** on the AccessManager (same grant as setFeedRoute).
 
 **Note**: Some oracles (like custom protocol oracles) may use `block.timestamp` as `updatedAt`, so they stay fresh automatically after time warp. Chainlink feeds are the ones that go stale.
 

@@ -111,15 +111,19 @@ actions:
 ## Compiling Instructions
 
 ```bash
-transpiler -- -i <caliber.yaml> -o <output.toml>
+"$TRANSPILER_PATH" -i <caliber.yaml> -t token-lists/prod-token-list.json -o <output.toml> transpile
 ```
 
 Example:
 ```bash
-transpiler -- \
+"$TRANSPILER_PATH" \
   -i /path/to/machines/deth/mainnet/caliber-test.yaml \
-  -o /path/to/machines/deth/mainnet/rootfiles/test-output.toml
+  -t token-lists/prod-token-list.json \
+  -o /path/to/machines/deth/mainnet/rootfiles/test-output.toml \
+  transpile
 ```
+
+(`-t/--token-list` is required; the `transpile`|`check`|`root` subcommand goes last; transpiler is not on PATH — see SKILL.md `## Transpiler`.)
 
 ## Notes
 

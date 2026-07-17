@@ -24,6 +24,7 @@ color: red
 | `cast`                                  | Encode calldata, send transactions, query state |
 | `curl`                                  | Direct API/RPC calls                            |
 | `web_search` / `web_fetch`              | Protocol documentation                          |
+| `anvil` / `cast`                        | Local fork fallback when the Tenderly MCP connector is down/expired (no connector needed) |
 
 
 ---
@@ -56,6 +57,11 @@ Etherscan MCP:get_function_code(address, chain, function_name)
 
 Identify the exact function signatures, parameter types, and return values for the target action.
 
+> **CRITICAL — verify against the DEPLOYED contract, not local `makina-core` source.** Deployed contracts drift from the `main` branch. Fetch the ABI/bytecode from Etherscan (or reuse signatures from a prior execution/test-report) before calling. Known divergences that revert with empty `0x` when you use the wrong one:
+>
+> - **OracleRegistry**: deployed uses `setFeedRoute` / `getFeedRoute` / `setFeedStaleThreshold`. The local source's `setTokenFeedData` / `getTokenFeedData` **REVERT** on the deployed contract.
+> - **Caliber**: deployed uses **1-arg** `addBaseToken(address)` (called from the riskManagerTimelock). Local `main` is a newer **2-arg** `addBaseToken(address,uint256)` — calling the 2-arg form reverts.
+
 ### 3. Setup Testnet
 
 ```python
@@ -63,6 +69,26 @@ tenderly:create_tenderly_testnet(chain="ethereum")
 ```
 
 Extract admin RPC URL from response.
+
+### 3b. Fallback: Local Anvil Fork (Tenderly MCP unavailable/expired)
+
+The Tenderly MCP connector token can expire mid-session and block every fork call. When Tenderly is unavailable, fall back to a **local anvil fork** — foundry is installed and it needs no connector:
+
+```bash
+anvil --fork-url $MAINNET_RPC_URL   # RPC http://127.0.0.1:8545, chain-id 1
+```
+
+Anvil supports everything the base-token setup needs, via raw RPC or `cast`:
+
+| Need | Anvil RPC / cast |
+| ---- | ---------------- |
+| Impersonate an account | `anvil_impersonateAccount` (`cast rpc anvil_impersonateAccount 0x..`) |
+| Set ETH balance | `anvil_setBalance` (`cast rpc anvil_setBalance 0x.. 0xVALUE`) |
+| Warp time (PERMANENT) | `evm_increaseTime` then `evm_mine` — unlike Tenderly, the shift persists |
+| Deploy a contract | `forge create <path>:<Name> --rpc-url http://127.0.0.1:8545 --unlocked --from 0x..` |
+| Send from impersonated | `cast send 0x.. "fn(args)" --unlocked --from 0xIMPERSONATED --rpc-url http://127.0.0.1:8545` |
+
+`cast call` / `cast send` work against the anvil RPC exactly as against a Tenderly RPC — only the impersonation/funding cheatcode names differ (`anvil_*` vs `tenderly_*`). The Base-Token & Oracle Registry Setup recipe below runs identically on anvil.
 
 ### 4. Fund Test Account
 
@@ -158,7 +184,9 @@ For calculations, show:
 
 **MANAGEMENT** (deposit, withdraw): Fund tokens → execute → verify position change
 
-**ACCOUNTING** (account, get_balance): Use static calls → verify calculations
+**ACCOUNTING** (account, get_balance): Use static calls → verify calculations. Two archetypes to test differently:
+- **Position model** — accounting = active (`convertToAssets`/`previewRedeem`) + pending; only the underlying/denomination token needs a feed. The held share token is a *position token*, NOT a base token.
+- **Base-token model** (VBILL/reUSD/EtherFi/Midas) — the held token IS a registered base token (`addBaseToken` + its OWN oracle feed) and on-chain accounting is PENDING-ONLY (returns 0 when idle) so the held value is not double-counted. Testing this path requires the full Base-Token & Oracle Registry Setup first.
 
 **HARVEST** (claim_rewards): Find address with rewards → execute → verify tokens received
 
@@ -212,6 +240,31 @@ result = (input_amount * rate) // 10**18
 | Token Balance | 1000   | 0     |
 | LP Balance    | 0      | 998   |
 
+## Base-Token & Oracle Registry Setup (on a fork)
+
+To test accounting for a **new base token** (base-token accounting model — see Action Types), you must register its oracle feed AND add it as a base token on the caliber. Order matters: **register the feed route BEFORE `addBaseToken`** — `addBaseToken` reverts if the token has no feed.
+
+**Fixed mainnet addresses (intMkSrRoyUSDC / shared makina deployment):**
+
+| Role | Address |
+| ---- | ------- |
+| OracleRegistry | `0xC388B72AB90Be82B230D919F9C05c87F9397f485` |
+| AccessManager (authority of registry + caliber) | `0x0FceFa3f1047F35521A49cD8B06faBd588665d7f` |
+| Zero-delay ADMIN (role 0) — grants roles immediately | `0x8d28a69328561ef9f171c58996fecb9f494e070c` |
+| riskManagerTimelock (calls `addBaseToken`) | `0x7c405bbd131e42af506d14e752f2e59b19d49997` |
+| Shared USDC quote feed (bump its staleness too!) | `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6` |
+
+> **Do NOT use the DELAYED Safe admin `0x62244C74...`** documented by the `caliber-token-setup` skill — a `grantRole` from it does NOT take effect immediately (it is timelocked). Use the zero-delay admin above.
+
+**Recipe (impersonate each admin; `setFeedRoute`/`setFeedStaleThreshold` are ROLE 1):**
+
+1. Impersonate zero-delay admin `0x8d28a69328561ef9f171c58996fecb9f494e070c` and grant yourself role 1: `AccessManager.grantRole(1, <your EOA>, 0)` (delay = 0).
+2. Impersonate your EOA and register the feed route for the new token: `OracleRegistry.setFeedRoute(<token>, <feed(s)>, ...)`, then `OracleRegistry.setFeedStaleThreshold(<feed>, 315360000)` (10 years).
+3. **Bump staleness to `315360000` on EVERY feed in the route — including the shared USDC quote feed `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6`.** Otherwise a `+7d` time-warp makes `getPrice` revert `PriceFeedStale`.
+4. Impersonate riskManagerTimelock `0x7c405bbd131e42af506d14e752f2e59b19d49997` and add the base token: `Caliber.addBaseToken(<token>)` (1-arg — see the deployed-vs-local callout in section 2).
+
+Only after all four steps will `getPrice(<token>)` and accounting calls succeed across a time-warp.
+
 ## Testing Multi-Step / Time-Locked Operations
 
 Some protocols (e.g., InfiniFi) require multi-step operations with waiting periods between steps. When exploring these flows:
@@ -237,7 +290,7 @@ assert block['timestamp'] >= target_timestamp
 
 ### Oracle Staleness After Time Warp
 
-After warping time forward, Chainlink oracle feeds become stale. Fix by calling `setFeedRoute` on the OracleRegistry with an extended staleness threshold (e.g., 315360000 = 10 years) before executing the time-warped transaction. This requires role 1 on the AccessManager.
+After warping time forward, ALL Chainlink feeds in a token's route go stale and `getPrice` reverts `PriceFeedStale`. Fix by calling `setFeedStaleThreshold(feed, 315360000)` (10 years) on the OracleRegistry for **every feed in the route — including the shared USDC quote feed `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6`**, not just the token's own feed. This requires role 1 on the AccessManager — see "Base-Token & Oracle Registry Setup" for the exact grant, addresses, and ordering.
 
 ### Storage Override Alternative (`tenderly_setStorageAt`)
 

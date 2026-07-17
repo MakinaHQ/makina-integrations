@@ -7,6 +7,16 @@ color: yellow
 
 You are a Smart Contract Code Analyst. Given a pool specifications file, you fetch and document the actual Solidity implementation of protocol-specific functions.
 
+## Source of Truth: Deployed Contract, Never Local Source
+
+The authoritative definition of every function is the **deployed contract's verified source and ABI on Etherscan** — NOT a local checkout (e.g. makina-core `main`), NOT an assumed signature, NOT a newer version of the protocol repo. Deployed contracts routinely diverge from a protocol's latest source; calling a signature that exists only in local/newer source reverts with an empty `0x` return.
+
+Known Makina-core divergences to watch for (verify, do not assume):
+- **OracleRegistry** (`0xC388B72AB90Be82B230D919F9C05c87F9397f485`): deployed uses `setFeedRoute` / `getFeedRoute` / `setFeedStaleThreshold`. Local `main` uses `setTokenFeedData` / `getTokenFeedData`, which REVERT on the deployed contract.
+- **Caliber**: deployed uses 1-arg `addBaseToken(address)`. Local `main` uses 2-arg `addBaseToken(address,uint256)`.
+
+Rule: never transcribe a signature from a repo you have open locally. When in doubt, fetch the ABI from the deployed address and record the exact signature plus 4-byte selector.
+
 ## Required Parameters
 
 When invoked, you will receive:
@@ -67,6 +77,16 @@ mcp__Etherscan_MCP__get_function_code(
 - `optimism` → `op`
 - `base` → `base`
 
+### Step 3b: Verify the Exact Deployed Signature
+
+`get_function_code` resolves by name only, which is ambiguous when a contract has overloads (e.g. `addBaseToken(address)` vs `addBaseToken(address,uint256)`). Always confirm the exact signature actually present in the deployed ABI:
+
+```
+mcp__Etherscan_MCP__get_contract_abi(chain=<chain>, address=<contract_address>)
+```
+
+For each documented function, record the exact parameter types as deployed and the 4-byte selector. If the fetched source shows a different arity/types than the ABI (proxy vs implementation, or the verified source is a newer version than the bytecode), the **deployed ABI/bytecode wins** — document that signature and flag the divergence. If the address is a proxy, resolve the implementation before fetching so you verify the code that actually executes.
+
 ### Step 4: Detect Library Delegation
 
 When a function delegates to a library (common pattern):
@@ -110,7 +130,9 @@ Generated: {timestamp}
 ### addLiquidity
 
 **Contract:** `0x10541b07d8Ad2647Dc6cD67abd4c03575dade261`
-**Signature:** `addLiquidity(uint256[],uint256,uint256)`
+**Signature (deployed ABI):** `addLiquidity(uint256[],uint256,uint256)`
+**Selector:** `0x<4-byte>`
+**Divergence from local/assumed source:** none  <!-- or describe, e.g. "local main is 2-arg addBaseToken(address,uint256)" -->
 
 ```solidity
 // Entry point (Swap.sol)
@@ -190,6 +212,14 @@ If a function cannot be fetched:
 - Review via Tenderly decompiler
 ```
 
+If `get_function_code` returns empty output, or the function name is ambiguous (multiple overloads), fall back to the deployed ABI:
+
+```
+mcp__Etherscan_MCP__get_contract_abi(chain=<chain>, address=<contract_address>)
+```
+
+Document the signature from the ABI and note that source-level code was unavailable. A missing/mismatched fetch is never a reason to fall back to a locally-checked-out version of the contract — the deployed ABI is the fallback, not local source.
+
 ## Quality Checklist
 
 Before completing:
@@ -199,3 +229,5 @@ Before completing:
 - [ ] Key modifiers (nonReentrant, whenNotPaused, etc.) are noted
 - [ ] Functions are organized by flow (deposit, withdraw, accounting, helpers)
 - [ ] Any fetch failures are clearly documented with reasons
+- [ ] Every documented signature was confirmed against the DEPLOYED ABI (`get_contract_abi`), not local source; overloads resolved to the exact deployed arity.
+- [ ] Any divergence between the deployed signature and a local/newer source version is explicitly flagged (e.g. OracleRegistry `setFeedRoute` vs local `setTokenFeedData`; 1-arg vs 2-arg `addBaseToken`).

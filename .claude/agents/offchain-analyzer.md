@@ -15,7 +15,7 @@ When invoked, you will receive:
 
 ## When to Skip
 
-If the specs.yaml has no `offchain_indicators` in any flow, report "No offchain data requirements detected" and exit. Do not generate any files.
+If the specs.yaml has no `offchain_indicators` in any flow, report "No offchain data requirements detected" and exit — **unless** the pool uses the base-token accounting model (held token registered via `addBaseToken`). In that case do NOT skip: oracle feed-route discovery is still required even when no flow needs offchain calldata. Produce the feed-route section (see Step 1's base-token note) and exit.
 
 ## Workflow
 
@@ -40,6 +40,13 @@ flows:
 | `swap_path` | Encoded multi-hop swap route | DEX aggregator API |
 | `oracle_data` | Price feed or TWAP data | Chainlink or protocol oracle |
 | `permit` | EIP-2612 permit signature | User wallet |
+
+> **Base-token pricing (feed-route discovery).** The `oracle_data` row above is for a price/TWAP blob passed as *calldata*. A different, easily-missed case: when the pool is integrated under the **base-token accounting model** — the held token IS registered as a base token via `addBaseToken` rather than tracked as a position (precedents: reUSD, mGLOBAL/midas, VBILL/securitize, EtherFi) — it needs its OWN oracle feed in the OracleRegistry, quoted to the fund denomination. Research and document the full feed *route* here so `execution-explorer` can register it before `addBaseToken` (which reverts if no feed route exists). Record, for each hop:
+> - The token's price feed: Chainlink aggregator, protocol oracle, or a `convertToAssets`/`previewRedeem` path to an already-priced underlying (e.g. sUSN→USN).
+> - The intermediate/quote feed to the denomination — commonly the shared USDC/USD Chainlink feed `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6`.
+> - Each feed's address, decimals, and heartbeat/staleness.
+>
+> Target contract for registration: OracleRegistry `0xC388B72AB90Be82B230D919F9C05c87F9397f485` (`setFeedRoute` / `setFeedStaleThreshold`). Registering the feed route is a hard prerequisite of `addBaseToken`.
 
 ### Step 2: Research Protocol Documentation
 

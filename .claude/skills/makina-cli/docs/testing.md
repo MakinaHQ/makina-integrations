@@ -14,10 +14,15 @@ End-to-end testing of blueprint instruction files on Tenderly testnets.
 ## Step 1: Compile
 
 ```bash
-transpiler -- \
-  --input-file=/path/to/caliber-test.yaml \
-  --output-file=/path/to/rootfiles/test-output.toml
+# transpiler is NOT on PATH — resolve $TRANSPILER_PATH or the rev-9471437 fallback (see SKILL.md ## Transpiler)
+"$TRANSPILER_PATH" \
+  --input-file /path/to/caliber-test.yaml \
+  --token-list token-lists/prod-token-list.json \
+  --output-file /path/to/rootfiles/test-output.toml \
+  transpile
 ```
+
+Note: no leading `--`; `--token-list` is required (instructions use `${token_list.*}`); the `transpile` subcommand goes LAST. Use `check` instead of `transpile` to validate without writing a rootfile.
 
 ## Step 2: Create Tenderly Testnet
 
@@ -26,6 +31,24 @@ mcp__tenderly__create_tenderly_testnet(chain="ethereum")
 ```
 
 Returns `admin_rpc` URL for subsequent commands.
+
+### Alternative: local anvil fork (no connector)
+
+```bash
+anvil --fork-url $MAINNET_RPC_URL   # serves http://127.0.0.1:8545; set DEV_MAINNET_RPC_URL to it
+```
+
+Map the Tenderly-MCP steps below to anvil RPCs when using this fork:
+
+| Tenderly MCP | anvil equivalent |
+|--------------|------------------|
+| `fund_address` (native) | `anvil_setBalance` |
+| `fund_address` (ERC20) | impersonate a whale via `anvil_impersonateAccount` + transfer, or set balance storage |
+| impersonate admin/timelock | `anvil_impersonateAccount` |
+| `dev-increase-time` / time-warp | `evm_increaseTime` |
+| deploy helper/mock | `forge create` |
+
+Use anvil when the Tenderly connector token has expired (auth failures on every call).
 
 ## Step 3: Update Root
 

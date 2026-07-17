@@ -12,6 +12,30 @@ Parse `$ARGUMENTS`:
 
 ---
 
+## Environment Prerequisites (verify BEFORE Stage 0)
+
+The orchestrator MUST confirm these once at the start of every run. Missing tooling here is the single largest time-sink; do not leave discovery to sub-agents.
+
+### Transpiler binary
+- The transpiler is a **separately-installed cargo binary, NOT on `$PATH`** and NOT part of the local `makina-rs` checkout. On this machine it lives at:
+  `/Users/augustin/.cargo/git/checkouts/transpiler-11f55d1751042103/9471437/target/debug/transpiler` (rev `9471437`).
+- The `makina-rs` checkout's `calldata` crate is an HTTP API server, NOT the transpiler — do not use it. (Its `abu` branch lacks the transpiler crate entirely.)
+- `TRANSPILER_PATH` must be set in **this (config) repo's** `.claude/settings.local.json`, not only in the rootfiles repo. Verify: `test -x "$TRANSPILER_PATH" && echo OK || echo "SET TRANSPILER_PATH"`
+- CLI: `transpiler --help` -> subcommands `transpile | check | root`; flags `-i/--input-file`, `-o/--output-file`, `-t/--token-list`, `--helpers`.
+
+### Token list is mandatory for check/transpile
+Instructions reference `${token_list.*}`, so `check` and `transpile` **fail without `--token-list`**. Canonical invocation:
+
+    "$TRANSPILER_PATH" --input-file machines/<machine>/<network>/caliber.yaml \
+      --token-list token-lists/prod-token-list.json [-o out.toml] check   # or: transpile
+
+### Fork tooling (for Stage 2 and Stage 4)
+- Confirm foundry: `anvil --version && forge --version`.
+- Confirm an RPC: `echo "$MAINNET_RPC_URL"` (set in `.claude/settings.local.json`).
+- Both a Tenderly testnet and a local anvil fork are valid backends — see "Fork backend & fallback" in Stage 2.
+
+---
+
 ## Required Artifacts Checklist
 
 **CRITICAL**: Each stage MUST generate specific files. Do NOT mark a stage complete until all required artifacts exist.
@@ -132,6 +156,7 @@ intent:
       index: N
     # ... one entry per selected token
   context: "{context}"           # from --context flag (optional, null if not provided)
+  accounting_model: base_token   # or: position (decided in 0e)
 
 # Progress tracking
 current_stage: 1
@@ -195,6 +220,24 @@ Integration Setup:
 
 Progress file: scripts-factory/{protocol}/{chain}/{pool_id}/progress.yaml
 ```
+
+### 0e. Accounting Model Decision (go/no-go — decide NOW, not at Stage 3)
+
+The most expensive rework is choosing the wrong accounting archetype late. Decide it up front from the pool tokens fetched in 0a and record it in `intent.accounting_model`.
+
+Two archetypes:
+- **POSITION model** — the held receipt token is NOT a base token. `position_tokens + accounting = active (convertToAssets/previewRedeem) + pending`. Only the underlying/denomination needs an oracle feed; `affected_tokens` on deposit/withdraw are the base tokens moved.
+- **BASE-TOKEN model** (use when the held token itself is/should be a registered base token — e.g. sUSN, VBILL, reUSD, mGLOBAL, EtherFi) — the held token gets its OWN oracle feed via `addBaseToken`, and accounting is **PENDING-ONLY** (0 when idle) so the held value is not double-counted. `affected_tokens`: deposit `[]` (synthetic swap between base tokens), async request `[base token burned/leaving]`, claim `[base token arriving]`, account `[denomination]`. For an async cooldown, still KV-track a pending term so NAV stays continuous across request->claim.
+
+Hard rule: **every `affected_tokens` entry of a management instruction MUST be a registered base token** or the caliber reverts `InvalidAffectedToken`; `_checkPositionMinDelta` bounds the signed per-leg value change.
+
+Precedents to copy: `blueprints/re` (reUSD), `blueprints/midas` (mGLOBAL), `blueprints/securitize` (VBILL), `blueprints/etherfi` (async redemption).
+
+If BASE-TOKEN model: base-token + oracle registration (feed route registered BEFORE `addBaseToken`) is a prerequisite of Stage 4 — flag it in `intent.context` and follow the caliber-token-setup skill, verifying every signature against DEPLOYED bytecode (see Stage 4).
+
+Add to the `intent:` block in 0c:
+
+    accounting_model: base_token   # or: position
 
 Then proceed to Stage 1.
 
@@ -362,6 +405,12 @@ deposit → account → withdraw → harvest (if applicable)
 
 **Testnet sharing**: Create one testnet at stage start, pass `testnet_id` and `rpc_url` to each agent.
 
+**Fork backend & fallback**: The Tenderly MCP connector is the default fork, but its access token can EXPIRE mid-session and block every fork tool call. When Tenderly is unavailable, fall back to a **local anvil fork** (foundry is installed, no connector required):
+
+    anvil --fork-url "$MAINNET_RPC_URL"        # serves http://127.0.0.1:8545
+
+anvil supports the cheatcodes these flows need: `anvil_impersonateAccount`, `anvil_setBalance`, `evm_increaseTime`, and contract deploys via `forge create`. Treat anvil as a first-class fork option, not a last resort — if Tenderly errors on auth, switch immediately rather than retrying the connector.
+
 **Base token handling**: The `intent.base_tokens` define what tokens the user starts with. This determines the flow type:
 - **All pool tokens** → balanced flows (user has both/all tokens)
 - **Single token** → single-sided flows (user only has that token)
@@ -387,6 +436,7 @@ Output: machines/{machine}/{network}/instructions/{protocol}-{pool}.yaml
 **Base token handling**: Use `intent.base_tokens` to generate the appropriate instruction:
 - The `affected_tokens` field should contain the base token address(es)
 - Use the matching blueprint variant (balanced vs single-sided) based on the execution flow
+- Read `intent.accounting_model` (set in Stage 0e) and select the archetype accordingly: POSITION -> `affected_tokens` = base tokens moved, value via convertToAssets/previewRedeem; BASE-TOKEN -> held token is a registered base token, accounting is pending-only, `affected_tokens` per the 0e matrix (deposit `[]`, request `[burned]`, claim `[arriving]`, account `[denomination]`).
 
 **On completion**: Update progress.yaml `stages.3_blueprint.status: completed`
 
@@ -407,6 +457,17 @@ Test instruction file end-to-end on Tenderly.
 Verify compilation, root update, and execution.
 Write test report to {working_dir}/test-report.md
 ```
+
+### Runtime expectations & how to run the tester (READ before launching)
+- A cold `cargo build` of spellcaster plus fork spin-up is genuinely **20-40 minutes**. Set this expectation with the user; a long-running build is not 'stuck'.
+- **Do NOT poll a background sub-agent.** Background agents only get compute while the main loop is idle — repeated status checks starve them and make them look hung. Prefer running the tester **synchronously**, or launch-and-yield and wait for its own completion signal. For hard e2e, consider driving the fork hands-on (see the `makina-cli` skill) instead of a background agent.
+
+### Cross-repo machines-path plumbing (calibers that live only in the config repo)
+Some calibers (e.g. `intMkSrRoyUSDC`) exist ONLY in this config repo, not in the rootfiles repo. spellcaster is invoked from rootfiles as:
+
+    cargo run -p spellcaster -- --machines-path <rootfiles>/machines-local.toml --dev
+
+so the config-repo caliber must be wired into a `machines-local.toml` / `config-local.toml` that points back at this repo's `machines/<machine>/<network>/`. Confirm this wiring exists before Stage 4 or the tester cannot find the caliber. (`machines*.toml` and `*local*` are gitignored, so these files stay local.)
 
 **On completion**: Update progress.yaml `stages.4_test.status: completed`
 
@@ -455,6 +516,14 @@ stages:
     attempts: 1
     last_attempt: "2026-01-06T16:00:00Z"
 ```
+
+## Committing & PR Hygiene
+
+Only when the user asks to commit / open a PR:
+1. **Run `dprint fmt` BEFORE committing.** CI runs a `formatting` (dprint) gate that reflows markdown tables and YAML; skipping it fails CI. Excludes are `.claude`, `CLAUDE.md`, `protocol_specs` (see `dprint.json`).
+2. **Never stage secrets or local-only files.** Do NOT commit `.mcp.json` (holds a Tenderly access token) or `.claude/worktrees/` — neither is in `.gitignore`. Stage integration files explicitly (`git add scripts-factory/... machines/... blueprints/...`); never `git add -A`.
+3. **Branching off main**: stash any pre-existing uncommitted edit first (e.g. a modified `test-report.md`) so the checkout is not blocked: `git stash -u && git checkout -b <branch> && git stash pop`.
+4. Use the repo's commit/PR trailer convention (Co-Authored-By + Generated-with).
 
 ## Final Output
 

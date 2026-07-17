@@ -19,6 +19,7 @@ Given a pool identifier (smart contract, web url or dialectic ID) and optionally
 ## Important Notes
 
 - Always use Tenderly MCP for executing Python code (mcp__tenderly__execute_code) - NEVER use the Bash tool for Python execution !
+- Read-only on-chain queries (view calls, `getFeedRoute`, decimals, `convertToAssets`, etc.) may also be run with `cast call --rpc-url $MAINNET_RPC_URL <addr> '<sig>' <args>` or against a local `anvil --fork-url $MAINNET_RPC_URL` fork. Use this fallback whenever the Tenderly MCP connector is unavailable or its token has expired — it needs no connector and does not block spec generation.
 
 ## Other Tools
 
@@ -65,6 +66,34 @@ Common helper contracts to look for:
 - **Claim/Reward helpers**: Simplified reward harvesting
 
 Document any useful helper contracts in the specs under a `helpers` section.
+
+### Step 2b: Classify the Accounting Archetype (DECIDE EARLY)
+
+Before documenting any flow, decide HOW THE FUND WILL VALUE the held token. This single choice drives `affected_tokens`, whether an oracle feed is required (Step 2c), and which blueprint precedent to copy. Record it in specs under `accounting_model`.
+
+Two archetypes:
+
+- **POSITION model** — the held receipt/share token stays a position. accounting = active (`convertToAssets`/`previewRedeem`) + pending. Only the underlying/denomination needs an oracle feed. Use when the token has a reliable share->assets conversion and no separate feed. Precedent: standard ERC-4626 vaults.
+- **BASE-TOKEN model** — the held token IS registered as a base token (`addBaseToken` + its OWN oracle feed) and position accounting is PENDING-ONLY (0 when idle) so the held value is not double-counted. affected_tokens: `deposit=[]` (synthetic swap between base tokens), async `request=[the base token burned/leaving]`, `claim=[the base token arriving]`, `account=[denomination]`. Use for tokens that have (or will get) their own price feed and/or async redemption. Precedents: `blueprints/re` (reUSD), `blueprints/midas` (mGLOBAL), `blueprints/securitize` (VBILL), `blueprints/etherfi` (async redemption).
+
+Rules to encode in specs:
+- Every `affected_tokens` entry of a MANAGEMENT instruction MUST be a REGISTERED BASE TOKEN, or the instruction reverts `InvalidAffectedToken`.
+- If redemption is ASYNC (cooldown / request->claim), the base-token model STILL needs a KV-tracked pending term so NAV stays continuous between request and claim — flag `async_redemption: true` and note the pending term.
+
+### Step 2c: Verify Oracle Feed Availability (GO-LIVE GATE)
+
+If the archetype is BASE-TOKEN, the held token needs an on-chain oracle feed route BEFORE it can be added as a base token — `addBaseToken` reverts if no feed exists. Feed availability is a GO-LIVE GATE: surface it here, not at test time.
+
+Query the DEPLOYED OracleRegistry at `0xC388B72AB90Be82B230D919F9C05c87F9397f485`:
+- `getFeedRoute(address token)` — does a route already exist for the held token AND for every intermediate/quote asset in its route?
+- The shared USDC quote feed is `0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6`.
+
+NOTE: the deployed OracleRegistry exposes `setFeedRoute`/`getFeedRoute` — NOT the local makina-core source's `setTokenFeedData`/`getTokenFeedData`, which revert on the deployed contract. Always query against the DEPLOYED ABI/bytecode.
+
+Record under specs `oracle:`:
+- `feed_exists: true|false`
+- `route: <feed addresses>` (if any)
+- If no feed exists, mark `blocker: "no oracle feed - must deploy/register before go-live"`. This is a hard blocker for the integration shipping.
 
 ### Step 3: Document Interaction Flows
 
@@ -167,6 +196,23 @@ helpers: # Official protocol helper contracts (if available)
     useful_functions:
       - <function_signature>
   # Add other helpers as discovered
+
+accounting_model:
+  archetype: base_token | position        # decided in Step 2b
+  rationale: <why this archetype>
+  async_redemption: true | false          # if true, needs a KV-tracked pending term to keep NAV continuous
+  affected_tokens:                        # every entry MUST be a registered base token
+    deposit: []
+    request: [<base token burned/leaving>]
+    claim: [<base token arriving>]
+    account: [<denomination>]
+  precedent: <blueprints/re | blueprints/midas | blueprints/securitize | blueprints/etherfi | erc4626-position>
+
+oracle:
+  registry: "0xC388B72AB90Be82B230D919F9C05c87F9397f485"
+  feed_exists: true | false               # GO-LIVE GATE
+  route: <feed addresses, incl. USDC quote 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6 when routed via USDC>
+  blocker: <null | "no oracle feed - must deploy/register before go-live">
 
 flows:
   deposit:
@@ -284,3 +330,7 @@ Before finalizing specs, verify:
 - [ ] Approval flows are properly documented
 - [ ] Events match actual contract emissions
 - [ ] The spec follows the project's existing format conventions
+- [ ] Accounting archetype (base_token vs position) is decided and recorded in `accounting_model` with a rationale
+- [ ] Oracle feed availability checked against the DEPLOYED OracleRegistry (`getFeedRoute`, 0xC388B72AB90Be82B230D919F9C05c87F9397f485); go-live blocker flagged if absent
+- [ ] If async redemption, a KV-tracked pending term is noted so NAV stays continuous across request->claim
+- [ ] Every `affected_tokens` entry is (or will be) a registered base token

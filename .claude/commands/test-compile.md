@@ -53,15 +53,27 @@ positions:
 
 ## Step 4: Run the Transpiler
 
-Execute the transpiler using the `TRANSPILER_PATH` environment variable (set in `.claude/settings.local.json`):
+The transpiler is a **separately-installed binary** — it is NOT on `PATH`, and it is NOT in the local makina-rs checkout (that repo's `calldata` crate is an HTTP API server, not the transpiler). Resolve the binary in this order:
+
+1. `$TRANSPILER_PATH` if it is set in `.claude/settings.local.json`.
+2. Otherwise fall back to the known build:
+   `/Users/augustin/.cargo/git/checkouts/transpiler-11f55d1751042103/9471437/target/debug/transpiler`
+
+Run from the **config repo root**. Global options come BEFORE the `transpile` subcommand, and `--token-list` is **required** because instructions reference `${token_list.*}`:
 
 ```bash
-transpiler -- \
-  --input-file=/Users/augustin/Desktop/git/rootfiles/machines/{fund}/{network}/caliber-test.yaml \
-  --output-file=/Users/augustin/Desktop/git/rootfiles/machines/{fund}/{network}/rootfiles/test-compile-output.toml
+TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-11f55d1751042103/9471437/target/debug/transpiler}"
+
+"$TRANSPILER" \
+  --input-file machines/{fund}/{network}/caliber-test.yaml \
+  --token-list token-lists/prod-token-list.json \
+  --output-file machines/{fund}/{network}/rootfiles/test-compile-output.toml \
+  transpile
 ```
 
-If `TRANSPILER_PATH` is not set, report an error asking the user to configure it in `.claude/settings.local.json`.
+- Paths are relative to the **config repo root** — do NOT point at `/Users/.../git/rootfiles`. Many calibers (e.g. `intMkSrRoyUSDC`) live ONLY in the config repo, not the rootfiles repo.
+- The subcommand (`transpile` or `check`) is a positional argument and goes LAST, after the flags. There is no `--` separator — that syntax is only for `cargo run -- …`.
+- If the instruction also references `${helpers.*}`, add `--helpers <path-to-helpers.json>`.
 
 ---
 
@@ -87,6 +99,7 @@ Common issues:
 - Invalid blueprint path
 - Malformed YAML syntax
 - Missing required inputs in blueprint
+- Missing `--token-list token-lists/prod-token-list.json` (shows up as an unresolved `${token_list.*}` reference, not a syntax error), or a missing `--helpers` list when the instruction uses `${helpers.*}`
 ```
 
 ---
