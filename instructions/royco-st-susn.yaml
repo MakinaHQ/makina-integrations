@@ -1,0 +1,40 @@
+# Royco Senior Tranche sUSN (Base)
+# Direct deposit: sUSN -> Senior Tranche shares (ROY-ST-sUSN)
+# Instant withdraw: redeem ST shares -> sUSN (no queue / cooldown / KV)
+# Accounting: single-slot ST position NAV -> USDC (6 dec)
+#
+# Go-live gates (external to this instruction; verified on a Tenderly Base fork):
+#   1. Register the sUSN USD oracle feed route in the Base OracleRegistry before addBaseToken(sUSN).
+#   2. Grant the caliber the ST REDEEM role (id 9623252227852051139) on AccessManager
+#      0x568c9709DaA2f7B7cc66AbC3E41DA0f0A339551A. deposit() is PUBLIC_ROLE (no grant needed);
+#      only redeem is gated (grant executor: 0x84d37a25...119e).
+
+# DEPOSIT: sUSN -> Senior Tranche shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.sUSN}" # sUSN
+  instruction:
+    label: "ROY-ST-sUSN"
+    path: "../../../blueprints/royco/st-susn/deposit.yaml:deposit"
+    inputs: {}
+
+# ACCOUNTING: single-slot ST position value in USDC
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.base.USDC}" # USDC - active ST position NAV
+  instruction:
+    label: "ROY-ST-sUSN-NAV"
+    path: "../../../blueprints/royco/st-susn/account.yaml:account"
+    inputs: {}
+
+# WITHDRAW: redeem ST shares -> sUSN (instant)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.sUSN}" # sUSN
+  instruction:
+    label: "ROY-ST-sUSN"
+    path: "../../../blueprints/royco/st-susn/withdraw.yaml:redeem"
+    inputs: {}

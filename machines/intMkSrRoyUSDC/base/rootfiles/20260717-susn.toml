@@ -1,0 +1,178 @@
+# this is a generated file - do not edit manually
+# root: 0xa69c50bed9bb380d7fb1de04ad0cdc3241bc7640e97d47c7e0ba54761284e880
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.base.sUSN}"]
+chainId = 8453
+address = "0x34a2798d47b238a7cba9d87d49618dee6c4d999f"
+name = "Staked USN"
+decimals = 18
+symbol = "sUSN"
+
+[instructions.noon.account."sUSN OTC"]
+position_id = "1"
+description = "Noon sUSN OTC swap"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
+commands = [
+  "0x70a082310102ff000000000234a2798d47b238a7cba9d87d49618dee6c4d999f",
+  "0xac41865a010304ff000000044b3336630e591d36ca81f0c25b798895289ddd30",
+  "0xaa9a091201020405ff00000016d120a18334e273fa3c029ece56bfa5a2abfcfd",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+  "0x00000000000000000000000034a2798d47b238a7cba9d87d49618dee6c4d999f",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.noon.buy_susn_with_usdc."sUSN OTC"]
+position_id = "1"
+description = "Noon sUSN OTC swap"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x23b872dd01030200ff0000ff34a2798d47b238a7cba9d87d49618dee6c4d999f",
+  "0xa9059cbb010301ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x779dffbe11087f8491497c18ff0469e56a51d9d31f8fed4d54b24edb3ace69f0",
+  "0xaaff9c2948d4833a16ba1854c6c9372f2439e1255f67ee0e7d86d8783c760dd6",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.noon.buy_susn_with_usdc."sUSN OTC".inputs_slots]]
+index = 0
+name = "susn_amount"
+type = "Uint"
+
+[[instructions.noon.buy_susn_with_usdc."sUSN OTC".inputs_slots]]
+index = 1
+name = "usdc_amount"
+type = "Uint"
+
+[instructions.noon.sell_susn_for_usdc."sUSN OTC"]
+position_id = "1"
+description = "Noon sUSN OTC swap"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x23b872dd01030200ff0000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xa9059cbb010301ff000000ff34a2798d47b238a7cba9d87d49618dee6c4d999f",
+]
+state = [
+  "0xaaff9c2948d4833a16ba1854c6c9372f2439e1255f67ee0e7d86d8783c760dd6",
+  "0x779dffbe11087f8491497c18ff0469e56a51d9d31f8fed4d54b24edb3ace69f0",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "63802943797675961899382738893456539648"
+
+[[instructions.noon.sell_susn_for_usdc."sUSN OTC".inputs_slots]]
+index = 0
+name = "usdc_amount"
+type = "Uint"
+
+[[instructions.noon.sell_susn_for_usdc."sUSN OTC".inputs_slots]]
+index = 1
+name = "susn_amount"
+type = "Uint"
+
+[instructions.royco-st-susn.account.ROY-ST-sUSN-NAV]
+position_id = "314806959820518655397242285877968798454"
+description = "Royco ST sUSN"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = ["0x98d55707b60793ac8cadab3c456da156671f138a"]
+commands = [
+  "0xd737d0c701ff0000000000050f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310105ff000000000598d55707b60793ac8cadab3c456da156671f138a",
+  "0x07a2d13a8105ff000000008598d55707b60793ac8cadab3c456da156671f138a",
+  "0x62de91e9018502ff00000005a5b2637997148160f3a878e85a978e8303f863cf",
+  "0xaa9a091201050304ff00000016d120a18334e273fa3c029ece56bfa5a2abfcfd",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x000000000000000000000000000000000000000000000000000000e8d4a51000",
+  "0x",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.royco-st-susn.deposit.ROY-ST-sUSN]
+position_id = "314806959820518655397242285877968798454"
+description = "Royco ST sUSN"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x095ea7b3010100ff000000ff34a2798d47b238a7cba9d87d49618dee6c4d999f",
+  "0x6e553f65010002ff000000ff98d55707b60793ac8cadab3c456da156671f138a",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000098d55707b60793ac8cadab3c456da156671f138a",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.royco-st-susn.deposit.ROY-ST-sUSN.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.royco-st-susn.redeem.ROY-ST-sUSN]
+position_id = "314806959820518655397242285877968798454"
+description = "Royco ST sUSN"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
+position_tokens = []
+commands = [
+  "0xd737d0c701ff0000000000020f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310102ff000000000398d55707b60793ac8cadab3c456da156671f138a",
+  "0xaa9a091201030001ff00000316d120a18334e273fa3c029ece56bfa5a2abfcfd",
+  "0xba08765201030202ff0000ff98d55707b60793ac8cadab3c456da156671f138a",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x",
+  "0x",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.royco-st-susn.redeem.ROY-ST-sUSN.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"

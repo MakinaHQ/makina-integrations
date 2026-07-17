@@ -1,0 +1,97 @@
+# Noon sUSN — OTC swap position (Base), position-token model (securitize/VBILL shape).
+#
+# sUSN on Base is a bridged OFT (not mintable, cannot be bridged in via Makina), so
+# the caliber acquires/releases it by trading USDC against an EOA we control (raw
+# transfer + transferFrom, no settler contract — the EOA pre-approves the caliber).
+#
+# sUSN is a caliber POSITION token (position_tokens: [sUSN] in caliber.yaml), valued
+# by the ACCOUNTING leg via the Makina OracleRegistry (getPrice sUSN->USDC over the
+# 2-feed route). USDC is the only base token that moves, so both MANAGEMENT legs
+# declare affected_tokens=[USDC] (sUSN is a position token, excluded — same as
+# instructions/securitize.yaml).
+#
+# SLIPPAGE (on-chain, oracle-enforced): the caliber's loss reconciliation nets the
+# USDC moved (affected base token) against the sUSN value gained/lost (position
+# accounting, priced by the oracle) and reverts if the swap is off-rate beyond the
+# caliber's max-loss bps. There is no counterparty contract enforcing price — we are
+# the counterparty — so this oracle check is the sole price guard.
+#
+# Oracle prerequisite (Base): sUSN priced via a 2-feed route
+#   sUSN/USD = SUSN_USN_RR (0x561afc67ee879ced6c92afe781c1d0ea9adf2049)
+#            × USNUSD_RR_CAPPED_1 (0x4485d256d9b305dba378ab9d0af26933fc8a8795)
+# registered in the OracleRegistry (0x4B33…dDD30). NOTE: sUSN is a position token,
+# so NO addBaseToken(sUSN) is required — only the feed route so getPrice works.
+# Adapters submitted 2026-07-17, not yet active — must be scheduled/activated in the
+# production OracleRegistry before go-live (see
+# scripts-factory/noon/base/.../oracle-setup.md).
+#
+# GO-LIVE TODO: replace otc_counterparty below with the real OTC EOA we control on
+# Base. It is an anchored value in THIS instruction file (per repo rule:
+# protocol/position-specific addresses stay out of caliber.yaml config). The EOA must
+# approve the caliber to spend its sUSN (buy leg) and its USDC (sell leg).
+
+# ── BUY sUSN: caliber pays USDC to the EOA, pulls sUSN from the EOA ────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: # USDC out (base); sUSN in is a position token, excluded
+    - "${token_list.base.USDC}"
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon-otc/swap.yaml:buy_susn_with_usdc"
+    inputs:
+      usdc_address:
+        type: "address"
+        value: "${token_list.base.USDC}"
+      susn_address:
+        type: "address"
+        value: "${token_list.base.sUSN}"
+      otc_counterparty:
+        type: "address"
+        value: "0x0000000000000000000000000000000000000000" # TODO: real OTC EOA on Base
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ── ACCOUNTING: value caliber sUSN balance in USDC via the OracleRegistry ──────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.base.USDC}"
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon-otc/account.yaml:account"
+    inputs:
+      susn_address:
+        type: "address"
+        value: "${token_list.base.sUSN}"
+      quote_token:
+        type: "address"
+        value: "${token_list.base.USDC}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      susn_unit_scale:
+        type: "uint256"
+        value: "1000000000000000000" # 10^sUSN.decimals (18) — for accounting mulDiv
+
+# ── SELL sUSN: caliber sends sUSN to the EOA, pulls USDC from the EOA ──────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: # USDC in (base); sUSN out is a position token, excluded
+    - "${token_list.base.USDC}"
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon-otc/swap.yaml:sell_susn_for_usdc"
+    inputs:
+      usdc_address:
+        type: "address"
+        value: "${token_list.base.USDC}"
+      susn_address:
+        type: "address"
+        value: "${token_list.base.sUSN}"
+      otc_counterparty:
+        type: "address"
+        value: "0x0000000000000000000000000000000000000000" # TODO: real OTC EOA on Base
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

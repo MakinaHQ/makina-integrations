@@ -1,0 +1,87 @@
+protocol: "noon"
+
+# Noon sUSN OTC position accounting (Base) via the Makina OracleRegistry.
+#
+# sUSN is held as a caliber POSITION token (position_tokens: [sUSN]), NOT a base
+# token, so its value is reported here rather than by the base-token registry. This
+# is the securitize/VBILL model (blueprints/securitize/account.yaml).
+#
+# OracleRegistry.getPrice(baseToken, quoteToken) returns the price of ONE whole
+# baseToken in quoteToken wei (quoteToken decimals). For sUSN it routes through the
+# 2-feed path sUSN/USN (SUSN_USN_RR) × USN/USD (USNUSD_RR_CAPPED_1); the registry
+# handles staleness + routing internally.
+#
+# Position value (USDC 6-dec):
+#   value = susn_balance * getPrice(sUSN, USDC) / 10^sUSN_decimals   (sUSN = 18 dec)
+#
+# Because this accounting values the position via the same oracle route, the buy/sell
+# MANAGEMENT legs (affected_tokens=[USDC]) get an on-chain slippage check for free:
+# the caliber's loss reconciliation nets the USDC moved against the sUSN value
+# gained/lost and reverts if the swap is off-rate beyond the caliber's max-loss bps.
+
+constants:
+  # Makina OracleRegistry on Base — shared per-chain singleton (same instance
+  # mteth/base and every Base fund use; the mainnet equivalent is 0xC388… used by
+  # instructions/securitize.yaml, which intMkSrRoyUSDC already consumes on mainnet).
+  oracle_registry_address:
+    type: "address"
+    value: "0x4B3336630e591D36ca81f0c25b798895289dDD30"
+  # MathHelper (Base) for mulDiv (balance * price / unit_scale).
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd"
+
+inputs:
+  susn_address:
+    type: "address"
+  quote_token:
+    type: "address"
+  caliber_address:
+    type: "address"
+  susn_unit_scale:
+    type: "uint256"
+
+actions:
+  account:
+    calls:
+      - description: "sUSN balance held by the caliber"
+        target: "${inputs.susn_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "susn_balance"
+          type: "uint256"
+
+      - description: "Price of 1 whole sUSN in USDC wei (2-feed route sUSN/USN x USN/USD)"
+        target: "${constants.oracle_registry_address}"
+        selector: "getPrice(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.susn_address}"
+          - type: "address"
+            value: "${inputs.quote_token}"
+        return:
+          name: "price"
+          type: "uint256"
+
+      - description: "value = susn_balance * price / susn_unit_scale (USDC 6-dec)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.susn_balance}"
+          - type: "uint256"
+            value: "${returns.price}"
+          - type: "uint256"
+            value: "${inputs.susn_unit_scale}"
+        return:
+          name: "value_in_quote_token"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.value_in_quote_token}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

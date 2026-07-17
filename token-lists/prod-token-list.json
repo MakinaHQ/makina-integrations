@@ -382,6 +382,13 @@
       "symbol": "cbETH"
     },
     {
+      "chainId": 8453,
+      "address": "0x34a2798D47b238A7CbA9D87D49618DEE6C4D999F",
+      "name": "Staked USN",
+      "decimals": 18,
+      "symbol": "sUSN"
+    },
+    {
       "chainId": 42161,
       "address": "0x46850aD61C2B7d64d08c9C754F45254596696984",
       "name": "PayPal USD",

@@ -1,0 +1,75 @@
+protocol: "royco-st-susn"
+
+# Royco Senior Tranche sUSN Withdraw Blueprint (Base)
+# INSTANT single-tx redeem: ST shares -> sUSN.
+# ST.redeem() has the kernel (stRedeem) transfer sUSN directly to `receiver`, then burns
+# the shares in the same call. NO redemption queue, NO cooldown, NO KV term.
+# (sUSN on Base is a Hyperlane-bridged plain ERC20; the Noon cooldown lives only on mainnet.)
+# Verified against deployed Base bytecode; ST surface has no requestRedeem/maxWithdraw.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # msgSender()
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd" # mulDiv (Base math helper)
+  senior_tranche_address:
+    type: "address"
+    value: "0x98d55707B60793AC8cadAB3C456dA156671F138a" # ROY-ST-sUSN
+
+inputs: {}
+
+actions:
+  redeem:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get Senior Tranche share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Calculate shares to redeem from basis points
+      - description: "Calculate shares to redeem based on basis points"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      # Redeem Senior Tranche shares to receive sUSN (instant, same tx)
+      - description: "Redeem Senior Tranche shares to receive sUSN"
+        target: "${constants.senior_tranche_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of ST shares to redeem (10000 = 100%)"
