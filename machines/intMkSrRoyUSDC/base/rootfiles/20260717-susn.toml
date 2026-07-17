@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0xa69c50bed9bb380d7fb1de04ad0cdc3241bc7640e97d47c7e0ba54761284e880
+# root: 0x14b13687f5676ab5b75fb13d42936e5eeaf72bf61c312cd4e2943793d07a2c16
 
 [tokens."${token_list.base.USDC}"]
 chainId = 8453
@@ -16,7 +16,7 @@ decimals = 18
 symbol = "sUSN"
 
 [instructions.noon.account."sUSN OTC"]
-position_id = "1"
+position_id = "323638792813778024403827224996075207355"
 description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
@@ -40,7 +40,7 @@ bitmap = "164824271477329568240072075474762727424"
 inputs_slots = []
 
 [instructions.noon.buy_susn_with_usdc."sUSN OTC"]
-position_id = "1"
+position_id = "323638792813778024403827224996075207355"
 description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
@@ -70,7 +70,7 @@ name = "usdc_amount"
 type = "Uint"
 
 [instructions.noon.sell_susn_for_usdc."sUSN OTC"]
-position_id = "1"
+position_id = "323638792813778024403827224996075207355"
 description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
@@ -100,7 +100,7 @@ name = "susn_amount"
 type = "Uint"
 
 [instructions.royco-st-susn.account.ROY-ST-sUSN-NAV]
-position_id = "314806959820518655397242285877968798454"
+position_id = "198042280204537586073334227466131068355"
 description = "Royco ST sUSN"
 is_debt = false
 group_id = "0"
@@ -126,7 +126,7 @@ bitmap = "159507359494189904748456847233641349120"
 inputs_slots = []
 
 [instructions.royco-st-susn.deposit.ROY-ST-sUSN]
-position_id = "314806959820518655397242285877968798454"
+position_id = "198042280204537586073334227466131068355"
 description = "Royco ST sUSN"
 is_debt = false
 group_id = "0"
@@ -151,7 +151,7 @@ name = "amount_to_deposit"
 type = "Uint"
 
 [instructions.royco-st-susn.redeem.ROY-ST-sUSN]
-position_id = "314806959820518655397242285877968798454"
+position_id = "198042280204537586073334227466131068355"
 description = "Royco ST sUSN"
 is_debt = false
 group_id = "0"

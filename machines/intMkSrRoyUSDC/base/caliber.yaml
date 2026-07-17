@@ -13,7 +13,7 @@ positions:
   # the caliber's loss reconciliation (USDC delta vs oracle-priced sUSN delta). Same
   # model as the securitize/VBILL position. Requires on-chain only the sUSN
   # OracleRegistry route (NO addBaseToken — sUSN is a position token).
-  - id: "1"
+  - id: "323638792813778024403827224996075207355" # Noon USN (Base), dialectic_id f37a907104f7513d9ecf7887bbcefabb
     group_id: "0"
     description: "Noon sUSN OTC swap"
     instructions: !include "./instructions/noon-susn-otc.yaml"
@@ -22,11 +22,9 @@ positions:
     vars:
       label: "sUSN OTC"
 
-  # Royco Senior Tranche sUSN (ROY-ST-sUSN) — DIA-817
-  # sUSN is registered as a caliber base token; the tranche is a position valued in
-  # USDC. NOTE: `id` is a PLACEHOLDER derived from the ST token address (pools_db was
-  # not available). Replace with the canonical Makina pool id from pools_db before go-live.
-  - id: "314806959820518655397242285877968798454"
+  # Royco Senior Tranche sUSN (ROY-ST-sUSN) — DIA-817 (base / RoycoV2)
+  # sUSN is registered as a caliber base token; the tranche is a position valued in USDC.
+  - id: "198042280204537586073334227466131068355" # dialectic_id 94fd8e46f26bbf53d46b877fffafd5c3
     group_id: "0"
     description: "Royco ST sUSN"
     instructions: !include "../../../instructions/royco-st-susn.yaml"
