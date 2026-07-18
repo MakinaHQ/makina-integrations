@@ -1,13 +1,13 @@
 # AaveV3 Supply — deposit, withdraw, and account for a supplied (non-debt) asset.
 #
 # Expected caliber vars:
-#   label:         string   — token name (e.g. "USDC", "WETH")
-#   asset_address: address  — underlying token address
-#   aave_token:    address  — aToken address (for accounting balanceOf)
+#   label:              string   — token name (e.g. "USDC", "WETH")
+#   asset_address:      address  — underlying token address
+#   aave_token:         address  — aToken address (for accounting balanceOf)
+#   aave_pool_instance: address  — Aave V3 Pool for this position
 #
 # Expected config:
 #   caliber_address
-#   aavev3_core_instance
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
@@ -25,7 +25,7 @@
         value: ${position.asset_address}
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${position.aave_pool_instance}"
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
@@ -43,7 +43,7 @@
         value: ${position.asset_address}
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${position.aave_pool_instance}"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"

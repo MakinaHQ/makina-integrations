@@ -24,6 +24,9 @@ def _load_toml(path: Path) -> dict:
 
 
 class TestTokenListRefRegex(unittest.TestCase):
+    def test_monad_uses_mainnet_chain_id(self) -> None:
+        self.assertEqual(validate_token_chains.CHAIN_TO_CHAIN_ID["monad"], 143)
+
     def test_parses_valid_ref(self) -> None:
         m = validate_token_chains.TOKEN_LIST_REF_RE.match(
             "${token_list.mainnet.USDC}"
