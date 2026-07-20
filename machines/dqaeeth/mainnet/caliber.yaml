@@ -7,7 +7,7 @@ config:
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
   etherfi_async_redeemer_address:
     type: "address"
-    value: "0x4aDcf7Ef16358da8EAA26038dB331AF49dEb7962" # DQAeETH-specific unaudited contract
+    value: "0x60d3d7b1da0B55B52CFE0D6599428793Fcc0A51B" # DQAeETH-specific unaudited contract
 
 positions:
   # EtherFi Async Redemption
