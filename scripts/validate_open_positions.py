@@ -213,12 +213,12 @@ def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
                 f"could not find Caliber address in `[calibers.{caliber_path.parent.name}].address` within {config_toml_path}"
             ) from exc
 
-    positions = data.get("positions", [])
-    if not positions:
-        raise ValueError(f"could not find any positions in {caliber_path}")
+    if "positions" not in data:
+        raise ValueError(f"could not find a positions field in {caliber_path}")
 
+    positions = data["positions"]
     position_ids = {str(p["id"]) for p in positions if "id" in p}
-    if not position_ids:
+    if positions and not position_ids:
         raise ValueError(f"could not find any position ids in {caliber_path}")
 
     if not caliber_address:

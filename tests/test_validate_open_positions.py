@@ -13,6 +13,7 @@ from __future__ import annotations
 import importlib.util
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -68,6 +69,64 @@ class ValidateOpenPositionsTests(unittest.TestCase):
         self.assertEqual(caliber_address, "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC")
         self.assertIn("128264429154381135287798106504544985667", position_ids)
         self.assertEqual(len(position_ids), 25)
+
+    def test_validate_target_passes_when_caliber_has_no_positions(self) -> None:
+        target = validate_open_positions.RootfileTarget(
+            machine="deth",
+            chain="monad",
+            rootfile_path=REPO_ROOT / "machines" / "deth" / "monad" / "rootfiles" / "20260720-monad-empty.toml",
+            caliber_path=REPO_ROOT / "machines" / "deth" / "monad" / "caliber.yaml",
+        )
+
+        result = validate_open_positions.validate_target(target, FakeReader([]))
+
+        self.assertTrue(result.ok)
+        self.assertEqual(result.open_position_ids, [])
+        self.assertEqual(result.missing_in_caliber, [])
+        self.assertEqual(result.missing_in_rootfile, [])
+        self.assertEqual(result.duplicate_accounting, [])
+
+    def test_validate_target_rejects_open_position_missing_from_empty_caliber(self) -> None:
+        target = validate_open_positions.RootfileTarget(
+            machine="deth",
+            chain="monad",
+            rootfile_path=REPO_ROOT / "machines" / "deth" / "monad" / "rootfiles" / "20260720-monad-empty.toml",
+            caliber_path=REPO_ROOT / "machines" / "deth" / "monad" / "caliber.yaml",
+        )
+
+        result = validate_open_positions.validate_target(target, FakeReader(["42"]))
+
+        self.assertFalse(result.ok)
+        self.assertEqual(result.open_position_ids, ["42"])
+        self.assertEqual(result.missing_in_caliber, ["42"])
+        self.assertEqual(result.missing_in_rootfile, ["42"])
+        self.assertEqual(result.duplicate_accounting, [])
+
+    def test_extract_caliber_metadata_rejects_positions_without_ids(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            caliber_path = Path(directory) / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  caliber_address:\n"
+                "    value: '0xD1A2d9DF5db842DA2Ee81075Fa441602B2352915'\n"
+                "positions:\n"
+                "  - name: missing-id\n"
+            )
+
+            with self.assertRaisesRegex(ValueError, "could not find any position ids"):
+                validate_open_positions.extract_caliber_metadata(caliber_path)
+
+    def test_extract_caliber_metadata_requires_positions_field(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            caliber_path = Path(directory) / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  caliber_address:\n"
+                "    value: '0xD1A2d9DF5db842DA2Ee81075Fa441602B2352915'\n"
+            )
+
+            with self.assertRaisesRegex(ValueError, "could not find a positions field"):
+                validate_open_positions.extract_caliber_metadata(caliber_path)
 
     def test_extract_accounting_counts_detects_reservoir_position(self) -> None:
         working_rootfile = (
