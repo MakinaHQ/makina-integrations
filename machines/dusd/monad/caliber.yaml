@@ -5,6 +5,22 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x69a5F9AD4f96ebf0a0C792dD42a01cC5C0102fef"
+  # ── Pendle / swap helpers (Monad) ─────────────────────────────────
+  caliber_helper_address:
+    type: "address"
+    value: "0x99AdE465D454404f8537f0ad159623fc5c0560a6"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x88cD4CAf33a89c528C79d808Cd8465655E68FB42"
+  swap_module:
+    type: "address"
+    value: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3" # Makina swapper (verified deployed on Monad, same addr cross-chain)
+  boolean_helper_address:
+    type: "address"
+    value: "0x8dc60173F37B34998FD5B2aeF47Dd68C68CC22C4" # BooleanHelper on Monad (verified: revertIfFalse/revertIfTrue/not)
+  pendle_pylp_oracle_address:
+    type: "address"
+    value: "0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2" # Pendle PY-LP oracle on Monad (verified live)
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -44,3 +60,10 @@ positions:
   #     asset_address: ${token_list.monad.USDT0}
   #     aave_token: "0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"
   #     aave_pool_instance: ${config.aavev3_core_instance}
+
+  # ── Pendle PT (group_id: 2) ───────────────────────────────────────
+  - id: "89999714421839596776837302513071113027" # PT-AUSD-8OCT2026
+    group_id: "2"
+    description: "Pendle PT-AUSD-8OCT2026 (market: 0x6f99...9fe7)"
+    instructions: !include "./instructions/pendle-pt-ausd-8oct2026.yaml"
+    position_tokens: ["0x9fc74F8ed616b5baF52a170caA97d6D3898602d1"] # PT-AUSD-8OCT2026

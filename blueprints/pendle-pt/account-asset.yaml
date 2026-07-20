@@ -1,0 +1,73 @@
+protocol: "pendle-pt"
+
+# Accounting for a PT whose SY wraps the underlying asset directly (plain-token SY,
+# assetType == TOKEN), i.e. there is NO ERC4626 IBT between SY and asset.
+# Use this instead of account.yaml:account-pt-4626 when SY.convertToAssets is not
+# implemented (e.g. PT-AUSD on Monad, where SY.exchangeRate == 1e18 and asset == AUSD).
+#
+#   PT balance -> getPtToAssetRate(market, twap) -> asset balance
+#
+inputs:
+  pt_token_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  pendle_pylp_oracle_address:
+    type: "address"
+  twap_duration:
+    type: "uint32"
+  pendle_market_address:
+    type: "address"
+  decimals_adjustment:
+    type: "uint256"
+
+actions:
+  account-pt-asset:
+    # eg: PT-AUSD -> AUSD (SY wraps AUSD 1:1, no 4626 IBT)
+    # 1. Get PT balance
+    # 2. Get PT -> asset price from Pendle Oracle (1e18 scaled)
+    # 3. Calculate asset equivalent of PT balance
+    calls:
+      - description: "Get PT token balance"
+        target: ${inputs.pt_token_address}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pt_token_balance"
+          type: "uint256"
+
+      - description: "Get asset per PT from Pendle Oracle"
+        target: "${inputs.pendle_pylp_oracle_address}"
+        selector: "getPtToAssetRate(address,uint32)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pendle_market_address}"
+          - type: "uint32"
+            value: "${inputs.twap_duration}"
+        return:
+          name: "asset_per_pt"
+          type: "uint256"
+
+      - description: "Calculate asset equivalent of PT balance. Rate is 1e18 scaled; PT and asset share the same decimals here, so decimals_adjustment == 1e18."
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pt_token_balance}"
+          - type: "uint256"
+            value: "${returns.asset_per_pt}"
+          - type: "uint256"
+            value: "${inputs.decimals_adjustment}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.asset_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

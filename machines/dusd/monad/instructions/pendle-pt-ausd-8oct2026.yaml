@@ -1,0 +1,88 @@
+# Pendle PT-AUSD-8OCT2026 on Monad (chainId 143)
+# Market: 0x6f99cf00ee7290ae78a072bb6910ef72d1129fe7
+#   SY:  0xBa3D60f5000f472aEF947fb8020a3e6319F9A0b7 (plain-token SY over AUSD, 1:1)
+#   PT:  0x9fc74F8ed616b5baF52a170caA97d6D3898602d1 (6 decimals)
+#   YT:  0xEddee9C0b56248D70a9bFdd103F8bd97c35dFd89
+#   Underlying (AUSD): 0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a (6 decimals)
+#
+# Deposit/Withdraw asset: AUSD. Action: buy/sell PT.
+# Accounting uses the plain-asset variant (getPtToAssetRate) because the SY is not
+# an ERC4626 vault — see blueprints/pendle-pt/account-asset.yaml.
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a" # AUSD
+  instruction:
+    label: "PT-AUSD-8OCT2026"
+    path: "../../../blueprints/pendle-pt/deposit.yaml:buy-pt"
+    inputs:
+      input_token_address:
+        type: "address"
+        value: "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a" # AUSD
+      pt_token_address:
+        type: "address"
+        value: "0x9fc74F8ed616b5baF52a170caA97d6D3898602d1" # PT-AUSD-8OCT2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a" # AUSD
+  instruction:
+    label: "PT-AUSD-8OCT2026"
+    path: "../../../blueprints/pendle-pt/account-asset.yaml:account-pt-asset"
+    inputs:
+      pt_token_address:
+        type: "address"
+        value: "0x9fc74F8ed616b5baF52a170caA97d6D3898602d1" # PT-AUSD-8OCT2026
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      pendle_pylp_oracle_address:
+        type: "address"
+        value: "${config.pendle_pylp_oracle_address}" # Pendle PY-LP oracle on Monad
+      twap_duration:
+        type: "uint32"
+        value: "900" # 15 minutes
+      pendle_market_address:
+        type: "address"
+        value: "0x6f99cf00ee7290ae78a072bb6910ef72d1129fe7" # PT-AUSD-8OCT2026 market
+      decimals_adjustment:
+        type: "uint256"
+        value: "1000000000000000000" # 1e18 (PT & AUSD both 6 decimals; rate is 1e18 scaled)
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a" # AUSD
+  instruction:
+    label: "PT-AUSD-8OCT2026"
+    path: "../../../blueprints/pendle-pt/withdraw.yaml:sell-pt"
+    inputs:
+      output_token_address:
+        type: "address"
+        value: "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a" # AUSD
+      pt_token_address:
+        type: "address"
+        value: "0x9fc74F8ed616b5baF52a170caA97d6D3898602d1" # PT-AUSD-8OCT2026
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
