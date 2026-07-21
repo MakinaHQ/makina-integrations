@@ -24,23 +24,23 @@ positions:
       asset_address: ${token_list.monad.USDC}
       aave_token: "0x35a73BAcb179d3740395A3ceCc87FF2e581d6042"
       aave_pool_instance: ${config.aavev3_core_instance}
-  # - id: "18883279859232606921081666227395984506"
-  #   group_id: "1"
-  #   description: "AaveV3 Supply AUSD"
-  #   instructions: !include "../../../instructions/aavev3-supply.yaml"
-  #   position_tokens: ["0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec"]
-  #   vars:
-  #     label: "AUSD"
-  #     asset_address: ${token_list.monad.AUSD}
-  #     aave_token: "0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec"
-  #     aave_pool_instance: ${config.aavev3_core_instance}
-  # - id: "137197543549345562682796396165999317048"
-  #   group_id: "1"
-  #   description: "AaveV3 Supply USDT0"
-  #   instructions: !include "../../../instructions/aavev3-supply.yaml"
-  #   position_tokens: ["0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"]
-  #   vars:
-  #     label: "USDT0"
-  #     asset_address: ${token_list.monad.USDT0}
-  #     aave_token: "0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"
-  #     aave_pool_instance: ${config.aavev3_core_instance}
+  - id: "18883279859232606921081666227395984506"
+    group_id: "1"
+    description: "AaveV3 Supply AUSD"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec"]
+    vars:
+      label: "AUSD"
+      asset_address: ${token_list.monad.AUSD}
+      aave_token: "0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec"
+      aave_pool_instance: ${config.aavev3_core_instance}
+  - id: "137197543549345562682796396165999317048"
+    group_id: "1"
+    description: "AaveV3 Supply USDT0"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"]
+    vars:
+      label: "USDT0"
+      asset_address: ${token_list.monad.USDT0}
+      aave_token: "0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"
+      aave_pool_instance: ${config.aavev3_core_instance}
