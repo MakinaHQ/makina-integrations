@@ -355,6 +355,13 @@
     },
     {
       "chainId": 8453,
+      "address": "0xFCc9Cc1209651Ed8867332d6F664CF82743A2584",
+      "name": "Midas Fasanara Global Open",
+      "decimals": 18,
+      "symbol": "mGLO"
+    },
+    {
+      "chainId": 8453,
       "address": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
       "name": "Tether USD",
       "decimals": 6,
