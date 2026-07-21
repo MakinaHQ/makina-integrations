@@ -34,13 +34,13 @@ positions:
       asset_address: ${token_list.monad.AUSD}
       aave_token: "0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec"
       aave_pool_instance: ${config.aavev3_core_instance}
-  # - id: "137197543549345562682796396165999317048"
-  #   group_id: "1"
-  #   description: "AaveV3 Supply USDT0"
-  #   instructions: !include "../../../instructions/aavev3-supply.yaml"
-  #   position_tokens: ["0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"]
-  #   vars:
-  #     label: "USDT0"
-  #     asset_address: ${token_list.monad.USDT0}
-  #     aave_token: "0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"
-  #     aave_pool_instance: ${config.aavev3_core_instance}
+  - id: "137197543549345562682796396165999317048"
+    group_id: "1"
+    description: "AaveV3 Supply USDT0"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"]
+    vars:
+      label: "USDT0"
+      asset_address: ${token_list.monad.USDT0}
+      aave_token: "0x9531E6bC99D7F7f0596ed7bA5b846Ba9Eb60468c"
+      aave_pool_instance: ${config.aavev3_core_instance}
