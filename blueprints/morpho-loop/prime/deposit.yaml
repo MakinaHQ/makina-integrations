@@ -1,0 +1,454 @@
+protocol: "morpho"
+
+# ============================================================================
+# PRIME/PYUSD Morpho loop — DEPOSIT (open / lever-up)
+# ============================================================================
+# One-legged Morpho Blue loop: PRIME collateral, PYUSD debt. All 4 tokens are
+# 6-decimal. The collateral path is NOT a single DEX swap — it is three legs
+# a DEX aggregator will not do end-to-end:
+#
+#   PYUSD --swap_module.swap(swapperId,data,PYUSD,USDC,in,min)--> USDC   (aggregator)
+#   USDC  --wYLDS.deposit(assets, caliber)---------------------> wYLDS   (ERC4626 wrap 1, 1:1)
+#   wYLDS --PRIME.deposit(assets, caliber)---------------------> PRIME   (ERC4626 wrap 2, /NAV)
+#   PRIME --Morpho.supplyCollateral--------------------------->         (collateral)
+#   PYUSD --Morpho.borrow------------------------------------->         (loop_in: repays FL)
+#
+# So this file mirrors blueprints/morpho-loop/deposit-swap.yaml but inserts the
+# two ERC4626 wrap legs (USDC->wYLDS, wYLDS->PRIME), each preceded by an approve,
+# between the swap and supplyCollateral. supplyCollateral uses the PRIME output
+# of the SECOND wrap (not the swap output).
+#
+# Per-leg approvals in the deposit path: PYUSD->swap_module, USDC->wYLDS,
+# wYLDS->PRIME, PRIME->Morpho.
+#
+# wYLDS deposit is NOT whitelist-gated for the caliber (verified: the wYLDS
+# whitelist only gates the WITHDRAWAL_ADMIN treasury egress, not deposit/transfer).
+# ============================================================================
+
+constants:
+  usdc:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  loan_token:
+    type: "address"
+  wylds_token:
+    type: "address"
+  prime_token:
+    type: "address"
+  swap_module:
+    type: "address"
+  morpho_address:
+    type: "address"
+  caliber_helper:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+
+actions:
+  # ==========================================================================
+  # loop_in: Enter/increase a leveraged loop via flash loan callback.
+  # Must be used as a FLASHLOAN_MANAGEMENT instruction. The caliber wallet holds
+  # equity + flash-loaned loan_token (PYUSD) at the start of execution.
+  # Flow: swap PYUSD->USDC, wrap USDC->wYLDS->PRIME, supply PRIME, borrow PYUSD
+  # to repay the flash loan.
+  # ==========================================================================
+  loop_in:
+    calls:
+      - description: "Approve swap module to spend loan token (PYUSD)"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.swap_data.inputAmount}"
+
+      - description: "Swap loan token (PYUSD) to USDC via DEX aggregator"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data.data}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "address"
+                value: "${constants.usdc}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.minOutputAmount}"
+        return:
+          type: "uint256"
+          name: "usdc_amount"
+
+      - description: "Approve wYLDS vault to spend USDC"
+        target: ${constants.usdc}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.wylds_token}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+      - description: "Wrap USDC -> wYLDS via ERC4626 deposit (1:1)"
+        target: ${inputs.wylds_token}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "wylds_amount"
+
+      - description: "Approve PRIME vault to spend wYLDS"
+        target: ${inputs.wylds_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.prime_token}"
+          - type: "uint256"
+            value: "${returns.wylds_amount}"
+
+      - description: "Wrap wYLDS -> PRIME via ERC4626 deposit (shares = wYLDS / NAV)"
+        target: ${inputs.prime_token}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.wylds_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "collateral_amount"
+
+      - description: "Approve Morpho to transfer PRIME collateral"
+        target: ${inputs.prime_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Supply PRIME collateral to Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Borrow the flash loaned amount (PYUSD) from Morpho to repay the FL"
+        target: "${inputs.morpho_address}"
+        selector: "borrow((address,address,address,address,uint256),uint256,uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.flash_loan_amount}"
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      swap_data:
+        type: "SwapData"
+        description: "Swap data for PYUSD -> USDC conversion (first leg of the wrap chain)."
+      flash_loan_amount:
+        type: "uint256"
+        description: "The amount of the flash loan (PYUSD) to borrow from Morpho to repay."
+
+  # ==========================================================================
+  # add_collateral: Top up collateral on an existing loop position (no leverage).
+  # Standalone MANAGEMENT instruction — no flash loan.
+  # Flow: swap PYUSD->USDC, wrap USDC->wYLDS->PRIME, supply PRIME to Morpho.
+  # ==========================================================================
+  add_collateral:
+    calls:
+      - description: "Approve swap module to spend loan token (PYUSD)"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.swap_data.inputAmount}"
+
+      - description: "Swap loan token (PYUSD) to USDC via DEX aggregator"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data.data}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "address"
+                value: "${constants.usdc}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.minOutputAmount}"
+        return:
+          type: "uint256"
+          name: "usdc_amount"
+
+      - description: "Approve wYLDS vault to spend USDC"
+        target: ${constants.usdc}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.wylds_token}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+      - description: "Wrap USDC -> wYLDS via ERC4626 deposit (1:1)"
+        target: ${inputs.wylds_token}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "wylds_amount"
+
+      - description: "Approve PRIME vault to spend wYLDS"
+        target: ${inputs.wylds_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.prime_token}"
+          - type: "uint256"
+            value: "${returns.wylds_amount}"
+
+      - description: "Wrap wYLDS -> PRIME via ERC4626 deposit (shares = wYLDS / NAV)"
+        target: ${inputs.prime_token}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.wylds_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "collateral_amount"
+
+      - description: "Approve Morpho to transfer PRIME collateral"
+        target: ${inputs.prime_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Supply PRIME collateral to Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+    input_slots:
+      swap_data:
+        type: "SwapData"
+        description: "Swap data for PYUSD -> USDC conversion (first leg of the wrap chain)."

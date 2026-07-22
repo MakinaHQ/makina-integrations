@@ -1,0 +1,230 @@
+protocol: "morpho"
+
+# ============================================================================
+# PRIME/PYUSD Morpho loop — ACCOUNT (equity in PYUSD + async pending term)
+# ============================================================================
+# POSITION-model accounting. Identical to blueprints/morpho-loop/account.yaml
+# :account_equity (oracle-based, clean 1e36 scale because both loan and
+# collateral tokens are 6-decimal) with ONE addition: the async pending term.
+#
+#   equity_PYUSD = max(0, collateral_PRIME * oracle.price()/1e36 - debt_PYUSD)
+#                + pendingRedemptions(caliber).assets      (USDC ~1:1 -> PYUSD)
+#
+# WHY the pending term is needed and why it does NOT double-count:
+#   During Variant B exit the wYLDS->USDC leg is async. Between
+#   wYLDS.requestRedeem and Hastra's completeRedeem the caliber's shares are
+#   LOCKED inside the wYLDS contract (caliber wYLDS balance = 0, not in loose
+#   balances) and are NOT reflected in the Morpho position. Adding
+#   pendingRedemptions(caliber).assets keeps NAV continuous across the gap.
+#   pendingRedemptions is DELETED inside completeRedeem in the SAME tx the USDC
+#   lands loose in the caliber (recaptured by the caliber's native USDC
+#   base-token accounting), so the term self-drops to 0 exactly when USDC
+#   appears — no moment of NAV dip, no double count. Read live on-chain; no KV
+#   mirror required (verified in execution-account.md).
+#
+# PRIME is NOT a base token and is priced ONLY by the Morpho market oracle here
+# (not the makina OracleRegistry). Only the denomination token PYUSD has a feed.
+# ============================================================================
+
+inputs:
+  morpho_address:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_helper:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  oracle_address:
+    type: "address"
+  # PRIME/PYUSD extension: wYLDS async pending-redemption term
+  wylds_address:
+    type: "address"
+
+actions:
+  account_equity_pending:
+    calls:
+      - description: "Get our position data"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho_address}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total borrow shares (index 3)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "total_borrow_shares_raw"
+          type: "uint256"
+
+      - description: "Floor to 1 to avoid mulDiv division by zero when market has no borrows"
+        target: "${inputs.math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_borrow_shares_raw}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "total_borrow_shares"
+          type: "uint256"
+
+      - description: "Extract total borrow assets (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "total_borrow_assets"
+          type: "uint256"
+
+      - description: "Calculate debt amount: borrow_shares * total_borrow_assets / total_borrow_shares"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "uint256"
+            value: "${returns.total_borrow_assets}"
+          - type: "uint256"
+            value: "${returns.total_borrow_shares}"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+      - description: "Get PRIME/PYUSD price from Morpho oracle (scaled by 1e36)"
+        target: "${inputs.oracle_address}"
+        selector: "price()"
+        parameters: []
+        return:
+          name: "oracle_price"
+          type: "uint256"
+
+      - description: "collateral_in_loan_token = collateral_amount * price / 1e36"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "uint256"
+            value: "${returns.oracle_price}"
+          - type: "uint256"
+            value: "1000000000000000000000000000000000000"
+        return:
+          name: "collateral_in_loan_token"
+          type: "uint256"
+
+      - description: "Cap debt at collateral value to avoid underflow when underwater"
+        target: "${inputs.math_helper}"
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.debt_amount}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "capped_debt"
+          type: "uint256"
+
+      - description: "Position equity = collateral_in_loan_token - capped_debt (saturates to 0). sub(a, b) = b - a"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.capped_debt}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "equity_in_loan_token"
+          type: "uint256"
+
+      # ---- Async pending-redemption term (the only delta vs account_equity) ----
+      - description: "Get wYLDS pending redemption for the caliber (shares, assets, timestamp)"
+        target: "${inputs.wylds_address}"
+        selector: "pendingRedemptions(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_redemption"
+          type: "(uint256,uint256,uint256)"
+
+      - description: "Extract pending assets (index 1) = USDC owed (~1:1 -> PYUSD); 0 when no pending"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.pending_redemption}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "pending_assets"
+          type: "uint256"
+
+      - description: "equity_with_pending = position equity + pending assets"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.equity_in_loan_token}"
+          - type: "uint256"
+            value: "${returns.pending_assets}"
+        return:
+          name: "equity_with_pending"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.equity_with_pending}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
