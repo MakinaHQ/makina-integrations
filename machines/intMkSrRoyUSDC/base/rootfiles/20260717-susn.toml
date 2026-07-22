@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x0c2eae42574fe930a2a389341b6dba2d6a922b3af965b81d70bf54b5d6539c89
+# root: 0xd7884a0b5b55fe15af6e97b504b89aca72260e937b530c3ad076c996336ee6c3
 
 [tokens."${token_list.base.USDC}"]
 chainId = 8453
@@ -25,7 +25,7 @@ affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
 position_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
 commands = [
   "0x70a082310102ff000000000234a2798d47b238a7cba9d87d49618dee6c4d999f",
-  "0xac41865a010304ff000000044b3336630e591d36ca81f0c25b798895289ddd30",
+  "0xac41865a010304ff00000004c388b72ab90be82b230d919f9c05c87f9397f485",
   "0xaa9a091201020405ff00000016d120a18334e273fa3c029ece56bfa5a2abfcfd",
 ]
 state = [

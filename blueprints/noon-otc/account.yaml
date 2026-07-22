@@ -20,12 +20,14 @@ protocol: "noon"
 # gained/lost and reverts if the swap is off-rate beyond the caliber's max-loss bps.
 
 constants:
-  # Makina OracleRegistry on Base — shared per-chain singleton (same instance
-  # mteth/base and every Base fund use; the mainnet equivalent is 0xC388… used by
-  # instructions/securitize.yaml, which intMkSrRoyUSDC already consumes on mainnet).
+  # Makina prod OracleRegistry — deployed at the SAME deterministic address on
+  # mainnet and Base (0xC388…), the instance instructions/securitize.yaml already
+  # consumes on mainnet. The Base sUSN feed route (sUSN/USN x USN/USD) is registered
+  # here. (0x4B33…630e is the TEST-infra registry and has no sUSN feed — calling
+  # getPrice on it reverts, so it must NOT be used in prod rootfiles.)
   oracle_registry_address:
     type: "address"
-    value: "0x4B3336630e591D36ca81f0c25b798895289dDD30"
+    value: "0xC388B72AB90Be82B230D919F9C05c87F9397f485"
   # MathHelper (Base) for mulDiv (balance * price / unit_scale).
   unsigned_math_helper_address:
     type: "address"
