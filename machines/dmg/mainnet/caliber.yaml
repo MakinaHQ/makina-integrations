@@ -19,6 +19,12 @@ config:
     value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
 positions:
+  # ── Harvest-only ──────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+
   # ── Midas ────────────────────────────────────────────────────────
   - id: "74279913377154171133723219389628797435147974258238735195930105321760025303591" # keccak256("midas.mglobal.swap-in")
     group_id: "0"
