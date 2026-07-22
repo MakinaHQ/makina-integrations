@@ -1,0 +1,23 @@
+name = "chronograph-x"
+chain = "mainnet"
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+
+[calibers.mainnet]
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/mainnet/rootfiles"
+
+[calibers.arbitrum]
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/arbitrum/rootfiles"
+
+[calibers.base]
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/base/rootfiles"
+
+[calibers.hyperliquid]
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/hyperevm/rootfiles"
+
+[calibers.polygon]
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/polygon/rootfiles"

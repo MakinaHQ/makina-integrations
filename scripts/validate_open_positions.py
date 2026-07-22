@@ -75,6 +75,18 @@ ICaliber_ABI = [
 ]
 
 
+class CaliberUnavailable(Exception):
+    """Raised when there is no live, standard Caliber to read on-chain — the
+    chain is unsupported, the contract is not deployed yet, or the address is
+    not a standard Caliber (e.g. a Makina lite module, which does not expose
+    the position-enumeration interface). Such targets are skipped rather than
+    failed: a freshly-initialized or lite fund has no live state to validate."""
+
+
+def chain_supported(chain: str) -> bool:
+    return chain in CHAIN_ALCHEMY_SLUG
+
+
 class CaliberReader(Protocol):
     """Protocol for reading open position ids from a Caliber contract.
     Swappable in tests with a FakeReader that returns canned data."""
@@ -121,7 +133,15 @@ class RpcCaliberReader:
         whose value is > 0 (i.e. currently open / non-zero balance)."""
         checksum_address = self.web3.to_checksum_address(caliber_address)
         contract = self.web3.eth.contract(address=checksum_address, abi=ICaliber_ABI)
-        positions_length = self._call(contract.functions.getPositionsLength())
+        try:
+            positions_length = self._call(contract.functions.getPositionsLength())
+        except Exception as exc:
+            # The call reverts / returns no data when the address is not a
+            # deployed standard Caliber (e.g. a lite module or a not-yet-deployed
+            # fund). Nothing to cross-check — surface as a skip, not a failure.
+            raise CaliberUnavailable(
+                f"caliber {caliber_address} on {self.chain} is not a readable Caliber: {exc}"
+            ) from exc
 
         # Enumerate all positions by index, then filter to open ones.
         # A position is "open" when its value field is non-zero.
@@ -343,11 +363,20 @@ def main(argv: list[str]) -> int:
     results: list[ValidationResult] = []
     readers: dict[str, RpcCaliberReader] = {}
     for target in targets:
+        if not chain_supported(target.chain):
+            print(
+                f"Skipping {target.rootfile_path}: chain '{target.chain}' is not supported "
+                f"for open-positions validation (supported: {', '.join(CHAIN_ALCHEMY_SLUG)})."
+            )
+            continue
         reader = readers.setdefault(
             target.chain, RpcCaliberReader(target.chain, block_number=args.block_number)
         )
         try:
             result = validate_target(target, reader)
+        except CaliberUnavailable as exc:
+            print(f"Skipping {target.rootfile_path}: {exc}")
+            continue
         except Exception as exc:
             print(f"Validation failed for {target.rootfile_path}: {exc}", file=sys.stderr)
             return 1

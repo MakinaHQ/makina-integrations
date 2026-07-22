@@ -46,6 +46,17 @@ ICaliber_ABI = [
 ]
 
 
+class CaliberUnavailable(Exception):
+    """Raised when there is no live, standard Caliber to read on-chain — the
+    chain is unsupported, the contract is not deployed yet, or the address is
+    not a standard Caliber (e.g. a Makina lite module, which does not expose
+    isBaseToken). Such targets are skipped rather than failed."""
+
+
+def chain_supported(chain: str) -> bool:
+    return chain in CHAIN_ALCHEMY_SLUG
+
+
 class BaseTokenChecker(Protocol):
     """Protocol for checking whether a token is a base token on a Caliber.
     Swappable in tests with a FakeChecker that returns canned data."""
@@ -81,6 +92,7 @@ class RpcBaseTokenChecker:
         except ImportError as exc:
             raise RuntimeError("web3 is required to query Caliber base tokens") from exc
 
+        self.chain = chain
         self.block_number = block_number
         self.web3 = Web3(Web3.HTTPProvider(resolve_rpc_url(chain)))
         self._contracts: dict[str, object] = {}
@@ -88,7 +100,14 @@ class RpcBaseTokenChecker:
     def is_base_token(self, caliber_address: str, token_address: str) -> bool:
         contract = self._get_contract(caliber_address)
         checksum_token = self.web3.to_checksum_address(token_address)
-        return self._call(contract.functions.isBaseToken(checksum_token))
+        try:
+            return self._call(contract.functions.isBaseToken(checksum_token))
+        except Exception as exc:
+            # Reverts / returns no data when the address is not a deployed
+            # standard Caliber (e.g. a lite module). Skip rather than fail.
+            raise CaliberUnavailable(
+                f"caliber {caliber_address} on {self.chain} is not a readable Caliber: {exc}"
+            ) from exc
 
     def _get_contract(self, caliber_address: str) -> object:
         addr = caliber_address.lower()
@@ -270,11 +289,20 @@ def main(argv: list[str]) -> int:
     results: list[ValidationResult] = []
     checkers: dict[str, RpcBaseTokenChecker] = {}
     for target in targets:
+        if not chain_supported(target.chain):
+            print(
+                f"Skipping {target.rootfile_path}: chain '{target.chain}' is not supported "
+                f"for base-token validation (supported: {', '.join(CHAIN_ALCHEMY_SLUG)})."
+            )
+            continue
         checker = checkers.setdefault(
             target.chain, RpcBaseTokenChecker(target.chain, block_number=args.block_number)
         )
         try:
             result = validate_target(target, checker)
+        except CaliberUnavailable as exc:
+            print(f"Skipping {target.rootfile_path}: {exc}")
+            continue
         except Exception as exc:
             print(f"Validation failed for {target.rootfile_path}: {exc}", file=sys.stderr)
             return 1

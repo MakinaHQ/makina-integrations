@@ -1,0 +1,9 @@
+config:
+  safe_address:
+    type: "address"
+    value: "0x9f0f855A7370cc30e24924258214681A782A34aC"
+  makina_lite_module:
+    type: "address"
+    value: "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+
+positions: []
