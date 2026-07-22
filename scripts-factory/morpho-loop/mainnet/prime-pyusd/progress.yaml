@@ -1,0 +1,122 @@
+# scripts-factory/morpho-loop/mainnet/prime-pyusd/progress.yaml
+
+# Intent - set at Stage 0, immutable
+intent:
+  pool_id: "prime-pyusd"
+  pool_name: "Morpho Loop PRIME/PYUSD (Hastra)"
+  protocol: "morpho-loop"
+  chain: "mainnet"
+  machine: "dusd"
+  actions: [deposit, withdraw, account]
+  base_tokens:
+    - address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+      symbol: "PYUSD"
+      decimals: 6
+      index: 0
+  accounting_model: position
+  context: |
+    LEVERAGED LOOP on Morpho market prime-pyusd
+      market_id: 0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa
+      collateral: PRIME 0x19ebb35279A16207Ec4ba82799CC64715065F7F6 (6 dec)
+      loan:       PYUSD 0x6c3ea9036406852006290770BEdFcAbA0e23A0e8 (6 dec)
+      oracle:     0x335e5718bC20028d5e357473a3736C187Ca6b07e  (Morpho oracle, PRIME/PYUSD)
+      irm:        0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC
+      lltv:       0.86 (860000000000000000)
+
+    TOKEN STACK (Hastra):  USDC -> wYLDS -> PRIME
+      PRIME 0x19ebb35279A16207Ec4ba82799CC64715065F7F6
+        ERC4626, asset = wYLDS, APPRECIATING (1 PRIME = ~1.0496 wYLDS). Morpho collateral.
+      wYLDS 0x6ad038ca6c04e885630851278ca0a856ad9a66cc  (user link, readProxyContract#F20)
+        ERC4626 wrapper, asset = USDC (0xA0b8...eB48), ~1:1. Yield paid via merkle claimRewards (NOT via price).
+        ASYNC REDEEM: requestRedeem(shares) -> cooldown -> completeRedeem(user). cancelRedeem() to abort.
+        redeemVault = 0xA8C3CF6183D49d5D372f8FC149BD2cb5CFC0faCd
+        Pending state (read from storage for accounting):
+          getPendingRedemption(user) -> (hasPending bool, shares, assets)
+          pendingRedemptions(user)   -> (shares, assets, timestamp)   <-- F20 the user referenced
+        WHITELIST-GATED: getWhitelistCount()==2; caliber 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC NOT whitelisted.
+        wYLDS roles: WHITELIST_ADMIN_ROLE. On Tenderly fork: impersonate whitelist admin and
+        addToWhitelist(caliber) before any wYLDS deposit/requestRedeem. (User approved self-whitelisting on fork.)
+
+    LOOP FLOW
+      OPEN (deposit): PYUSD -> (swap PYUSD->USDC) -> wYLDS.deposit(USDC) -> PRIME.deposit(wYLDS)
+                      -> supply PRIME collateral to Morpho -> borrow PYUSD -> repeat to target leverage.
+      EXIT (withdraw): repay PYUSD (may need flash_loan_aggregator 0x820D35e6... to break repay<->unwind
+                       chicken/egg) -> withdraw PRIME collateral -> PRIME.redeem -> wYLDS
+                       -> wYLDS.requestRedeem (ASYNC) -> completeRedeem -> USDC -> (swap USDC->PYUSD).
+      ACCOUNT: equity = PRIME_collateral * oracle_price - PYUSD_debt
+               + pending wYLDS redemption (from pendingRedemptions storage) valued in PYUSD terms,
+               so NAV stays continuous across the async request->claim window.
+
+    BASE TOKEN = PYUSD only -> requires a PYUSD<->USDC swap leg (config.swap_module 0x923c98b2...).
+    HARVEST (wYLDS merkle rewards) intentionally OUT OF SCOPE for this integration.
+
+    PREREQS for Stage 4: PRIME base-token/oracle NOT needed (POSITION model; only equity in PYUSD).
+
+    ===== STAGE 1B CORRECTIONS (from deployed-bytecode read; supersede notes above) =====
+    - PRIME redeem is SYNCHRONOUS standard ERC4626 (redeem/withdraw work instantly; whenNotPaused/nonReentrant only).
+    - wYLDS whitelist is NOT a deposit/redeem gate: the only transfer hook (_update) checks frozen[] only;
+      whitelistedAddresses is read only in withdrawUSDC (WITHDRAWAL_ADMIN treasury egress) + removeFromWhitelist.
+      => caliber does NOT need whitelisting to deposit/requestRedeem/receive completeRedeem. Drop addToWhitelist fork step.
+    - wYLDS sync redeem/withdraw are hard-disabled (pure reverts) -> async-only exit confirmed.
+    - PRIME prices via a NAV Chainlink oracle (navOracle): convertToAssets/preview REVERT if navOracle unset ->
+      preserve navOracle wiring on forks. totalAssets = _totalManagedAssets.
+    - Morpho oracle composes: BASE_FEED_1 "PRIME/WYLDS rate"(18dec) / QUOTE_FEED_1 "PYUSD/USD"(8dec), SCALE 1e26,
+      wYLDS implicitly $1. Reproduces price() ~= 1.0497e36. Does NOT chain through USDC.
+    - Flash-loan PYUSD via aggregator provider MORPHO (enum 3), ZERO fee: requestFlashloan(0x4140b286) + onMorphoFlashLoan.
+      Reuse the 9-entry FLASHLOAN_MANAGEMENT wiring from instructions/morpho-loop-swap.yaml + blueprints/morpho-loop/deposit-swap.yaml.
+    - AccessControl is non-enumerable (no getRoleMember). For fork: find a REWARDS_ADMIN_ROLE / DEFAULT_ADMIN holder via
+      RoleGranted logs, or impersonate DEFAULT_ADMIN to grantRole(REWARDS_ADMIN_ROLE, ...) then fund redeemVault with USDC
+      before completeRedeem. Whitelist admin step no longer required.
+
+# Progress tracking
+current_stage: 4
+stages:
+  0_intent:
+    status: completed
+    timestamp: "2026-07-22T00:00:00Z"
+  1_specs:
+    status: completed
+    artifacts: [specs.yaml, SUMMARY.md]
+  1b_enrich:
+    status: completed
+    artifacts: [functions.md]
+  1c_offchain:
+    status: skipped
+    note: "No new offchain metatype: swap legs reuse the established swap_module runtime-calldata convention (as sibling loops); async accounting reads on-chain wYLDS.pendingRedemptions. Harvest out of scope."
+  2_deposit:
+    status: completed
+    artifacts: [execution-deposit.md]
+  2_account:
+    status: completed
+    artifacts: [execution-account.md]
+  2_withdraw:
+    status: completed
+    artifacts: [execution-withdraw.md]
+  3_blueprint:
+    status: completed
+    artifacts:
+      - blueprints/morpho-loop/prime/deposit.yaml
+      - blueprints/morpho-loop/prime/withdraw.yaml
+      - blueprints/morpho-loop/prime/account.yaml
+      - machines/dusd/mainnet/instructions/morpho-loop-prime-pyusd.yaml
+      - "caliber.yaml position 141763829504617283950461728395046172839"
+    note: "transpiler check + transpile both EXIT=0; PRIME/wYLDS addrs + position id present in root output"
+  4_test:
+    status: completed
+    artifacts: [test-report.md]
+    note: "ALL flows PASS on fork (account/add_collateral/borrow/Variant-A close/Variant-B unwind+completeRedeem+swap). NAV reconciles across 2 open->close cycles (~0.0093% cost). REQUIRED fund-wide fix applied: config.flash_loan_aggregator -> 0xa36F64152EA5df6a0eC732aAa7950dcb930fF3D4 (verified == registry.flashLoanModule() on mainnet)."
+
+# Shared resources (populated as stages run)
+testnets:
+  # Reuse this SAME fork for account + withdraw (Stage 2). All actions run AS the caliber.
+  stage2:
+    provider: tenderly
+    testnet_id: "8f992f50-3553-441e-aae5-26a38d5bb786"
+    admin_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/b7c578ff-ff43-42b7-a797-eacd4caa81ca"
+    public_rpc: "https://virtual.mainnet.eu.rpc.tenderly.co/9df9105b-c427-4059-a5e8-e2a3afa0ddb3"
+    notes: |
+      After deposit, the caliber holds an OPEN leveraged position on market
+      0x41c41d0c...a3fa: collateral 136227.942710 PRIME, debt 86000.009850 PYUSD,
+      LTV 60.14%, HF 1.43 (~2.5x). PRIME.navOracle intact (0xdF4a...d6a3).
+      account/withdraw can read/close this live position. FlashTest helper deployed
+      at 0x99c51EcCB10A54C1145E4555e17AB4407cf01E0f (Morpho PYUSD flashloan proven, 0 fee).

@@ -1,0 +1,309 @@
+# ============================================================================
+# PRIME/PYUSD Leveraged Morpho Loop  (machine: dusd, mainnet)
+# ============================================================================
+#
+# One-legged Morpho Blue loop: PRIME collateral, PYUSD debt. Equity reported in
+# PYUSD. Base token: PYUSD only (POSITION accounting model). All 4 tokens
+# (PRIME, wYLDS, PYUSD, USDC) are 6-decimal, so the Morpho oracle scale is a
+# clean 1e36.
+#
+# Token stack:  PYUSD --(swap)--> USDC --(wYLDS.deposit)--> wYLDS --(PRIME.deposit)--> PRIME
+#   PRIME is a SYNCHRONOUS ERC4626 over wYLDS (redeem/withdraw instant).
+#   wYLDS is an ASYNC-only ERC4626 over USDC (sync redeem disabled; exit is
+#         requestRedeem -> Hastra REWARDS_ADMIN completeRedeem).
+#
+# PRIME is NOT a base token and needs NO makina OracleRegistry feed — it is
+# priced by the Morpho market oracle inside the ACCOUNTING blueprint. Only the
+# denomination token PYUSD needs a registry feed (it has one). No addBaseToken /
+# OracleRegistry.setFeedRoute governance is required for this position.
+#
+# Market: PRIME (collateral) / PYUSD (loan)
+#   Market ID: 0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa
+#   Oracle:    0x335e5718bC20028d5e357473a3736C187Ca6b07e (price ~1.0497e36)
+#   LLTV:      0.86
+#
+# Key protocol-specific addresses (HARDCODED per repo rule — not in caliber config):
+#   PRIME: 0x19ebb35279A16207Ec4ba82799CC64715065F7F6 (ERC4626 over wYLDS, sync)
+#   wYLDS: 0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc (ERC4626 over USDC, async exit)
+#   PYUSD: 0x6c3ea9036406852006290770BEdFcAbA0e23A0e8 (loan / base token)
+#   USDC:  0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48 (intermediate; blueprint constant)
+#
+# User flows:
+#   - Open / increase leverage:   Flash loan request (1) + Loop in (2)
+#   - Add collateral (no debt):   Add collateral (3)
+#   - Full close (atomic, VAR A): Flash loan request (1) + Close loop swap (4)
+#   - Staged async exit (VAR B):  Unwind to pending (5) -> [Hastra completeRedeem, off-chain] -> Swap to loan (6)
+#   - Borrow more:                Borrow (7)
+#   - Repay debt:                 Repay (8)
+#   - Accounting:                 Automatic equity + pending-term reporting (9)
+#
+# All entries use PYUSD (loan / base token) as the single affected token, per
+# the wsrUSD/USDC one-legged loop precedent (intermediate USDC/wYLDS/PRIME are
+# transient inside a single instruction and net out).
+# ============================================================================
+
+# 1/9 - Flash loan request (shared by loop_in and close_loop_swap callbacks; Morpho venue = 3)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Flash Loan Request"
+    path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
+    inputs:
+      flash_loan_aggregator:
+        type: "address"
+        value: "${config.flash_loan_aggregator}"
+
+# 2/9 - Loop in: FL callback (swap PYUSD->USDC, wrap USDC->wYLDS->PRIME, supply, borrow to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Loop In"
+    path: "../../../blueprints/morpho-loop/prime/deposit.yaml:loop_in"
+    inputs:
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      wylds_token:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      prime_token:
+        type: "address"
+        value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 3/9 - Add collateral: standalone swap PYUSD->USDC->wYLDS->PRIME -> supply to Morpho (no leverage)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Add Collateral"
+    path: "../../../blueprints/morpho-loop/prime/deposit.yaml:add_collateral"
+    inputs:
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      wylds_token:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      prime_token:
+        type: "address"
+        value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 4/9 - VARIANT A (PRIMARY): atomic full close via FL callback.
+#   repay(full by shares) -> withdrawCollateral(all PRIME) -> swap PRIME->USDC->PYUSD -> repay FL.
+#   No ERC4626 unwrap, no async. Pair with entry 1 (flash loan request).
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Close Loop (atomic, Variant A)"
+    path: "../../../blueprints/morpho-loop/prime/withdraw.yaml:close_loop_swap"
+    inputs:
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      prime_token:
+        type: "address"
+        value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+      wylds_token:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 5/9 - VARIANT B1 (staged async, NAV-optimal): repay(full) + withdrawCollateral(all)
+#   + PRIME.redeem(all)->wYLDS + wYLDS.requestRedeem(all). Repay funded from IDLE FUND PYUSD.
+#   Leaves a pending redemption; ACCOUNTING pending term bridges the gap.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Unwind To Pending (Variant B1)"
+    path: "../../../blueprints/morpho-loop/prime/withdraw.yaml:unwind_to_pending"
+    inputs:
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      prime_token:
+        type: "address"
+        value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+      wylds_token:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 6/9 - VARIANT B2 (staged async): swap USDC->PYUSD after Hastra completeRedeem lands USDC.
+#   Run once pendingRedemptions(caliber)==0 and USDC is loose.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Swap To Loan (Variant B2)"
+    path: "../../../blueprints/morpho-loop/prime/withdraw.yaml:swap_to_loan"
+    inputs:
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      prime_token:
+        type: "address"
+        value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+      wylds_token:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 7/9 - Borrow PYUSD from Morpho (generic morpho borrow blueprint)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Borrow"
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 8/9 - Repay PYUSD to Morpho (generic morpho repay blueprint)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop - Repay"
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token:
+        type: "address"
+        value: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+
+# 9/9 - Accounting: equity = max(0, collateral*price/1e36 - debt) + pendingRedemptions(caliber).assets
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+  instruction:
+    label: "PRIME/PYUSD Morpho Loop"
+    path: "../../../blueprints/morpho-loop/prime/account.yaml:account_equity_pending"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      oracle_address:
+        type: "address"
+        value: "0x335e5718bC20028d5e357473a3736C187Ca6b07e"
+      wylds_address:
+        type: "address"
+        value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS

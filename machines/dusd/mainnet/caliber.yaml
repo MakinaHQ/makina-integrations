@@ -31,7 +31,7 @@ config:
     value: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
   flash_loan_aggregator:
     type: "address"
-    value: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
+    value: "0xa36F64152EA5df6a0eC732aAa7950dcb930fF3D4"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -370,6 +370,13 @@ positions:
     group_id: "0"
     description: "wsrUSD/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
+  # PRIME/PYUSD one-legged loop (POSITION model, equity in PYUSD + async pending term).
+  # PRIME is priced by the Morpho market oracle inside accounting — NOT a base token,
+  # so no addBaseToken / OracleRegistry.setFeedRoute is required.
+  - id: "141763829504617283950461728395046172839"
+    group_id: "0"
+    description: "PRIME/PYUSD Morpho Loop"
+    instructions: !include "./instructions/morpho-loop-prime-pyusd.yaml"
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"

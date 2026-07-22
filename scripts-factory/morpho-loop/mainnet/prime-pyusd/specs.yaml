@@ -1,0 +1,499 @@
+# ============================================================================
+# PRIME / PYUSD Leveraged Morpho Loop  (machine: dusd, mainnet)
+# ============================================================================
+# One-legged Morpho Blue loop: PRIME collateral, PYUSD debt. Equity reported
+# in PYUSD. Base token: PYUSD only. Harvest OUT of scope.
+#
+# Token stack (all 6 decimals): USDC -> wYLDS -> PRIME
+#   PRIME  is a SYNCHRONOUS ERC4626 over wYLDS (redeem/withdraw work instantly)
+#   wYLDS  is an ASYNC-only ERC4626 over USDC (sync redeem/withdraw disabled;
+#          exit is requestRedeem -> admin-gated completeRedeem)
+#
+# All addresses verified on-chain (mainnet) at spec time.
+# ============================================================================
+
+pool:
+  id: prime-pyusd
+  name: "PRIME/PYUSD Morpho Loop (Hastra)"
+  protocol: morpho-loop
+  version: "morpho-blue"
+  network: mainnet
+  machine: dusd
+  actions: [deposit, withdraw, account] # harvest OUT of scope
+
+contracts:
+  # ---- Morpho Blue market -------------------------------------------------
+  morpho_blue:
+    address: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+    note: "idToMarketParams verified"
+  market:
+    id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+    # idToMarketParams(id) => (loan, collateral, oracle, irm, lltv) VERIFIED:
+    loan_token: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD (6 dec)
+    collateral_token: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME (6 dec)
+    oracle: "0x335e5718bC20028d5e357473a3736C187Ca6b07e" # price() = 1.049690555e36
+    irm: "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC"
+    lltv: "860000000000000000" # 0.86
+
+  # ---- Collateral leg: PRIME (Hastra PRIME) -------------------------------
+  collateral:
+    address: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6"
+    symbol: PRIME
+    name: "Hastra PRIME"
+    decimals: 6
+    standard: "ERC4626 (UUPS proxy)"
+    implementation: "0x90fd843c68db38e2de0618acbb39341cba5a5abd"
+    asset: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+    convert_to_assets_1e6: 1049629 # 1e6 PRIME -> 1.049629e6 wYLDS (appreciating)
+    redemption: SYNCHRONOUS
+    redemption_note: >-
+      Standard OZ ERC4626. VERIFIED: redeem(uint256,address,address) is the
+      normal OZ impl; maxRedeem(owner)=balanceOf(owner); maxDeposit=uint256.max;
+      _update is plain ERC20 (no whitelist / no transfer hook). No async
+      request/complete functions (getPendingRedemption / redeemVault / pendingRedemptions
+      all REVERT on PRIME). PRIME is NOT whitelist-gated (getWhitelistCount reverts).
+      So PRIME.deposit(wYLDS) and PRIME.redeem(shares) are instant.
+
+  # ---- Intermediate leg: wYLDS --------------------------------------------
+  intermediate:
+    address: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc"
+    symbol: wYLDS
+    decimals: 6
+    standard: "ERC4626 (UUPS proxy)"
+    implementation: "0xda962f7a0308e9d4f2f60c5aab94f173c26d1a1d"
+    asset: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC (~1:1)
+    convert_1_to_1: true # convertToAssets/convertToShares are `pure` 1:1
+    redemption: ASYNC_ADMIN_GATED # see async_redemption block below
+    whitelist_gated: true # deposit/mint gated; caliber NOT whitelisted
+
+  # ---- Denomination / base token ------------------------------------------
+  base_token:
+    address: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"
+    symbol: PYUSD
+    decimals: 6
+
+  # ---- Other tokens referenced --------------------------------------------
+  usdc:
+    address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    symbol: USDC
+    decimals: 6
+
+# ---------------------------------------------------------------------------
+# Caliber / machine infra (from machines/dusd/mainnet/caliber.yaml)
+# ---------------------------------------------------------------------------
+helpers:
+  caliber_address: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+  morpho_address: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  swap_module: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+  flash_loan_aggregator: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
+  caliber_helper_address: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  unsigned_math_helper: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  key_value_store_address: "0xa81fC382489F9560211AB15aD87f001b98C92E91"
+
+# ---------------------------------------------------------------------------
+# Accounting archetype
+# ---------------------------------------------------------------------------
+accounting_model:
+  archetype: position
+  rationale: >-
+    One-legged Morpho loop. Equity = PRIME collateral valued in PYUSD via the
+    Morpho market oracle price() MINUS PYUSD debt. PRIME is NOT registered as a
+    base token and needs no makina OracleRegistry feed (it is priced by the
+    Morpho market oracle inside the ACCOUNTING blueprint). Only the denomination
+    token PYUSD needs a feed (it has one). Identical shape to the existing
+    wsrUSD/USDC Morpho loop precedent.
+  async_redemption: true
+  async_pending_term: >-
+    The async gap is ONLY on the wYLDS->USDC leg of EXIT. Between wYLDS.requestRedeem
+    and completeRedeem the caliber's shares are locked inside the wYLDS contract and
+    are NOT reflected in the Morpho position nor in loose balances. To keep NAV
+    continuous, ACCOUNTING must ADD wYLDS.pendingRedemptions(caliber).assets
+    (USDC, ~1:1 -> PYUSD). This is readable live on-chain (no KV strictly required):
+    pendingRedemptions is DELETED on completeRedeem, so the term self-drops to 0
+    exactly when the USDC lands loose (captured by the caliber's own USDC/PYUSD
+    accounting) — no double count. A KV mirror may still be added for robustness
+    if the reference blueprint requires a fixed number of accounting calls.
+  affected_tokens:
+    deposit: ["0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"] # PYUSD leaves
+    borrow: ["0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"] # PYUSD
+    repay: ["0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"] # PYUSD
+    withdraw: ["0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"] # PYUSD (post-swap)
+    account: ["0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"] # equity in PYUSD
+  affected_tokens_note: >-
+    Intermediate USDC/wYLDS/PRIME are transient inside a single instruction and
+    net out; following the wsrUSD loop precedent all legs use the loan token
+    (PYUSD) as the single affected/base token. NOTE: USDC is ALSO a registered
+    base token on dusd — the async completeRedeem lands USDC loose; ensure the
+    ACCOUNTING pending term and the caliber's native USDC accounting cannot both
+    count the same USDC (guaranteed by pendingRedemptions being deleted on complete).
+  precedent: >-
+    machines/dusd/mainnet/instructions/morpho-loop-wsrusd-usdc.yaml
+    (blueprints/morpho-loop/{deposit-swap,withdraw-swap,account}.yaml,
+     blueprints/morpho/{borrow,repay}.yaml). Async settlement pattern akin to
+     blueprints/etherfi + Makina DMG (request -> admin/claim -> pending term).
+
+# ---------------------------------------------------------------------------
+# Oracle (GO-LIVE GATE)
+# ---------------------------------------------------------------------------
+oracle:
+  registry: "0xC388B72AB90Be82B230D919F9C05c87F9397f485"
+  # Position model: only the denomination token (PYUSD) needs a registry feed.
+  # PRIME is priced by the Morpho market oracle, NOT the makina registry.
+  feed_exists: true
+  route:
+    pyusd: "0x8f1dF6D7F2db73eECE86a18b4381F4707b918FB1" # getFeedRoute(PYUSD) = (feed1, 0x0) single-hop
+    usdc_quote: "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6" # getFeedRoute(USDC), for reference
+  morpho_market_oracle:
+    address: "0x335e5718bC20028d5e357473a3736C187Ca6b07e"
+    price_now: "1049690555221613945938417681788095852" # ~1.0497e36
+    scale: "1e36" # scale = 1e36 * 10^(loanDec-collDec) = 1e36 (both tokens 6 dec)
+    formula: "collateral_in_pyusd = collateral_amount(PRIME) * price() / 1e36"
+  blocker: null
+
+# ===========================================================================
+# FLOWS
+# ===========================================================================
+flows:
+
+  # -------------------------------------------------------------------------
+  # DEPOSIT / OPEN / INCREASE LEVERAGE
+  # -------------------------------------------------------------------------
+  # Per-leg path (verified selectors):
+  #   PYUSD --swap_module.swap--> USDC
+  #   USDC  --wYLDS.deposit(assets,receiver)--> wYLDS     [WHITELIST-GATED]
+  #   wYLDS --PRIME.deposit(assets,receiver)--> PRIME
+  #   PRIME --Morpho.supplyCollateral--> collateral
+  #   PYUSD --Morpho.borrow--> (loop back to swap for leverage)
+  #
+  # Two construction options:
+  #   (A) add_collateral (MANAGEMENT, no leverage): swap+wrap+supply only.
+  #       Pair with a separate morpho borrow instruction to add debt.
+  #   (B) loop_in (FLASHLOAN_MANAGEMENT): flash-borrow PYUSD via
+  #       flash_loan_aggregator, swap ALL PYUSD->USDC->wYLDS->PRIME, supply,
+  #       then Morpho.borrow(PYUSD) to repay the flash loan -> hits target
+  #       leverage atomically. This is the preferred precedent
+  #       (blueprints/morpho-loop/deposit-swap.yaml:loop_in).
+  deposit:
+    description: "Open or increase the PRIME/PYUSD leveraged loop."
+    precondition_blocker:
+      whitelist: >-
+        wYLDS.deposit is whitelist-gated. isWhitelisted(caliber
+        0xD1A1C248...c1BC) == false. The caliber MUST be added to the wYLDS
+        whitelist before any deposit. See preconditions.whitelist below.
+    preconditions:
+      - "caliber added to wYLDS whitelist (WHITELIST_ADMIN must call addToWhitelist(caliber))"
+      - "caliber holds PYUSD (from fund liquidity)"
+      - "swap route PYUSD->USDC available on swap_module (aggregator; USDC~PYUSD, thin spread)"
+    steps:
+      - action: swap
+        description: "PYUSD -> USDC via swap module (DEX aggregator)"
+        contract: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3" # swap_module
+        function: "swap((uint16,bytes,address,address,uint256,uint256))"
+        approve:
+          contract: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+          function: "approve(address,uint256)"
+          spender: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3" # swap_module
+        params:
+          tokenIn: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+          tokenOut: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+        offchain_indicators:
+          - param: "bytes data"
+            pattern: "dex_aggregator_calldata" # 0x/1inch/paraswap route, fetched offchain
+
+      - action: wrap_usdc_to_wylds
+        description: "USDC -> wYLDS via ERC4626 deposit (WHITELIST-GATED)"
+        contract: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+        function: "deposit(uint256,address)" # (assets, receiver)
+        approve:
+          contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+          function: "approve(address,uint256)"
+          spender: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+        params:
+          assets: "<usdc_out>"
+          receiver: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC" # caliber
+        note: "wYLDS/USDC 1:1 (convertToShares pure). Reverts if receiver/sender not whitelisted."
+
+      - action: wrap_wylds_to_prime
+        description: "wYLDS -> PRIME via ERC4626 deposit"
+        contract: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+        function: "deposit(uint256,address)" # (assets, receiver)
+        approve:
+          contract: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+          function: "approve(address,uint256)"
+          spender: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+        params:
+          assets: "<wylds_out>"
+          receiver: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC" # caliber
+        note: "PRIME appreciating; shares_out = previewDeposit(wYLDS) < wYLDS in."
+
+      - action: supply_collateral
+        description: "Supply PRIME as Morpho collateral"
+        contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb" # Morpho Blue
+        function: "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)"
+        approve:
+          contract: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+          function: "approve(address,uint256)"
+          spender: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb" # Morpho
+        params:
+          marketParams: "(PYUSD, PRIME, oracle, irm, lltv)" # from idToMarketParams(id)
+          assets: "<prime_shares_out>"
+          onBehalf: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+          data: "0x"
+
+      - action: borrow
+        description: "Borrow PYUSD against PRIME collateral (leverage leg / FL repay)"
+        contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb" # Morpho Blue
+        function: "borrow((address,address,address,address,uint256),uint256,uint256,address,address)"
+        params:
+          marketParams: "(PYUSD, PRIME, oracle, irm, lltv)"
+          assets: "<amount_to_borrow>" # for loop_in = flash_loan_amount to repay
+          shares: "0"
+          onBehalf: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+          receiver: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+        health_factor_note: "Keep collateral_value*lltv > debt. lltv=0.86."
+    flash_loan:
+      recommended: true
+      aggregator: "0x820D35e62Ad73a5Dc7b81d54cE993080d2064065"
+      loan_token: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+      pattern: "blueprints/morpho-loop/deposit-swap.yaml:loop_in (FLASHLOAN_MANAGEMENT)"
+    events_to_monitor:
+      - "Morpho: SupplyCollateral(id, caller, onBehalf, assets)"
+      - "Morpho: Borrow(id, caller, onBehalf, receiver, assets, shares)"
+      - "wYLDS: Deposit(sender, owner, assets, shares)"
+      - "PRIME: Deposit(sender, owner, assets, shares)"
+
+  # -------------------------------------------------------------------------
+  # WITHDRAW / DELEVERAGE / EXIT
+  # -------------------------------------------------------------------------
+  # CHICKEN/EGG WARNING: the canonical wYLDS->USDC leg is ASYNC and admin-gated
+  # (requestRedeem -> completeRedeem by REWARDS_ADMIN). It CANNOT settle inside a
+  # single tx, so a Morpho flash-loan atomic close (repay->withdraw->swap->repayFL)
+  # is IMPOSSIBLE unless a SYNCHRONOUS PRIME/wYLDS -> PYUSD DEX route exists on
+  # swap_module. Stage 2 MUST determine which variant applies:
+  #
+  #   VARIANT A (atomic, PREFERRED if DEX liquidity exists):
+  #     flash-borrow PYUSD -> Morpho.repay -> Morpho.withdrawCollateral(PRIME)
+  #     -> swap PRIME->PYUSD (swap_module) -> repay flash loan.
+  #     Blueprint: blueprints/morpho-loop/withdraw-swap.yaml:{loop_out,close_loop}.
+  #     Requires a real DEX market for PRIME (or wYLDS) -> PYUSD. LIKELY THIN/ABSENT
+  #     for these RWA tokens — VERIFY before assuming.
+  #
+  #   VARIANT B (staged async unwind, fallback if no DEX route):
+  #     1. Source PYUSD to repay (flash loan OR idle fund PYUSD) and Morpho.repay.
+  #     2. Morpho.withdrawCollateral(PRIME).
+  #     3. PRIME.redeem(shares) -> wYLDS   (SYNC, instant).
+  #     4. wYLDS.requestRedeem(shares)     -> locks shares, records pending USDC.
+  #     5. [OFF-CHAIN / cross-cycle] wYLDS REWARDS_ADMIN calls completeRedeem(caliber)
+  #        -> USDC sent from redeemVault to caliber.
+  #     6. swap USDC -> PYUSD (swap_module); if a flash loan was used in step 1 it
+  #        must have been repaid from OTHER caliber PYUSD, not from this USDC.
+  #     Between step 4 and 6 the pending USDC is captured by the ACCOUNTING
+  #     pending term (see accounting.pending_query) so NAV is continuous.
+  withdraw:
+    description: "Deleverage / exit the PRIME/PYUSD loop (see VARIANT A/B above)."
+    preconditions:
+      - "position has collateral/debt (Morpho.position(id, caliber))"
+      - "PYUSD available to repay debt (flash loan or idle fund PYUSD)"
+    steps:
+      - action: repay
+        description: "Repay PYUSD debt to Morpho (partial or full-by-shares)"
+        contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+        function: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
+        approve:
+          contract: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+          function: "approve(address,uint256)"
+          spender: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+        params:
+          marketParams: "(PYUSD, PRIME, oracle, irm, lltv)"
+          assets: "<amount>" # OR set 0 and pass shares=borrowShares for full close
+          shares: "0"
+          onBehalf: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+          data: "0x"
+
+      - action: withdraw_collateral
+        description: "Withdraw PRIME collateral from Morpho"
+        contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+        function: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        params:
+          marketParams: "(PYUSD, PRIME, oracle, irm, lltv)"
+          assets: "<prime_amount>"
+          onBehalf: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+          receiver: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+
+      - action: redeem_prime_to_wylds
+        description: "PRIME -> wYLDS via SYNC ERC4626 redeem (instant)"
+        contract: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6" # PRIME
+        function: "redeem(uint256,address,address)" # (shares, receiver, owner)
+        params:
+          shares: "<prime_amount>"
+          receiver: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+          owner: "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC"
+        note: "Returns wYLDS (asset of PRIME). maxRedeem(owner)=balanceOf(owner)."
+
+      - action: request_redeem_wylds
+        description: "wYLDS -> (pending USDC) via ASYNC requestRedeem"
+        contract: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+        function: "requestRedeem(uint256)" # (shares)
+        params:
+          shares: "<wylds_amount>"
+        mechanics: >-
+          Transfers wYLDS shares INTO the wYLDS contract, records
+          pendingRedemptions[caliber] = {shares, assets=convertToAssets(shares)
+          (USDC, 1:1), timestamp=block.timestamp}. whenNotPaused. Only ONE pending
+          redemption per address (reverts RedemptionAlreadyPending otherwise).
+          Reverts InvalidAmount if shares==0. cancelRedeem() reverses it.
+
+      - action: complete_redeem_wylds
+        description: "[ADMIN-GATED, OFF-CHAIN/CROSS-CYCLE] settle pending redemption to USDC"
+        contract: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+        function: "completeRedeem(address)" # (user = caliber)
+        caller_role: "REWARDS_ADMIN_ROLE"
+        caller_role_holders:
+          - "0x8d358b8ae881f8ea92c3d07783abca21727c6309"
+          - "0x997e2efbce91d170b00ea402e35a66c887ee1da9"
+        mechanics: >-
+          onlyRole(REWARDS_ADMIN_ROLE). NO on-chain time cooldown. Burns the
+          locked shares and safeTransferFrom(USDC, redeemVault -> caliber,
+          pending.assets). Reverts InsufficientVaultBalance if
+          USDC.balanceOf(redeemVault) < pending.assets, or AccountIsFrozen.
+          THE CALIBER CANNOT CALL THIS ITSELF — it is an operational dependency
+          on the Hastra REWARDS_ADMIN + a funded redeemVault.
+
+      - action: swap_usdc_to_pyusd
+        description: "USDC -> PYUSD via swap module (after USDC lands)"
+        contract: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3" # swap_module
+        function: "swap((uint16,bytes,address,address,uint256,uint256))"
+        approve:
+          contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+          function: "approve(address,uint256)"
+          spender: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+        params:
+          tokenIn: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
+          tokenOut: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8" # PYUSD
+        offchain_indicators:
+          - param: "bytes data"
+            pattern: "dex_aggregator_calldata"
+    async_settlement:
+      redeem_vault: "0xA8C3CF6183D49d5D372f8FC149BD2cb5CFC0faCd"
+      redeem_vault_code: "NONE (EOA / off-chain-funded address)"
+      redeem_vault_usdc_balance_now: "972187152" # ~972.19 USDC ONLY -> large redemptions revert until funded
+      redeem_vault_usdc_allowance_to_wylds: "5881907903360"
+      cooldown: "NONE on-chain; settlement is admin-triggered (operational latency, not a timelock)"
+    events_to_monitor:
+      - "Morpho: Repay(id, caller, onBehalf, assets, shares)"
+      - "Morpho: WithdrawCollateral(id, caller, onBehalf, receiver, assets)"
+      - "PRIME: Withdraw(sender, receiver, owner, assets, shares)"
+      - "wYLDS: RedemptionRequested(user, shares, assets, timestamp)"
+      - "wYLDS: RedemptionCompleted(user, shares, assets, timestamp)"
+
+  # -------------------------------------------------------------------------
+  # ACCOUNT (equity in PYUSD)
+  # -------------------------------------------------------------------------
+  account:
+    description: >-
+      equity_PYUSD = collateral_PRIME * oracle.price() / 1e36  -  PYUSD_debt
+                     + pendingRedemptions(caliber).assets (USDC ~1:1 -> PYUSD)
+      Saturate to 0 when underwater. Follows blueprints/morpho-loop/account.yaml:account_equity
+      with an added pending-redemption term.
+    position_query:
+      contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+      function: "position(bytes32,address)" # (id, caliber) -> (supplyShares, borrowShares, collateral)
+      returns: "(uint256 supplyShares, uint128 borrowShares, uint128 collateral)"
+      collateral_index: 2
+      borrow_shares_index: 1
+    market_query:
+      contract: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+      function: "market(bytes32)" # (id) -> 6x uint128
+      returns: "(totalSupplyAssets, totalSupplyShares, totalBorrowAssets, totalBorrowShares, lastUpdate, fee)"
+      total_borrow_assets_index: 2
+      total_borrow_shares_index: 3
+    debt_formula: "debt_PYUSD = borrowShares * totalBorrowAssets / max(totalBorrowShares,1)"
+    collateral_price_query:
+      contract: "0x335e5718bC20028d5e357473a3736C187Ca6b07e"
+      function: "price()" # 1e36-scaled (both tokens 6 dec)
+    collateral_value_formula: "collateral_PYUSD = collateral * price() / 1e36"
+    pending_query:
+      contract: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+      function: "pendingRedemptions(address)" # (caliber) -> (shares, assets, timestamp)
+      returns: "(uint256 shares, uint256 assets, uint256 timestamp)"
+      use: "add `assets` (USDC, ~1:1 -> PYUSD) to equity; auto-zero after completeRedeem"
+      alt_view: "getPendingRedemption(address) -> (bool hasPending, uint256 shares, uint256 assets)"
+    equity_formula: "equity = max(0, collateral_PYUSD - debt_PYUSD) + pending_assets_as_pyusd"
+
+# ===========================================================================
+# WHITELIST ADMIN (needed by Stage 4 to whitelist the caliber on a fork)
+# ===========================================================================
+whitelist:
+  token: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc" # wYLDS
+  gated: true
+  caliber_currently_whitelisted: false
+  current_whitelist:
+    - "0xEcDEb94b4f464d7Be68B48cf7786Dc5FE19b59Ea"
+    - "0xA8C3CF6183D49d5D372f8FC149BD2cb5CFC0faCd" # redeemVault
+  admin_role: "WHITELIST_ADMIN_ROLE = 0x9cc798953f1657230a000cfd0cfb877f321fc37733bbdaba923c800c0f6f63b6"
+  admin_holder: "0x8d358b8ae881f8ea92c3d07783abca21727c6309"
+  add_function: "addToWhitelist(address account)   [onlyRole(WHITELIST_ADMIN_ROLE)]"
+  remove_function: "removeFromWhitelist(address account)"
+  check_function: "isWhitelisted(address) -> bool"
+  fork_procedure: >-
+    Impersonate 0x8d358b8ae881f8ea92c3d07783abca21727c6309, call
+    wYLDS.addToWhitelist(0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC).
+
+# ===========================================================================
+# UNVERIFIED / OPEN ITEMS  (for Stage 1b / Stage 2 to resolve)
+# ===========================================================================
+open_items:
+  - id: whitelist_enforcement_point
+    question: >-
+      Exactly which address must be whitelisted and on which action? Evidence
+      says DEPOSIT/MINT is gated (task fact + isWhitelisted(caliber)=false) while
+      TRANSFERS appear OPEN (PRIME holds ~255M wYLDS yet PRIME is NOT whitelisted;
+      the impl's _update/transfer are plain OZ with no hook). get_function_code
+      returned OZ library stubs for deposit/_deposit, so the contract-level
+      whitelist check location was NOT directly read. Confirm on a fork whether
+      whitelisting the caliber is sufficient for deposit(assets, caliber) and
+      whether requestRedeem needs whitelist (requestRedeem uses _transfer to the
+      contract; likely fine).
+    resolve_by: "Stage 1b (read contract-level _deposit override) + Stage 2 fork test"
+  - id: synchronous_dex_route
+    question: >-
+      Does swap_module have a working synchronous route PRIME->PYUSD (or
+      wYLDS->USDC/PYUSD)? If YES -> atomic flash-loan close (VARIANT A) is viable
+      and preferred. If NO -> exit is the staged async unwind (VARIANT B) with the
+      admin-gated completeRedeem dependency. RWA tokens likely have thin/no DEX
+      liquidity; do NOT assume a route exists.
+    resolve_by: "Stage 2 fork test (quote PRIME->PYUSD via aggregator)"
+  - id: redeem_vault_funding
+    fact: >-
+      redeemVault 0xA8C3CF...faCd is an EOA holding only ~972 USDC now. Real
+      redemptions above that revert InsufficientVaultBalance until Hastra funds it.
+      On a fork, fund the redeemVault with USDC (and it already has allowance to
+      wYLDS) before calling completeRedeem.
+    resolve_by: "Stage 2/4 fork setup"
+  - id: flash_loan_aggregator_iface
+    question: >-
+      Confirm flash_loan_aggregator (0x820D35...) borrow token support for PYUSD
+      and the FLASHLOAN_MANAGEMENT callback wiring, reusing the morpho-loop-swap
+      precedent (deposit-swap.yaml:loop_in / withdraw-swap.yaml:loop_out).
+    resolve_by: "Stage 2 (mirror existing swap-loop instructions)"
+  - id: prime_deposit_open
+    question: >-
+      Confirm PRIME.deposit has NO KYC/whitelist/cap gate (evidence: maxDeposit=
+      uint256.max, plain _update, getWhitelistCount reverts). Verify a caliber
+      PRIME.deposit(wYLDS) succeeds on a fork.
+    resolve_by: "Stage 2 fork test"
+
+metadata:
+  generated_at: "2026-07-22"
+  data_sources:
+    - "cast (mainnet RPC) — market params, tokens, oracle, roles, whitelist, feed route"
+    - "etherscan (impl ABIs + function code): PRIME impl 0x90fd843c..., wYLDS impl 0xda962f7a..."
+    - "caliber.yaml (dusd/mainnet) — infra addresses"
+    - "precedent: morpho-loop-wsrusd-usdc.yaml + blueprints/morpho-loop/*"
+  notes: >-
+    All 4 tokens (PRIME, wYLDS, PYUSD, USDC) are 6-decimal -> Morpho oracle scale
+    is a clean 1e36. Async is confined to the wYLDS->USDC leg and is ADMIN-gated
+    with NO on-chain timelock. The single hard operational dependency is the
+    Hastra REWARDS_ADMIN calling completeRedeem against a funded redeemVault; if a
+    synchronous DEX route for PRIME/wYLDS->PYUSD exists, the whole exit can instead
+    be atomic and this dependency disappears (VARIANT A).

@@ -1,0 +1,551 @@
+protocol: "morpho"
+
+# ============================================================================
+# PRIME/PYUSD Morpho loop — WITHDRAW (deleverage / exit)
+# ============================================================================
+# TWO validated exit variants, selectable as separate actions:
+#
+#   VARIANT A — close_loop_swap (PRIMARY, atomic):
+#     A single FLASHLOAN_MANAGEMENT instruction closes the whole position with
+#     NO async dependency and NO Hastra operator involvement. Inside the Morpho
+#     PYUSD flash-loan callback:
+#       repay(full by borrowShares) -> withdrawCollateral(all PRIME)
+#       -> swap PRIME->USDC (UniV3 PRIME/USDC 0.01% pool via swap_module)
+#       -> swap USDC->PYUSD (Curve PYUSD/USDC via swap_module)
+#       -> repay flash loan from PYUSD proceeds.
+#     No ERC4626 unwrap (PRIME is SOLD on the DEX, not redeemed), no async.
+#     A deep sync PRIME/USDC UniV3 pool exists; verify pool depth vs position
+#     size before use. This path never calls PRIME.getVerifiedNav().
+#
+#   VARIANT B — staged async unwind (NAV-optimal fallback / large size):
+#     The wYLDS->USDC leg is async + admin-gated, so a flash loan cannot bridge
+#     the whole close. Split across the async gap into two management txs:
+#       B1 = unwind_to_pending: repay(full) + withdrawCollateral(all PRIME)
+#            + PRIME.redeem(all)->wYLDS + wYLDS.requestRedeem(all).
+#            Repay funded from IDLE FUND PYUSD (NOT a flash loan — it cannot be
+#            repaid before settlement). Leaves a pending wYLDS redemption; the
+#            ACCOUNTING pending term keeps NAV flat across the gap.
+#       [async gap — OFF-CHAIN, not a caliber instruction]: Hastra REWARDS_ADMIN
+#            calls wYLDS.completeRedeem(caliber) once redeemVault is funded ->
+#            USDC lands loose in the caliber.
+#       B2 = swap_to_loan: swap USDC->PYUSD (Curve via swap_module) once the
+#            pending redemption has settled (pendingRedemptions(caliber)==0).
+#
+# All 4 tokens are 6-decimal. Per-leg approvals depend on the variant (see each).
+# ============================================================================
+
+constants:
+  usdc:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  loan_token:
+    type: "address"
+  prime_token:
+    type: "address"
+  wylds_token:
+    type: "address"
+  swap_module:
+    type: "address"
+  morpho_address:
+    type: "address"
+  caliber_helper:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+
+actions:
+  # ==========================================================================
+  # VARIANT A — close_loop_swap: atomic full close via flash loan callback.
+  # Must be used as a FLASHLOAN_MANAGEMENT instruction. The caliber holds the
+  # flash-loaned PYUSD at the start of execution.
+  # Reads borrowShares + collateral on-chain, repays ALL debt by shares,
+  # withdraws ALL PRIME, sells PRIME->USDC->PYUSD (two hops), repays FL.
+  # ==========================================================================
+  close_loop_swap:
+    calls:
+      - description: "Get position data (supplyShares, borrowShares, collateral)"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Approve Morpho to spend loan token (max, revoked after repay)"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Repay ALL debt by shares (assets=0, shares=borrowShares)"
+        target: "${inputs.morpho_address}"
+        selector: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "0"
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Revoke Morpho loan token approval"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Withdraw ALL PRIME collateral from Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Approve swap module to spend PRIME"
+        target: ${inputs.prime_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.swap_data_prime_usdc.inputAmount}"
+
+      - description: "Swap PRIME -> USDC via DEX aggregator (UniV3 PRIME/USDC 0.01%)"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data_prime_usdc.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data_prime_usdc.data}"
+              - type: "address"
+                value: "${inputs.prime_token}"
+              - type: "address"
+                value: "${constants.usdc}"
+              - type: "uint256"
+                value: "${input_slots.swap_data_prime_usdc.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data_prime_usdc.minOutputAmount}"
+        return:
+          type: "uint256"
+          name: "usdc_amount"
+
+      - description: "Approve swap module to spend USDC"
+        target: ${constants.usdc}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.swap_data_usdc_loan.inputAmount}"
+
+      - description: "Swap USDC -> PYUSD via DEX aggregator (Curve PYUSD/USDC) to repay FL"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data_usdc_loan.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data_usdc_loan.data}"
+              - type: "address"
+                value: "${constants.usdc}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "uint256"
+                value: "${input_slots.swap_data_usdc_loan.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data_usdc_loan.minOutputAmount}"
+
+    input_slots:
+      swap_data_prime_usdc:
+        type: "SwapData"
+        description: "Swap data for PRIME -> USDC (hop 1). inputAmount should match the full withdrawn PRIME."
+      swap_data_usdc_loan:
+        type: "SwapData"
+        description: "Swap data for USDC -> PYUSD (hop 2). inputAmount should match the USDC out of hop 1."
+
+  # ==========================================================================
+  # VARIANT B1 — unwind_to_pending: staged async exit, phase 1 (MANAGEMENT).
+  # Repay funded from IDLE FUND PYUSD (NOT a flash loan). Reads borrowShares +
+  # collateral on-chain, repays ALL debt by shares, withdraws ALL PRIME,
+  # redeems PRIME->wYLDS (sync), then wYLDS.requestRedeem(all) to open the async
+  # redemption. Ends with a pending wYLDS redemption; the caliber holds no loose
+  # PRIME/wYLDS. ACCOUNTING's pendingRedemptions term bridges the async gap.
+  # ==========================================================================
+  unwind_to_pending:
+    calls:
+      - description: "Get position data (supplyShares, borrowShares, collateral)"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Approve Morpho to spend loan token (max, revoked after repay)"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${builtins.UINT256_MAX}"
+
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Repay ALL debt by shares (assets=0, shares=borrowShares)"
+        target: "${inputs.morpho_address}"
+        selector: "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "0"
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Revoke Morpho loan token approval"
+        target: ${inputs.loan_token}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Withdraw ALL PRIME collateral from Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Redeem ALL PRIME -> wYLDS via SYNC ERC4626 redeem (instant)"
+        target: ${inputs.prime_token}
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          type: "uint256"
+          name: "wylds_amount"
+
+      - description: "Request async redemption of ALL wYLDS -> pending USDC (no approval needed; self-transfer)"
+        target: ${inputs.wylds_token}
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.wylds_amount}"
+
+  # ==========================================================================
+  # VARIANT B2 — swap_to_loan: staged async exit, phase 2 (MANAGEMENT).
+  # Run AFTER Hastra REWARDS_ADMIN has settled the pending redemption
+  # (pendingRedemptions(caliber)==0) and the USDC is loose in the caliber.
+  # Swaps USDC -> PYUSD via the DEX aggregator (Curve PYUSD/USDC).
+  # ==========================================================================
+  swap_to_loan:
+    calls:
+      - description: "Approve swap module to spend USDC"
+        target: ${constants.usdc}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.swap_module}"
+          - type: "uint256"
+            value: "${input_slots.swap_data.inputAmount}"
+
+      - description: "Swap USDC -> PYUSD via DEX aggregator (Curve PYUSD/USDC)"
+        target: ${inputs.swap_module}
+        selector: "swap((uint16,bytes,address,address,uint256,uint256))"
+        parameters:
+          - type: "(uint16,bytes,address,address,uint256,uint256)"
+            value:
+              - type: "uint16"
+                value: "${input_slots.swap_data.swapperId}"
+              - type: "bytes"
+                value: "${input_slots.swap_data.data}"
+              - type: "address"
+                value: "${constants.usdc}"
+              - type: "address"
+                value: "${inputs.loan_token}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.inputAmount}"
+              - type: "uint256"
+                value: "${input_slots.swap_data.minOutputAmount}"
+
+    input_slots:
+      swap_data:
+        type: "SwapData"
+        description: "Swap data for USDC -> PYUSD conversion (settled redemption proceeds)."
