@@ -13,7 +13,7 @@ constants:
     value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # msgSender()
   unsigned_math_helper_address:
     type: "address"
-    value: "0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd" # mulDiv (Base math helper)
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # mulDiv (prod MathHelper, all chains)
   senior_tranche_address:
     type: "address"
     value: "0x98d55707B60793AC8cadAB3C456dA156671F138a" # ROY-ST-sUSN

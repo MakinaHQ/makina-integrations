@@ -104,6 +104,26 @@ Known **test-infra / non-prod** addresses seen in config PRs (must be replaced i
   verify the contract on-chain (a prod contract is verified with source; test/ad-hoc ones
   often are not).
 
+**Independent on-chain verification (spawn a subagent).** The static table above can go stale,
+so do not rely on it alone. After collecting the hardcoded infra addresses, **spawn a
+general-purpose subagent** (Agent tool) to independently verify them on-chain, in parallel with
+the rest of the import. Give it the list of `(address, expected contract, chain)` tuples and
+have it report, per address:
+  1. **Verified source** — the contract is verified (has published source) on the relevant
+     explorer for that chain. Unverified ⇒ almost certainly not a prod deployment ⇒ flag.
+  2. **Prod match** — the address equals the canonical prod address for that contract (same on
+     every chain), and the deployed code actually behaves as that contract (e.g. `getPrice`
+     returns for OracleRegistry, `mulDiv` for MathHelper).
+  3. **Registry registration (if applicable)** — where a registry should know the address,
+     confirm it is registered: e.g. the token/position is routed in the **OracleRegistry**
+     (`getPrice(token, quote)` does not revert) and listed in the **TokenRegistry**
+     (`0xd9310A41d085c0DC1E40F691e8647080862A5fd4`). If a lookup isn't possible, say so rather
+     than assuming.
+  Prefer the etherscan/tenderly MCP read tools (`read_contract_state`, `get_address_info`) for
+  this. **Block the import on any address that fails (1) or (2)** — replace with the prod
+  address and regenerate; surface (3) failures to the user as go-live gates (a feed/route may
+  simply not be registered on-chain yet).
+
 ## 2. NEVER import these (specs / factory notes / docs)
 
 Exclude every one of these — they are notes, not config:
