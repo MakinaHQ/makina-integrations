@@ -27,7 +27,7 @@ CHAIN_TO_CHAIN_ID: dict[str, int] = {
     "mainnet": 1,
     "base": 8453,
     "arbitrum": 42161,
-    "monad": 10143,
+    "monad": 143,
     "hyperevm": 998,
 }
 
@@ -36,6 +36,7 @@ _FALLBACK_RPC: dict[str, str] = {
     "mainnet": "https://eth.llamarpc.com",
     "base": "https://mainnet.base.org",
     "arbitrum": "https://arb1.arbitrum.io/rpc",
+    "monad": "https://rpc.monad.xyz",
     "hyperevm": "https://rpc.hyperliquid.xyz/evm",
 }
 

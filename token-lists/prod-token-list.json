@@ -159,13 +159,6 @@
     },
     {
       "chainId": 1,
-      "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
-      "name": "Savings USDS",
-      "decimals": 18,
-      "symbol": "sUSDS"
-    },
-    {
-      "chainId": 1,
       "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "name": "Tether USD",
       "decimals": 6,
@@ -285,6 +278,13 @@
     },
     {
       "chainId": 1,
+      "address": "0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD",
+      "name": "Savings USDS",
+      "decimals": 18,
+      "symbol": "sUSDS"
+    },
+    {
+      "chainId": 1,
       "address": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
       "name": "Staked USDe",
       "decimals": 18,
@@ -324,6 +324,20 @@
       "name": "Wrapped liquid staked Ether 2.0",
       "decimals": 18,
       "symbol": "wstETH"
+    },
+    {
+      "chainId": 143,
+      "address": "0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a",
+      "name": "AUSD",
+      "decimals": 6,
+      "symbol": "AUSD"
+    },
+    {
+      "chainId": 143,
+      "address": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC"
     },
     {
       "chainId": 8453,
@@ -376,13 +390,6 @@
     },
     {
       "chainId": 42161,
-      "address": "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF",
-      "name": "USDai",
-      "decimals": 18,
-      "symbol": "USDai"
-    },
-    {
-      "chainId": 42161,
       "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       "name": "USD Coin",
       "decimals": 6,
@@ -394,6 +401,13 @@
       "name": "USDT0",
       "decimals": 6,
       "symbol": "USDT0"
+    },
+    {
+      "chainId": 42161,
+      "address": "0x0A1a1A107E45b7Ced86833863f482BC5f4ed82EF",
+      "name": "USDai",
+      "decimals": 18,
+      "symbol": "USDai"
     },
     {
       "chainId": 42161,
