@@ -1,29 +1,29 @@
-# Noon sUSN — OTC swap position (Base), position-token model (securitize/VBILL shape).
+# Noon sUSN — OTC swap position (Base), base-token model (uniswap-x shape).
 #
 # sUSN on Base is a bridged OFT (not mintable, cannot be bridged in via Makina), so
 # the caliber acquires/releases it by trading USDC against an EOA we control (raw
 # transfer + transferFrom, no settler contract — the EOA pre-approves the caliber).
 #
-# sUSN is a caliber POSITION token (position_tokens: [sUSN] in caliber.yaml), valued
-# by the ACCOUNTING leg via the Makina OracleRegistry (getPrice sUSN->USDC over the
-# 2-feed route). USDC is the only base token that moves, so both MANAGEMENT legs
-# declare affected_tokens=[USDC] (sUSN is a position token, excluded — same as
-# instructions/securitize.yaml).
+# sUSN is a caliber BASE token (addBaseToken + an OracleRegistry sUSN feed route), so
+# held sUSN is priced directly by the base-token registry — the same registration the
+# Royco ST sUSN position in this caliber relies on. A token cannot be both a base and a
+# position token in one caliber, so this position uses NO position_tokens and has NO
+# ACCOUNTING leg (accounting the held sUSN would double-count what the base-token
+# registry already prices). Only the two MANAGEMENT swap legs remain.
 #
-# SLIPPAGE (on-chain, oracle-enforced): the caliber's loss reconciliation nets the
-# USDC moved (affected base token) against the sUSN value gained/lost (position
-# accounting, priced by the oracle) and reverts if the swap is off-rate beyond the
-# caliber's max-loss bps. There is no counterparty contract enforcing price — we are
-# the counterparty — so this oracle check is the sole price guard.
+# SLIPPAGE (on-chain, oracle-enforced): both swap legs move two base tokens, so they
+# declare affected_tokens=[USDC, sUSN]. The caliber's loss reconciliation nets the USDC
+# moved against the sUSN moved (both base-token-priced by the OracleRegistry) and reverts
+# if the swap is off-rate beyond the caliber's max-loss bps. There is no counterparty
+# contract enforcing price — we are the counterparty — so this oracle check is the sole
+# price guard. Same base-token, MANAGEMENT-only model as blueprints/uniswap-x.
 #
 # Oracle prerequisite (Base): sUSN priced via a 2-feed route
 #   sUSN/USD = SUSN_USN_RR (0x561afc67ee879ced6c92afe781c1d0ea9adf2049)
 #            × USNUSD_RR_CAPPED_1 (0x4485d256d9b305dba378ab9d0af26933fc8a8795)
-# registered in the OracleRegistry (0x4B33…dDD30). NOTE: sUSN is a position token,
-# so NO addBaseToken(sUSN) is required — only the feed route so getPrice works.
-# Adapters submitted 2026-07-17, not yet active — must be scheduled/activated in the
-# production OracleRegistry before go-live (see
-# scripts-factory/noon/base/.../oracle-setup.md).
+# registered in the OracleRegistry (prod 0xC388…f485). Adapters submitted 2026-07-17 —
+# must be scheduled/activated in the production OracleRegistry, and addBaseToken(sUSN)
+# executed, before go-live. Both are already required by the Royco ST sUSN position.
 #
 # otc_counterparty is the OTC EOA we control on Base, anchored below in THIS instruction
 # file (per repo rule: protocol/position-specific addresses stay out of caliber.yaml
@@ -33,8 +33,9 @@
 # ── BUY sUSN: caliber pays USDC to the EOA, pulls sUSN from the EOA ────────────
 - is_debt: false
   instruction_type: "MANAGEMENT"
-  affected_tokens: # USDC out (base); sUSN in is a position token, excluded
+  affected_tokens: # USDC out + sUSN in — both base tokens; delta reconciliation is the slippage guard
     - "${token_list.base.USDC}"
+    - "${token_list.base.sUSN}"
   instruction:
     label: ${position.label}
     path: "../../../blueprints/noon-otc/swap.yaml:buy_susn_with_usdc"
@@ -52,33 +53,25 @@
         type: "address"
         value: "${config.caliber_address}"
 
-# ── ACCOUNTING: value caliber sUSN balance in USDC via the OracleRegistry ──────
+# ── ACCOUNTING: 0 (held sUSN is valued by the caliber base-token registry) ─────
+# Required single accounting leg; returns 0 to avoid double-counting the held sUSN
+# (a base token). Slippage is enforced by the swap legs' affected_tokens above, not
+# here. Mirrors blueprints/re/account.yaml:account_0.
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "${token_list.base.USDC}"
+    - "${token_list.base.sUSN}"
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/noon-otc/account.yaml:account"
-    inputs:
-      susn_address:
-        type: "address"
-        value: "${token_list.base.sUSN}"
-      quote_token:
-        type: "address"
-        value: "${token_list.base.USDC}"
-      caliber_address:
-        type: "address"
-        value: "${config.caliber_address}"
-      susn_unit_scale:
-        type: "uint256"
-        value: "1000000000000000000" # 10^sUSN.decimals (18) — for accounting mulDiv
+    path: "../../../blueprints/noon-otc/account.yaml:account_0"
+    inputs: {}
 
 # ── SELL sUSN: caliber sends sUSN to the EOA, pulls USDC from the EOA ──────────
 - is_debt: false
   instruction_type: "MANAGEMENT"
-  affected_tokens: # USDC in (base); sUSN out is a position token, excluded
+  affected_tokens: # USDC in + sUSN out — both base tokens; delta reconciliation is the slippage guard
     - "${token_list.base.USDC}"
+    - "${token_list.base.sUSN}"
   instruction:
     label: ${position.label}
     path: "../../../blueprints/noon-otc/swap.yaml:sell_susn_for_usdc"

@@ -1,92 +1,30 @@
 protocol: "noon"
 
-# Noon sUSN OTC position accounting (Base) via the Makina OracleRegistry.
+# Noon sUSN OTC — no-op accounting for the base-token OTC swap position.
 #
-# sUSN is held as a caliber POSITION token (position_tokens: [sUSN]), NOT a base
-# token, so its value is reported here rather than by the base-token registry. This
-# is the securitize/VBILL model (blueprints/securitize/account.yaml).
+# sUSN is registered as a caliber base token and priced by the caliber's
+# OracleRegistry (sUSN/USN x USN/USD route), so the held sUSN is already counted
+# in AUM by the base-token registry. This accounting action therefore returns 0 to
+# avoid double counting — same pattern as blueprints/re/account.yaml:account_0 and
+# blueprints/midas/account.yaml.
 #
-# OracleRegistry.getPrice(baseToken, quoteToken) returns the price of ONE whole
-# baseToken in quoteToken wei (quoteToken decimals). For sUSN it routes through the
-# 2-feed path sUSN/USN (SUSN_USN_RR) × USN/USD (USNUSD_RR_CAPPED_1); the registry
-# handles staleness + routing internally.
+# Every caliber position must have exactly one ACCOUNTING instruction, so this leg
+# exists purely to satisfy that requirement while contributing 0 position value.
 #
-# Position value (USDC 6-dec):
-#   value = susn_balance * getPrice(sUSN, USDC) / 10^sUSN_decimals   (sUSN = 18 dec)
-#
-# Because this accounting values the position via the same oracle route, the buy/sell
-# MANAGEMENT legs (affected_tokens=[USDC]) get an on-chain slippage check for free:
-# the caliber's loss reconciliation nets the USDC moved against the sUSN value
-# gained/lost and reverts if the swap is off-rate beyond the caliber's max-loss bps.
-
-constants:
-  # Makina prod OracleRegistry — deployed at the SAME deterministic address on
-  # mainnet and Base (0xC388…), the instance instructions/securitize.yaml already
-  # consumes on mainnet. The Base sUSN feed route (sUSN/USN x USN/USD) is registered
-  # here. (0x4B33…630e is the TEST-infra registry and has no sUSN feed — calling
-  # getPrice on it reverts, so it must NOT be used in prod rootfiles.)
-  oracle_registry_address:
-    type: "address"
-    value: "0xC388B72AB90Be82B230D919F9C05c87F9397f485"
-  # Makina prod MathHelper for mulDiv (balance * price / unit_scale) — deployed
-  # at the SAME deterministic address on all chains (0x3D62…e3c0), the instance
-  # instructions/securitize.yaml uses on mainnet. (0x16D1…FCFd is an unverified
-  # non-prod deployment; do not use it in prod rootfiles.)
-  unsigned_math_helper_address:
-    type: "address"
-    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
-
-inputs:
-  susn_address:
-    type: "address"
-  quote_token:
-    type: "address"
-  caliber_address:
-    type: "address"
-  susn_unit_scale:
-    type: "uint256"
-
+# Slippage is NOT enforced here. Unlike the re/midas swaps (which pass a protocol
+# minShares/minPayout), this OTC trades against an EOA we control via raw
+# transfer/transferFrom with no protocol min-out, so the caliber's own loss
+# reconciliation is the sole price guard: the two MANAGEMENT swap legs declare
+# affected_tokens=[USDC, sUSN] (both base tokens), and the caliber nets the USDC
+# value moved against the sUSN value moved (both OracleRegistry-priced) and reverts
+# if the swap is off-rate beyond the caliber's max-loss bps.
 actions:
-  account:
-    calls:
-      - description: "sUSN balance held by the caliber"
-        target: "${inputs.susn_address}"
-        selector: "balanceOf(address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.caliber_address}"
-        return:
-          name: "susn_balance"
-          type: "uint256"
-
-      - description: "Price of 1 whole sUSN in USDC wei (2-feed route sUSN/USN x USN/USD)"
-        target: "${constants.oracle_registry_address}"
-        selector: "getPrice(address,address)"
-        parameters:
-          - type: "address"
-            value: "${inputs.susn_address}"
-          - type: "address"
-            value: "${inputs.quote_token}"
-        return:
-          name: "price"
-          type: "uint256"
-
-      - description: "value = susn_balance * price / susn_unit_scale (USDC 6-dec)"
-        target: "${constants.unsigned_math_helper_address}"
-        selector: "mulDiv(uint256,uint256,uint256)"
-        parameters:
-          - type: "uint256"
-            value: "${returns.susn_balance}"
-          - type: "uint256"
-            value: "${returns.price}"
-          - type: "uint256"
-            value: "${inputs.susn_unit_scale}"
-        return:
-          name: "value_in_quote_token"
-          type: "uint256"
+  # Account: returns 0 (no-op) — held sUSN is valued by the caliber base-token registry.
+  account_0:
+    calls: []
 
     reserved_slots:
       - type: "uint256"
-        value: "${returns.value_in_quote_token}"
+        value: "${builtins.UINT256_0}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"

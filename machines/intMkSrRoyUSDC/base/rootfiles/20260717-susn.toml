@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x43ced535910e309003a2a826f26d4f849912d7f49da449eba4896b5b191a1e67
+# root: 0x2f1d5957c72837fb6c6d1bf352c903e4e21f53cb593eb8580b81ea918e112c4a
 
 [tokens."${token_list.base.USDC}"]
 chainId = 8453
@@ -15,28 +15,20 @@ name = "Staked USN"
 decimals = 18
 symbol = "sUSN"
 
-[instructions.noon.account."sUSN OTC"]
+[instructions.noon.account_0."sUSN OTC"]
 position_id = "323638792813778024403827224996075207355"
 description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
 instruction_type = 1
-affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
-position_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
-commands = [
-  "0x70a082310102ff000000000234a2798d47b238a7cba9d87d49618dee6c4d999f",
-  "0xac41865a010304ff00000004c388b72ab90be82b230d919f9c05c87f9397f485",
-  "0xaa9a091201020405ff0000003d623b199e290358416415ea7e05b635e442e3c0",
-]
+affected_tokens = ["0x34a2798d47b238a7cba9d87d49618dee6c4d999f"]
+position_tokens = []
+commands = []
 state = [
-  "0x",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
   "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
-  "0x00000000000000000000000034a2798d47b238a7cba9d87d49618dee6c4d999f",
-  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
-  "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000",
 ]
-bitmap = "164824271477329568240072075474762727424"
+bitmap = "255211775190703847597530955573826158592"
 inputs_slots = []
 
 [instructions.noon.buy_susn_with_usdc."sUSN OTC"]
@@ -45,7 +37,10 @@ description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
 instruction_type = 0
-affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x34a2798d47b238a7cba9d87d49618dee6c4d999f",
+]
 position_tokens = []
 commands = [
   "0x23b872dd01030200ff0000ff34a2798d47b238a7cba9d87d49618dee6c4d999f",
@@ -75,7 +70,10 @@ description = "Noon sUSN OTC swap"
 is_debt = false
 group_id = "0"
 instruction_type = 0
-affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x34a2798d47b238a7cba9d87d49618dee6c4d999f",
+]
 position_tokens = []
 commands = [
   "0x23b872dd01030200ff0000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
