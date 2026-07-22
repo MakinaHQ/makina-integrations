@@ -17,6 +17,9 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  aavev3_horizon_instance:
+    type: "address"
+    value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
   aave_umbrella_batch_helper:
     type: "address"
     value: "0xCe6Ced23118EDEb23054E06118a702797b13fc2F"
@@ -264,6 +267,7 @@ positions:
       label: "USDC"
       asset_address: ${token_list.mainnet.USDC}
       aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "232678016241942897729445069841802885622"
     group_id: "1"
     description: "AaveV3 Supply USDT"
@@ -278,6 +282,19 @@ positions:
       label: "USDG"
       asset_address: ${token_list.mainnet.USDG}
       aave_token: "0x7c0477d085ECb607CF8429f3eC91Ae5E1e460F4F"
+      aave_pool_instance: "${config.aavev3_core_instance}"
+
+  # ── AaveV3 Horizon Supply (group_id: 3) ──────────────────────────
+  - id: "47445753596645566272224472924421400103"
+    group_id: "3"
+    description: "AaveV3 Horizon Supply RLUSD"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0xe3190143eB552456F88464662F0C0C4AC67A77Eb"]
+    vars:
+      label: "RLUSD - Horizon Lend"
+      asset_address: ${token_list.mainnet.RLUSD}
+      aave_token: "0xe3190143eB552456F88464662F0C0C4AC67A77Eb"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
 
   # ── AaveV3 sUSDe E-Mode (group_id: 1) ────────────────────────────
   - id: "13362078339443395382342079025223961472"
@@ -298,6 +315,7 @@ positions:
       label: "USDe - Lend"
       asset_address: ${token_list.mainnet.USDe}
       aave_token: "0x4F5923Fc5FD4a93352581b38B7cD26943012DECF"
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "227329230297595858214811008018294296109"
     group_id: "1"
     description: "AaveV3 Borrow USDC (sUSDe E-Mode)"
@@ -307,6 +325,7 @@ positions:
       label: "USDC - Borrow"
       asset_address: ${token_list.mainnet.USDC}
       debt_token: "0x72E95b8931767C79bA4EeE721354d6E99a61D004"
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "117961051486591206861124901427435972709"
     group_id: "1"
     description: "AaveV3 Borrow USDT (sUSDe E-Mode)"
@@ -316,6 +335,7 @@ positions:
       label: "USDT - Borrow"
       asset_address: ${token_list.mainnet.USDT}
       debt_token: "0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"
+      aave_pool_instance: "${config.aavev3_core_instance}"
 
   # ── AaveV4 Supply (Hub & Spoke, group_id: 2) ──────────────────────
   # Aave V4 Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485; reserves are keyed

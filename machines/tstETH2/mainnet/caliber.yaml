@@ -33,3 +33,4 @@ positions:
       label: "WETH"
       asset_address: ${token_list.mainnet.WETH}
       aave_token: "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8" # aEthWETH
+      aave_pool_instance: "${config.aavev3_core_instance}"

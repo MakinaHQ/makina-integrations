@@ -14,8 +14,17 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  aavev3_horizon_instance:
+    type: "address"
+    value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
 positions:
+  # ── Harvest-only ──────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+
   # ── Midas ────────────────────────────────────────────────────────
   - id: "74279913377154171133723219389628797435147974258238735195930105321760025303591" # keccak256("midas.mglobal.swap-in")
     group_id: "0"
@@ -33,7 +42,7 @@ positions:
     instructions: !include "../../../instructions/midas-redemption.yaml"
     vars:
       label: "mGlobal Redemption"
-      redeemer_address: "0xA0Fc8BDFb1E6a705C1375810989B1d70a982b01B"
+      redeemer_address: "0x1e0fd66753198c7b8bA64edEe8d41D8628Bf20D7"
       mtoken_address: ${token_list.mainnet.mGLOBAL}
       token_out_address: ${token_list.mainnet.USDC}
       kv_storage_key: "${keccak256(makina.mainnet.midas.mglobal-redemption)}"
@@ -55,3 +64,35 @@ positions:
       label: "mGLOBAL/USDC (0xfd40...50cd)"
       market_id: "0xfd4079d94bfbd35545e3dadfe4101619db0946174357cbe8810fd8e8537a50cd"
       loan_token: ${token_list.mainnet.USDC}
+
+  # ── AaveV3 Horizon mGLOBAL/Stablecoins (group_id: 2) ─────────────
+  - id: "333271207406914509852071294122931497073"
+    group_id: "2"
+    description: "AaveV3 Horizon Supply mGLOBAL"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x49d3cdE03813eE32DFD47F6aA3957d5F9CbAB985"]
+    vars:
+      label: "mGLOBAL - Lend"
+      asset_address: ${token_list.mainnet.mGLOBAL}
+      aave_token: "0x49d3cdE03813eE32DFD47F6aA3957d5F9CbAB985"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
+  - id: "133495794982505815817947498041694656764"
+    group_id: "2"
+    description: "AaveV3 Horizon Borrow RLUSD"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"]
+    vars:
+      label: "RLUSD - Borrow"
+      asset_address: ${token_list.mainnet.RLUSD}
+      debt_token: "0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
+  - id: "317835433613879557430416658618884687921"
+    group_id: "2"
+    description: "AaveV3 Horizon Borrow USDC"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x4139EcBe83d78ef5EFF0A6eDA6f894Be9D590FC7"]
+    vars:
+      label: "USDC - Borrow"
+      asset_address: ${token_list.mainnet.USDC}
+      debt_token: "0x4139EcBe83d78ef5EFF0A6eDA6f894Be9D590FC7"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
