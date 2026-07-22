@@ -1,0 +1,280 @@
+# this is a generated file - do not edit manually
+# root: 0x52a226ac95b12d4c2318f7cb4b020234354cf9bec484dccea6610014760d63b1
+
+[tokens."${token_list.monad.AUSD}"]
+chainId = 143
+address = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+name = "AUSD"
+decimals = 6
+symbol = "AUSD"
+
+[tokens."${token_list.monad.USDC}"]
+chainId = 143
+address = "0x754704bc059f8c67012fed69bc8a327a5aafb603"
+name = "USDC"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.monad.USDT0}"]
+chainId = 143
+address = "0xe7cd86e13ac4309349f30b3435a9d337750fc82d"
+name = "USDT0"
+decimals = 6
+symbol = "USDT0"
+
+[instructions.aavev3.account.AUSD]
+position_id = "18883279859232606921081666227395984506"
+description = "AaveV3 Supply AUSD"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x00000000efe302beaa2b3e6e1b18d08d69a9012a"]
+position_tokens = ["0xdebfedf35faed5d1664e553545e144c02227a2ec"]
+commands = ["0x70a082310102ff0000000000debfedf35faed5d1664e553545e144c02227a2ec"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.USDC]
+position_id = "226666382788514932918636686861146238730"
+description = "AaveV3 Supply USDC"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x754704bc059f8c67012fed69bc8a327a5aafb603"]
+position_tokens = ["0x35a73bacb179d3740395a3cecc87ff2e581d6042"]
+commands = ["0x70a082310102ff000000000035a73bacb179d3740395a3cecc87ff2e581d6042"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account.USDT0]
+position_id = "137197543549345562682796396165999317048"
+description = "AaveV3 Supply USDT0"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xe7cd86e13ac4309349f30b3435a9d337750fc82d"]
+position_tokens = ["0x9531e6bc99d7f7f0596ed7ba5b846ba9eb60468c"]
+commands = ["0x70a082310102ff00000000009531e6bc99d7f7f0596ed7ba5b846ba9eb60468c"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.add_collateral.AUSD]
+position_id = "18883279859232606921081666227395984506"
+description = "AaveV3 Supply AUSD"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x00000000efe302beaa2b3e6e1b18d08d69a9012a"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff00000000efe302beaa2b3e6e1b18d08d69a9012a",
+  "0x617ba0370102000304ff00ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000069a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+  "0x00000000000000000000000000000000efe302beaa2b3e6e1b18d08d69a9012a",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.AUSD.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.USDC]
+position_id = "226666382788514932918636686861146238730"
+description = "AaveV3 Supply USDC"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x754704bc059f8c67012fed69bc8a327a5aafb603"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff754704bc059f8c67012fed69bc8a327a5aafb603",
+  "0x617ba0370102000304ff00ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000069a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+  "0x000000000000000000000000754704bc059f8c67012fed69bc8a327a5aafb603",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.USDC.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral.USDT0]
+position_id = "137197543549345562682796396165999317048"
+description = "AaveV3 Supply USDT0"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xe7cd86e13ac4309349f30b3435a9d337750fc82d"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffe7cd86e13ac4309349f30b3435a9d337750fc82d",
+  "0x617ba0370102000304ff00ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000069a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef",
+  "0x000000000000000000000000e7cd86e13ac4309349f30b3435a9d337750fc82d",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral.USDT0.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.AUSD]
+position_id = "18883279859232606921081666227395984506"
+description = "AaveV3 Supply AUSD"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x00000000efe302beaa2b3e6e1b18d08d69a9012a"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x00000000000000000000000000000000efe302beaa2b3e6e1b18d08d69a9012a",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.AUSD.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.USDC]
+position_id = "226666382788514932918636686861146238730"
+description = "AaveV3 Supply USDC"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x754704bc059f8c67012fed69bc8a327a5aafb603"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000754704bc059f8c67012fed69bc8a327a5aafb603",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.USDC.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.USDT0]
+position_id = "137197543549345562682796396165999317048"
+description = "AaveV3 Supply USDT0"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xe7cd86e13ac4309349f30b3435a9d337750fc82d"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff69a5f9ad4f96ebf0a0c792dd42a01cc5c0102fef"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000e7cd86e13ac4309349f30b3435a9d337750fc82d",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral.USDT0.inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"

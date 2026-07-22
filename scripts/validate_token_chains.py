@@ -34,7 +34,7 @@ CHAIN_TO_CHAIN_ID: dict[str, int] = {
     "mainnet": 1,
     "base": 8453,
     "arbitrum": 42161,
-    "monad": 10143,
+    "monad": 143,
 }
 
 

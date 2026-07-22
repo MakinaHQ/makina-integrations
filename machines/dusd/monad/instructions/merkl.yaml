@@ -1,0 +1,10 @@
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "Merkl"
+    path: "../../../blueprints/merkl/harvest.yaml:harvest"
+    inputs:
+      merkl_distributor_address:
+        type: "address"
+        value: "0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae"

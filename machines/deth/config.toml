@@ -35,6 +35,17 @@ decimals = 18
 name = "Wrapped Ether"
 symbol = "WETH"
 
+[calibers.monad]
+address = "0xd1a2d9df5db842da2ee81075fa441602b2352915"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/deth/monad/rootfiles"
+
+[calibers.monad.accounting_token]
+address = "0xEE8c0E9f1BFFb4Eb878d8f15f368A02a35481242"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
+
 [ntt.mainnet]
 token = "0x871aB8E36CaE9AF35c6A3488B049965233DeB7ed"
 manager = "0x02eCA64b489847183Ccd4952e424314EF798Af5d"
