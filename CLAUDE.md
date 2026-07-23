@@ -2,6 +2,14 @@
 
 Automated DeFi pool integration pipeline using Claude agents.
 
+## Makina X (makina-x) and `blueprints-x/`
+
+**MakinaX** is a lightweight, relaxed version of the Makina protocol — a Solidity system for running advanced DeFi strategies as a **Safe module** on top of a Safe multisig, rather than the full Machine/Caliber framework. Repo: https://github.com/MakinaHQ/makina-x. It shares the core pricing/oracle model but relaxes governance (e.g. `onlySafe setFeedRoute`, no schedule/execute timelock, no `addBaseToken`). Governance txs are crafted with `/craft_txs_for_X`. **chronograph-x** is a fund operating on MakinaX (`machines/chronograph-x/`).
+
+makina-x calibers are configured with `safe_address` + `makina_lite_module` (not `caliber_address`), positions are **held by the Safe** (`on_behalf_of`/`to`/holder = `${config.safe_address}`), and they are **not NAV-accounted on-chain** — so their instructions are **MANAGEMENT-only with no ACCOUNTING action**. Compile makina-x/lite calibers with the transpiler `--lite` flag.
+
+**`blueprints-x/`** is the makina-x parallel to `blueprints/`: same per-protocol/per-action layout, but no `account.yaml` (no accounting needed). Reference makina-x integrations: `machines/uniswap-x-filler/` (Aave USDC supply), `machines/morpho-curator/` (vault curation), `machines/chronograph-x/mainnet/` (Aave Horizon RLUSD supply, via `blueprints-x/aave-horizon`).
+
 ## Commands
 
 | Command | Description |

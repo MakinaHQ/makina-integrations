@@ -6,4 +6,18 @@ config:
     type: "address"
     value: "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
 
-positions: []
+positions:
+  # Aave Horizon RLUSD supply (permissionless stablecoin lender side).
+  # aToken aHorRwaRLUSD 0xe3190143eB552456F88464662F0C0C4AC67A77Eb tracks the position.
+  - id: "47445753596645566272224472924421400103" # pools_db makina_id — Aave Horizon RLUSD lending (Pool 0xAe05Cd22…332C8)
+    group_id: "0"
+    description: "Aave Horizon RLUSD supply"
+    instructions: !include "./instructions/aave-horizon-rlusd.yaml"
+    position_tokens: ["0xe3190143eB552456F88464662F0C0C4AC67A77Eb"]
+
+  # USDC transfer from the Safe to the Binance spot deposit account.
+  # Not an on-chain position (funds leave to a CEX) — management-only, no position token.
+  - id: "15485344612102556934079546605738104609"
+    group_id: "0"
+    description: "Binance spot USDC transfer"
+    instructions: !include "./instructions/binance-usdc-spot.yaml"

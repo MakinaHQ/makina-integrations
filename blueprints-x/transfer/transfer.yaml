@@ -1,0 +1,30 @@
+# makina-x generic ERC20 transfer.
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted
+# on-chain, so no account balanceOf step is emitted.
+# Venue-agnostic: the destination (`to`) and token (`asset_address`) are supplied by
+# the instruction file, so the same blueprint serves any transfer target (e.g. a CEX
+# spot deposit address). The transfer is executed by the module on the Safe's behalf,
+# moving tokens out of the Safe to `to`.
+protocol: "transfer"
+
+inputs:
+  asset_address:
+    type: "address"
+  to:
+    type: "address"
+
+actions:
+  transfer_to_spot_account:
+    calls:
+      - description: "Transfer the asset from the Safe to the destination account"
+        target: ${inputs.asset_address}
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.to}
+          - type: "uint256"
+            value: ${input_slots.amount_to_transfer}
+    input_slots:
+      amount_to_transfer:
+        type: "uint256"
+        description: "The amount of tokens to transfer"

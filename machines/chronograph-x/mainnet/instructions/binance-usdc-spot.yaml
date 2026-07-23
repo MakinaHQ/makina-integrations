@@ -1,0 +1,25 @@
+# chronograph-x (makina-x) — transfer USDC from the Safe to the Binance spot deposit account.
+#
+# Management-only (no ACCOUNTING) — makina-x positions are not NAV-accounted on-chain.
+# The USDC is held by the Safe (config.safe_address); the module executes the ERC20
+# transfer on the Safe's behalf, moving USDC out to the Binance deposit address.
+#
+# Venue-specific address (hardcoded here per repo convention — instance-specific
+# addresses live in the instruction file, not config):
+#   Binance spot deposit : 0x59cb2cd215e9e8004797d8723c29a3da7caad550
+
+- name: binance_transfer_usdc_to_spot
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "USDC - Binance spot"
+    path: "../../../blueprints-x/transfer/transfer.yaml:transfer_to_spot_account"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "${token_list.mainnet.USDC}"
+      to:
+        type: "address"
+        value: "0x59cb2cd215e9e8004797d8723c29a3da7caad550"

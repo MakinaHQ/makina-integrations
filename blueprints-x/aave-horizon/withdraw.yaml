@@ -1,0 +1,29 @@
+# makina-x Aave v3 withdraw (lender side). Management-only, no ACCOUNTING.
+# Pass type(uint256).max as the amount to withdraw the full supplied balance.
+protocol: "aavev3"
+
+inputs:
+  aave_pool_instance:
+    type: "address"
+  to:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  withdraw_collateral:
+    calls:
+      - description: "Withdraw the supplied asset from the Aave pool"
+        target: ${inputs.aave_pool_instance}
+        selector: "withdraw(address,uint256,address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_withdraw}
+          - type: "address"
+            value: ${inputs.to}
+    input_slots:
+      amount_to_withdraw:
+        type: "uint256"
+        description: "The amount to withdraw (type(uint256).max for the full balance)"

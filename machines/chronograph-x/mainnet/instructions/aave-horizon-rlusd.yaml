@@ -1,0 +1,53 @@
+# chronograph-x (makina-x) — Aave Horizon RLUSD supply (lender side).
+#
+# Horizon is a separate, permissioned Aave v3 instance (forks v3.3). The RWA
+# collateral side is allowlisted, but the stablecoin supply side (RLUSD/USDC/GHO)
+# is permissionless, so supplying RLUSD as a lender requires no allowlisting.
+#
+# Management-only (no ACCOUNTING) — makina-x positions are not NAV-accounted
+# on-chain. The position is held by the Safe (config.safe_address); the module
+# executes supply/withdraw on the Safe's behalf.
+#
+# Horizon-specific addresses (hardcoded here per repo convention — protocol/
+# instance-specific addresses live in the instruction file, not config):
+#   Horizon Pool : 0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8
+#   aToken       : 0xe3190143eB552456F88464662F0C0C4AC67A77Eb (aHorRwaRLUSD)
+#   Underlying   : RLUSD 0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD (18 dec)
+
+- name: aave_horizon_supply_rlusd
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.RLUSD}"
+  instruction:
+    label: "RLUSD - Horizon"
+    path: "../../../blueprints-x/aave-horizon/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: "${config.safe_address}"
+      asset_address:
+        type: "address"
+        value: "${token_list.mainnet.RLUSD}"
+      aave_pool_instance:
+        type: "address"
+        value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+
+- name: aave_horizon_withdraw_rlusd
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.RLUSD}"
+  instruction:
+    label: "RLUSD - Horizon"
+    path: "../../../blueprints-x/aave-horizon/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to:
+        type: "address"
+        value: "${config.safe_address}"
+      asset_address:
+        type: "address"
+        value: "${token_list.mainnet.RLUSD}"
+      aave_pool_instance:
+        type: "address"
+        value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"

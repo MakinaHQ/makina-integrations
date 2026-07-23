@@ -1,0 +1,43 @@
+# makina-x Aave v3 supply (lender side).
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted
+# on-chain, so the account balanceOf step used by core blueprints/aave is omitted.
+# Instance-agnostic: pass the target pool (e.g. Aave core or the Horizon instance)
+# via aave_pool_instance.
+protocol: "aavev3"
+
+inputs:
+  aave_pool_instance:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  add_collateral:
+    calls:
+      - description: "Approve the Aave pool to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.aave_pool_instance}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+
+      - description: "Supply the asset to the Aave pool"
+        target: ${inputs.aave_pool_instance}
+        selector: "supply(address,uint256,address,uint16)"
+        parameters:
+          - type: "address"
+            value: ${inputs.asset_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+          - type: "uint256"
+            value: "0"
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of tokens to supply"
