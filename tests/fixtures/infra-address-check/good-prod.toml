@@ -1,0 +1,11 @@
+# Fixture: clean rootfile. Infra address embedded in the Weiroll command word is
+# the PROD MathHelper (0x3D623B199E290358416415eA7e05B635E442e3c0). Also contains
+# ordinary protocol/token addresses that must never be flagged.
+[[instructions]]
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = ["0x98d55707b60793ac8cadab3c456da156671f138a"]
+commands = [
+  "0xd737d0c701ff0000000000050f431322e1ff2500d4c5a4e090a7da7344f953be",
+  "0x70a082310105ff000000000598d55707b60793ac8cadab3c456da156671f138a",
+  "0xaa9a091201050304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
