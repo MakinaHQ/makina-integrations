@@ -1,0 +1,8 @@
+# Fixture: BAD. The test-infra OracleRegistry v1.3.0 address
+# (0xe75e81E0995816eBcd510Ed9CDD84ED05aC60442) is embedded as the trailing 20
+# bytes of a Weiroll command word — exactly how it would leak into a real rootfile.
+[[instructions]]
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+commands = [
+  "0xd737d0c701ff000000000005e75e81e0995816ebcd510ed9cdd84ed05ac60442",
+]

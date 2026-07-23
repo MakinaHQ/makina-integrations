@@ -1,0 +1,7 @@
+# Fixture: BAD. The non-prod / unverified MathHelper from PR #79
+# (0x16D120a18334e273FA3C029Ece56bfA5A2ABFCFd). Written UPPERCASE here to prove
+# the scan is case-insensitive.
+[[instructions]]
+commands = [
+  "0xAA9A091201050304FF00000016D120A18334E273FA3C029ECE56BFA5A2ABFCFD",
+]
