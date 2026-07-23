@@ -4,10 +4,10 @@
 #   label:         string   — token name (e.g. "USDC", "WETH")
 #   asset_address: address  — underlying token address
 #   debt_token:    address  — variableDebtToken address (for accounting balanceOf)
+#   aave_pool_instance: address — Aave V3 pool instance
 #
 # Expected config:
 #   caliber_address
-#   aavev3_core_instance
 
 - is_debt: true
   instruction_type: "MANAGEMENT"
@@ -19,7 +19,7 @@
     inputs:
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${position.aave_pool_instance}"
       token:
         type: "address"
         value: ${position.asset_address}
@@ -46,7 +46,7 @@
         value: ${position.asset_address}
       pool_address:
         type: "address"
-        value: "${config.aavev3_core_instance}"
+        value: "${position.aave_pool_instance}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
