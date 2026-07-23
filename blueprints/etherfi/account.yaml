@@ -1,0 +1,38 @@
+protocol: "etherfi"
+
+# EtherFi Async Redemption Accounting Blueprint
+#
+# Position value = sum of pending NFT claim values + any stray ETH/WETH on
+# the redeemer. The EtherfiAsyncRedeemer aggregates all of that into a
+# single read via `totalValueInWETH()`, returned in WETH wei (1:1 with ETH).
+#
+# Pre- and post-finalization values match by construction (the redeemer
+# uses the same `min(amountOfEEth, pool.amountForShare(share)) - fee` cap
+# that etherfi's `getClaimableAmount` would yield), so the position does
+# not jump at finalization.
+#
+# Note: eETH held directly by the caliber is a base token and accounted
+# for separately by the caliber's oracle registry. WETH released to the
+# caliber after `claim_redemption` is also a base token and accounted for
+# directly. This blueprint only covers value held inside the redeemer.
+
+inputs:
+  async_redeemer_address:
+    type: "address"
+
+actions:
+  account_pending_redemption:
+    calls:
+      - description: "Read total value held by the async redeemer (pending NFTs + stray ETH/WETH) in WETH wei"
+        target: "${inputs.async_redeemer_address}"
+        selector: "totalValueInWETH()"
+        parameters: []
+        return:
+          name: "total_value_weth"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_value_weth}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

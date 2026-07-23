@@ -1,0 +1,14 @@
+name = "dqaeeth"
+chain = "mainnet"
+address = "0x165afd0b156355D9D51e9E6Ab317a96787Fb6271"
+
+[calibers.mainnet]
+address = "0xD1A557Fe9d49D047A2318c05a13523e4B9E56e09"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dqaeeth/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+decimals = 18
+name = "Wrapped Ether"
+symbol = "WETH"
