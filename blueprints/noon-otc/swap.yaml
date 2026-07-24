@@ -1,0 +1,102 @@
+protocol: "noon"
+
+# Noon sUSN — OTC swap against a counterparty EOA we control (Base).
+#
+# sUSN on Base (0x34a2798D47b238A7CbA9D87D49618DEE6C4D999F) is a bridged OFT: it
+# is NOT mintable and cannot be acquired via the canonical Ethereum stake path, so
+# it cannot be bridged in through the Makina setup. Instead the caliber acquires /
+# releases sUSN by trading directly against an EOA we control (funded out-of-band),
+# exchanging caliber USDC for the EOA's sUSN and back.
+#
+# Settlement is raw ERC20 transfers, no settler contract:
+#   * the caliber SENDS its own token with transfer(EOA, amt)      — caliber is holder
+#   * the caliber PULLS the counter token with transferFrom(EOA, caliber, amt)
+#     — the EOA must approve the caliber off-chain for that token first.
+# Both legs run inside one managePosition call, so settlement is atomic.
+#
+# Exchange-rate slippage is enforced ON-CHAIN by the caliber's OracleRegistry NAV
+# check: both USDC and sUSN are caliber base tokens, and the instruction declares
+# affected_tokens=[USDC, sUSN] (see machines/.../instructions/noon-susn-otc.yaml).
+# The caliber recomputes NAV before/after via the oracle and reverts if the value
+# loss exceeds its max-loss bps. There is no counterparty contract enforcing price
+# (we are the counterparty), so this oracle check is the sole price guard — same
+# base-token, MANAGEMENT-only model as blueprints/uniswap-x.
+#
+# Expected inputs (from instructions/noon-susn-otc.yaml):
+#   usdc_address     — caliber accounting/base token (USDC on Base)
+#   susn_address     — Noon Staked USN (base token, oracle-priced)
+#   otc_counterparty — EOA we control that holds sUSN / receives USDC
+#   caliber_address  — recipient of the pulled token (the caliber itself)
+
+inputs:
+  usdc_address:
+    type: "address"
+  susn_address:
+    type: "address"
+  otc_counterparty:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  # ── BUY sUSN: caliber pays USDC to the EOA, pulls sUSN from the EOA ──────────
+  buy_susn_with_usdc:
+    calls:
+      - description: "Pull sUSN from the counterparty EOA into the caliber (EOA pre-approved the caliber)"
+        target: "${inputs.susn_address}"
+        selector: "transferFrom(address,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.otc_counterparty}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.susn_amount}"
+
+      - description: "Send USDC from the caliber to the counterparty EOA"
+        target: "${inputs.usdc_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.otc_counterparty}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount}"
+
+    input_slots:
+      susn_amount:
+        type: "uint256"
+        description: "sUSN pulled from the EOA into the caliber (18-dec)"
+      usdc_amount:
+        type: "uint256"
+        description: "USDC sent from the caliber to the EOA (6-dec)"
+
+  # ── SELL sUSN: caliber sends sUSN to the EOA, pulls USDC from the EOA ────────
+  sell_susn_for_usdc:
+    calls:
+      - description: "Pull USDC from the counterparty EOA into the caliber (EOA pre-approved the caliber)"
+        target: "${inputs.usdc_address}"
+        selector: "transferFrom(address,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.otc_counterparty}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.usdc_amount}"
+
+      - description: "Send sUSN from the caliber to the counterparty EOA"
+        target: "${inputs.susn_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.otc_counterparty}"
+          - type: "uint256"
+            value: "${input_slots.susn_amount}"
+
+    input_slots:
+      usdc_amount:
+        type: "uint256"
+        description: "USDC pulled from the EOA into the caliber (6-dec)"
+      susn_amount:
+        type: "uint256"
+        description: "sUSN sent from the caliber to the EOA (18-dec)"

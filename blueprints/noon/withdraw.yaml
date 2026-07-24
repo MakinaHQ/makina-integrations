@@ -1,0 +1,288 @@
+protocol: "noon"
+
+# Noon Staked USN (sUSN) Withdraw Blueprint — two-phase cooldown exit
+# (mirrors blueprints/infinifi two-step withdraw + KV store tracking)
+#
+# sUSN has NO instant redeem for non-whitelisted holders. Exit is:
+#   1. request_withdrawal[_relative] : sUSN.redeem(shares, receiver=WithdrawalHandler,
+#      owner=caliber) burns shares, ships USN to the handler and registers a
+#      per-user withdrawal request. The open requestId is captured and stored in
+#      the KV store.
+#   2. (wait withdrawPeriod = 7 days)
+#   3. claim_withdrawal : handler.claimWithdrawal(requestId) releases USN to the
+#      caliber, then the KV store is cleared.
+#
+# KV sentinel encoding — requestId 0 is a VALID id, so we store `requestId + 1`
+# (== getUserNextRequestId(caliber) read AFTER the redeem, since
+# createWithdrawalRequest does `nextRequestId[user]++`). Sentinel 0 therefore
+# unambiguously means "no open request". To recover the id: requestId = sentinel - 1.
+#
+# Only ONE open request per position at a time (KV holds a single sentinel):
+# sequence request -> wait -> claim before opening the next request.
+#
+# receiver MUST be the WithdrawalHandler (else sUSN.redeem reverts Unauthorized).
+# owner MUST be the caliber (msg.sender); redeem needs no allowance since owner
+# == msg.sender.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+
+inputs:
+  susn_address:
+    type: "address"
+  withdrawal_handler_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+
+actions:
+  # Phase 1 (absolute): redeem an exact number of sUSN shares into the handler
+  request_withdrawal:
+    calls:
+      # Guard: no open request already tracked for this position (sentinel == 0)
+      - description: "Get existing request sentinel from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "existing_sentinel"
+          type: "uint256"
+
+      - description: "Check that there is no open request (sentinel == 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_sentinel}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_open_request"
+          type: "bool"
+
+      - description: "Revert if there is already an open request"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_open_request}"
+
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Redeem sUSN shares; USN is sent to the WithdrawalHandler (receiver),
+      # a request is registered against the caliber (owner).
+      - description: "Redeem sUSN shares into the WithdrawalHandler (registers request)"
+        target: "${inputs.susn_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.withdrawal_handler_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      # Capture the open requestId + 1 as the sentinel. After the redeem,
+      # getUserNextRequestId(caliber) == requestId + 1.
+      - description: "Get next request id (== open requestId + 1)"
+        target: "${inputs.withdrawal_handler_address}"
+        selector: "getUserNextRequestId(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "sentinel"
+          type: "uint256"
+
+      - description: "Store request sentinel (requestId + 1) in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.sentinel}"
+
+    input_slots:
+      shares_to_redeem:
+        type: "uint256"
+        description: "Exact amount of sUSN shares to redeem (18 decimals)"
+
+  # Phase 1 (relative): redeem a percentage (bps) of the caliber's sUSN balance
+  request_withdrawal_relative:
+    calls:
+      - description: "Get existing request sentinel from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "existing_sentinel"
+          type: "uint256"
+
+      - description: "Check that there is no open request (sentinel == 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_sentinel}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_open_request"
+          type: "bool"
+
+      - description: "Revert if there is already an open request"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_open_request}"
+
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      - description: "Get caliber's sUSN share balance"
+        target: "${inputs.susn_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "share_balance"
+          type: "uint256"
+
+      - description: "Calculate shares to redeem from basis points"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.share_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "shares_to_redeem"
+          type: "uint256"
+
+      - description: "Redeem sUSN shares into the WithdrawalHandler (registers request)"
+        target: "${inputs.susn_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.withdrawal_handler_address}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+      - description: "Get next request id (== open requestId + 1)"
+        target: "${inputs.withdrawal_handler_address}"
+        selector: "getUserNextRequestId(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "sentinel"
+          type: "uint256"
+
+      - description: "Store request sentinel (requestId + 1) in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.sentinel}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of sUSN balance to redeem (10000 = 100%)"
+
+  # Phase 2: claim USN after the 7-day cooldown, then clear the KV sentinel
+  claim_withdrawal:
+    calls:
+      - description: "Get request sentinel from KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "sentinel"
+          type: "uint256"
+
+      # Guard: there must be an open request (sentinel > 0)
+      - description: "Check if there is no open request (sentinel == 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.sentinel}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_open_request"
+          type: "bool"
+
+      - description: "Revert if there is no open request to claim"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_open_request}"
+
+      # requestId = sentinel - 1
+      - description: "Recover requestId (sentinel - 1)"
+        target: "${constants.math_helper_address}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.sentinel}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "request_id"
+          type: "uint256"
+
+      - description: "Claim the matured withdrawal (transfers USN to the caliber)"
+        target: "${inputs.withdrawal_handler_address}"
+        selector: "claimWithdrawal(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_id}"
+
+      - description: "Clear the request sentinel in KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "0"

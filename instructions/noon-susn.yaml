@@ -1,0 +1,158 @@
+# Noon Staked USN (sUSN) — BASE-TOKEN model (synthetic swap in + async redemption)
+#
+# sUSN is registered as a caliber BASE token (addBaseToken + an OracleRegistry sUSN
+# feed = 4626 rate route), so the held sUSN is priced directly by the base-token
+# registry. USN is also a base token (deposit input + claim output). This mirrors the
+# EtherFi async-redemption position (base-token held value + pending-only accounting)
+# combined with the reUSD/midas "synthetic swap in" deposit — the VBILL-style model.
+#
+#   DEPOSIT  : USN.approve(sUSN) -> sUSN.deposit(amount, caliber). Synthetic swap of one
+#              base token (USN) for another (sUSN). affected_tokens=[] — both legs settle
+#              into base tokens and the pending-only accounting is 0 here, so (as in
+#              reUSD/midas) declaring affected tokens would trip _checkPositionMinDelta on
+#              the swap leg; value conservation is inherent to ERC4626 mint at the rate the
+#              sUSN base-token feed also prices at.
+#   ACCOUNT  : pending only = open WithdrawalHandler request (KV-tracked), USN 18 dec, 0
+#              otherwise. The held sUSN is NOT accounted here (base-token registry prices
+#              it) — accounting it would double-count. Mirrors etherfi account_pending_redemption.
+#   WITHDRAW : request_withdrawal[_relative] -> (wait 7 days) -> claim_withdrawal.
+#              request burns sUSN into the handler; affected_tokens=[sUSN] (the base token
+#              leaving), offset by pending rising -> position Δ≈0. claim brings USN back;
+#              affected_tokens=[USN] (the base token arriving), offset by pending falling.
+#              Only ONE open request per position at a time: request -> wait -> claim.
+#
+# GO-LIVE PREREQUISITES (on-chain governance, outside these files):
+#   * OracleRegistry feed route for USN (USN/USD) and sUSN (sUSN 4626 rate * USN/USD).
+#   * caliber.addBaseToken(USN) and caliber.addBaseToken(sUSN).
+# See scripts-factory/noon/eth/<id>/ for the exact feeds used on the validation fork.
+#
+# Example caliber.yaml position entry (note: NO position_tokens — sUSN is a base token):
+#   - id: "294421829413359114064708960489435288598"
+#     group_id: "0"
+#     description: "Noon Staked USN (sUSN) — base token"
+#     instructions: !include "../../../instructions/noon-susn.yaml"
+#     vars:
+#       label: "sUSN"
+#       susn_address: "0xE24a3DC889621612422A64E6388927901608B91D"
+#       usn_address: "0xda67b4284609d2d48e5d10cfac411572727dc1ed"
+#       withdrawal_handler_address: "0x0dabc0d9b270c9b0c4c77aaceaa712b56d0f9178"
+#       kv_storage_key: "${keccak256(makina.intMkSrRoyUSDC.mainnet.noon-susn)}"
+
+# DEPOSIT (absolute): stake an exact USN amount into sUSN (synthetic swap in)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # USN -> sUSN, both base tokens; pending-only account is 0 here (else _checkPositionMinDelta reverts on the swap leg)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/deposit.yaml:deposit"
+    inputs:
+      usn_address:
+        type: "address"
+        value: ${position.usn_address}
+      susn_address:
+        type: "address"
+        value: ${position.susn_address}
+
+# DEPOSIT (relative): stake a percentage (bps) of the caliber's USN balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # USN -> sUSN, both base tokens
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/deposit.yaml:deposit_relative"
+    inputs:
+      usn_address:
+        type: "address"
+        value: ${position.usn_address}
+      susn_address:
+        type: "address"
+        value: ${position.susn_address}
+
+# ACCOUNTING: pending-only (KV-tracked open WithdrawalHandler request), USN-denominated.
+# The held sUSN is valued by the base-token registry, so it is intentionally NOT read here.
+# affected_tokens = the single denomination base token (USN) the pending value is priced in
+# (mirrors blueprints/etherfi/account.yaml with affected_tokens=[WETH]).
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "0xda67b4284609d2d48e5d10cfac411572727dc1ed" # USN
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/account.yaml:account"
+    inputs:
+      withdrawal_handler_address:
+        type: "address"
+        value: ${position.withdrawal_handler_address}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# WITHDRAW Phase 1 (absolute): redeem an exact number of sUSN shares into the handler.
+# affected_tokens=[sUSN] — the base token that LEAVES the caliber (burned); its registry
+# value drop is offset by the pending term rising, so position Δ≈0 (mirrors etherfi request).
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE24a3DC889621612422A64E6388927901608B91D" # sUSN
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/withdraw.yaml:request_withdrawal"
+    inputs:
+      susn_address:
+        type: "address"
+        value: ${position.susn_address}
+      withdrawal_handler_address:
+        type: "address"
+        value: ${position.withdrawal_handler_address}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# WITHDRAW Phase 1 (relative): redeem a percentage (bps) of the caliber's sUSN balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xE24a3DC889621612422A64E6388927901608B91D" # sUSN
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/withdraw.yaml:request_withdrawal_relative"
+    inputs:
+      susn_address:
+        type: "address"
+        value: ${position.susn_address}
+      withdrawal_handler_address:
+        type: "address"
+        value: ${position.withdrawal_handler_address}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}
+
+# WITHDRAW Phase 2: claim USN after the 7-day cooldown, then clear the KV sentinel.
+# affected_tokens=[USN] — the base token that ARRIVES; its registry value rise is offset by
+# the pending term falling to 0, so position Δ≈0 (mirrors etherfi claim).
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0xda67b4284609d2d48e5d10cfac411572727dc1ed" # USN
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/noon/withdraw.yaml:claim_withdrawal"
+    inputs:
+      withdrawal_handler_address:
+        type: "address"
+        value: ${position.withdrawal_handler_address}
+      kv_store_address:
+        type: "address"
+        value: ${config.key_value_store_address}
+      kv_storage_key:
+        type: "bytes32"
+        value: ${position.kv_storage_key}

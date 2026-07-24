@@ -1,0 +1,94 @@
+protocol: "royco-st-susn"
+
+# Royco Senior Tranche sUSN Account Blueprint (Base)
+# Single-slot NAV: ST.convertToAssets(balanceOf) returns the Royco tuple
+# (stAssets, jtAssets, nav); take nav (index 2, USD 18-dec) and scale to USDC (6-dec)
+# by dividing by 1e12. sUSN held idle is accounted natively (registered base token),
+# so this blueprint only values the active ST position.
+#
+# Do NOT call kernel.syncTrancheAccounting(): it is `restricted` + `nonReentrant`
+# (would revert), and convertToAssets already previews the synced NAV.
+# Verified live: convertToAssets(1e18) = (0.8308 sUSN, 0, 1.0034 USD nav).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # msgSender()
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # mulDiv (prod MathHelper, all chains)
+  revertable_caliber_helper_address:
+    type: "address"
+    value: "0xA5b2637997148160F3A878E85A978E8303f863CF" # extractElementFromStaticTuple (Base)
+  senior_tranche_address:
+    type: "address"
+    value: "0x98d55707B60793AC8cadAB3C456dA156671F138a" # ROY-ST-sUSN
+
+inputs: {}
+
+actions:
+  account:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Get Senior Tranche share balance
+      - description: "Get Senior Tranche share balance"
+        target: "${constants.senior_tranche_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${returns.caliber_address}"
+        return:
+          name: "st_shares"
+          type: "uint256"
+
+      # Convert ST shares to asset claims tuple (stAssets, jtAssets, nav)
+      - description: "Convert ST shares to asset claims with NAV"
+        target: "${constants.senior_tranche_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.st_shares}"
+        return:
+          name: "asset_claims"
+          type: "(uint256,uint256,uint256)"
+
+      # Extract NAV (index 2) from the tuple - USD value with 18 decimals
+      - description: "Extract NAV (USD 18 decimals) from asset claims tuple"
+        target: "${constants.revertable_caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.asset_claims}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "nav_usd_18dec"
+          type: "uint256"
+
+      # Scale NAV from USD (18 dec) to USDC (6 dec): nav / 1e12
+      - description: "Convert NAV from USD (18 dec) to USDC (6 dec)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.nav_usd_18dec}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "1000000000000"
+        return:
+          name: "usdc_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.usdc_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

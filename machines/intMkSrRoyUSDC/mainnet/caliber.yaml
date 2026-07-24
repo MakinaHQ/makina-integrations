@@ -199,3 +199,26 @@ positions:
     position_tokens:
       - "0x761c3b16A5afDD7a1869c4b979cFF3383d5fE98b" # DMG MT
       - "0xaC9CF7e8f83C471cA596F4371fF002cdaF9573e6" # ST-DMG
+
+  # ── Noon Staked USN (sUSN) — BASE-TOKEN model (group_id: 0) ──────────
+  # sUSN is registered as a caliber BASE token (addBaseToken + an OracleRegistry
+  # sUSN feed = 4626 rate route), so the held sUSN is priced directly by the
+  # base-token registry — hence NO position_tokens here. USN is also a base token
+  # (deposit input + claim output). Deposit is a synthetic swap (USN -> sUSN);
+  # accounting returns ONLY the KV-tracked in-flight WithdrawalHandler request
+  # (pending-only, like the EtherFi async-redemption position), 0 otherwise, so the
+  # active sUSN is never double-counted. Exit is the 7-day cooldown (request -> wait
+  # -> claim). This is the base-token alternative to the position-model PR #257.
+  #
+  # GO-LIVE PREREQUISITE (on-chain governance, outside these files): register the
+  # USN and sUSN OracleRegistry feed routes and addBaseToken(USN)/addBaseToken(sUSN).
+  - id: "294421829413359114064708960489435288598"
+    group_id: "0"
+    description: "Noon Staked USN (sUSN) — base token"
+    instructions: !include "../../../instructions/noon-susn.yaml"
+    vars:
+      label: "sUSN"
+      susn_address: "0xE24a3DC889621612422A64E6388927901608B91D"
+      usn_address: "0xda67b4284609d2d48e5d10cfac411572727dc1ed"
+      withdrawal_handler_address: "0x0dabc0d9b270c9b0c4c77aaceaa712b56d0f9178"
+      kv_storage_key: "${keccak256(makina.intMkSrRoyUSDC.mainnet.noon-susn)}"

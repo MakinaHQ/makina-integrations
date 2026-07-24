@@ -1,0 +1,56 @@
+protocol: "royco-st-susn"
+
+# Royco Senior Tranche sUSN Deposit Blueprint (Base)
+# Direct single-hop: sUSN -> Senior Tranche shares (ROY-ST-sUSN).
+# The ST token's deposit() pulls sUSN via safeTransferFrom(msg.sender, KERNEL, assets)
+# and mints ST shares to `receiver`, so the approval spender is the ST token itself.
+# Verified against deployed Base bytecode + sample tx 0x8d1a..63a (selector 0x6e553f65).
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # msgSender() (same address on Base)
+  susn_address:
+    type: "address"
+    value: "0x34a2798D47b238A7CbA9D87D49618DEE6C4D999F" # sUSN (Staked USN), 18 dec
+  senior_tranche_address:
+    type: "address"
+    value: "0x98d55707B60793AC8cadAB3C456dA156671F138a" # ROY-ST-sUSN (deposit/redeem/convertToAssets target)
+
+inputs: {}
+
+actions:
+  deposit:
+    calls:
+      - description: "Get caliber's address"
+        target: ${constants.context_helper_address}
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address"
+          type: "address"
+
+      # Approve sUSN to the Senior Tranche (ST) token (the spender that pulls sUSN)
+      - description: "Approve sUSN spending by the Senior Tranche token"
+        target: "${constants.susn_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.senior_tranche_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+
+      # Deposit sUSN into the Senior Tranche to receive ST shares
+      - description: "Deposit sUSN into the Senior Tranche to receive ST shares"
+        target: "${constants.senior_tranche_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_deposit}"
+          - type: "address"
+            value: "${returns.caliber_address}"
+
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "Amount of sUSN to deposit (18 decimals)"

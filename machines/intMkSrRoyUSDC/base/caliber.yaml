@@ -3,4 +3,29 @@ config:
     type: "address"
     value: "0x5476F4E23dAA093Ce6700e1026013c55F7AF9083"
 
-positions: []
+positions:
+  # ── Noon sUSN OTC swap (base-token model, group_id: 0) ────────────────────
+  # sUSN on Base is a bridged OFT (not mintable / not bridgeable via Makina), so the
+  # caliber trades USDC against an EOA we control to acquire/release it (raw
+  # transfer/transferFrom, no settler). sUSN is a caliber BASE token (registered via
+  # addBaseToken + the OracleRegistry sUSN route), so held sUSN is priced directly by
+  # the base-token registry — there is no ACCOUNTING leg and no position_tokens. Both
+  # swap legs move two base tokens (USDC + sUSN); slippage is enforced on-chain by the
+  # caliber's loss reconciliation (USDC delta vs base-token-priced sUSN delta). This
+  # shares sUSN's base-token registration with the Royco ST position below (a token
+  # cannot be both a base and a position token in the same caliber). Requires on-chain
+  # addBaseToken(sUSN) + the sUSN OracleRegistry route — both already needed by Royco.
+  - id: "323638792813778024403827224996075207355" # Noon USN (Base), dialectic_id f37a907104f7513d9ecf7887bbcefabb
+    group_id: "0"
+    description: "Noon sUSN OTC swap"
+    instructions: !include "./instructions/noon-susn-otc.yaml"
+    vars:
+      label: "sUSN OTC"
+
+  # Royco Senior Tranche sUSN (ROY-ST-sUSN) — DIA-817 (base / RoycoV2)
+  # sUSN is registered as a caliber base token; the tranche is a position valued in USDC.
+  - id: "198042280204537586073334227466131068355" # dialectic_id 94fd8e46f26bbf53d46b877fffafd5c3
+    group_id: "0"
+    description: "Royco ST sUSN"
+    instructions: !include "../../../instructions/royco-st-susn.yaml"
+    position_tokens: ["0x98d55707B60793AC8cadAB3C456dA156671F138a"] # ROY-ST-sUSN

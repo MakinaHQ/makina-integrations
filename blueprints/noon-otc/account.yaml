@@ -1,0 +1,30 @@
+protocol: "noon"
+
+# Noon sUSN OTC — no-op accounting for the base-token OTC swap position.
+#
+# sUSN is registered as a caliber base token and priced by the caliber's
+# OracleRegistry (sUSN/USN x USN/USD route), so the held sUSN is already counted
+# in AUM by the base-token registry. This accounting action therefore returns 0 to
+# avoid double counting — same pattern as blueprints/re/account.yaml:account_0 and
+# blueprints/midas/account.yaml.
+#
+# Every caliber position must have exactly one ACCOUNTING instruction, so this leg
+# exists purely to satisfy that requirement while contributing 0 position value.
+#
+# Slippage is NOT enforced here. Unlike the re/midas swaps (which pass a protocol
+# minShares/minPayout), this OTC trades against an EOA we control via raw
+# transfer/transferFrom with no protocol min-out, so the caliber's own loss
+# reconciliation is the sole price guard: the two MANAGEMENT swap legs declare
+# affected_tokens=[USDC, sUSN] (both base tokens), and the caliber nets the USDC
+# value moved against the sUSN value moved (both OracleRegistry-priced) and reverts
+# if the swap is off-rate beyond the caliber's max-loss bps.
+actions:
+  # Account: returns 0 (no-op) — held sUSN is valued by the caliber base-token registry.
+  account_0:
+    calls: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
