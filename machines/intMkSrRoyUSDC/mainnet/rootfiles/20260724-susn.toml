@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0xe0ee951350bc5761e0b5564e8be4748de39c1207643f27a6f04bbb2536c99a8a
+# root: 0xfd8e4c12282e4d55ea15fc2e55b6a3ec7b7bf2498a1d4227c598177545f85556
 
 [tokens."${token_list.mainnet.NUSD}"]
 chainId = 1
@@ -192,6 +192,23 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.account."RLUSD - Horizon Lend"]
+position_id = "47445753596645566272224472924421400103"
+description = "AaveV3 Horizon Supply RLUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = ["0xe3190143eb552456f88464662f0c0c4ac67a77eb"]
+commands = ["0x70a082310102ff0000000000e3190143eb552456f88464662f0c0c4ac67a77eb"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
 [instructions.aavev3.account."RLUSD - Lend"]
 position_id = "127941166575521302841184731003311232234"
 description = "AaveV3 Supply RLUSD"
@@ -259,6 +276,32 @@ state = [
 ]
 bitmap = "127605887595351923798765477786913079296"
 inputs_slots = []
+
+[instructions.aavev3.add_collateral."RLUSD - Horizon Lend"]
+position_id = "47445753596645566272224472924421400103"
+description = "AaveV3 Horizon Supply RLUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff8292bb45bf1ee4d140127049757c2e0ff06317ed",
+  "0x617ba0370102000304ff00ffae05cd22df81871bc7cc2a04becfb516bfe332c8",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000ae05cd22df81871bc7cc2a04becfb516bfe332c8",
+  "0x0000000000000000000000008292bb45bf1ee4d140127049757c2e0ff06317ed",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."RLUSD - Horizon Lend".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
 
 [instructions.aavev3.add_collateral."RLUSD - Lend"]
 position_id = "127941166575521302841184731003311232234"
@@ -362,6 +405,27 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.add_collateral."USDtb - Lend".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend"]
+position_id = "47445753596645566272224472924421400103"
+description = "AaveV3 Horizon Supply RLUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ffae05cd22df81871bc7cc2a04becfb516bfe332c8"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x0000000000000000000000008292bb45bf1ee4d140127049757c2e0ff06317ed",
+  "0x0000000000000000000000005476f4e23daa093ce6700e1026013c55f7af9083",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
 type = "Uint"
 
 [instructions.aavev3.withdraw_collateral."RLUSD - Lend"]
