@@ -1,0 +1,44 @@
+# makina-x Morpho vault deposit (ERC-4626 supply side).
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted
+# on-chain, so the account balanceOf step used by core blueprints/morpho is omitted.
+#
+# Generic ERC-4626: works for Morpho MetaMorpho V1 and VaultV2 — the management
+# deposit path is identical (deposit(uint256,address) selector 0x6e553f65). The V1/V2
+# split only matters for accounting (the VaultV2 liquidity lens), which makina-x omits.
+#
+# Instance-agnostic: pass the target vault via vault_address. The vault itself is the
+# approval target (it pulls the asset via transferFrom). Shares are minted to on_behalf_of.
+protocol: "morpho"
+
+inputs:
+  vault_address:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  deposit_vault:
+    calls:
+      - description: "Approve the Morpho vault to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.vault_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+
+      - description: "Deposit the asset into the Morpho vault (shares minted to on_behalf_of)"
+        target: ${inputs.vault_address}
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${input_slots.amount_to_deposit}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+    input_slots:
+      amount_to_deposit:
+        type: "uint256"
+        description: "The amount of the underlying asset to deposit"

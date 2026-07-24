@@ -6,4 +6,11 @@ config:
     type: "address"
     value: "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
 
-positions: []
+positions:
+  # Morpho "Clearstar cbAssets Vault" (CSCBUSDC) USDC supply — Morpho VaultV2 (ERC-4626).
+  # Vault shares 0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c track the position.
+  - id: "133242423309628000059155946577244883881" # pools_db makina_id — Morpho Clearstar cbAssets Vault (USDC)
+    group_id: "0"
+    description: "Morpho Clearstar cbAssets Vault USDC supply"
+    instructions: !include "./instructions/morpho-clearstar-cbassets.yaml"
+    position_tokens: ["0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"]

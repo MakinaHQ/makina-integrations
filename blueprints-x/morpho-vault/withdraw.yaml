@@ -1,0 +1,44 @@
+# makina-x Morpho vault withdraw (ERC-4626 full exit). Management-only, no ACCOUNTING.
+#
+# Full exit: reads the Safe's share balance on-chain (weiroll) and redeems ALL of it via
+# redeem(shares, receiver, owner) — selector 0xba087652. There is deliberately NO amount
+# input slot: ERC-4626 redeem has no max sentinel (redeem(type(uint256).max) reverts), so
+# the amount is computed on-chain from balanceOf rather than passed in. msg.sender == owner
+# (the Safe) so no allowance step is needed. Withdraw is synchronous — the vault
+# auto-deallocates from its liquidity adapter; a redeem larger than available adapter
+# liquidity can revert (forceDeallocate is the manual fallback, out of scope here).
+#
+# Generic ERC-4626: works for Morpho MetaMorpho V1 and VaultV2 (identical redeem/balanceOf).
+protocol: "morpho"
+
+inputs:
+  vault_address:
+    type: "address"
+  receiver:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+
+actions:
+  redeem_all:
+    calls:
+      - description: "Query the Safe's share balance held in the vault"
+        target: ${inputs.vault_address}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+        return:
+          name: "shares_balance"
+          type: "uint256"
+
+      - description: "Redeem the full share balance back to the underlying asset"
+        target: ${inputs.vault_address}
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: ${returns.shares_balance}
+          - type: "address"
+            value: ${inputs.receiver}
+          - type: "address"
+            value: ${inputs.on_behalf_of}

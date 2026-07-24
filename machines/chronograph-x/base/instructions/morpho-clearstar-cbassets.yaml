@@ -1,0 +1,54 @@
+# chronograph-x (makina-x) — Morpho "Clearstar cbAssets Vault" (CSCBUSDC) USDC supply.
+#
+# Morpho VaultV2 (ERC-4626) on Base. Underlying asset is USDC. The position is held by
+# the Safe (config.safe_address); the MakinaX module executes deposit/redeem on the
+# Safe's behalf. Management-only (no ACCOUNTING) — makina-x positions are not
+# NAV-accounted on-chain.
+#
+# Vault version: V2 (MORPHO() reverts, firstTotalAssets() returns) — but the management
+# deposit/redeem path is version-agnostic ERC-4626, so it reuses blueprints-x/morpho-vault.
+# Deposits/withdrawals are permissionless (all VaultV2 gates unset); approval target is the
+# vault itself. Withdraw is synchronous (auto-deallocates from the vault's liquidity adapter).
+#
+# Vault (hardcoded here per repo convention — protocol/instance-specific addresses live in
+# the instruction file, not config):
+#   Vault  : 0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c (CSCBUSDC, 18-dec shares)
+#   Asset  : USDC 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 (6 dec)
+
+- name: morpho_clearstar_cbassets_deposit
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.USDC}"
+  instruction:
+    label: "USDC - Clearstar cbAssets Vault"
+    path: "../../../blueprints-x/morpho-vault/deposit.yaml:deposit_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+      on_behalf_of:
+        type: "address"
+        value: "${config.safe_address}"
+      asset_address:
+        type: "address"
+        value: "${token_list.base.USDC}"
+
+- name: morpho_clearstar_cbassets_withdraw
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.USDC}"
+  instruction:
+    label: "USDC - Clearstar cbAssets Vault"
+    path: "../../../blueprints-x/morpho-vault/withdraw.yaml:redeem_all"
+    inputs:
+      vault_address:
+        type: "address"
+        value: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+      receiver:
+        type: "address"
+        value: "${config.safe_address}"
+      on_behalf_of:
+        type: "address"
+        value: "${config.safe_address}"

@@ -1,0 +1,51 @@
+intent:
+  pool_id: "643d8eaaa76be6f28b34754444aa8ba9" # dialectic_id
+  makina_id: "133242423309628000059155946577244883881"
+  pool_name: "Clearstar cbAssets Vault"
+  vault_address: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+  vault_symbol: "CSCBUSDC"
+  morpho_vault_version: "v2" # VaultV2 (ERC-4626): MORPHO() reverts, firstTotalAssets() ok
+  protocol: "morpho"
+  chain: "base"
+  machine: "chronograph-x"
+  network: "base"
+  makina_x: true
+  safe_address: "0x9f0f855A7370cc30e24924258214681A782A34aC"
+  makina_lite_module: "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+  actions: [deposit, withdraw] # user-selected; no account (makina-x), no harvest (no rewards)
+  base_tokens:
+    - address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+      symbol: "USDC"
+      decimals: 6
+      index: 0
+  context: null
+
+current_stage: 4 # complete
+stages:
+  0_intent: { status: completed, timestamp: "2026-07-23T00:00:00Z" }
+  1_specs: { status: completed, artifacts: [specs.yaml, SUMMARY.md] }
+  1b_enrich: { status: completed, artifacts: [functions.md] }
+  1c_offchain: { status: skipped, reason: "no proofs/signatures/APIs/rewards; standard ERC-4626" }
+  2_deposit: { status: completed, artifacts: [execution-deposit.md] }
+  2_withdraw: { status: completed, artifacts: [execution-withdraw.md] }
+  3_blueprint:
+    status: completed
+    artifacts:
+      - blueprints-x/morpho-vault/deposit.yaml
+      - blueprints-x/morpho-vault/withdraw.yaml
+      - machines/chronograph-x/base/instructions/morpho-clearstar-cbassets.yaml
+      - machines/chronograph-x/base/caliber.yaml
+      - machines/chronograph-x/base/rootfiles/20260723-morpho-clearstar-cbassets.toml
+    root: "0x249b881a6fe68d76bc50a47b62c1aa7e691300f3212a602be648be3d42170365"
+    transpiler: "MakinaHQ/transpiler v0.2.4 (--lite), built in scratchpad"
+    note: "withdraw uses redeem_all (on-chain balanceOf -> redeem, no input slot); root recompiled after that change"
+  4_test:
+    status: completed
+    artifacts: [test-report.md]
+    result: "PASS (root_check PASS, deposit->withdraw lifecycle PASS)"
+    note: |
+      redeem-all round-trip returns 10000e6 - 1 wei (ERC-4626 round-down; vault market has
+      ~0 utilization in-fork so no yield accrues). Harness template updated: +7d warp
+      (helps interest-bearing vaults) + 10-wei rounding-dust tolerance on the >= assertion.
+    root: "0x249b881a6fe68d76bc50a47b62c1aa7e691300f3212a602be648be3d42170365"
+testnets: {}

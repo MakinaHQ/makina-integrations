@@ -1,0 +1,211 @@
+pool:
+  id: "643d8eaaa76be6f28b34754444aa8ba9" # dialectic_id
+  makina_id: "133242423309628000059155946577244883881" # position id
+  name: "Clearstar cbAssets Vault"
+  protocol: "morpho"
+  version: "vault-v2" # Morpho VaultV2 (NOT MetaMorpho V1)
+  network: "base"
+  chain_id: 8453
+
+# ---------------------------------------------------------------------------
+# Execution model: MakinaX (Safe module). Management-only.
+# No caliber, no on-chain NAV accounting. The position is held and executed
+# AS the Safe: on_behalf / receiver / owner == the Safe.
+# ---------------------------------------------------------------------------
+execution_context:
+  makina_x: true
+  machine: "chronograph-x"
+  safe_address: "0x9f0f855A7370cc30e24924258214681A782A34aC" # holder / on_behalf / receiver / owner
+  makina_x_module: "0x785db5f3F3Ad18D6291689907D319954AF79A03E" # MakinaXModule (Safe module executor)
+  accounting: "none" # makina-x fund: NO on-chain accounting flow is produced
+
+contracts:
+  pool: # the vault IS the ERC-4626 contract (self-contained)
+    address: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+    symbol: "CSCBUSDC"
+    decimals: 18 # share token decimals
+    abi_source: "https://basescan.org/address/0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c#code"
+    version_detection: "MORPHO() reverts; firstTotalAssets()(uint256) succeeds => VaultV2, not MetaMorpho V1"
+  underlying:
+    address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    symbol: "USDC"
+    decimals: 6
+  receipt_token: # shares == the vault itself (ERC-4626 self-share)
+    address: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+    symbol: "CSCBUSDC"
+    decimals: 18
+
+# ---------------------------------------------------------------------------
+# Approval target for ERC-4626 deposit/mint == the vault itself.
+# The vault pulls `asset` from msg.sender (the Safe) via transferFrom, so the
+# Safe must approve USDC to the vault address (NOT a router/periphery).
+# ---------------------------------------------------------------------------
+approval_target: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+
+helpers: {} # none required. No router/periphery; the vault is the direct interface.
+
+# ---------------------------------------------------------------------------
+# VaultV2-specific gating / constraints (read from the DEPLOYED contract)
+# ---------------------------------------------------------------------------
+gating:
+  # Transfer gates: all UNSET (zero address) => fully permissionless. The
+  # corresponding view checks all return true for the Safe.
+  receiveSharesGate: "0x0000000000000000000000000000000000000000" # canReceiveShares(safe)=true (deposit share recipient)
+  sendSharesGate: "0x0000000000000000000000000000000000000000" # canSendShares(safe)=true    (withdraw/redeem owner)
+  receiveAssetsGate: "0x0000000000000000000000000000000000000000" # canReceiveAssets(safe)=true (withdraw asset recipient)
+  sendAssetsGate: "0x0000000000000000000000000000000000000000" # canSendAssets(safe)=true    (deposit funder)
+  per_address_caps: false # no per-address deposit/withdraw caps
+  # IMPORTANT: maxDeposit/maxMint/maxWithdraw/maxRedeem are declared `pure` on
+  # this VaultV2 and ALWAYS return 0. This is a known VaultV2 trait, NOT a
+  # cap-full or gate signal. Do NOT use them to size or gate transactions.
+  max_functions_return_zero: true
+  # Timelocks (submit/executableAt/timelock(bytes4)) govern ONLY curator
+  # actions (cap changes, adapter changes, fee changes). They do NOT apply to
+  # user deposit/withdraw/redeem/mint. Deposits and withdrawals are immediate.
+  user_flows_timelocked: false
+  caps_model: "Absolute/relative caps exist on internal allocation ids and are enforced on curator `allocate`, not on user deposit."
+
+# ---------------------------------------------------------------------------
+# Liquidity / redemption profile
+# ---------------------------------------------------------------------------
+liquidity:
+  synchronous: true # deposit & withdraw are synchronous — NO request/claim, NO withdrawal queue
+  async_redemption: false
+  idle_assets: 0 # all assets currently allocated to the liquidity adapter
+  liquidity_adapter: "0x812B71c33Ae5EAfEbAe967C5670e37eca3cab0ac" # single registered adapter (adaptersLength=1)
+  withdraw_liquidity_path: >
+    withdraw/redeem first consumes idle assets, then automatically deallocates
+    from liquidityAdapter to cover the shortfall. A withdraw can revert if the
+    requested amount exceeds available adapter liquidity (underlying market
+    liquidity constraint) — this is a liquidity revert, not an async queue.
+  force_deallocate:
+    function: "forceDeallocate(address adapter,bytes data,uint256 assets,address onBehalf)"
+    penalty_wad: "3000000000000000" # 0.3% (3e15 / 1e18) penalty on force-deallocated assets
+    note: "Fallback to pull liquidity from a specific adapter when standard withdraw is liquidity-constrained; charges a penalty. Not needed for normal management."
+
+accounting_model:
+  archetype: position # off-chain valued as a position; NO on-chain accounting instruction (makina-x)
+  rationale: >
+    MakinaX management-only integration — there is no caliber and no on-chain
+    NAV accounting. Off-chain, the holding is valued as an ERC-4626 position
+    via convertToAssets(shares) / previewRedeem(shares). No base token is
+    registered (makina-x has no addBaseToken) and no oracle feed is required
+    for this management-only flow.
+  async_redemption: false
+  affected_tokens:
+    deposit: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"] # USDC leaves the Safe
+    withdraw: ["0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"] # USDC returns to the Safe
+  precedent: erc4626-position
+
+oracle:
+  required: false
+  note: "MakinaX management-only: no addBaseToken, no on-chain NAV, so no OracleRegistry feed is needed to ship. Share->asset conversion is read directly from the vault (convertToAssets/previewRedeem)."
+
+# ---------------------------------------------------------------------------
+# FLOWS
+# ---------------------------------------------------------------------------
+flows:
+  deposit:
+    description: >
+      Supply USDC into the vault to mint CSCBUSDC shares to the Safe. Executed
+      as the Safe via MakinaXModule. Two calls: approve USDC to the vault, then
+      deposit(assets, onBehalf=Safe).
+    synchronous: true
+    steps:
+      - action: approve
+        contract: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
+        function: "approve(address,uint256)"
+        params:
+          spender: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c" # the vault (approval target)
+          amount: "<assets_in_usdc_6dp>"
+      - action: deposit
+        contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+        # deposit(uint256 assets, address onBehalf) returns (uint256 shares)
+        # NOTE: 2nd arg is named `onBehalf` on VaultV2 (it is the share recipient).
+        function: "deposit(uint256,address)"
+        params:
+          assets: "<assets_in_usdc_6dp>"
+          onBehalf: "0x9f0f855A7370cc30e24924258214681A782A34aC" # Safe = share recipient
+        returns: "uint256 shares (18dp)"
+    alt_entry:
+      # Equivalent share-first entry if minting an exact share amount is preferred.
+      function: "mint(uint256,address)" # mint(uint256 shares, address onBehalf) returns (uint256 assets)
+      params:
+        shares: "<shares_18dp>"
+        onBehalf: "0x9f0f855A7370cc30e24924258214681A782A34aC"
+    preview:
+      contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+      function: "previewDeposit(uint256)" # assets(6dp) -> shares(18dp)
+    events_to_monitor:
+      - "Deposit(address indexed sender, address indexed onBehalf, uint256 assets, uint256 shares)"
+      - "Transfer(address indexed from, address indexed to, uint256 shares)" # 0x0 -> Safe (shares minted)
+
+  withdraw:
+    description: >
+      Redeem CSCBUSDC shares back to USDC to the Safe. Executed as the Safe via
+      MakinaXModule. Synchronous; pulls idle then deallocates from the liquidity
+      adapter. Two natural variants: redeem (by share amount) and withdraw
+      (by exact asset amount). No approval needed — the Safe is the owner
+      (onBehalf) burning its own shares.
+    synchronous: true
+    steps:
+      - action: redeem
+        contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+        # redeem(uint256 shares, address receiver, address onBehalf) returns (uint256 assets)
+        function: "redeem(uint256,address,address)"
+        params:
+          shares: "<shares_18dp>"
+          receiver: "0x9f0f855A7370cc30e24924258214681A782A34aC" # Safe = USDC recipient
+          onBehalf: "0x9f0f855A7370cc30e24924258214681A782A34aC" # Safe = share owner (burned from)
+        returns: "uint256 assets (6dp)"
+    alt_entry:
+      # Exact-asset variant.
+      function: "withdraw(uint256,address,address)" # withdraw(uint256 assets, address receiver, address onBehalf) returns (uint256 shares)
+      params:
+        assets: "<assets_in_usdc_6dp>"
+        receiver: "0x9f0f855A7370cc30e24924258214681A782A34aC" # Safe = USDC recipient
+        onBehalf: "0x9f0f855A7370cc30e24924258214681A782A34aC" # Safe = share owner
+    preview:
+      contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+      functions:
+        - "previewRedeem(uint256)" # shares(18dp) -> assets(6dp)
+        - "previewWithdraw(uint256)" # assets(6dp)  -> shares(18dp)
+    liquidity_note: "May revert if the requested assets exceed adapter liquidity. forceDeallocate (0.3% penalty) is the fallback to force-pull from a specific adapter."
+    events_to_monitor:
+      - "Withdraw(address indexed sender, address indexed receiver, address indexed onBehalf, uint256 assets, uint256 shares)"
+      - "Transfer(address indexed from, address indexed to, uint256 shares)" # Safe -> 0x0 (shares burned)
+
+# No accounting flow: makina-x management-only (per task).
+# No harvest flow: no reward tokens registered.
+
+position_read:
+  # For off-chain position valuation only (not an on-chain accounting instruction).
+  shares_balance:
+    contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+    function: "balanceOf(address)" # balanceOf(Safe) -> shares (18dp)
+    subject: "0x9f0f855A7370cc30e24924258214681A782A34aC"
+  shares_to_assets:
+    contract: "0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"
+    function: "convertToAssets(uint256)" # shares(18dp) -> USDC(6dp)
+
+state_snapshot:
+  block_note: "read on base @ ~block 25.59M"
+  total_assets_usdc_6dp: "13916451116858" # ~13.92M USDC
+  total_supply_shares_18dp: "13633533438948079606609654"
+  share_price: "1 CSCBUSDC = 1.020751 USDC (convertToAssets(1e18)=1020751)"
+  owner: "0xb3CF59A5f12cA319861376C5e63Eef4790a42B44"
+  curator: "0xb3CF59A5f12cA319861376C5e63Eef4790a42B44"
+
+metadata:
+  generated_at: "2026-07-23"
+  data_sources:
+    - "on-chain (base RPC via cast)"
+    - "basescan verified ABI (etherscan MCP)"
+  notes: >
+    Function signatures verified against the DEPLOYED VaultV2 ABI on basescan
+    (not makina-core / vault-v2 main). deposit(assets,onBehalf) and
+    mint(shares,onBehalf) take the share recipient as arg #2; withdraw and
+    redeem take (amount, receiver, onBehalf-owner). Approval target is the
+    vault itself. maxDeposit/maxWithdraw/maxMint/maxRedeem are `pure` and
+    return 0 — do not use them. Flows are fully synchronous; no queue, no
+    timelock on user flows, gates unset (permissionless).

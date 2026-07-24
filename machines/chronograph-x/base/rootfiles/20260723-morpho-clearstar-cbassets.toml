@@ -1,0 +1,52 @@
+# this is a generated file - do not edit manually
+# root: 0x249b881a6fe68d76bc50a47b62c1aa7e691300f3212a602be648be3d42170365
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.morpho.deposit_vault."USDC - Clearstar cbAssets Vault"]
+position_id = "133242423309628000059155946577244883881"
+description = "Morpho Clearstar cbAssets Vault USDC supply"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x6e553f65010002ff000000ff91c056b6d4311a743614fbc03ac32d4e6a2d3a3c",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000091c056b6d4311a743614fbc03ac32d4e6a2d3a3c",
+  "0x0000000000000000000000009f0f855a7370cc30e24924258214681a782a34ac",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."USDC - Clearstar cbAssets Vault".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.redeem_all."USDC - Clearstar cbAssets Vault"]
+position_id = "133242423309628000059155946577244883881"
+description = "Morpho Clearstar cbAssets Vault USDC supply"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310100ff000000000191c056b6d4311a743614fbc03ac32d4e6a2d3a3c",
+  "0xba08765201010000ff0000ff91c056b6d4311a743614fbc03ac32d4e6a2d3a3c",
+]
+state = [
+  "0x0000000000000000000000009f0f855a7370cc30e24924258214681a782a34ac",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
