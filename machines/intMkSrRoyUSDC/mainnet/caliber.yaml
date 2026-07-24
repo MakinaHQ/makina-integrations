@@ -11,6 +11,9 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+  aavev3_horizon_instance:
+    type: "address"
+    value: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
   key_value_store_address:
     type: "address"
     value: "0x1b52c5d62458675597ce9b25e81af89fdd8c4029"
@@ -55,7 +58,7 @@ positions:
       label: "USDC - Lend"
       asset_address: ${token_list.mainnet.USDC}
       aave_token: "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
-      aave_pool_instance: ${config.aavev3_core_instance}
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "127941166575521302841184731003311232234"
     group_id: "1"
     description: "AaveV3 Supply RLUSD"
@@ -66,7 +69,7 @@ positions:
       label: "RLUSD - Lend"
       asset_address: ${token_list.mainnet.RLUSD}
       aave_token: "0xFa82580c16A31D0c1bC632A36F82e83EfEF3Eec0"
-      aave_pool_instance: ${config.aavev3_core_instance}
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "198834366791576294957883993689758100677"
     group_id: "1"
     description: "AaveV3 Supply USDG"
@@ -77,7 +80,7 @@ positions:
       label: "USDG - Lend"
       asset_address: ${token_list.mainnet.USDG}
       aave_token: "0x7c0477d085ECb607CF8429f3eC91Ae5E1e460F4F"
-      aave_pool_instance: ${config.aavev3_core_instance}
+      aave_pool_instance: "${config.aavev3_core_instance}"
   - id: "180824950629563478123006004740707789068"
     group_id: "1"
     description: "AaveV3 Supply USDtb"
@@ -88,7 +91,19 @@ positions:
       label: "USDtb - Lend"
       asset_address: ${token_list.mainnet.USDtb}
       aave_token: "0xEc4ef66D4fCeEba34aBB4dE69dB391Bc5476ccc8"
-      aave_pool_instance: ${config.aavev3_core_instance}
+      aave_pool_instance: "${config.aavev3_core_instance}"
+
+  # ── AaveV3 Horizon Supply (group_id: 3) ──────────────────────────
+  - id: "47445753596645566272224472924421400103"
+    group_id: "3"
+    description: "AaveV3 Horizon Supply RLUSD"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0xe3190143eB552456F88464662F0C0C4AC67A77Eb"]
+    vars:
+      label: "RLUSD - Horizon Lend"
+      asset_address: ${token_list.mainnet.RLUSD}
+      aave_token: "0xe3190143eB552456F88464662F0C0C4AC67A77Eb"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
 
   # ── AaveV4 Supply (Hub & Spoke, group_id: 2) ──────────────────────
   # Aave V4 Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485; reserves are keyed
