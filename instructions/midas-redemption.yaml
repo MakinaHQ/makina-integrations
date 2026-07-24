@@ -12,7 +12,9 @@
 #   kv_storage_key:     bytes32  — unique per position (e.g. keccak256("makina.<chain>.midas.<vault>"))
 #
 # Expected config:
-#   key_value_store_address
+#   caliber_address, key_value_store_address, math_helper_address,
+#   bytes32_helper_address, caliber_helper_address,
+#   boolean_helper_address
 
 # MANAGEMENT — redeem_request (absolute mToken amount)
 - is_debt: false
@@ -23,6 +25,21 @@
     label: ${position.label}
     path: "../../../blueprints/midas/withdraw.yaml:redeem_request"
     inputs:
+      math_helper_address:
+        type: "address"
+        value: "${config.math_helper_address}"
+      bytes32_helper_address:
+        type: "address"
+        value: "${config.bytes32_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}
@@ -48,6 +65,21 @@
     label: ${position.label}
     path: "../../../blueprints/midas/withdraw.yaml:redeem_request_relative"
     inputs:
+      math_helper_address:
+        type: "address"
+        value: "${config.math_helper_address}"
+      bytes32_helper_address:
+        type: "address"
+        value: "${config.bytes32_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}
@@ -73,6 +105,18 @@
     label: ${position.label}
     path: "../../../blueprints/midas/account.yaml:account"
     inputs:
+      math_helper_address:
+        type: "address"
+        value: "${config.math_helper_address}"
+      bytes32_helper_address:
+        type: "address"
+        value: "${config.bytes32_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}

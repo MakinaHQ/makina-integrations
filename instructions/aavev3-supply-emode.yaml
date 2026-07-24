@@ -1,15 +1,15 @@
-# AaveV3 Horizon mGLOBAL Supply with E-Mode activation/deactivation.
+# AaveV3 Supply with E-Mode activation/deactivation.
 #
-# Expected caliber vars:
-#   label:         string   - position label
-#   asset_address: address  - mGLOBAL token address
-#   aave_token:    address  - Horizon aToken address for mGLOBAL
+# Expected position vars:
+#   label:              string   — supplied asset label
+#   asset_address:      address  — underlying asset
+#   aave_token:         address  — aToken used for accounting
+#   aave_pool_instance: address  — Aave V3 Pool
+#   e_mode_category:    uint8    — E-Mode category to activate
 #
 # Expected config:
 #   caliber_address
-#   aavev3_horizon_instance
 
-# 1/5 - Activate Horizon mGLOBAL/Stablecoins E-Mode (category 5)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: []
@@ -19,12 +19,11 @@
     inputs:
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_horizon_instance}"
+        value: "${position.aave_pool_instance}"
       e_mode:
         type: "uint8"
-        value: "5"
+        value: "${position.e_mode_category}"
 
-# 2/5 - Supply mGLOBAL as collateral
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -41,9 +40,8 @@
         value: ${position.asset_address}
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_horizon_instance}"
+        value: "${position.aave_pool_instance}"
 
-# 3/5 - Withdraw mGLOBAL collateral
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -60,9 +58,8 @@
         value: ${position.asset_address}
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_horizon_instance}"
+        value: "${position.aave_pool_instance}"
 
-# 4/5 - Deactivate E-Mode (category 0)
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: []
@@ -72,12 +69,11 @@
     inputs:
       aave_pool_instance:
         type: "address"
-        value: "${config.aavev3_horizon_instance}"
+        value: "${position.aave_pool_instance}"
       e_mode:
         type: "uint8"
         value: "0"
 
-# 5/5 - Accounting
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:

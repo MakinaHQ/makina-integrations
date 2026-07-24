@@ -1,0 +1,67 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xd36f095556d5717fd9231a2091e8e98beb7cb621"
+  key_value_store_address:
+    type: "address"
+    value: "0x22b0214F224ccc1Ae6026A034929325A560423f6"
+  caliber_helper_address:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  boolean_helper_address:
+    type: "address"
+    value: "0x8dc60173F37B34998FD5B2aeF47Dd68C68CC22C4"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+
+positions:
+  # ── Midas mGLO ───────────────────────────────────────────────────
+  - id: "53294670794897441434170557904199351668511760854159440289297735578033011077594" # keccak256("midas.mglo.swap-in")
+    group_id: "0"
+    description: "Midas mGLO Swap In (synthetic)"
+    instructions: !include "../../../instructions/midas-swap-in.yaml"
+    vars:
+      label: "mGLO Swap In (synthetic)"
+      asset_address: ${token_list.base.USDC}
+      mtoken_address: ${token_list.base.mGLO}
+      depositor_address: "0x2B7e9c9a72a31e4299F735D6e13445B320701Df1"
+
+  - id: "30264516356471232104546370531296025866967283429682496623412006582877924542466" # keccak256("midas.mglo.redemption")
+    group_id: "0"
+    description: "Midas mGLO Redemption (async)"
+    instructions: !include "../../../instructions/midas-redemption.yaml"
+    vars:
+      label: "mGLO Redemption"
+      redeemer_address: "0xA80F9BfFff91CBC13314fEfD05560032aF018F18"
+      mtoken_address: ${token_list.base.mGLO}
+      token_out_address: ${token_list.base.USDC}
+      kv_storage_key: "${keccak256(makina.base.midas.mglo-redemption)}"
+
+  # ── Morpho mGLO/USDC (market: 0x29ae...52d0b) ────────────────────
+  - id: "125056470168347138528124109495472443889"
+    group_id: "1"
+    description: "Morpho mGLO collateral (market: 0x29ae...52d0b)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "mGLO/USDC (0x29ae...52d0b)"
+      market_id: "0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b"
+      collateral_token: ${token_list.base.mGLO}
+
+  - id: "282483784221449498647186934766547121044"
+    group_id: "1"
+    description: "Morpho USDC debt (market: 0x29ae...52d0b)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "mGLO/USDC (0x29ae...52d0b)"
+      market_id: "0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b"
+      loan_token: ${token_list.base.USDC}

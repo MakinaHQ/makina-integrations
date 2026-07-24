@@ -1,8 +1,6 @@
 protocol: "aavev3"
 
 inputs:
-  aave_pool_instance:
-    type: "address"
   token:
     type: "address"
   interest_rate_mode:
@@ -10,6 +8,8 @@ inputs:
   referral_code:
     type: "uint256"
   receiver:
+    type: "address"
+  aave_pool_instance:
     type: "address"
 
 actions:
