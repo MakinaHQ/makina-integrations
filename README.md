@@ -38,6 +38,11 @@ Every machine gets its own toplevel directory (`machines`) for its rootfiles and
 
 Network names (`[network-name-N]`) should match the chains defined in `config.toml`.
 
+A full Makina machine declares every chain in one `config.toml` via `[calibers.<chain>]`. A MakinaLite module cannot: its config format is flat
+(`name`/`chain`/`address`/`rootfiles`) and holds a single chain, and the CLI takes the target chain from that field. A multi-chain MakinaLite module
+therefore needs one `config.toml` per network, at `[machine-name]/[network-name]/config.toml`, each registered as its own entry under
+`[makina_lite_modules]` in the operator's CLI config.
+
 \* Transpiling of instructions is done by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
 
 The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file and the output is stored in the `[machine-name]/[network-name]/rootfiles/[timestamp]-[name-of-the-migration].toml` file.

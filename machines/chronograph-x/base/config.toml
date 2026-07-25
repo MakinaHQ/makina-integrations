@@ -1,0 +1,4 @@
+name = "chronograph-x"
+chain = "base"
+address = "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+rootfiles = "github:MakinaHQ/config/machines/chronograph-x/base/rootfiles"
