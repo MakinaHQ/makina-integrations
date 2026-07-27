@@ -1,0 +1,137 @@
+name: Transpile and Validate Calibers
+description: >-
+  Transpiles each given caliber, diffs the output against its newest existing
+  rootfile, and runs `check` plus the on-chain validators for whichever
+  calibers actually changed. Leaves a __ci_generated__.toml temp file in each
+  processed caliber's rootfiles/ directory — callers own renaming/deleting it.
+
+inputs:
+  calibers:
+    description: Newline-separated "machine/chain" pairs to process.
+    required: true
+  etherscan-api-key:
+    required: true
+  alchemy-api-key:
+    required: true
+
+outputs:
+  changed-calibers:
+    description: >-
+      Newline-separated "machine/chain" pairs whose transpiled output differs
+      from their newest existing rootfile.
+    value: ${{ steps.diff.outputs.changed }}
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout transpiler repository
+      uses: actions/checkout@v6
+      with:
+        repository: MakinaHQ/transpiler
+        path: transpiler
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo
+      uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: transpiler
+
+    - name: Build transpiler
+      shell: bash
+      working-directory: transpiler
+      run: cargo build --release
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+
+    - name: Transpile each caliber and diff against its newest existing rootfile
+      id: diff
+      shell: bash
+      env:
+        CALIBERS: ${{ inputs.calibers }}
+      run: |
+        set -euo pipefail
+        changed=()
+        failed=()
+        while IFS= read -r pair; do
+          [ -z "$pair" ] && continue
+          machine="${pair%%/*}"
+          chain="${pair#*/}"
+          dir="machines/$machine/$chain"
+          caliber="$dir/caliber.yaml"
+          mkdir -p "$dir/rootfiles"
+          tmp="$dir/rootfiles/__ci_generated__.toml"
+
+          lite=""
+          if grep -q 'makina_lite_module' "$caliber"; then lite="--lite"; fi
+          echo "Transpiling $caliber $lite"
+          if ! (cd transpiler && cargo run -r -- -i "../$caliber" -o "../$tmp" -t "../token-lists/prod-token-list.json" $lite); then
+            echo "::error file=$caliber::Transpile failed for $pair"
+            failed+=("$pair")
+            continue
+          fi
+
+          newest=$(cd "$dir/rootfiles" && ls -1 | grep -E '^[0-9]{8}' | LC_ALL=C sort | tail -n 1 || true)
+          if [ -z "$newest" ] || ! diff -q "$dir/rootfiles/$newest" "$tmp" > /dev/null 2>&1; then
+            echo "  -> changed (vs '${newest:-<none>}')"
+            changed+=("$pair")
+          else
+            echo "  -> unchanged (matches $newest)"
+          fi
+        done <<< "$CALIBERS"
+
+        {
+          echo "changed<<TRANSPILE_VALIDATE_EOF"
+          if [ "${#changed[@]}" -gt 0 ]; then
+            printf '%s\n' "${changed[@]}"
+          fi
+          echo "TRANSPILE_VALIDATE_EOF"
+        } >> "$GITHUB_OUTPUT"
+
+        if [ "${#failed[@]}" -gt 0 ]; then
+          echo ""
+          echo "::error::The following calibers failed to transpile:"
+          printf '  %s\n' "${failed[@]}"
+          echo ""
+          echo "Every caliber must transpile before a release can regenerate rootfiles."
+          exit 1
+        fi
+
+    - name: Run transpiler checks and on-chain validators for changed calibers
+      shell: bash
+      env:
+        CHANGED: ${{ steps.diff.outputs.changed }}
+        ETHERSCAN_API_KEY: ${{ inputs.etherscan-api-key }}
+        ALCHEMY_API_KEY: ${{ inputs.alchemy-api-key }}
+      run: |
+        set -euo pipefail
+        rootfiles=()
+        while IFS= read -r pair; do
+          [ -z "$pair" ] && continue
+          machine="${pair%%/*}"
+          chain="${pair#*/}"
+          dir="machines/$machine/$chain"
+          caliber="$dir/caliber.yaml"
+          tmp="$dir/rootfiles/__ci_generated__.toml"
+
+          lite=""
+          if grep -q 'makina_lite_module' "$caliber"; then lite="--lite"; fi
+          echo "Running transpiler check for $caliber $lite"
+          (cd transpiler && cargo run -r -- -i "../$caliber" -t "../token-lists/prod-token-list.json" $lite check --github-errors)
+
+          rootfiles+=("$tmp")
+        done <<< "$CHANGED"
+
+        if [ "${#rootfiles[@]}" -eq 0 ]; then
+          echo "No changed calibers — skipping check and validators."
+        else
+          uv run python -m unittest tests.test_validate_token_chains
+          uv run python scripts/validate_token_chains.py "${rootfiles[@]}"
+
+          uv run --with 'web3==7.14.1' --with pyyaml python -m unittest tests.test_validate_open_positions
+          uv run --with 'web3==7.14.1' --with pyyaml python -m unittest tests.test_validate_base_tokens
+          uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_open_positions.py "${rootfiles[@]}"
+          uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_base_tokens.py "${rootfiles[@]}"
+        fi

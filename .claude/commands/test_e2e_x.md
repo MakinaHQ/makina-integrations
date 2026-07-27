@@ -34,9 +34,13 @@ test → report); this command does not re-implement it.
   `lib/forge-std`; it will `git submodule update --init lib/forge-std` there if missing. Point at a
   non-default checkout with `--makina-x-path` or `$MAKINA_X_PATH` (default
   `/Users/augustin/Desktop/git/makina-x`).
-- **No transpiler needed** — makina-x rootfiles are committed; the harness parses the compiled
-  rootfile rather than recompiling (the fallback transpiler lacks `--lite`). Recompile separately
-  if you changed the caliber source, then re-run.
+- **No transpiler needed for calibers already on `main`** — their historical rootfiles remain
+  committed, and the harness parses the compiled rootfile rather than recompiling (the fallback
+  transpiler lacks `--lite`). For a caliber under active integration (a new position not yet in
+  any committed rootfile), compile to a scratch path yourself (see `/integrate-x` Stage 3) and
+  pass `--rootfile <scratch-path>` explicitly — do **not** rely on "newest in the sibling
+  `rootfiles/`" below, since production rootfiles are release-only now and may be stale relative
+  to your branch's `caliber.yaml`.
 
 ---
 

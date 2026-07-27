@@ -10,6 +10,7 @@ from __future__ import annotations
 import importlib.util
 import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -109,6 +110,28 @@ class ValidateBaseTokensTests(unittest.TestCase):
         result = validate_base_tokens.validate_target(target, checker)
         self.assertFalse(result.ok)
         self.assertEqual(len(result.non_base_tokens), len(result.affected_tokens))
+
+    def test_extract_caliber_address_raises_caliber_unavailable_for_lite_caliber(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            caliber_path = Path(directory) / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  safe_address:\n"
+                "    value: '0x3470c3a0717406137dD3c94b5421C2409459b368'\n"
+                "  makina_lite_module:\n"
+                "    value: '0xD57152f21aB5E5A8b3AdFf197c73aCC2Fdbd1CbD'\n"
+                "positions: []\n"
+            )
+
+            with self.assertRaisesRegex(
+                validate_base_tokens.CaliberUnavailable, "makina-x \\(lite\\) caliber"
+            ):
+                validate_base_tokens.extract_caliber_address(caliber_path)
+
+    def test_extract_caliber_address_still_resolves_normal_caliber(self) -> None:
+        caliber_path = FIXTURES_ROOT / "dusd" / "mainnet" / "caliber.yaml"
+        caliber_address = validate_base_tokens.extract_caliber_address(caliber_path)
+        self.assertEqual(caliber_address, "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC")
 
     def test_dusd_mainnet_iusd_not_base_token(self) -> None:
         """Integration test: at block 24721023, iUSD (0x48f9...) is NOT a

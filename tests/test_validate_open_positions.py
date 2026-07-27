@@ -128,6 +128,31 @@ class ValidateOpenPositionsTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "could not find a positions field"):
                 validate_open_positions.extract_caliber_metadata(caliber_path)
 
+    def test_extract_caliber_metadata_raises_caliber_unavailable_for_lite_caliber(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            caliber_path = Path(directory) / "caliber.yaml"
+            caliber_path.write_text(
+                "config:\n"
+                "  safe_address:\n"
+                "    value: '0x3470c3a0717406137dD3c94b5421C2409459b368'\n"
+                "  makina_lite_module:\n"
+                "    value: '0xD57152f21aB5E5A8b3AdFf197c73aCC2Fdbd1CbD'\n"
+                "positions:\n"
+                "  - id: '1'\n"
+            )
+
+            with self.assertRaisesRegex(
+                validate_open_positions.CaliberUnavailable, "makina-x \\(lite\\) caliber"
+            ):
+                validate_open_positions.extract_caliber_metadata(caliber_path)
+
+    def test_extract_caliber_metadata_still_resolves_normal_caliber(self) -> None:
+        caliber_path = FIXTURES_ROOT / "dusd" / "mainnet" / "caliber.yaml"
+        caliber_address, position_ids = validate_open_positions.extract_caliber_metadata(caliber_path)
+
+        self.assertEqual(caliber_address, "0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC")
+        self.assertTrue(position_ids)
+
     def test_extract_accounting_counts_detects_reservoir_position(self) -> None:
         working_rootfile = (
             FIXTURES_ROOT

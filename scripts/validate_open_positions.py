@@ -211,6 +211,12 @@ def extract_caliber_metadata(caliber_path: Path) -> tuple[str, set[str]]:
     set of declared position ids."""
     data = yaml.load(caliber_path.read_text(), Loader=_PermissiveLoader)
 
+    if "makina_lite_module" in (data.get("config") or {}):
+        raise CaliberUnavailable(
+            f"{caliber_path} is a makina-x (lite) caliber: positions are held by a Safe "
+            "and are not NAV-accounted on-chain, so there is no Caliber contract to read"
+        )
+
     caliber_address: str | None = None
 
     # Prefer reading from caliber.yaml directly. This matches the structure used

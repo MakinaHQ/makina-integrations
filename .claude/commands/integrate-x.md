@@ -205,13 +205,18 @@ Requirements for the agent:
   ACCOUNTING action.
 - Protocol/instance-specific addresses (e.g. the pool) are hardcoded in the instruction file, not
   added to caliber config (only Safe-wide values live in config).
-Then compile the caliber with the `--lite` transpiler to produce the rootfile (see prerequisites).
+Then compile the caliber with the `--lite` transpiler to a **scratch path** —
+`scripts-factory/{protocol}/{chain}/{pool_id}/test-rootfile.toml`, NOT
+`machines/{machine}/{network}/rootfiles/`. Production rootfiles are release-only now (see
+README.md); this pipeline must not add or commit a rootfile. Pass the scratch path to
+`/test_e2e_x` explicitly via `--rootfile`.
 
 ## Stage 4: Test Blueprint — `/test_e2e_x`
 Do NOT use `blueprint-tester`/spellcaster (no lite-module support). Run the makina-x harness:
 ```
 uv run scripts/makinax_e2e_harness.py \
   machines/{machine}/{network}/caliber.yaml [--amount N] [--position-id ID] \
+  --rootfile scripts-factory/{protocol}/{chain}/{pool_id}/test-rootfile.toml \
   --out scripts-factory/{protocol}/{chain}/{pool_id}/test-report.md --json
 ```
 It drives the real deployed `MakinaXModule` on a fork, runs **deposit → withdraw**, validates the

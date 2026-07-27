@@ -30,6 +30,8 @@ machines/
 │   ├── [network-name-2]/
 │   └── ...
 └── ...
+
+machines/.deprecated/                                        # retired machines, tracked but out of CI scope — see machines/.deprecated/README.md
 ```
 
 ### Machines
@@ -45,7 +47,7 @@ therefore needs one `config.toml` per network, at `[machine-name]/[network-name]
 
 \* Transpiling of instructions is done by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
 
-The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file and the output is stored in the `[machine-name]/[network-name]/rootfiles/[timestamp]-[name-of-the-migration].toml` file.
+The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file. The release workflow stores its output as `[machine-name]/[network-name]/rootfiles/[timestamp]-[release-tag].toml` — see "Updating the rootfiles" below.
 
 #### Instructions
 
@@ -53,7 +55,28 @@ It is in the instructions files that we feed the pool/caliber/machine-specific i
 
 #### Updating the rootfiles
 
-When instructions, blueprints, or calibers are updated, the rootfiles must be regenerated. Add the new rootfiles to the corresponding `rootfiles` directory. Previous rootfiles are kept as references and remain necessary until the upgrade is applied on-chain. You can think of the rootfiles directory as a collection of “migration files.” The name of the rootfile should be: `[timestamp]-[name-of-the-migration].toml`. Where timestamps are in the format `YYYYMMDDHHMMSS` or `YYYYMMDD`.
+Rootfiles are **generated, not hand-authored**. Contributors only ever edit source files —
+`caliber.yaml`, `instructions/`, `blueprints/`, `blueprints-x/`, and the token lists. A CI
+check (`rootfiles-guard`) rejects any PR that adds or modifies a file under a `rootfiles/`
+directory.
+
+New rootfiles are produced by publishing a GitHub Release. Publishing a release runs the
+`release.yaml` workflow, which:
+
+1. Transpiles every `caliber.yaml` in the repo.
+2. Compares each caliber's fresh output against its newest existing rootfile — only
+   calibers whose output actually changed are touched.
+3. Runs the transpiler's `check` plus the on-chain validators (open positions, base
+   tokens, token chains) against the changed set.
+4. Commits the regenerated rootfiles (named `[timestamp]-[release-tag].toml`) to a bot
+   branch and opens a PR that merges automatically once required checks pass.
+
+Previous rootfiles are kept as references and remain necessary until the corresponding
+upgrade is applied on-chain — nothing is deleted automatically. See
+`docs/superpowers/specs/2026-07-24-release-generated-rootfiles-design.md` for the full
+design (this replaces the old model, where contributors hand-generated and committed
+rootfiles directly in their PRs — which let a later-merged PR silently overwrite an
+earlier one's rootfile).
 
 ## Formatting
 

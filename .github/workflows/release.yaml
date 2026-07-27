@@ -1,0 +1,144 @@
+name: Release Rootfiles
+
+# Fires when a GitHub Release is published. Transpiles every caliber,
+# detects which ones' output actually changed vs their newest existing
+# rootfile, runs `check` plus the on-chain validators for the changed set,
+# and opens an auto-merging PR (as the release bot) with the regenerated
+# rootfiles. If nothing changed, no PR is opened.
+#
+# See docs/superpowers/specs/2026-07-24-release-generated-rootfiles-design.md
+#
+# Required repo config (see the operational setup checklist):
+#   - secrets.RELEASE_BOT_TOKEN  (GitHub App installation token or fine-grained PAT;
+#     contents:write + pull-requests:write on this repo)
+#   - vars.RELEASE_BOT_LOGIN     (the login RELEASE_BOT_TOKEN authenticates as)
+#   - secrets.ETHERSCAN_API_KEY, secrets.ALCHEMY_API_KEY (already present)
+#   - "Allow auto-merge" enabled on the repo
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-rootfiles-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  release-rootfiles:
+    name: Transpile and commit release rootfiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_BOT_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Compute release identifiers
+        id: release
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          PUBLISHED_AT: ${{ github.event.release.published_at }}
+        run: |
+          set -euo pipefail
+          SLUG=$(echo "$TAG_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
+          if [ -z "$SLUG" ]; then
+            echo "::error::Release tag '$TAG_NAME' contains no alphanumeric characters, so it cannot be turned into a rootfile name or branch name. Re-tag the release using a name containing letters or digits." >&2
+            exit 1
+          fi
+          TIMESTAMP=$(date -u -d "$PUBLISHED_AT" +%Y%m%d%H%M%S)
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
+          echo "branch=release/rootfiles/$SLUG" >> "$GITHUB_OUTPUT"
+
+      - name: List all calibers
+        id: all
+        run: |
+          set -euo pipefail
+          CALIBERS=$(uv run python scripts/compute_affected_calibers.py --all)
+          {
+            echo "calibers<<RELEASE_ALL_CALIBERS_EOF"
+            echo "$CALIBERS"
+            echo "RELEASE_ALL_CALIBERS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Transpile all calibers and detect changed output
+        id: transpile
+        uses: ./.github/actions/transpile-validate
+        with:
+          calibers: ${{ steps.all.outputs.calibers }}
+          etherscan-api-key: ${{ secrets.ETHERSCAN_API_KEY }}
+          alchemy-api-key: ${{ secrets.ALCHEMY_API_KEY }}
+
+      - name: Rename changed rootfiles and clean up unchanged temp files
+        id: rename
+        env:
+          CHANGED: ${{ steps.transpile.outputs['changed-calibers'] }}
+          TIMESTAMP: ${{ steps.release.outputs.timestamp }}
+          SLUG: ${{ steps.release.outputs.slug }}
+        run: |
+          set -euo pipefail
+          renamed=()
+          while IFS= read -r pair; do
+            [ -z "$pair" ] && continue
+            machine="${pair%%/*}"
+            chain="${pair#*/}"
+            dir="machines/$machine/$chain/rootfiles"
+            final="$dir/${TIMESTAMP}-${SLUG}.toml"
+            mv "$dir/__ci_generated__.toml" "$final"
+            renamed+=("$final")
+            echo "Regenerated $final"
+          done <<< "$CHANGED"
+
+          find machines -name '__ci_generated__.toml' -delete
+
+          if [ "${#renamed[@]}" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "files<<RELEASE_RENAMED_FILES_EOF"
+              printf '%s\n' "${renamed[@]}"
+              echo "RELEASE_RENAMED_FILES_EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: No changes — nothing to release
+        if: steps.rename.outputs.has_changes == 'false'
+        run: echo "No caliber's transpiled output changed since the last release. Nothing to commit."
+
+      - name: Commit, push, and open the auto-merge PR
+        if: steps.rename.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+          FILES: ${{ steps.rename.outputs.files }}
+        run: |
+          set -euo pipefail
+          git config user.name "release-rootfiles-bot"
+          git config user.email "release-rootfiles-bot@users.noreply.github.com"
+
+          RENAMED=()
+          while IFS= read -r file; do
+            [ -n "$file" ] && RENAMED+=("$file")
+          done <<< "$FILES"
+
+          git checkout -b "$BRANCH"
+          git add -- "${RENAMED[@]}"
+          git commit -m "chore(release): rootfiles for ${TAG_NAME}"
+          git push origin "$BRANCH"
+
+          BULLETS=$(printf -- '- `%s`\n' "${RENAMED[@]}")
+          BODY=$(printf 'Rootfiles regenerated for release `%s`.\n\nRegenerated calibers:\n\n%s\n' "$TAG_NAME" "$BULLETS")
+          gh pr create --title "chore(release): rootfiles for ${TAG_NAME}" --body "$BODY" --base main --head "$BRANCH"
+          gh pr merge "$BRANCH" --auto --squash

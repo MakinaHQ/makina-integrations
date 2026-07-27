@@ -15,7 +15,8 @@ oracle feed routes are required — see --feeds).
 Inputs: a makina-x caliber.yaml (has `makina_lite_module` + `safe_address`) and a
 compiled rootfile TOML (auto-discovered in the sibling rootfiles/ dir, or --rootfile).
 This tool does NOT recompile: makina-x calibers need a `--lite` transpiler the local
-fallback lacks, and the rootfile is committed. Recompile separately if you changed source.
+fallback lacks. Historical rootfiles on `main` are committed, but a caliber under active
+integration requires a scratch rootfile passed via `--rootfile`.
 
 Usage:
   uv run scripts/makinax_e2e_harness.py <caliber.yaml> [--rootfile T.toml]
