@@ -14,3 +14,8 @@ positions:
     description: "Morpho Clearstar cbAssets Vault USDC supply"
     instructions: !include "./instructions/morpho-clearstar-cbassets.yaml"
     position_tokens: ["0x91C056B6d4311a743614FBc03ac32d4E6A2d3a3c"]
+
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"

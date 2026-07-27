@@ -21,3 +21,8 @@ positions:
     group_id: "0"
     description: "Binance spot USDC transfer"
     instructions: !include "./instructions/binance-usdc-spot.yaml"
+
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
