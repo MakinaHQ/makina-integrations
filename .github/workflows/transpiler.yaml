@@ -16,8 +16,13 @@ permissions:
   contents: read
 
 jobs:
+  # NOTE: this job id is the required-status-check context string configured in
+  # the repository ruleset for `main`. It deliberately has no display `name:` —
+  # a required check keyed on a prose display name silently stops matching if
+  # anyone edits that name, which would make this gate non-blocking while still
+  # appearing green. Renaming this job id means updating the ruleset in the
+  # same change.
   transpile-and-validate:
-    name: Transpile and validate affected calibers
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
