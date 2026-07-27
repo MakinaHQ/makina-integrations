@@ -12,18 +12,20 @@
 # collaborators. This only has teeth while the ruleset on `main` has
 # require_code_owner_review enabled — the file and that setting are a pair.
 #
-# Owners below are the repo admins. A dedicated team would be easier to maintain
-# (@MakinaHQ/dialectic and @MakinaHQ/makina_dev already exist) — swap these lines
-# for a team if one of those is the right owner of CI machinery. Note GitHub
-# forbids self-approval, so a PR touching these paths needs a *different* owner
-# to approve it, which is the point.
+# Deliberately a single owner. Consequence, by design: a PR from anyone else
+# touching these paths cannot merge without @platykurtic-icu's approval. And
+# because GitHub forbids self-approval, a PR *authored by* @platykurtic-icu
+# touching these paths can never satisfy this rule at all — it has to go through
+# the ruleset's admin bypass checkbox. That is the accepted trade for keeping
+# sole ownership of the enforcement machinery; add a second owner if that
+# friction stops being worth it.
 
 # CI enforcement: the guard, the PR gate, the release producer, the shared action.
-/.github/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+/.github/ @platykurtic-icu
 
 # The validators and the affected-calibers rule the workflows depend on.
-/scripts/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+/scripts/ @platykurtic-icu
 
 # The canonical description of the process, and the design record.
-/README.md @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
-/docs/superpowers/specs/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+/README.md @platykurtic-icu
+/docs/superpowers/specs/ @platykurtic-icu
