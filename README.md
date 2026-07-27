@@ -90,6 +90,42 @@ design (this replaces the old model, where contributors hand-generated and commi
 rootfiles directly in their PRs — which let a later-merged PR silently overwrite an
 earlier one's rootfile).
 
+### Release bot credentials
+
+The release workflow authenticates with `RELEASE_BOT_TOKEN` (a repo secret) and signs its
+commit with `RELEASE_BOT_GPG_KEY`. Both are needed for a release to complete.
+
+|                          |                                                                                                                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RELEASE_BOT_TOKEN`      | Needs **contents: write** + **pull requests: write** on this repo. A fine-grained PAT scoped to this repo alone is strongly preferred over a classic `repo` token, which grants access to every repository the owner can reach. |
+| `RELEASE_BOT_GPG_KEY`    | The bot's ASCII-armored private key. `main` requires signed commits, so an unsigned release commit is blocked with every check green and no one able to merge it.                                                               |
+| `vars.RELEASE_BOT_LOGIN` | The login the token authenticates as. `rootfiles-guard` uses it to tell a genuine release PR from a human one.                                                                                                                  |
+| `vars.RELEASE_BOT_EMAIL` | The account's `<id>+<login>@users.noreply.github.com` address. The signature is only _verified_ if the commit author email is one GitHub considers verified for the account that owns the signing key.                          |
+
+**When the token expires**, `release.yaml` fails on its very first step:
+
+```
+remote: Write access to repository not granted.
+fatal: unable to access 'https://github.com/MakinaHQ/config/': 403
+```
+
+Nothing is written — the failure happens before any commit — but no release can complete
+until it is rotated:
+
+```bash
+gh secret set RELEASE_BOT_TOKEN --repo MakinaHQ/config
+```
+
+Fine-grained PATs against an organisation may also need org approval, which produces the
+same 403 while pending. The `Release Token Canary` workflow checks the token weekly so
+expiry surfaces as a failing scheduled run rather than mid-release; you can also run it
+on demand from the Actions tab.
+
+**Note on changing `release.yaml` itself:** a `release` event runs the workflow file from
+the commit its tag points at, not from `main`. A change to the release workflow therefore
+only takes effect for tags created _after_ it merges, and re-running an older release
+replays the older definition.
+
 ## Formatting
 
 1. [install dprint](https://dprint.dev/install/)

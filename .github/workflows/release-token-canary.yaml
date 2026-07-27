@@ -1,0 +1,73 @@
+name: Release Token Canary
+
+# RELEASE_BOT_TOKEN expiry is otherwise discovered only when someone publishes a
+# release: release.yaml dies on its very first step with
+#   remote: Write access to repository not granted.
+#   fatal: unable to access 'https://github.com/MakinaHQ/config/': 403
+# Nothing is written when that happens (the failure is before any commit), but it
+# surfaces at the worst possible moment. This job checks the token weekly so an
+# expired or revoked credential shows up as a failing scheduled run days early.
+#
+# It deliberately checks *permissions*, not just authentication: a token can be
+# alive but have lost repo access (org policy change, fine-grained PAT approval
+# revoked, scope edited), which fails release.yaml exactly the same way.
+
+on:
+  schedule:
+    # Mondays 08:00 UTC — early enough in the week to fix before a release.
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check-release-token:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify RELEASE_BOT_TOKEN is alive and still has repo write
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+          EXPECTED_LOGIN: ${{ vars.RELEASE_BOT_LOGIN }}
+        run: |
+          set -uo pipefail
+
+          fail() {
+            echo "::error::$1"
+            echo ""
+            echo "release.yaml will fail on its Checkout step with:"
+            echo "  remote: Write access to repository not granted. (403)"
+            echo "No rootfiles are written when that happens — the failure is before"
+            echo "any commit — but a release cannot complete until this is fixed."
+            echo ""
+            echo "To rotate:  gh secret set RELEASE_BOT_TOKEN --repo MakinaHQ/config"
+            echo "The token needs contents:write + pull-requests:write on this repo."
+            echo "If it is a fine-grained PAT, check it is still approved by the org:"
+            echo "  https://github.com/organizations/MakinaHQ/settings/personal-access-token-requests"
+            echo "See README, 'Release bot credentials'."
+            exit 1
+          }
+
+          if [ -z "${GH_TOKEN:-}" ]; then
+            fail "RELEASE_BOT_TOKEN is not set."
+          fi
+
+          # 1. Is the credential alive at all?
+          login=$(gh api user --jq .login 2>/dev/null) \
+            || fail "RELEASE_BOT_TOKEN failed to authenticate — expired or revoked."
+          echo "Authenticated as: $login"
+
+          # 2. Is it still the identity rootfiles-guard trusts? A mismatch means bot
+          #    PRs would be judged as human PRs and rejected.
+          if [ -n "${EXPECTED_LOGIN:-}" ] && [ "$login" != "$EXPECTED_LOGIN" ]; then
+            fail "Token authenticates as '$login' but vars.RELEASE_BOT_LOGIN is '$EXPECTED_LOGIN'. rootfiles-guard would not recognise its PRs as release-bot PRs."
+          fi
+
+          # 3. Does it still have write on THIS repo? Alive != authorized.
+          perms=$(gh api repos/${GITHUB_REPOSITORY} --jq '.permissions.push' 2>/dev/null) \
+            || fail "Token cannot read ${GITHUB_REPOSITORY} — it has lost access to this repository."
+          if [ "$perms" != "true" ]; then
+            fail "Token authenticates but has no write access to ${GITHUB_REPOSITORY} (permissions.push=$perms)."
+          fi
+
+          echo "RELEASE_BOT_TOKEN is valid, is $login, and has write access to ${GITHUB_REPOSITORY}."
