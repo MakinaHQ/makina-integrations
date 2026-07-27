@@ -16,7 +16,7 @@
 - Transpiler CLI, exactly as proven in the current `transpiler.yaml`: `cargo run -r -- -i <input> -o <output> -t <token-list> [--lite] [transpile|check --github-errors]`. `--lite` detection: `grep -q 'makina_lite_module' "$caliber"`.
 - Token list path (single file, no ambiguity): `token-lists/prod-token-list.json`.
 - Temp/generated rootfile name (never committed as-is): `__ci_generated__.toml`.
-- Final committed rootfile name: `<YYYYMMDDHHMMSS>-<release-tag-slug>.toml`, timestamp from `github.event.release.published_at`, slug = tag lowercased with every run of non-`[a-z0-9]` collapsed to a single `-` and leading/trailing `-` stripped.
+- Final committed rootfile name: `<YYYYMMDD>-<release-tag-slug>.toml`, timestamp from `github.event.release.published_at`, slug = tag lowercased with every run of non-`[a-z0-9]` collapsed to a single `-` and leading/trailing `-` stripped.
 - Bot branch naming: `release/rootfiles/<release-tag-slug>`.
 - New secret: `secrets.RELEASE_BOT_TOKEN` (GitHub App installation token or fine-grained PAT; `contents:write` + `pull-requests:write` on this repo). New repo variable: `vars.RELEASE_BOT_LOGIN` (the login `RELEASE_BOT_TOKEN` authenticates as).
 - Existing secrets, unchanged: `secrets.ETHERSCAN_API_KEY`, `secrets.ALCHEMY_API_KEY`.
@@ -766,7 +766,7 @@ jobs:
             echo "::error::Release tag '$TAG_NAME' contains no alphanumeric characters, so it cannot be turned into a rootfile name or branch name. Re-tag the release using a name containing letters or digits." >&2
             exit 1
           fi
-          TIMESTAMP=$(date -u -d "$PUBLISHED_AT" +%Y%m%d%H%M%S)
+          TIMESTAMP=$(date -u -d "$PUBLISHED_AT" +%Y%m%d)
           echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
           echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
           echo "branch=release/rootfiles/$SLUG" >> "$GITHUB_OUTPUT"

@@ -181,9 +181,11 @@ workflow (scoped, not blanket `secrets: inherit`).
      changed set only. A caliber with no existing rootfile counts as changed (first
      rootfile). A comment/whitespace-only edit is unchanged ⇒ skipped.
   2. Rename each changed temp file to the final name
-     `machines/<m>/<net>/rootfiles/<YYYYMMDDHHMMSS>-<release-tag-slug>.toml` (timestamp
-     from the release's `published_at`; `<release-tag-slug>` = tag lowercased and reduced
-     to `[a-z0-9-]`). Delete all temp files for unchanged calibers.
+     `machines/<m>/<net>/rootfiles/<YYYYMMDD>-<release-tag-slug>.toml` (date from the
+     release's `published_at`; `<release-tag-slug>` = tag lowercased and reduced to
+     `[a-z0-9-]`). Delete all temp files for unchanged calibers. The date format is
+     coupled to `rootfiles-guard`'s filename regex — changing one without the other
+     makes the guard reject the release bot's own output.
   3. If nothing changed ⇒ log "no rootfiles to regenerate", open **no** PR, exit 0.
   4. Else create branch `release/rootfiles/<release-tag-slug>`, commit
      `chore(release): rootfiles for <tag>`, push, open a PR with `gh pr create`, enable

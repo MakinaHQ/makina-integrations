@@ -55,7 +55,7 @@ jobs:
             echo "::error::Release tag '$TAG_NAME' contains no alphanumeric characters, so it cannot be turned into a rootfile name or branch name. Re-tag the release using a name containing letters or digits." >&2
             exit 1
           fi
-          TIMESTAMP=$(date -u -d "$PUBLISHED_AT" +%Y%m%d%H%M%S)
+          TIMESTAMP=$(date -u -d "$PUBLISHED_AT" +%Y%m%d)
           echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
           echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
           echo "branch=release/rootfiles/$SLUG" >> "$GITHUB_OUTPUT"

@@ -149,12 +149,14 @@ jobs:
             touched+=("$f")
           done <<< "$FILES"
 
-          # (b) Every touched rootfile must use the release naming convention: a
-          # 14-digit timestamp (%Y%m%d%H%M%S) plus sanitized tag slug, exactly
-          # what release.yaml's "Compute release identifiers" step produces.
+          # (b) Every touched rootfile must use the release naming convention: an
+          # 8-digit date (%Y%m%d) plus sanitized tag slug, exactly what
+          # release.yaml's "Compute release identifiers" step produces. This
+          # regex and that date format are coupled — changing one without the
+          # other makes this guard reject the release bot's own output.
           for f in "${touched[@]}"; do
             name=$(basename "$f")
-            if [[ ! "$name" =~ ^[0-9]{14}-[a-z0-9][a-z0-9-]*\.toml$ ]]; then
+            if [[ ! "$name" =~ ^[0-9]{8}-[a-z0-9][a-z0-9-]*\.toml$ ]]; then
               fail "Rootfile name does not match the release naming convention: $f"
             fi
           done

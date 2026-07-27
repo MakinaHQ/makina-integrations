@@ -47,7 +47,7 @@ therefore needs one `config.toml` per network, at `[machine-name]/[network-name]
 
 \* Transpiling of instructions is done by the [transpiler](https://github.com/MakinaHQ/makina-rs/tree/main/crates/transpiler).
 
-The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file. The release workflow stores its output as `[machine-name]/[network-name]/rootfiles/[timestamp]-[release-tag].toml` — see "Updating the rootfiles" below.
+The transpiler is run on the `[machine-name]/[network-name]/caliber.yaml` file. The release workflow stores its output as `[machine-name]/[network-name]/rootfiles/[YYYYMMDD]-[release-tag].toml` — see "Updating the rootfiles" below.
 
 #### Instructions
 
@@ -68,7 +68,7 @@ New rootfiles are produced by publishing a GitHub Release. Publishing a release 
    calibers whose output actually changed are touched.
 3. Runs the transpiler's `check` plus the on-chain validators (open positions, base
    tokens, token chains) against the changed set.
-4. Commits the regenerated rootfiles (named `[timestamp]-[release-tag].toml`) to a bot
+4. Commits the regenerated rootfiles (named `[YYYYMMDD]-[release-tag].toml`) to a bot
    branch and opens a PR that merges automatically once required checks pass.
 
 Previous rootfiles are kept as references and remain necessary until the corresponding
