@@ -17,6 +17,13 @@ inputs:
     description: Pinned MakinaHQ/transpiler release tag to download.
     required: false
     default: v0.2.4
+  transpiler-sha256:
+    description: >-
+      Expected SHA256 of transpiler-x86_64-unknown-linux-gnu.tar.xz for
+      transpiler-version. Pinned HERE, in this repo, on purpose — see the
+      download step. Update both inputs together when bumping the transpiler.
+    required: false
+    default: 9b42296ed74ec9a0830bd0e1f1724e730de30405ba7fae8f96b505bde2a76054
 
 outputs:
   changed-calibers:
@@ -33,20 +40,39 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
         TRANSPILER_VERSION: ${{ inputs.transpiler-version }}
+        EXPECTED_SHA256: ${{ inputs.transpiler-sha256 }}
       run: |
         set -euo pipefail
         asset="transpiler-x86_64-unknown-linux-gnu.tar.xz"
         dest="$RUNNER_TEMP/transpiler-$TRANSPILER_VERSION"
         mkdir -p "$dest"
 
+        # Download the asset only. We deliberately do NOT fetch the upstream
+        # .sha256 and verify against it: that file lives in the same release as
+        # the asset, so anyone who can replace one can replace both, and the
+        # check would only prove the download wasn't corrupted in transit.
+        #
+        # GitHub release assets are mutable (`gh release upload --clobber`) and
+        # tags are movable, so pinning a tag name alone does not pin content.
+        # This binary produces every rootfile in the repo, and rootfiles-guard's
+        # "byte-identical to fresh transpiler output" check re-runs this same
+        # binary — so a substituted transpiler would make that proof vacuous
+        # rather than catching anything. Pin the digest HERE instead: this file
+        # is on main, behind required review, so changing it is visible.
         gh release download "$TRANSPILER_VERSION" \
           --repo MakinaHQ/transpiler \
           --pattern "$asset" \
-          --pattern "$asset.sha256" \
           --dir "$dest" \
           --clobber
 
-        (cd "$dest" && sha256sum -c "$asset.sha256")
+        echo "${EXPECTED_SHA256}  ${asset}" > "$dest/expected.sha256"
+        if ! (cd "$dest" && sha256sum -c expected.sha256); then
+          echo "::error::Transpiler asset digest mismatch for $TRANSPILER_VERSION."
+          echo "::error::Expected $EXPECTED_SHA256"
+          echo "::error::Got      $(cd "$dest" && sha256sum "$asset" | cut -d' ' -f1)"
+          echo "::error::Either the upstream release asset was replaced, or the pinned digest is stale after a version bump. Do NOT update the digest without establishing why the bytes changed."
+          exit 1
+        fi
 
         tar -xJf "$dest/$asset" -C "$dest"
 

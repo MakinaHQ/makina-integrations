@@ -1,0 +1,29 @@
+# Code owners for the paths that enforce the release-generated-rootfiles model.
+#
+# Why this file exists: for `pull_request` events GitHub runs the workflow
+# definitions from the PR's own merge commit, so a PR can rewrite the very check
+# that is supposed to judge it. Nothing else stopped that — a single PR could
+# replace rootfiles-guard's body with a no-op AND add a hand-authored rootfile,
+# and all three required checks would report success (transpile-and-validate
+# scopes by caliber source paths, which a workflow-only change does not touch).
+#
+# Requiring a code owner's approval on these paths means such a PR needs sign-off
+# from someone who owns the enforcement machinery, not just any of the write-role
+# collaborators. This only has teeth while the ruleset on `main` has
+# require_code_owner_review enabled — the file and that setting are a pair.
+#
+# Owners below are the repo admins. A dedicated team would be easier to maintain
+# (@MakinaHQ/dialectic and @MakinaHQ/makina_dev already exist) — swap these lines
+# for a team if one of those is the right owner of CI machinery. Note GitHub
+# forbids self-approval, so a PR touching these paths needs a *different* owner
+# to approve it, which is the point.
+
+# CI enforcement: the guard, the PR gate, the release producer, the shared action.
+/.github/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+
+# The validators and the affected-calibers rule the workflows depend on.
+/scripts/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+
+# The canonical description of the process, and the design record.
+/README.md @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
+/docs/superpowers/specs/ @Hugoo @jennazenk @siosw @Meph1587 @platykurtic-icu
