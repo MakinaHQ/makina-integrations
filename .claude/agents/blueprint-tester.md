@@ -99,6 +99,8 @@ bitmap = "0"
 inputs_slots = []
 ```
 
+This placeholder is a **local-only workaround** for spellcaster's startup requirement (it needs ≥1 rootfile per known caliber directory) — it must never be committed. A committed rootfile can only come from a release; see README's "Updating the rootfiles" and `.claude/skills/makina-cli/docs/root-updates.md`.
+
 ### Runtime expectations (do not mistake slow for stuck)
 
 A cold `cargo build` of spellcaster plus fork spin-up genuinely takes **20-40 min** — this is NOT a hang. Run long e2e steps **synchronously** (or launch-and-yield); do NOT poll a backgrounded build/run in a tight loop. Background work only advances while the main loop is idle, so repeated status checks starve it and make it look stuck. State the ~20-40 min expectation up front and let the step run.
@@ -150,9 +152,11 @@ TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-1
 "$TRANSPILER" \
   --input-file machines/{machine}/{network}/caliber-test.yaml \
   --token-list token-lists/prod-token-list.json \
-  --output-file machines/{machine}/{network}/rootfiles/test-output.toml \
+  --output-file /tmp/makina-blueprint-test-output.toml \
   transpile
 ```
+
+**Never write `--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now (see README's "Updating the rootfiles"); `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory. Always send output outside the repo (`/tmp/...`) — this applies to any checkout of this repo, including one cloned under a different local directory name (e.g. `${ROOTFILES_PATH}`).
 
 ### Step 2: Setup Local Config
 
@@ -215,7 +219,7 @@ spellcaster -- \
   --dev \
   --machine {machine} \
   --caliber {network} \
-  dev-update-root --rootfile ${ROOTFILES_PATH}/machines/{machine}/{network}/rootfiles/test-output.toml
+  dev-update-root --rootfile /tmp/makina-blueprint-test-output.toml
 ```
 
 ### Step 5: Get Addresses

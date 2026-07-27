@@ -67,13 +67,14 @@ TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-1
 "$TRANSPILER" \
   --input-file machines/{fund}/{network}/caliber-test.yaml \
   --token-list token-lists/prod-token-list.json \
-  --output-file machines/{fund}/{network}/rootfiles/test-compile-output.toml \
+  --output-file /tmp/makina-test-compile-output.toml \
   transpile
 ```
 
 - Paths are relative to the **config repo root** — do NOT point at `/Users/.../git/rootfiles`. Many calibers (e.g. `intMkSrRoyUSDC`) live ONLY in the config repo, not the rootfiles repo.
 - The subcommand (`transpile` or `check`) is a positional argument and goes LAST, after the flags. There is no `--` separator — that syntax is only for `cargo run -- …`.
 - If the instruction also references `${helpers.*}`, add `--helpers <path-to-helpers.json>`.
+- **Never write `--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now; `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory, so always send output outside the repo (`/tmp/...`).
 
 ---
 
@@ -110,7 +111,7 @@ Always delete the temporary files:
 
 ```bash
 rm machines/{fund}/{network}/caliber-test.yaml
-rm machines/{fund}/{network}/rootfiles/test-compile-output.toml  # if created
+rm /tmp/makina-test-compile-output.toml  # if created
 ```
 
 ---

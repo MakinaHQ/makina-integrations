@@ -50,7 +50,7 @@ TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-1
 "$TRANSPILER" \
   --input-file machines/{fund}/{network}/caliber-test.yaml \
   --token-list token-lists/prod-token-list.json \
-  --output-file machines/{fund}/{network}/rootfiles/compile-output.toml \
+  --output-file /tmp/makina-compile-output.toml \
   transpile
 ```
 
@@ -58,6 +58,7 @@ TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-1
 - The subcommand is a **positional argument that comes AFTER the flags**: `transpile` emits TOML, `check` validates only (`root` also exists).
 - Short flags: `-i` = `--input-file`, `-o` = `--output-file`, `-t` = `--token-list`.
 - Do NOT write `transpiler -- ...`; the leading `--` is a `cargo run` artifact and is wrong for the standalone binary.
+- **Never write `--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now (see README's "Updating the rootfiles"); `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory, so a leftover or mis-cleaned-up output there breaks CI. Always send output outside the repo (`/tmp/...`).
 
 ---
 
@@ -69,7 +70,7 @@ TRANSPILER="${TRANSPILER_PATH:-/Users/augustin/.cargo/git/checkouts/transpiler-1
 
 Unless `--keep`, delete:
 - `caliber-test.yaml`
-- `compile-output.toml`
+- `/tmp/makina-compile-output.toml`
 
 ---
 

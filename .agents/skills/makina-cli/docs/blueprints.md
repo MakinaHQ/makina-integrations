@@ -119,8 +119,10 @@ Example:
 ```bash
 transpiler -- \
   -i /path/to/machines/deth/mainnet/caliber-test.yaml \
-  -o /path/to/machines/deth/mainnet/rootfiles/test-output.toml
+  -o /tmp/makina-test-output.toml
 ```
+
+**Never send `-o`/`--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now; `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory. Always write output outside the repo (`/tmp/...`).
 
 ## Notes
 

@@ -100,6 +100,13 @@ Create placeholder rootfiles for empty directories:
 echo 'instructions = []' > /path/to/caliber/rootfiles/20250101-empty.toml
 ```
 
+**This placeholder is local-only and must NEVER be committed.** Rootfiles are release-generated
+build artifacts now (see README's "Updating the rootfiles"): `rootfiles-guard` rejects any PR
+that adds or modifies a file under a `rootfiles/` directory, and a committed rootfile can only
+come from a published GitHub Release. The `echo` above is fine to unblock a local spellcaster run
+that genuinely needs at least one rootfile per caliber directory to start — just don't `git add`
+it.
+
 ## Troubleshooting
 
 | Error                              | Cause                             | Solution                                             |

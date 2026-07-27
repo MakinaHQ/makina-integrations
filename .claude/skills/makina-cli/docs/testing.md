@@ -18,11 +18,13 @@ End-to-end testing of blueprint instruction files on Tenderly testnets.
 "$TRANSPILER_PATH" \
   --input-file /path/to/caliber-test.yaml \
   --token-list token-lists/prod-token-list.json \
-  --output-file /path/to/rootfiles/test-output.toml \
+  --output-file /tmp/makina-test-output.toml \
   transpile
 ```
 
 Note: no leading `--`; `--token-list` is required (instructions use `${token_list.*}`); the `transpile` subcommand goes LAST. Use `check` instead of `transpile` to validate without writing a rootfile.
+
+**Never send `--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now; `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory. Always write output outside the repo (`/tmp/...`), as above.
 
 ## Step 2: Create Tenderly Testnet
 
@@ -59,7 +61,7 @@ DEV_MAINNET_RPC_URL="{admin_rpc}" \
 spellcaster -- \
   --config machines-local.toml --dev \
   --machine {fund} --caliber {network} \
-  dev-update-root --rootfile /path/to/test-output.toml
+  dev-update-root --rootfile /tmp/makina-test-output.toml
 ```
 
 ## Step 4: Fund Caliber
@@ -96,7 +98,7 @@ mcp__tenderly__fund_address(
 
 ### Check input slots
 ```bash
-grep -A 5 'inputs_slots' /path/to/test-output.toml
+grep -A 5 'inputs_slots' /tmp/makina-test-output.toml
 ```
 
 ### Encode inputs

@@ -119,11 +119,13 @@ Example:
 "$TRANSPILER_PATH" \
   -i /path/to/machines/deth/mainnet/caliber-test.yaml \
   -t token-lists/prod-token-list.json \
-  -o /path/to/machines/deth/mainnet/rootfiles/test-output.toml \
+  -o /tmp/makina-test-output.toml \
   transpile
 ```
 
 (`-t/--token-list` is required; the `transpile`|`check`|`root` subcommand goes last; transpiler is not on PATH — see SKILL.md `## Transpiler`.)
+
+**Never send `-o`/`--output-file` into `machines/*/*/rootfiles/`.** Rootfiles are release-generated build artifacts now; `rootfiles-guard` rejects any PR that adds or modifies a file under a `rootfiles/` directory. Always write output outside the repo (`/tmp/...`).
 
 ## Notes
 
