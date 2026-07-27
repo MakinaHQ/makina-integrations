@@ -69,7 +69,19 @@ New rootfiles are produced by publishing a GitHub Release. Publishing a release 
 3. Runs the transpiler's `check` plus the on-chain validators (open positions, base
    tokens, token chains) against the changed set.
 4. Commits the regenerated rootfiles (named `[YYYYMMDD]-[release-tag].toml`) to a bot
-   branch and opens a PR that merges automatically once required checks pass.
+   branch and opens a PR.
+
+**That PR needs a human approval before it can merge** — `main` requires one review, so
+nothing lands unreviewed. Auto-merge is enabled on top of that, which means approving the
+PR is enough: it lands once the checks are green, without anyone coming back to click
+merge.
+
+Rootfiles are what spellcaster applies, so each one becomes the authoritative instruction
+root for its caliber. `rootfiles-guard` re-transpiles every file in the PR and proves it
+is byte-identical to fresh transpiler output, so review is not about whether the bytes are
+right — it is about whether the change is _wanted_. In particular, a caliber appearing in
+a release PR that nobody knowingly changed means its source had drifted from its last
+rootfile.
 
 Previous rootfiles are kept as references and remain necessary until the corresponding
 upgrade is applied on-chain — nothing is deleted automatically. See

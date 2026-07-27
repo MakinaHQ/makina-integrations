@@ -34,7 +34,8 @@ produced by a single serialized producer from the authoritative merged `caliber.
 2. Rootfiles are (re)generated automatically when a **GitHub Release is published**.
 3. A release regenerates only the calibers whose **transpiler output** changed (vs their
    newest existing rootfile), and commits the results back to `main` via an
-   **auto-merged bot PR**.
+   **bot PR that a human must approve** (`main` requires 1 review; auto-merge lands it
+   once approved and green).
 
 ## Hard constraint (drives the whole design)
 
@@ -46,13 +47,13 @@ workflow, never by a human PR.
 
 ## Decisions (locked)
 
-| Decision                       | Choice                                                                                                                                                                                                                                                                                                        |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Where generated rootfiles live | In-tree on `main` (spellcaster path unchanged)                                                                                                                                                                                                                                                                |
-| Release trigger                | GitHub Release **published** (`on: release: { types: [published] }`)                                                                                                                                                                                                                                          |
-| Which calibers regenerate      | **Output-based**: transpile every caliber, diff against its newest existing rootfile; only the changed set is checked/validated/committed (see "Output-based change detection on release" — supersedes git-path scoping, which is retained only for the lighter-weight PR check)                              |
-| Existing 120 rootfiles         | Keep as-is (historical migrations)                                                                                                                                                                                                                                                                            |
-| How the bot writes to `main`   | Release workflow opens an **auto-merged bot PR** using a **dedicated `RELEASE_BOT_TOKEN`** (GitHub App installation token or fine-grained PAT, not `GITHUB_TOKEN`) so the PR's required checks actually fire; the PR guard runs in **verify mode** on the bot branch (bytes must reproduce transpiler output) |
+| Decision                       | Choice                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Where generated rootfiles live | In-tree on `main` (spellcaster path unchanged)                                                                                                                                                                                                                                                                                                                              |
+| Release trigger                | GitHub Release **published** (`on: release: { types: [published] }`)                                                                                                                                                                                                                                                                                                        |
+| Which calibers regenerate      | **Output-based**: transpile every caliber, diff against its newest existing rootfile; only the changed set is checked/validated/committed (see "Output-based change detection on release" — supersedes git-path scoping, which is retained only for the lighter-weight PR check)                                                                                            |
+| Existing 120 rootfiles         | Keep as-is (historical migrations)                                                                                                                                                                                                                                                                                                                                          |
+| How the bot writes to `main`   | Release workflow opens a **bot PR requiring 1 approving review** (auto-merge lands it once approved and green) using a **dedicated `RELEASE_BOT_TOKEN`** (GitHub App installation token or fine-grained PAT, not `GITHUB_TOKEN`) so the PR's required checks actually fire; the PR guard runs in **verify mode** on the bot branch (bytes must reproduce transpiler output) |
 
 ## Dependency graph → "affected calibers"
 
@@ -195,9 +196,9 @@ workflow (scoped, not blanket `secrets: inherit`).
   GitHub App installation token or fine-grained PAT with `contents:write` +
   `pull-requests:write` on this repo) — **not** the default `GITHUB_TOKEN`. GitHub does
   not fire further workflow runs on PRs opened by `GITHUB_TOKEN`, so `rootfiles-guard`
-  (verify mode) and other required checks would never start and auto-merge would hang
-  forever. Using a dedicated bot token makes the bot PR behave like a normal contributor
-  PR: its checks run, and auto-merge proceeds once they're green.
+  (verify mode) and other required checks would never start, leaving the PR permanently
+  unmergeable. Using a dedicated bot token makes the bot PR behave like a normal
+  contributor PR: its checks run, and a reviewer can merge it once they're green.
 
 - **Injection hardening:** `github.event.release.tag_name`, `published_at`, and any
   attacker-influenceable field are passed via `env:` and referenced quoted (`"$VAR"`) —
@@ -214,7 +215,7 @@ Human PR (source only) ──▶ rootfiles-guard.yaml   (fails if a human adds/m
 GitHub Release published ──▶ release.yaml
       ├─ _transpile-validate.yaml (selection: all)  ← transpile ALL, detect changed by output, validate changed
       ├─ rename changed temps → <ts>-<tag>.toml
-      └─ bot branch → commit → auto-merge PR        ← rootfiles-guard runs in VERIFY mode on this PR
+      └─ bot branch → commit → PR (needs 1 approval) ← rootfiles-guard runs in VERIFY mode on this PR
                                    │
                                    ▼
                              main (rootfiles updated) ──▶ spellcaster github:.../rootfiles
@@ -242,7 +243,8 @@ standalone workflow files are **deleted**; the `scripts/validate_*.py` and
 ## Operational prerequisites (outside this repo's code)
 
 1. Branch protection on `main`: mark the required status check with context string **`rootfiles-guard`** (the job id from `rootfiles-guard.yaml`, the enforcement boundary).
-   Configure the required checks so the auto-merge bot PR can merge once they pass.
+   Set `required_approving_review_count: 1` so nothing lands unreviewed; admins get a
+   ruleset bypass checkbox on a PR for the cases that need it.
 2. Auto-merge enabled on the repo.
 3. Provision **`RELEASE_BOT_TOKEN`**: a GitHub App installation token (recommended) or
    fine-grained PAT scoped to this repo with `contents:write` + `pull-requests:write`,
@@ -311,9 +313,9 @@ does not make the underlying source correct.
 PRs opened by the built-in `GITHUB_TOKEN` do **not** trigger further workflow runs
 (GitHub's recursion guard). Resolved by having `release.yaml` open/merge the bot PR with
 `secrets.RELEASE_BOT_TOKEN` (App installation token or fine-grained PAT) instead of
-`GITHUB_TOKEN` — see Component D. Its checks fire normally and auto-merge proceeds once
-they're green, giving an independent re-verification (`rootfiles-guard` verify mode) at
-merge time rather than trusting release.yaml's own run alone.
+`GITHUB_TOKEN` — see Component D. Its checks fire normally, giving an independent
+re-verification (`rootfiles-guard` verify mode) at review time rather than trusting
+release.yaml's own run alone.
 
 ## Edge cases
 
@@ -333,9 +335,9 @@ merge time rather than trusting release.yaml's own run alone.
 - **Transpiler version bump** (pinned `MakinaHQ/transpiler` advances): may change output
   for many calibers ⇒ a release legitimately regenerates them. A real migration; expected.
 - **Two releases the same day / concurrent releases**: filenames disambiguate via the
-  `HHMMSS` timestamp + tag slug and sort monotonically after existing `YYYYMMDD` files.
-  Concurrent runs open separate bot PRs from their respective HEADs; auto-merge serializes
-  them (second may rebase). Low risk; re-runnable.
+  tag slug (the date alone is shared), and sort monotonically after existing files.
+  Concurrent runs open separate bot PRs from their respective HEADs; the reviewer merges
+  them in turn (the second may need updating). Low risk; re-runnable.
 - **Position deleted from `caliber.yaml`**: output changes ⇒ new rootfile. The
   open-positions validator still guards that on-chain-open positions retain accounting, so
   removing a position that is still open on-chain fails CI. ✅
@@ -355,7 +357,7 @@ merge time rather than trusting release.yaml's own run alone.
   sweep like any published release. Decide during implementation whether to filter
   pre-releases out (default: no — treat every published release the same).
 - **`main` moves during a release**: the bot PR is created from `main`'s HEAD at run time;
-  auto-merge merges/rebases normally. If blocked, the release is re-runnable idempotently
+  the reviewer updates the branch if needed. If blocked, the release is re-runnable idempotently
   (same tag ⇒ same slug ⇒ same target files; timestamps differ only if `published_at`
   differs, which it will not for the same release).
 - **Bot PR re-triggering PR CI**: `rootfiles-guard` runs in verify mode (passes iff bytes

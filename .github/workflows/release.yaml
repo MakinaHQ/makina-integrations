@@ -3,8 +3,16 @@ name: Release Rootfiles
 # Fires when a GitHub Release is published. Transpiles every caliber,
 # detects which ones' output actually changed vs their newest existing
 # rootfile, runs `check` plus the on-chain validators for the changed set,
-# and opens an auto-merging PR (as the release bot) with the regenerated
-# rootfiles. If nothing changed, no PR is opened.
+# and opens a PR (as the release bot) with the regenerated rootfiles for a
+# human to review and approve. If nothing changed, no PR is opened.
+#
+# The PR requires a human approval before it can merge — main's ruleset sets
+# required_approving_review_count: 1. Auto-merge is enabled on top of that, so
+# it means "merge once a reviewer has approved and the checks are green", not
+# "merge unattended". That review matters: these rootfiles are what spellcaster
+# applies, so each becomes the authoritative instruction root for its caliber,
+# and rootfiles-guard only proves they are reproducible transpiler output — a
+# person still has to decide the change is *wanted*.
 #
 # See docs/superpowers/specs/2026-07-24-release-generated-rootfiles-design.md
 #
@@ -13,7 +21,8 @@ name: Release Rootfiles
 #     contents:write + pull-requests:write on this repo)
 #   - vars.RELEASE_BOT_LOGIN     (the login RELEASE_BOT_TOKEN authenticates as)
 #   - secrets.ETHERSCAN_API_KEY, secrets.ALCHEMY_API_KEY (already present)
-#   - "Allow auto-merge" enabled on the repo
+#   - "Allow auto-merge" enabled on the repo (the PR still waits for the
+#     ruleset's required approval before auto-merge can land it)
 
 on:
   release:
@@ -116,7 +125,7 @@ jobs:
         if: steps.rename.outputs.has_changes == 'false'
         run: echo "No caliber's transpiled output changed since the last release. Nothing to commit."
 
-      - name: Commit, push, and open the auto-merge PR
+      - name: Commit, push, and open the release PR
         if: steps.rename.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
@@ -130,8 +139,9 @@ jobs:
 
           # main's ruleset has a required_signatures rule, so the bot's commit must
           # be GPG-signed AND verifiable, or the PR is blocked with every check green
-          # (mergeable=MERGEABLE, state=BLOCKED) and no one — not even an org owner —
-          # can merge it, since bypass_actors is empty.
+          # (mergeable=MERGEABLE, state=BLOCKED). Repo admins can tick the ruleset
+          # bypass checkbox to force it through, but nobody should have to: an
+          # unsigned release commit means this step is broken.
           #
           # "Verifiable" needs two things to line up: the signing key must be
           # registered on the bot's GitHub account, and the commit author email must
@@ -178,6 +188,8 @@ jobs:
           git push origin "$BRANCH"
 
           BULLETS=$(printf -- '- `%s`\n' "${RENAMED[@]}")
-          BODY=$(printf 'Rootfiles regenerated for release `%s`.\n\nRegenerated calibers:\n\n%s\n' "$TAG_NAME" "$BULLETS")
+          BODY=$(printf 'Rootfiles regenerated for release `%s`.\n\n**This PR needs a human approval before it can merge** (main requires one review). Auto-merge is on, so approving it is enough — it will land once the checks are green. These rootfiles are what spellcaster applies, so each one becomes the authoritative instruction root for its caliber.\n\n## Regenerated calibers\n\n%s\n## What to check\n\n- Each caliber above is one you expected this release to touch. A caliber here that you did not knowingly change means its source drifted from its last rootfile.\n- The diff for each is the intended change and nothing more.\n- `rootfiles-guard` has already re-transpiled every file here and confirmed it is byte-identical to fresh transpiler output, so these are reproducible — review is about *whether the change is wanted*, not whether the bytes are right.\n' "$TAG_NAME" "$BULLETS")
           gh pr create --title "chore(release): rootfiles for ${TAG_NAME}" --body "$BODY" --base main --head "$BRANCH"
+
           gh pr merge "$BRANCH" --auto --squash
+          echo "::notice::Opened the release rootfiles PR and enabled auto-merge. It still needs a reviewer's approval before it can land."
