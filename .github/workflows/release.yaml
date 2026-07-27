@@ -185,11 +185,27 @@ jobs:
             exit 1
           fi
 
-          git push origin "$BRANCH"
+          # Force-push, and create-or-update the PR below, so re-publishing a
+          # release actually works. That is the recovery rootfiles-guard's own
+          # failure message tells you to use ("Re-publish the release to
+          # regenerate them"), but it used to collide: same tag => same slug =>
+          # same branch, so `git push` hit a non-fast-forward and `gh pr create`
+          # hit a duplicate-PR error. Recovering meant closing the stale PR and
+          # deleting its branch by hand, which is what had to be done for the
+          # first release. Forcing is safe here because this branch is
+          # release-owned, disposable, and rebuilt from main on every run.
+          git push --force origin "$BRANCH"
 
           BULLETS=$(printf -- '- `%s`\n' "${RENAMED[@]}")
           BODY=$(printf 'Rootfiles regenerated for release `%s`.\n\n**This PR needs a human approval before it can merge** (main requires one review). Auto-merge is on, so approving it is enough — it will land once the checks are green. These rootfiles are what spellcaster applies, so each one becomes the authoritative instruction root for its caliber.\n\n## Regenerated calibers\n\n%s\n## What to check\n\n- Each caliber above is one you expected this release to touch. A caliber here that you did not knowingly change means its source drifted from its last rootfile.\n- The diff for each is the intended change and nothing more.\n- `rootfiles-guard` has already re-transpiled every file here and confirmed it is byte-identical to fresh transpiler output, so these are reproducible — review is about *whether the change is wanted*, not whether the bytes are right.\n' "$TAG_NAME" "$BULLETS")
-          gh pr create --title "chore(release): rootfiles for ${TAG_NAME}" --body "$BODY" --base main --head "$BRANCH"
+          # Create the PR, or update the existing one if this tag was published
+          # before. `gh pr create` fails when a PR already exists for the head
+          # branch, so treat that as "update it" rather than an error.
+          if ! gh pr create --title "chore(release): rootfiles for ${TAG_NAME}" --body "$BODY" --base main --head "$BRANCH" 2>/dev/null; then
+            echo "A PR already exists for $BRANCH — updating it instead."
+            gh pr edit "$BRANCH" --title "chore(release): rootfiles for ${TAG_NAME}" --body "$BODY"
+          fi
 
+          # Also idempotent: enabling auto-merge when it is already enabled is a no-op.
           gh pr merge "$BRANCH" --auto --squash
           echo "::notice::Opened the release rootfiles PR and enabled auto-merge. It still needs a reviewer's approval before it can land."

@@ -113,7 +113,24 @@ runs:
             continue
           fi
 
-          newest=$(cd "$dir/rootfiles" && ls -1 | grep -E '^[0-9]{8}' | LC_ALL=C sort | tail -n 1 || true)
+          # Baseline = the caliber's current active root, i.e. the most recently
+          # ADDED rootfile, determined from git history rather than from the
+          # filename. Sorting names lexically is wrong: 20260727-v1-9-0 ranks
+          # after 20260727-v1-10-0, so two releases on the same UTC day would pick
+          # the wrong baseline. File mtime is no help either — a fresh CI checkout
+          # stamps every file with the checkout time.
+          #
+          # The `^[0-9]{8}-` filter still guards the candidate set: it excludes the
+          # TEST-*.toml files that exist in some caliber dirs, and a stray 9-digit
+          # name (202605027-etherfi-lido.toml) that would otherwise sort high.
+          newest=$(
+            cd "$dir/rootfiles" || exit 0
+            ls -1 2>/dev/null | grep -E '^[0-9]{8}-' | while IFS= read -r f; do
+              # commit time of the commit that added this file; 0 if unknown
+              added=$(git log --diff-filter=A -1 --format=%ct -- "$f" 2>/dev/null)
+              printf '%s\t%s\n' "${added:-0}" "$f"
+            done | LC_ALL=C sort -n -k1,1 | tail -n 1 | cut -f2-
+          )
           if [ -z "$newest" ] || ! diff -q "$dir/rootfiles/$newest" "$tmp" > /dev/null 2>&1; then
             echo "  -> changed (vs '${newest:-<none>}')"
             changed+=("$pair")
