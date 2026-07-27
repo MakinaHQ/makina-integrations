@@ -18,6 +18,9 @@
       receiver:
         type: "address"
         value: ${config.caliber_address}
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
 
 # account for the borrowed WETH
 - is_debt: true
