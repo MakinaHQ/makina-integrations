@@ -123,10 +123,42 @@ jobs:
           TAG_NAME: ${{ github.event.release.tag_name }}
           BRANCH: ${{ steps.release.outputs.branch }}
           FILES: ${{ steps.rename.outputs.files }}
+          GPG_PRIVATE_KEY: ${{ secrets.RELEASE_BOT_GPG_KEY }}
+          BOT_EMAIL: ${{ vars.RELEASE_BOT_EMAIL }}
         run: |
           set -euo pipefail
+
+          # main's ruleset has a required_signatures rule, so the bot's commit must
+          # be GPG-signed AND verifiable, or the PR is blocked with every check green
+          # (mergeable=MERGEABLE, state=BLOCKED) and no one — not even an org owner —
+          # can merge it, since bypass_actors is empty.
+          #
+          # "Verifiable" needs two things to line up: the signing key must be
+          # registered on the bot's GitHub account, and the commit author email must
+          # be an address GitHub considers verified for that account. Hence
+          # RELEASE_BOT_EMAIL (the account's <id>+<login>@users.noreply.github.com
+          # form) rather than an invented address — a made-up address signs fine and
+          # still shows Unverified.
+          #
+          # gpg-agent's socket lives under GNUPGHOME, and a long path exceeds the
+          # UNIX socket limit, so keep GNUPGHOME short.
+          export GNUPGHOME
+          GNUPGHOME=$(mktemp -d /tmp/gnupg.XXXXXX)
+          chmod 700 "$GNUPGHOME"
+          # trailing newline matters: a secret stored without one can trip armor parsing
+          printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --quiet --import
+          SIGNING_KEY=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/{print $10; exit}')
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::RELEASE_BOT_GPG_KEY did not import a usable secret key."
+            exit 1
+          fi
+          echo "Signing as $BOT_EMAIL with key $SIGNING_KEY"
+
           git config user.name "release-rootfiles-bot"
-          git config user.email "release-rootfiles-bot@users.noreply.github.com"
+          git config user.email "$BOT_EMAIL"
+          git config user.signingkey "$SIGNING_KEY"
+          git config commit.gpgsign true
+          git config gpg.program gpg
 
           RENAMED=()
           while IFS= read -r file; do
@@ -135,7 +167,14 @@ jobs:
 
           git checkout -b "$BRANCH"
           git add -- "${RENAMED[@]}"
-          git commit -m "chore(release): rootfiles for ${TAG_NAME}"
+          git commit -S -m "chore(release): rootfiles for ${TAG_NAME}"
+
+          # Fail loudly here rather than leaving a blocked PR for someone to debug.
+          if ! git verify-commit HEAD 2>/dev/null; then
+            echo "::error::The release commit is not signed — main's required_signatures rule would block it."
+            exit 1
+          fi
+
           git push origin "$BRANCH"
 
           BULLETS=$(printf -- '- `%s`\n' "${RENAMED[@]}")
