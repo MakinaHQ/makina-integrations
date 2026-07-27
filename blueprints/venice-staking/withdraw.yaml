@@ -1,0 +1,87 @@
+protocol: "venice-staking"
+
+# Venice AI sVVV unstake — two-step with on-chain cooldown (7 days).
+#
+# Step 1 (initiate_unstake):
+#   - claims pending VVV rewards
+#   - burns `amount` sVVV from caliber
+#   - sets stakes[caliber].cooldownEnd = now + cooldownDuration, cooldownAmount = amount
+#   Reverts if a cooldown is already in progress (cooldownAmount != 0).
+#
+# Step 1' (initiate_unstake_relative):
+#   - same as initiate_unstake, but `amount` is computed as
+#     bps_to_unstake / 10000 of the caliber's current sVVV balance
+#     (10000 = full balance). Fails with UNSTAKE_ZERO if balance is 0.
+#
+# Step 2 (finalize_unstake):
+#   - after cooldown elapsed, transfers VVV (= cooldownAmount) back to caliber
+#   - resets cooldownEnd / cooldownAmount to 0
+#   No arguments — the contract reads state from stakes[msg.sender].
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper_address:
+    type: "address"
+
+actions:
+  initiate_unstake:
+    calls:
+      - description: "Burn sVVV and start the 7-day cooldown for `amount`"
+        target: "${inputs.staking_contract_address}"
+        selector: "initiateUnstake(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.amount_to_unstake}"
+
+    input_slots:
+      amount_to_unstake:
+        type: "uint256"
+        description: "Amount of sVVV to unstake (1:1 with VVV)"
+
+  initiate_unstake_relative:
+    calls:
+      - description: "Get caliber sVVV balance (still-staked, 1:1 with VVV)"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "svvv_balance"
+          type: "uint256"
+
+      - description: "Compute amount to unstake = balance * bps / 10000"
+        target: "${inputs.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.svvv_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_unstake}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "amount_to_unstake"
+          type: "uint256"
+
+      - description: "Burn sVVV and start the 7-day cooldown for the computed amount"
+        target: "${inputs.staking_contract_address}"
+        selector: "initiateUnstake(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.amount_to_unstake}"
+
+    input_slots:
+      bps_to_unstake:
+        type: "uint256"
+        description: "Basis points of the caliber's sVVV balance to unstake (10000 = full balance)"
+
+  finalize_unstake:
+    calls:
+      - description: "After cooldown, withdraw VVV (= stakes.cooldownAmount) to caliber"
+        target: "${inputs.staking_contract_address}"
+        selector: "finalizeUnstake()"
+        parameters: []

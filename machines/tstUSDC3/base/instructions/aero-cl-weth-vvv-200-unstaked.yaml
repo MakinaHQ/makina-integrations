@@ -1,0 +1,152 @@
+# WETH/VVV Aerodrome CL — tickSpacing 200 — unstaked (earns trading fees, no AERO emissions).
+# Pool:  0x46d398a5b33709877f50c8918a7ee96f1be1d7dd (token0=WETH, token1=VVV, fee=8000)
+# Gauge: 0x6831125a82Af7417e0cde3A214c03fE248Ff6AA8 (used by accounting helper to read nft()/pool())
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.WETH}" # WETH
+    - "${token_list.base.VVV}" # VVV
+  instruction:
+    label: "weth_vvv_200_unstaked"
+    path: "../../../blueprints/aerodrome-cl/deposit.yaml:swap_and_deposit_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.tstUSDC3.base.aerodrome.0x46d398a5b33709877f50c8918a7ee96f1be1d7dd.unstaked)}"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      token_a_address:
+        type: "address"
+        value: "${token_list.base.WETH}"
+      token_b_address:
+        type: "address"
+        value: "${token_list.base.VVV}"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      cl_pool_address:
+        type: "address"
+        value: "0x46d398a5b33709877f50c8918a7ee96f1be1d7dd"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_router:
+        type: "address"
+        value: "0xBE6D8f0d05cC4be24d5167a3eF062215bE6D18a5"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.WETH}" # WETH
+    - "${token_list.base.VVV}" # VVV
+  instruction:
+    label: "weth_vvv_200_unstaked"
+    path: "../../../blueprints/aerodrome-cl/deposit.yaml:deposit_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.tstUSDC3.base.aerodrome.0x46d398a5b33709877f50c8918a7ee96f1be1d7dd.unstaked)}"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      token_a_address:
+        type: "address"
+        value: "${token_list.base.WETH}"
+      token_b_address:
+        type: "address"
+        value: "${token_list.base.VVV}"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      cl_pool_address:
+        type: "address"
+        value: "0x46d398a5b33709877f50c8918a7ee96f1be1d7dd"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.base.WETH}" # WETH
+    - "${token_list.base.VVV}" # VVV
+  instruction:
+    label: "weth_vvv_200_unstaked"
+    path: "../../../blueprints/aerodrome-cl/account.yaml:account_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.tstUSDC3.base.aerodrome.0x46d398a5b33709877f50c8918a7ee96f1be1d7dd.unstaked)}"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      gauge_address:
+        type: "address"
+        value: "0x6831125a82Af7417e0cde3A214c03fE248Ff6AA8"
+      aerodrome_cl_helper:
+        type: "address"
+        value: "${config.aerodrome_cl_helper}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens:
+    - "${token_list.base.WETH}" # WETH
+    - "${token_list.base.VVV}" # VVV
+  instruction:
+    label: "weth_vvv_200_unstaked"
+    path: "../../../blueprints/aerodrome-cl/harvest.yaml:collect_fees"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      nft_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.tstUSDC3.base.aerodrome.0x46d398a5b33709877f50c8918a7ee96f1be1d7dd.unstaked)}"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.base.WETH}" # WETH
+    - "${token_list.base.VVV}" # VVV
+  instruction:
+    label: "weth_vvv_200_unstaked"
+    path: "../../../blueprints/aerodrome-cl/withdraw.yaml:withdraw_cl"
+    inputs:
+      nft_id_storage_key:
+        type: "bytes32"
+        value: "${keccak256(makina.tstUSDC3.base.aerodrome.0x46d398a5b33709877f50c8918a7ee96f1be1d7dd.unstaked)}"
+      kv_store_address:
+        type: "address"
+        value: "${config.kv_store_address}"
+      revertable_caliber_helper:
+        type: "address"
+        value: "${config.revertable_caliber_helper}"
+      gauge_address:
+        type: "address"
+        value: "0x6831125a82Af7417e0cde3A214c03fE248Ff6AA8"
+      aerodrome_cl_helper:
+        type: "address"
+        value: "${config.aerodrome_cl_helper}"
+      nft_manager_address:
+        type: "address"
+        value: "0x827922686190790b37229fd06084350e74485b72"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

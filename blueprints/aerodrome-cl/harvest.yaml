@@ -6,16 +6,21 @@ inputs:
   kv_store_address:
     type: "address"
   nft_id_storage_key:
-    type: "string"
+    type: "bytes32"
+  nft_manager_address:
+    type: "address"
+  caliber_address:
+    type: "address"
 
 actions:
+  # harvest: for STAKED positions only. Calling getReward on an unstaked position reverts.
   harvest:
     calls:
       - description: "Get the position id from the KV store"
         target: "${inputs.kv_store_address}"
-        selector: "get(string)"
+        selector: "get(bytes32)"
         parameters:
-          - type: "string"
+          - type: "bytes32"
             value: "${inputs.nft_id_storage_key}"
         return:
           type: "uint256"
@@ -27,3 +32,33 @@ actions:
         parameters:
           - type: "uint256"
             value: "${returns.position_id}"
+
+  # collect_fees: for UNSTAKED positions only. nftManager.collect() requires isAuthorizedForToken,
+  # which fails when the gauge owns the NFT (staked). Fees don't accumulate on staked positions
+  # anyway — they go to voters.
+  collect_fees:
+    calls:
+      - description: "Get the position id from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "existing_position_id"
+
+      - description: "Collect accumulated trading fees from the unstaked position"
+        target: "${inputs.nft_manager_address}"
+        selector: "collect((uint256,address,uint128,uint128))"
+        parameters:
+          - type: "(uint256,address,uint128,uint128)"
+            value:
+              - type: "uint256"
+                value: "${returns.existing_position_id}"
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint128"
+                value: "${builtins.UINT128_MAX}"
+              - type: "uint128"
+                value: "${builtins.UINT128_MAX}"

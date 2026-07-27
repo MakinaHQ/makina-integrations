@@ -1,0 +1,44 @@
+protocol: "venice-staking"
+
+# Venice AI sVVV staking
+#
+# StakingV2 contract IS the sVVV ERC20. Calling `stake(recipient, amount)`:
+#   - claims any pending VVV rewards to recipient first
+#   - pulls `amount` of VVV from msg.sender via transferFrom
+#   - mints `amount` of sVVV to recipient (1:1 with VVV)
+#
+# Recipient must equal the caliber so the caliber holds the sVVV position.
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  venice_token_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  stake:
+    calls:
+      - description: "Approve the StakingV2 contract to spend VVV"
+        target: "${inputs.venice_token_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.staking_contract_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+      - description: "Stake VVV; receive sVVV 1:1 to the caliber"
+        target: "${inputs.staking_contract_address}"
+        selector: "stake(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_to_stake}"
+
+    input_slots:
+      amount_to_stake:
+        type: "uint256"
+        description: "Amount of VVV to stake"

@@ -2,7 +2,7 @@ protocol: "aerodrome"
 
 inputs:
   nft_id_storage_key:
-    type: "string"
+    type: "bytes32"
   kv_store_address:
     type: "address"
   revertable_caliber_helper:
@@ -21,9 +21,9 @@ actions:
     calls:
       - description: "Get the position id from the KV store"
         target: "${inputs.kv_store_address}"
-        selector: "get(string)"
+        selector: "get(bytes32)"
         parameters:
-          - type: "string"
+          - type: "bytes32"
             value: "${inputs.nft_id_storage_key}"
         return:
           type: "uint256"
@@ -163,6 +163,10 @@ actions:
           type: "uint256"
           name: "current_timestamp"
 
+      # NOTE: amount_token_a/b are passed as amount0Min/amount1Min. Since this is a full withdrawal
+      # in an atomic tx (no frontrunning possible within weiroll), these serve no slippage protection.
+      # There is a known 1-wei rounding divergence between getAmountsForLiquidity and pool.burn()
+      # in some Uniswap V3 forks. If this ever reverts with "PS", consider passing 0 for both mins.
       - description: "Decrease liquidity"
         target: "${inputs.nft_manager_address}"
         selector: "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))"
@@ -195,9 +199,197 @@ actions:
               - type: "uint128"
                 value: "${builtins.UINT128_MAX}"
 
+      # NOTE: NFT is not burned after withdrawal — it stays with 0 liquidity owned by the caliber.
+      # This is harmless but accumulates ghost NFTs over time.
       - description: "Remove the nft id from the kv store"
         target: "${inputs.kv_store_address}"
-        selector: "reset(string)"
+        selector: "set(bytes32,bytes32)"
         parameters:
-          - type: "string"
+          - type: "bytes32"
             value: "${inputs.nft_id_storage_key}"
+          - type: "uint256"
+            value: "0"
+
+  # withdraw_cl: for UNSTAKED positions only. Same as unstake_and_withdraw_cl minus the gauge.withdraw step.
+  # Calling decreaseLiquidity on a staked position reverts (isAuthorizedForToken — gauge owns the NFT).
+  withdraw_cl:
+    calls:
+      - description: "Get the position id from the KV store"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.nft_id_storage_key}"
+        return:
+          type: "uint256"
+          name: "existing_position_id"
+
+      - description: "Check that it is not equal to zero"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_position_id}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "bool"
+          name: "no_position_bool"
+
+      - description: "Revert if the condition is True"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_position_bool}"
+
+      - description: "Get the position state for token id using the aero helper"
+        target: "${inputs.aerodrome_cl_helper}"
+        selector: "getPositionStateForTokenId(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_position_id}"
+          - type: "address"
+            value: "${inputs.gauge_address}"
+        return:
+          type: "(uint128,uint160,uint160,uint160)"
+          name: "position_state"
+
+      - description: "Extract liquidity value from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint128"
+          name: "liquidity"
+
+      - description: "Extract current price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "uint160"
+          name: "current_price"
+
+      - description: "Extract lower tick price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "2"
+        return:
+          type: "uint160"
+          name: "lower_tick_price"
+
+      - description: "Extract upper tick price from position state"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint160,uint160,uint160)"
+            value: "${returns.position_state}"
+          - type: "uint256"
+            value: "3"
+        return:
+          type: "uint160"
+          name: "upper_tick_price"
+
+      - description: "Get amounts for liquidity, in cl helper"
+        target: "${inputs.aerodrome_cl_helper}"
+        selector: "getAmountsForLiquidity(uint160,uint160,uint160,uint128)"
+        parameters:
+          - type: "uint160"
+            value: "${returns.current_price}"
+          - type: "uint160"
+            value: "${returns.lower_tick_price}"
+          - type: "uint160"
+            value: "${returns.upper_tick_price}"
+          - type: "uint128"
+            value: "${returns.liquidity}"
+        return:
+          type: "(uint256,uint256)"
+          name: "amounts_in_position"
+
+      - description: "Get amount token a"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.amounts_in_position}"
+          - type: "uint256"
+            value: "0"
+        return:
+          type: "uint256"
+          name: "amount_token_a"
+
+      - description: "Get amount token b"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256)"
+            value: "${returns.amounts_in_position}"
+          - type: "uint256"
+            value: "1"
+        return:
+          type: "uint256"
+          name: "amount_token_b"
+
+      - description: "Get the current block.timestamp, for deadline"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "blockTimestamp()"
+        parameters: []
+        return:
+          type: "uint256"
+          name: "current_timestamp"
+
+      # NOTE: same rounding caveat as unstake_and_withdraw_cl above.
+      - description: "Decrease liquidity"
+        target: "${inputs.nft_manager_address}"
+        selector: "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))"
+        parameters:
+          - type: "(uint256,uint128,uint256,uint256,uint256)"
+            value:
+              - type: "uint256"
+                value: "${returns.existing_position_id}"
+              - type: "uint128"
+                value: "${returns.liquidity}"
+              - type: "uint256"
+                value: "${returns.amount_token_a}"
+              - type: "uint256"
+                value: "${returns.amount_token_b}"
+              - type: "uint256"
+                value: "${returns.current_timestamp}"
+
+      # collect with UINT128_MAX sweeps both the withdrawn principal and any accumulated trading fees
+      - description: "Collect tokens and accumulated fees"
+        target: "${inputs.nft_manager_address}"
+        selector: "collect((uint256,address,uint128,uint128))"
+        parameters:
+          - type: "(uint256,address,uint128,uint128)"
+            value:
+              - type: "uint256"
+                value: "${returns.existing_position_id}"
+              - type: "address"
+                value: "${inputs.caliber_address}"
+              - type: "uint128"
+                value: "${builtins.UINT128_MAX}"
+              - type: "uint128"
+                value: "${builtins.UINT128_MAX}"
+
+      - description: "Remove the nft id from the kv store"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.nft_id_storage_key}"
+          - type: "uint256"
+            value: "0"

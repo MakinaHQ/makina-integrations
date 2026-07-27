@@ -341,6 +341,13 @@
     },
     {
       "chainId": 8453,
+      "address": "0x63706e401c06ac8513145b7687A14804d17f814b",
+      "name": "Aave Token",
+      "decimals": 18,
+      "symbol": "AAVE"
+    },
+    {
+      "chainId": 8453,
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
       "name": "EURC",
       "decimals": 6,
@@ -376,10 +383,24 @@
     },
     {
       "chainId": 8453,
+      "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+      "name": "Coinbase Wrapped BTC",
+      "decimals": 8,
+      "symbol": "cbBTC"
+    },
+    {
+      "chainId": 8453,
       "address": "0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22",
       "name": "Coinbase Wrapped Staked ETH",
       "decimals": 18,
       "symbol": "cbETH"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xacfE6019Ed1A7Dc6f7B508C02d1b04ec88cC21bf",
+      "name": "Venice Token",
+      "decimals": 18,
+      "symbol": "VVV"
     },
     {
       "chainId": 42161,

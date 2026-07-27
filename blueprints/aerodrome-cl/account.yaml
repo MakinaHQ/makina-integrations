@@ -2,7 +2,7 @@ protocol: "aerodrome"
 
 inputs:
   nft_id_storage_key:
-    type: "string"
+    type: "bytes32"
   kv_store_address:
     type: "address"
   gauge_address:
@@ -13,13 +13,18 @@ inputs:
     type: "address"
 
 actions:
+  # account_cl: works for both staked and unstaked positions.
+  # getPositionStateForTokenId reads nftManager.positions(tokenId) which is ownership-agnostic;
+  # the gauge param is only used to look up nft() and pool() references.
+  # NOTE: uncollected trading fees on unstaked positions are NOT included in the amounts.
+  # Operator must call collect_fees to realize them into the caliber's token balance.
   account_cl:
     calls:
       - description: "Get the token id from the KV store"
         target: "${inputs.kv_store_address}"
-        selector: "get(string)"
+        selector: "get(bytes32)"
         parameters:
-          - type: "string"
+          - type: "bytes32"
             value: "${inputs.nft_id_storage_key}"
         return:
           type: "uint256"

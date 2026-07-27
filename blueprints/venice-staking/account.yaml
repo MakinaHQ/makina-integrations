@@ -1,0 +1,97 @@
+protocol: "venice-staking"
+
+# Venice AI sVVV position accounting (in VVV terms, 1:1 with sVVV).
+#
+# Position value = active_stake + pending_rewards + cooldown_amount, where
+#   - active_stake     = sVVV.balanceOf(caliber)        (still-staked, 1:1 with VVV)
+#   - pending_rewards  = staking.pendingRewards(caliber) (unclaimed VVV emissions)
+#   - cooldown_amount  = stakes(caliber).cooldownAmount  (VVV waiting after initiateUnstake)
+#
+# `stakes(address)` returns (rewardDebt, cooldownEnd, cooldownAmount); we
+# extract index 2 via the caliber helper. Free VVV in the caliber wallet
+# is not counted here because VVV is a registered base token.
+
+inputs:
+  staking_contract_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  revertable_caliber_helper:
+    type: "address"
+  math_helper_address:
+    type: "address"
+
+actions:
+  account:
+    calls:
+      - description: "Get caliber sVVV balance (still-staked, 1:1 with VVV)"
+        target: "${inputs.staking_contract_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "active_stake"
+          type: "uint256"
+
+      - description: "Get pending VVV rewards for caliber"
+        target: "${inputs.staking_contract_address}"
+        selector: "pendingRewards(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_rewards"
+          type: "uint256"
+
+      - description: "Get caliber stakes tuple (rewardDebt, cooldownEnd, cooldownAmount)"
+        target: "${inputs.staking_contract_address}"
+        selector: "stakes(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "stakes_tuple"
+          type: "(uint256,uint256,uint256)"
+
+      - description: "Extract cooldownAmount (index 2) — VVV pending finalizeUnstake"
+        target: "${inputs.revertable_caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.stakes_tuple}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "cooldown_amount"
+          type: "uint256"
+
+      - description: "Sum active stake + pending rewards"
+        target: "${inputs.math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.active_stake}"
+          - type: "uint256"
+            value: "${returns.pending_rewards}"
+        return:
+          name: "stake_plus_rewards"
+          type: "uint256"
+
+      - description: "Add cooldown amount to get total position value in VVV"
+        target: "${inputs.math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.stake_plus_rewards}"
+          - type: "uint256"
+            value: "${returns.cooldown_amount}"
+        return:
+          name: "total_position_value"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_position_value}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
