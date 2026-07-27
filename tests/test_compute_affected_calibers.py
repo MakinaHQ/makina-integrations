@@ -52,6 +52,23 @@ class TestAffectedCalibers(unittest.TestCase):
         changed = [".github/workflows/linting.yaml", "README.md", "scripts/foo.py"]
         self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), [])
 
+    def test_composite_action_change_affects_all_calibers(self):
+        # The transpile-validate action defines HOW every caliber is transpiled,
+        # including the pinned transpiler version, so a change there must sweep
+        # everything — otherwise a version bump validates nothing.
+        changed = [".github/actions/transpile-validate/action.yml"]
+        self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), sorted(ALL_CALIBERS))
+
+    def test_workflow_change_affects_no_calibers(self):
+        # Workflows orchestrate WHEN transpiling happens and cannot change its
+        # output, so the narrower `.github/actions/` scoping is deliberate.
+        changed = [
+            ".github/workflows/rootfiles-guard.yaml",
+            ".github/workflows/release.yaml",
+            ".github/workflows/transpiler.yaml",
+        ]
+        self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), [])
+
     def test_unknown_machine_chain_pair_is_ignored(self):
         changed = ["machines/doesnotexist/mainnet/caliber.yaml"]
         self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), [])

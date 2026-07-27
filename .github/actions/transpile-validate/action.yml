@@ -13,6 +13,10 @@ inputs:
     required: true
   alchemy-api-key:
     required: true
+  transpiler-version:
+    description: Pinned MakinaHQ/transpiler release tag to download.
+    required: false
+    default: v0.2.4
 
 outputs:
   changed-calibers:
@@ -24,24 +28,34 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Checkout transpiler repository
-      uses: actions/checkout@v6
-      with:
-        repository: MakinaHQ/transpiler
-        path: transpiler
-
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Cache Cargo
-      uses: Swatinem/rust-cache@v2
-      with:
-        workspaces: transpiler
-
-    - name: Build transpiler
+    - name: Download prebuilt transpiler
       shell: bash
-      working-directory: transpiler
-      run: cargo build --release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        TRANSPILER_VERSION: ${{ inputs.transpiler-version }}
+      run: |
+        set -euo pipefail
+        asset="transpiler-x86_64-unknown-linux-gnu.tar.xz"
+        dest="$RUNNER_TEMP/transpiler-$TRANSPILER_VERSION"
+        mkdir -p "$dest"
+
+        gh release download "$TRANSPILER_VERSION" \
+          --repo MakinaHQ/transpiler \
+          --pattern "$asset" \
+          --pattern "$asset.sha256" \
+          --dir "$dest" \
+          --clobber
+
+        (cd "$dest" && sha256sum -c "$asset.sha256")
+
+        tar -xJf "$dest/$asset" -C "$dest"
+
+        bin="$dest/transpiler-x86_64-unknown-linux-gnu/transpiler"
+        chmod +x "$bin"
+
+        echo "TRANSPILER_BIN=$bin" >> "$GITHUB_ENV"
+        echo "Resolved transpiler version: $TRANSPILER_VERSION"
+        echo "Transpiler binary: $bin"
 
     - name: Install uv
       uses: astral-sh/setup-uv@v7
@@ -67,7 +81,7 @@ runs:
           lite=""
           if grep -q 'makina_lite_module' "$caliber"; then lite="--lite"; fi
           echo "Transpiling $caliber $lite"
-          if ! (cd transpiler && cargo run -r -- -i "../$caliber" -o "../$tmp" -t "../token-lists/prod-token-list.json" $lite); then
+          if ! "$TRANSPILER_BIN" -i "$caliber" -o "$tmp" -t "token-lists/prod-token-list.json" $lite; then
             echo "::error file=$caliber::Transpile failed for $pair"
             failed+=("$pair")
             continue
@@ -119,7 +133,7 @@ runs:
           lite=""
           if grep -q 'makina_lite_module' "$caliber"; then lite="--lite"; fi
           echo "Running transpiler check for $caliber $lite"
-          (cd transpiler && cargo run -r -- -i "../$caliber" -t "../token-lists/prod-token-list.json" $lite check --github-errors)
+          "$TRANSPILER_BIN" -i "$caliber" -t "token-lists/prod-token-list.json" $lite check --github-errors
 
           rootfiles+=("$tmp")
         done <<< "$CHANGED"

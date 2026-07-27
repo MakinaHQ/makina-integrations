@@ -21,10 +21,21 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-# Any change under these prefixes could affect every caliber, since
-# instructions/blueprints/blueprints-x are shared across machines and the
-# token list is a transpiler input for all of them.
-GLOBAL_PREFIXES = ("instructions/", "blueprints/", "blueprints-x/", "token-lists/")
+# Any change under these prefixes could alter *any* caliber's transpiled
+# output, so touching one sweeps every caliber. instructions/blueprints/
+# blueprints-x are shared across machines and the token list is a transpiler
+# input for all of them. `.github/actions/` is included because it holds the
+# transpile-validate composite action, which defines *how* every caliber is
+# transpiled — including the pinned transpiler version. Workflow files are
+# deliberately NOT here: they orchestrate when transpiling happens and cannot
+# change its output, so sweeping all calibers for a workflow tweak is noise.
+GLOBAL_PREFIXES = (
+    "instructions/",
+    "blueprints/",
+    "blueprints-x/",
+    "token-lists/",
+    ".github/actions/",
+)
 
 # Machines under machines/.deprecated/ are retained for reference only and are
 # out of scope for every CI workflow. See machines/.deprecated/README.md.
