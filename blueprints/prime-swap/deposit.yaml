@@ -22,15 +22,11 @@ protocol: "prime-swap"
 # gte + revertIfFalse guard on the realised PRIME shares.
 #
 # Philosophy: this blueprint is inherently PRIME-specific — the swap topology is a
-# FIXED USDC -> wYLDS -> PRIME chain, so the entry asset can only ever be USDC. The
-# entry input is therefore named `usdc` (not a generic `asset_address`) to make the
-# fixed topology explicit. wYLDS/PRIME are passed as inputs only so the addresses
-# live in the instruction alongside their token-list references.
+# FIXED USDC -> wYLDS -> PRIME chain, so the entry asset can only ever be USDC and
+# the three token addresses are fixed mainnet deployments. They are therefore
+# constants; the caliber is the only per-machine value.
 #
 # Expected inputs (from instructions/prime-swap-in.yaml):
-#   usdc            — entry asset pulled from the caliber (always USDC)
-#   wylds_address   — wYLDS ERC4626 over USDC (sync deposit)
-#   prime_address   — PRIME ERC4626 over wYLDS (sync deposit)
 #   caliber_address — deposit receiver / position holder
 
 constants:
@@ -40,14 +36,20 @@ constants:
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
-
-inputs:
-  usdc:
+  # Entry asset pulled from the caliber (always USDC).
+  usdc_address:
     type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+  # wYLDS ERC4626 over USDC (sync deposit).
   wylds_address:
     type: "address"
+    value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc"
+  # PRIME ERC4626 over wYLDS (sync deposit).
   prime_address:
     type: "address"
+    value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6"
+
+inputs:
   caliber_address:
     type: "address"
 
@@ -55,16 +57,16 @@ actions:
   swap_asset_for_prime:
     calls:
       - description: "Approve wYLDS vault to spend the entry asset (USDC)"
-        target: "${inputs.usdc}"
+        target: "${constants.usdc_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.wylds_address}"
+            value: "${constants.wylds_address}"
           - type: "uint256"
             value: "${input_slots.asset_amount}"
 
       - description: "Deposit USDC into wYLDS (sync ERC4626, 1:1) minting wYLDS to the caliber"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"
@@ -76,16 +78,16 @@ actions:
           type: "uint256"
 
       - description: "Approve PRIME vault to spend the wYLDS just received"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "approve(address,uint256)"
         parameters:
           - type: "address"
-            value: "${inputs.prime_address}"
+            value: "${constants.prime_address}"
           - type: "uint256"
             value: "${returns.wylds_received}"
 
       - description: "Deposit wYLDS into PRIME (sync ERC4626, NAV-priced) minting PRIME to the caliber"
-        target: "${inputs.prime_address}"
+        target: "${constants.prime_address}"
         selector: "deposit(uint256,address)"
         parameters:
           - type: "uint256"

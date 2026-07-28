@@ -38,12 +38,6 @@
     label: "PRIME Redemption Request"
     path: "../../../blueprints/prime-swap/withdraw.yaml:redeem_request"
     inputs:
-      prime_address:
-        type: "address"
-        value: "${token_list.mainnet.PRIME}"
-      wylds_address:
-        type: "address"
-        value: "${token_list.mainnet.wYLDS}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -57,12 +51,6 @@
     label: "PRIME Redemption Request (relative)"
     path: "../../../blueprints/prime-swap/withdraw.yaml:redeem_request_relative"
     inputs:
-      prime_address:
-        type: "address"
-        value: "${token_list.mainnet.PRIME}"
-      wylds_address:
-        type: "address"
-        value: "${token_list.mainnet.wYLDS}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -76,12 +64,6 @@
     label: "PRIME Redemption Request"
     path: "../../../blueprints/prime-swap/withdraw.yaml:account_pending"
     inputs:
-      prime_address:
-        type: "address"
-        value: "${token_list.mainnet.PRIME}"
-      wylds_address:
-        type: "address"
-        value: "${token_list.mainnet.wYLDS}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"

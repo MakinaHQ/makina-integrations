@@ -28,9 +28,10 @@ protocol: "prime-swap"
 # self-zeros in the SAME tx the USDC lands loose (USDC is a base token), so there
 # is no double count and no NAV discontinuity.
 #
+# The PRIME/wYLDS topology is a fixed pair of mainnet deployments, so both
+# addresses are constants; the caliber is the only per-machine value.
+#
 # Expected inputs (from instructions/prime-redemption.yaml):
-#   prime_address   — PRIME ERC4626 (redeemed to wYLDS, sync)
-#   wylds_address   — wYLDS ERC4626 (async requestRedeem; pendingRedemptions getter)
 #   caliber_address — owner/receiver of the redeem, and pendingRedemptions subject
 
 constants:
@@ -45,12 +46,16 @@ constants:
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
-
-inputs:
+  # PRIME ERC4626 (redeemed to wYLDS, sync).
   prime_address:
     type: "address"
+    value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6"
+  # wYLDS ERC4626 (async requestRedeem; pendingRedemptions getter).
   wylds_address:
     type: "address"
+    value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc"
+
+inputs:
   caliber_address:
     type: "address"
 
@@ -60,7 +65,7 @@ actions:
     calls:
       # ---- Guard: no wYLDS redemption already in flight ------------------
       - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "pendingRedemptions(address)"
         parameters:
           - type: "address"
@@ -102,7 +107,7 @@ actions:
 
       # ---- Redeem PRIME -> wYLDS (sync) ----------------------------------
       - description: "Redeem PRIME shares to wYLDS (sync ERC4626, NAV-priced)"
-        target: "${inputs.prime_address}"
+        target: "${constants.prime_address}"
         selector: "redeem(uint256,address,address)"
         parameters:
           - type: "uint256"
@@ -117,7 +122,7 @@ actions:
 
       # ---- Request the async wYLDS -> USDC redemption --------------------
       - description: "Request async wYLDS redemption (locks the wYLDS shares; Hastra settles later)"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "requestRedeem(uint256)"
         parameters:
           - type: "uint256"
@@ -133,7 +138,7 @@ actions:
     calls:
       # ---- Guard: no wYLDS redemption already in flight ------------------
       - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "pendingRedemptions(address)"
         parameters:
           - type: "address"
@@ -175,7 +180,7 @@ actions:
 
       # ---- Compute PRIME amount from bps of the caliber balance ----------
       - description: "Read caliber's PRIME balance"
-        target: "${inputs.prime_address}"
+        target: "${constants.prime_address}"
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
@@ -200,7 +205,7 @@ actions:
 
       # ---- Redeem PRIME -> wYLDS (sync) ----------------------------------
       - description: "Redeem PRIME shares to wYLDS (sync ERC4626, NAV-priced)"
-        target: "${inputs.prime_address}"
+        target: "${constants.prime_address}"
         selector: "redeem(uint256,address,address)"
         parameters:
           - type: "uint256"
@@ -215,7 +220,7 @@ actions:
 
       # ---- Request the async wYLDS -> USDC redemption --------------------
       - description: "Request async wYLDS redemption (locks the wYLDS shares; Hastra settles later)"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "requestRedeem(uint256)"
         parameters:
           - type: "uint256"
@@ -232,7 +237,7 @@ actions:
   account_pending:
     calls:
       - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
-        target: "${inputs.wylds_address}"
+        target: "${constants.wylds_address}"
         selector: "pendingRedemptions(address)"
         parameters:
           - type: "address"

@@ -29,15 +29,6 @@
     label: "PRIME Swap In"
     path: "../../../blueprints/prime-swap/deposit.yaml:swap_asset_for_prime"
     inputs:
-      usdc:
-        type: "address"
-        value: "${token_list.mainnet.USDC}"
-      wylds_address:
-        type: "address"
-        value: "${token_list.mainnet.wYLDS}"
-      prime_address:
-        type: "address"
-        value: "${token_list.mainnet.PRIME}"
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"

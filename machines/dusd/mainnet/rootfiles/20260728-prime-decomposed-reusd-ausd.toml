@@ -141,13 +141,6 @@ name = "Staked USDe"
 decimals = 18
 symbol = "sUSDe"
 
-[tokens."${token_list.mainnet.wYLDS}"]
-chainId = 1
-address = "0x6ad038ca6c04e885630851278ca0a856ad9a66cc"
-name = "Hastra wYLDS"
-decimals = 6
-symbol = "wYLDS"
-
 [instructions.3jane.account.USD3]
 position_id = "252447803558201206481473565375486988428"
 description = "3Jane USD3 (senior)"
