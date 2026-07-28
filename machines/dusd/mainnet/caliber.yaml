@@ -458,6 +458,30 @@ positions:
       label: "PRIME/AUSD (0xf3cf...523b)"
       market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
       loan_token: ${token_list.mainnet.AUSD}
+  # ── reUSD/AUSD Morpho market (0xd989…7cac) ────────────────────────
+  # Its own liquidation set -> group_id "6". reUSD collateral / AUSD debt, 91.5%
+  # LLTV, AdaptiveCurveIRM, oracle 0xa66a4f03fd8031973f8c7718904ce32385f54e70.
+  # NO governance prerequisite: both legs are already registered dusd base tokens
+  # (isBaseToken(reUSD)=isBaseToken(AUSD)=true) with live OracleRegistry routes
+  # (getPrice(reUSD,AUSD)=1.0913), so this pair goes live with the root update
+  # alone. reUSD collateral is funded by the existing Re Protocol synthetic swap
+  # position below (USDC -> reUSD via the ICL).
+  - id: "328350624757279255217968622283478199222" # pools_db makina_id — market 0xd989…7cac reUSD collateral (lending)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Collateral (reUSD)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      collateral_token: ${token_list.mainnet.reUSD}
+  - id: "165433007824915924341521454650476721637" # pools_db makina_id — market 0xd989…7cac AUSD debt (borrowing)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Debt (AUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      loan_token: ${token_list.mainnet.AUSD}
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"
