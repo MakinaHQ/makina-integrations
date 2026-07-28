@@ -28,7 +28,7 @@ protocol: "prime-swap"
 # self-zeros in the SAME tx the USDC lands loose (USDC is a base token), so there
 # is no double count and no NAV discontinuity.
 #
-# Expected inputs (from machines/dusd/mainnet/instructions/prime-redemption.yaml):
+# Expected inputs (from instructions/prime-redemption.yaml):
 #   prime_address   — PRIME ERC4626 (redeemed to wYLDS, sync)
 #   wylds_address   — wYLDS ERC4626 (async requestRedeem; pendingRedemptions getter)
 #   caliber_address — owner/receiver of the redeem, and pendingRedemptions subject

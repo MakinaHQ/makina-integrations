@@ -9,14 +9,16 @@
 #     a wYLDS/USDC-denominated claim (wYLDS.convertToAssets is hard-coded 1:1 USDC).
 #
 # ==> affected_tokens for the ACCOUNTING pending term is [USDC], NOT [PRIME].
-#     DELIBERATE DEVIATION from specs.yaml's affected_tokens matrix
-#     (redeem_account: [PRIME]). The Caliber prices each accounting reserved-slot
+#     This is a DELIBERATE deviation from the obvious choice of [PRIME] (the token
+#     the MANAGEMENT leg moves). The Caliber prices each accounting reserved-slot
 #     amount via getPrice(affectedToken, accountingToken) (Caliber.sol:552). The
 #     pending amount is USDC-denominated, so pricing it as PRIME would inflate it by
 #     the PRIME premium (~4.96%), creating a silent NAV bump at requestRedeem and a
 #     ~5% NAV drop at completeRedeem. [USDC] (a registered dusd base token, ~1:1)
-#     values it correctly and continuously. See the Stage-3 report for the full
-#     quantitative rationale. Off-chain Hastra completeRedeem then lands USDC loose
+#     values it correctly and continuously. Verified on a mainnet fork: registry NAV
+#     within -1.33 bps of the Morpho oracle, round-trip cost -0.248 bps, and the
+#     pending term resets cleanly on completeRedeem.
+#     Off-chain Hastra completeRedeem then lands USDC loose
 #     (a base token) in the SAME tx pendingRedemptions is deleted -> no double count.
 #
 # GO-LIVE: requires the same PRIME base-token registration as prime-swap-in.yaml

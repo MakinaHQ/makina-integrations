@@ -9,7 +9,7 @@ protocol: "prime-swap"
 # tokens; nothing to check on the swap leg — value conservation comes from the
 # min_shares slippage floor, not accounting).
 #
-# Mechanism (verified on a mainnet fork 2026-07-22, execution-deposit.md):
+# Mechanism (verified on a mainnet fork 2026-07-22):
 #   1. USDC.approve(wYLDS, asset_amount)
 #   2. wYLDS.deposit(asset_amount, caliber) -> wylds_received      (0x6e553f65; 1:1, EXACT)
 #   3. wYLDS.approve(PRIME, wylds_received)
