@@ -1,0 +1,53 @@
+# PRIME synthetic swap-in (dusd, mainnet) — DECOMPOSED base-token design.
+#
+# Acquire PRIME from USDC via two synchronous ERC4626 deposits
+# (USDC -> wYLDS -> PRIME). PRIME is a registered caliber base token (NEW
+# PRIME/USD 2-hop OracleRegistry route), so the acquired PRIME is valued natively
+# by the registry and the ACCOUNTING leg returns 0.
+#
+# GO-LIVE GOVERNANCE PREREQUISITE (outside these files, one-time):
+#   1. OracleRegistry.setFeedRoute(PRIME, feed1=0xf17c0edc..., st1, feed2=0x8fffffd4..., st2)
+#      on 0xC388B72AB90Be82B230D919F9C05c87F9397f485 via its AccessManager role-1 holder.
+#   2. Caliber.addBaseToken(PRIME) on 0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC — MUST be
+#      sent from the dusd Machine's riskManagerTimelock
+#      0x38542447c49D24e617fc06113295D7AaA3BEc4b6 (NOT 0x7c405bbd...9997, which reverts
+#      UnauthorizedCaller). setFeedRoute MUST precede addBaseToken (on-chain ordering).
+#   Until both are done, accounting cannot value PRIME and affected_tokens=[PRIME] reverts
+#   InvalidAffectedToken.
+#
+# Coexists with PR #270 (position 141763829504617283950461728395046172839,
+# blueprints/morpho-loop/prime/*) — this is a NEW, independent primitive.
+#
+# Protocol-specific token addresses referenced from the token list.
+
+# MANAGEMENT — swap USDC -> wYLDS -> PRIME (both base tokens; nothing to check on
+# the swap leg -> affected_tokens=[]; value conservation via the min_shares floor).
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "PRIME Swap In"
+    path: "../../../blueprints/prime-swap/deposit.yaml:swap_asset_for_prime"
+    inputs:
+      usdc:
+        type: "address"
+        value: "${token_list.mainnet.USDC}"
+      wylds_address:
+        type: "address"
+        value: "${token_list.mainnet.wYLDS}"
+      prime_address:
+        type: "address"
+        value: "${token_list.mainnet.PRIME}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ACCOUNTING — 0 (PRIME is valued natively by the base-token registry).
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.PRIME}" # PRIME
+  instruction:
+    label: "PRIME Swap In"
+    path: "../../../blueprints/common/account_0.yaml:account_0"
+    inputs: {}

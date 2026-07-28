@@ -340,6 +340,20 @@
       "symbol": "TSLAx"
     },
     {
+      "chainId": 1,
+      "address": "0x19ebb35279A16207Ec4ba82799CC64715065F7F6",
+      "name": "Hastra PRIME",
+      "decimals": 6,
+      "symbol": "PRIME"
+    },
+    {
+      "chainId": 1,
+      "address": "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc",
+      "name": "Hastra wYLDS",
+      "decimals": 6,
+      "symbol": "wYLDS"
+    },
+    {
       "chainId": 8453,
       "address": "0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42",
       "name": "EURC",

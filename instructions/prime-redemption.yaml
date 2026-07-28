@@ -1,0 +1,85 @@
+# PRIME async redeem-out (dusd, mainnet) — DECOMPOSED base-token design.
+#
+# Dispose of PRIME back to USDC across the asynchronous Hastra-settled gap:
+#   MANAGEMENT redeem_request: PRIME.redeem -> wYLDS (sync) then wYLDS.requestRedeem
+#     (async). affected_tokens=[PRIME] — PRIME leaves the caliber balance; its
+#     registry-value drop is offset by the pending term rising, so the paired
+#     accounting keeps NAV continuous.
+#   ACCOUNTING account_pending: values pendingRedemptions(caliber).assets, which is
+#     a wYLDS/USDC-denominated claim (wYLDS.convertToAssets is hard-coded 1:1 USDC).
+#
+# ==> affected_tokens for the ACCOUNTING pending term is [USDC], NOT [PRIME].
+#     DELIBERATE DEVIATION from specs.yaml's affected_tokens matrix
+#     (redeem_account: [PRIME]). The Caliber prices each accounting reserved-slot
+#     amount via getPrice(affectedToken, accountingToken) (Caliber.sol:552). The
+#     pending amount is USDC-denominated, so pricing it as PRIME would inflate it by
+#     the PRIME premium (~4.96%), creating a silent NAV bump at requestRedeem and a
+#     ~5% NAV drop at completeRedeem. [USDC] (a registered dusd base token, ~1:1)
+#     values it correctly and continuously. See the Stage-3 report for the full
+#     quantitative rationale. Off-chain Hastra completeRedeem then lands USDC loose
+#     (a base token) in the SAME tx pendingRedemptions is deleted -> no double count.
+#
+# GO-LIVE: requires the same PRIME base-token registration as prime-swap-in.yaml
+# (setFeedRoute + addBaseToken via riskManagerTimelock 0x38542447...c4b6). USDC is
+# already a registered dusd base token.
+#
+# Settlement (NOT a caliber instruction): Hastra REWARDS_ADMIN
+# 0x8D358B8aE881F8ea92C3d07783aBCA21727C6309 calls wYLDS.completeRedeem(caliber)
+# once the redeemVault holds >= pending.assets USDC. The caliber cannot self-settle.
+
+# MANAGEMENT — redeem_request (absolute PRIME share amount)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.PRIME}" # PRIME (leaving)
+  instruction:
+    label: "PRIME Redemption Request"
+    path: "../../../blueprints/prime-swap/withdraw.yaml:redeem_request"
+    inputs:
+      prime_address:
+        type: "address"
+        value: "${token_list.mainnet.PRIME}"
+      wylds_address:
+        type: "address"
+        value: "${token_list.mainnet.wYLDS}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# MANAGEMENT — redeem_request_relative (bps of the caliber's PRIME balance)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.PRIME}" # PRIME (leaving)
+  instruction:
+    label: "PRIME Redemption Request (relative)"
+    path: "../../../blueprints/prime-swap/withdraw.yaml:redeem_request_relative"
+    inputs:
+      prime_address:
+        type: "address"
+        value: "${token_list.mainnet.PRIME}"
+      wylds_address:
+        type: "address"
+        value: "${token_list.mainnet.wYLDS}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# ACCOUNTING — pending term (USDC-denominated in-flight wYLDS redemption)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}" # USDC — pending.assets is USDC-denominated (see header)
+  instruction:
+    label: "PRIME Redemption Request"
+    path: "../../../blueprints/prime-swap/withdraw.yaml:account_pending"
+    inputs:
+      prime_address:
+        type: "address"
+        value: "${token_list.mainnet.PRIME}"
+      wylds_address:
+        type: "address"
+        value: "${token_list.mainnet.wYLDS}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
