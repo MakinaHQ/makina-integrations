@@ -1,0 +1,265 @@
+protocol: "prime-swap"
+
+# PRIME async redeem-out + pending-term accounting.
+#
+# Disposes of PRIME back to USDC across an asynchronous, Hastra-settled gap:
+#   1. PRIME.redeem(shares, caliber, caliber)  -> wYLDS   (0xba087652, SYNC; assets = shares*NAV/1e18)
+#   2. wYLDS.requestRedeem(wYLDS)                          (0xaa2f892d, ASYNC; locks the wYLDS shares)
+#   3. [off-chain] Hastra REWARDS_ADMIN completeRedeem(caliber) pushes USDC to the
+#      caliber and deletes pendingRedemptions[caliber]. NOT a caliber instruction.
+#
+# ## One-in-flight guard (authoritative on-chain read, NOT KV)
+# wYLDS keys its pending redemption by holder ADDRESS, not by an incrementing
+# request id, and exposes it directly via pendingRedemptions(caliber) (self-zeroed
+# on completeRedeem). This is unlike the Midas redemption vault, whose id-keyed
+# request forced a KV sentinel to disambiguate id 0. Here the authoritative,
+# self-describing on-chain state makes a KV sentinel vestigial, so the one-in-flight
+# invariant is enforced by reading pendingRedemptions(caliber).shares and reverting
+# if it is non-zero (the vault itself also reverts RedemptionAlreadyPending). See
+# the report for why this deviates from the "KV one-in-flight" wording.
+#
+# ## Pending-term accounting (account_pending)
+# Values the in-flight redemption so NAV stays continuous across the async gap.
+# pendingRedemptions(caliber).assets (index 1) is a wYLDS/USDC-denominated claim
+# (wYLDS.convertToAssets is a hard-coded 1:1 with USDC), so it is reported as a
+# USDC amount and the paired instruction declares affected_tokens=[USDC] — the
+# caliber then prices it via the USDC registry route (~1:1). Pricing it as PRIME
+# would over-value it by the PRIME premium (~4.96%). At completeRedeem the term
+# self-zeros in the SAME tx the USDC lands loose (USDC is a base token), so there
+# is no double count and no NAV discontinuity.
+#
+# The PRIME/wYLDS topology is a fixed pair of mainnet deployments, so both
+# addresses are constants; the caliber is the only per-machine value.
+#
+# Expected inputs (from instructions/prime-redemption.yaml):
+#   caliber_address — owner/receiver of the redeem, and pendingRedemptions subject
+
+constants:
+  # bytes32-helper: getTupleWord(bytes,uint256)->bytes32 decodes one word of an
+  # ABI-encoded static tuple (same singleton already trusted by blueprints/midas).
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  # PRIME ERC4626 (redeemed to wYLDS, sync).
+  prime_address:
+    type: "address"
+    value: "0x19ebb35279A16207Ec4ba82799CC64715065F7F6"
+  # wYLDS ERC4626 (async requestRedeem; pendingRedemptions getter).
+  wylds_address:
+    type: "address"
+    value: "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc"
+
+inputs:
+  caliber_address:
+    type: "address"
+
+actions:
+  # Absolute variant: redeem an exact amount of PRIME shares.
+  redeem_request:
+    calls:
+      # ---- Guard: no wYLDS redemption already in flight ------------------
+      - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
+        target: "${constants.wylds_address}"
+        selector: "pendingRedemptions(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_tuple"
+          type: "(uint256,uint256,uint256)"
+
+      - description: "Extract pending shares (index 0)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.pending_tuple}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "pending_shares"
+          type: "uint256"
+
+      - description: "no_pending = (pending shares == 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_shares}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_pending"
+          type: "bool"
+
+      - description: "Enforce one-in-flight: revert if a redemption is already pending"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_pending}"
+
+      # ---- Redeem PRIME -> wYLDS (sync) ----------------------------------
+      - description: "Redeem PRIME shares to wYLDS (sync ERC4626, NAV-priced)"
+        target: "${constants.prime_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.prime_shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "wylds_received"
+          type: "uint256"
+
+      # ---- Request the async wYLDS -> USDC redemption --------------------
+      - description: "Request async wYLDS redemption (locks the wYLDS shares; Hastra settles later)"
+        target: "${constants.wylds_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.wylds_received}"
+
+    input_slots:
+      prime_shares_to_redeem:
+        type: "uint256"
+        description: "Exact amount of PRIME shares (6-dec) to redeem"
+
+  # Relative variant: redeem a basis-points fraction of the caliber's PRIME balance.
+  redeem_request_relative:
+    calls:
+      # ---- Guard: no wYLDS redemption already in flight ------------------
+      - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
+        target: "${constants.wylds_address}"
+        selector: "pendingRedemptions(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_tuple"
+          type: "(uint256,uint256,uint256)"
+
+      - description: "Extract pending shares (index 0)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.pending_tuple}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "pending_shares"
+          type: "uint256"
+
+      - description: "no_pending = (pending shares == 0)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_shares}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "no_pending"
+          type: "bool"
+
+      - description: "Enforce one-in-flight: revert if a redemption is already pending"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.no_pending}"
+
+      # ---- Compute PRIME amount from bps of the caliber balance ----------
+      - description: "Read caliber's PRIME balance"
+        target: "${constants.prime_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "prime_balance"
+          type: "uint256"
+
+      - description: "Compute PRIME shares = balance * bps / 10000"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.prime_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_redeem}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "prime_shares_to_redeem"
+          type: "uint256"
+
+      # ---- Redeem PRIME -> wYLDS (sync) ----------------------------------
+      - description: "Redeem PRIME shares to wYLDS (sync ERC4626, NAV-priced)"
+        target: "${constants.prime_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.prime_shares_to_redeem}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "wylds_received"
+          type: "uint256"
+
+      # ---- Request the async wYLDS -> USDC redemption --------------------
+      - description: "Request async wYLDS redemption (locks the wYLDS shares; Hastra settles later)"
+        target: "${constants.wylds_address}"
+        selector: "requestRedeem(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.wylds_received}"
+
+    input_slots:
+      bps_to_redeem:
+        type: "uint256"
+        description: "Basis points of the caliber's PRIME balance to redeem (10000 = 100%)"
+
+  # Accounting: value the in-flight wYLDS redemption (USDC-denominated pending term).
+  # Reports pendingRedemptions(caliber).assets; paired instruction declares
+  # affected_tokens=[USDC]. Zero when no redemption is in flight -> position closes.
+  account_pending:
+    calls:
+      - description: "Read pendingRedemptions(caliber) — (shares, assets, timestamp)"
+        target: "${constants.wylds_address}"
+        selector: "pendingRedemptions(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_tuple"
+          type: "(uint256,uint256,uint256)"
+
+      - description: "Extract pending assets (index 1) — USDC-equivalent claim (wYLDS 1:1 USDC)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,uint256)"
+            value: "${returns.pending_tuple}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "pending_assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.pending_assets}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

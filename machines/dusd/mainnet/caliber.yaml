@@ -390,6 +390,98 @@ positions:
     group_id: "0"
     description: "wsrUSD/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
+  # ── PRIME leverage — DECOMPOSED base-token model ──────────────────
+  #
+  # PRIME is a registered caliber base token, so leverage is assembled from
+  # independently-accounted primitives instead of one monolithic loop position:
+  # a synthetic USDC->PRIME swap-in, an async PRIME->USDC redemption, and the
+  # generic Morpho collateral/debt primitives. Leverage is opened manually by the
+  # operator (no flashloans): swap-in -> add_collateral -> borrow -> swap -> repeat.
+  #
+  # GO-LIVE PREREQUISITE (one-time governance, outside these files):
+  #   1. OracleRegistry.setFeedRoute(PRIME, feed1 0xf17c0edc…, feed2 0x8fffffd4…) on
+  #      0xC388B72AB90Be82B230D919F9C05c87F9397f485 — ALREADY DONE: the 2-hop route is
+  #      registered and getPrice(PRIME,USDC) returns 1.050733. NOTE the registered
+  #      staleness threshold is 87000s while the PRIME/wYLDS feed heartbeat is ~86412s
+  #      (24.00h) — only ~10min of slack, so any delayed daily update makes the price
+  #      read revert. Risk manager should widen it before size goes on.
+  #   2. Caliber.addBaseToken(PRIME) — STILL OUTSTANDING. Must be sent from the dusd
+  #      Machine riskManagerTimelock 0x38542447c49D24e617fc06113295D7AaA3BEc4b6.
+  #      Until done, the PRIME-affected accounting reverts InvalidAffectedToken.
+  #
+  # swap-in / redemption are standalone base-token positions (like the reUSD
+  # synthetic swap) -> group_id "0". Their ids are documented keccak preimages,
+  # matching the re/midas convention. Collateral+debt of a Morpho market are a
+  # single liquidation set, so each market gets its own group_id; their ids come
+  # from pools_db, NOT keccak. group_id "3" is already taken by AaveV3 Horizon
+  # Supply, so PRIME/PYUSD (0x41c4…a3fa) uses "4" and the DISTINCT PRIME/AUSD
+  # market (0xf3cf…523b) uses "5". AUSD is already a registered dusd base token
+  # with a direct feed route (getFeedRoute(AUSD)=0xB003…D1FD "AUSD/USD"), so the
+  # debt leg needs no extra governance; PRIME's registration above covers collateral.
+  - id: "88685588701895893924186462793094177949654118628018819322996153435220574076920" # keccak256("prime.swap-in")
+    group_id: "0"
+    description: "PRIME Swap In (USDC->PRIME synthetic, base-token)"
+    instructions: !include "../../../instructions/prime-swap-in.yaml"
+  - id: "72349290285513021043842986906750831638657345372251354085839905937687160017989" # keccak256("prime.redemption")
+    group_id: "0"
+    description: "PRIME Redemption (async PRIME->USDC via wYLDS)"
+    instructions: !include "../../../instructions/prime-redemption.yaml"
+  - id: "37645447233873664515981871938816299267" # pools_db makina_id — market 0x41c4…a3fa PRIME collateral (lending)
+    group_id: "4"
+    description: "PRIME/PYUSD Morpho Collateral (PRIME)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      collateral_token: ${token_list.mainnet.PRIME}
+  - id: "82274847838354216265357335302519678531" # pools_db makina_id — market 0x41c4…a3fa PYUSD debt (borrowing)
+    group_id: "4"
+    description: "PRIME/PYUSD Morpho Debt (PYUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
+  - id: "5371229124908624150131427880782716527" # pools_db makina_id — market 0xf3cf…523b PRIME collateral (lending)
+    group_id: "5"
+    description: "PRIME/AUSD Morpho Collateral (PRIME)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "PRIME/AUSD (0xf3cf...523b)"
+      market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
+      collateral_token: ${token_list.mainnet.PRIME}
+  - id: "105364652794375054965418306805151713337" # pools_db makina_id — market 0xf3cf…523b AUSD debt (borrowing)
+    group_id: "5"
+    description: "PRIME/AUSD Morpho Debt (AUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "PRIME/AUSD (0xf3cf...523b)"
+      market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
+      loan_token: ${token_list.mainnet.AUSD}
+  # ── reUSD/AUSD Morpho market (0xd989…7cac) ────────────────────────
+  # Its own liquidation set -> group_id "6". reUSD collateral / AUSD debt, 91.5%
+  # LLTV, AdaptiveCurveIRM, oracle 0xa66a4f03fd8031973f8c7718904ce32385f54e70.
+  # NO governance prerequisite: both legs are already registered dusd base tokens
+  # (isBaseToken(reUSD)=isBaseToken(AUSD)=true) with live OracleRegistry routes
+  # (getPrice(reUSD,AUSD)=1.0913), so this pair goes live with the root update
+  # alone. reUSD collateral is funded by the existing Re Protocol synthetic swap
+  # position below (USDC -> reUSD via the ICL).
+  - id: "328350624757279255217968622283478199222" # pools_db makina_id — market 0xd989…7cac reUSD collateral (lending)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Collateral (reUSD)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      collateral_token: ${token_list.mainnet.reUSD}
+  - id: "165433007824915924341521454650476721637" # pools_db makina_id — market 0xd989…7cac AUSD debt (borrowing)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Debt (AUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      loan_token: ${token_list.mainnet.AUSD}
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"
