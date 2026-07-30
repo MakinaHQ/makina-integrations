@@ -7,7 +7,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BLUEPRINT_ROOT = REPO_ROOT / "blueprints" / "morpho-vault-v2-curation"
-INSTRUCTION_FILE = REPO_ROOT / "instructions" / "morpho-vault-v2-curation.yaml"
+INSTRUCTION_FILE = REPO_ROOT / "instructions-x" / "morpho-vault-v2-curation.yaml"
 MACHINE_ROOT = REPO_ROOT / "machines" / "morpho-curator"
 
 
@@ -129,7 +129,7 @@ class MorphoVaultV2CurationBlueprintTests(unittest.TestCase):
         self.assertIn('description: "Morpho Vault V2 curation - Dialectic WETH Test"', caliber)
         self.assertIn('label: "Dialectic WETH Test"', caliber)
         self.assertIn('vault_address: "0xef3ac91ec3a45f3C6913bFB0C41659919EB85062"', caliber)
-        self.assertIn('instructions: !include "../../../instructions/morpho-vault-v2-curation.yaml"', caliber)
+        self.assertIn('instructions: !include "../../../instructions-x/morpho-vault-v2-curation.yaml"', caliber)
 
         self.assertIn('instruction_type: "MANAGEMENT"', instructions)
         self.assertNotIn('instruction_type: "ACCOUNTING"', instructions)

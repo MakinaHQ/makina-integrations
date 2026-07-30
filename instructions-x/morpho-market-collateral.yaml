@@ -1,0 +1,73 @@
+# makina-x Morpho Blue market, collateral side — supply and withdraw collateral.
+#
+# Reuses the Makina Core blueprints/morpho actions unchanged, so the leaves are the same ones
+# already in production on Caliber machines. Nothing in them is Caliber-coupled: `caliber_address`
+# / `receiver_address` are only ever call *parameters* (Morpho's onBehalf/receiver), never call
+# targets, and the CaliberHelper's `extractElementFromStaticTuple` is a stateless pure utility
+# callable by any address — verified on-chain from this Safe. So passing the Safe address and the
+# helper is all makina-x needs.
+#
+# The blueprint reads MarketParams on-chain from `market_id` via `idToMarketParams` plus five
+# helper calls to index the returned tuple (weiroll cannot index a tuple itself). That costs six
+# extra calls per leg versus hardcoding the five fields, and buys a single source of truth: the
+# market is identified by one id that Morpho itself expands.
+#
+# This is the makina-x parallel of ./morpho-market-collateral.yaml, minus the ACCOUNTING entry:
+# makina-x positions are not NAV-accounted on-chain, so MANAGEMENT-only.
+#
+# Expected position vars:
+#   label:            string   — e.g. "steakEURCV/USDC (0xc498...e5b5)"
+#   market_id:        bytes32  — Morpho market identifier
+#   collateral_token: address  — collateral token address
+#
+# Expected config:
+#   safe_address
+#   morpho_address
+#   caliber_helper_address
+
+# supply collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/deposit.yaml:add_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      caliber_address:
+        type: "address"
+        value: "${config.safe_address}"
+
+# withdraw collateral
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_collateral"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      receiver_address:
+        type: "address"
+        value: "${config.safe_address}"

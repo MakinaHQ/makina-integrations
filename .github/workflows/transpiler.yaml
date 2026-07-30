@@ -34,6 +34,15 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
 
+      # Runs BEFORE (and independently of) the affected-set computation, and
+      # unconditionally: these tests guard the scoping rule itself, including that
+      # every shared source directory a caliber depends on is covered by
+      # GLOBAL_PREFIXES. An uncovered directory makes the affected set come back
+      # empty, so a test that only ran when the set was non-empty would be silent
+      # in exactly the case it exists to catch.
+      - name: Test affected-caliber scoping
+        run: uv run python -m unittest tests.test_compute_affected_calibers
+
       - name: Compute affected calibers
         id: affected
         env:

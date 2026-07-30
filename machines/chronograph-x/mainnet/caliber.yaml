@@ -5,6 +5,25 @@ config:
   makina_lite_module:
     type: "address"
     value: "0x785db5f3F3Ad18D6291689907D319954AF79A03E"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  # CaliberHelper — a stateless pure weiroll utility (extractElementFromStaticTuple), used by
+  # blueprints/morpho to index the tuple returned by idToMarketParams. Nothing about it is
+  # Caliber-specific and it is callable by any address, including this Safe (verified on-chain);
+  # the name is just the contract's. Fund-wide helper, so it belongs in config per CLAUDE.md.
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x836C9007DbD73fcFC473190304C72b7E39BaBb91"
+  # Morpho VaultV2 liquidity lens — a VaultV2's native maxRedeem() returns 0, so the emergency
+  # exit sizes its redeem from this lens, which walks the vault's allocations. Verified live
+  # against both steakEURCV and steakUSDC.
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
 
 positions:
   # Aave Horizon RLUSD supply (permissionless stablecoin lender side).
@@ -21,6 +40,106 @@ positions:
     group_id: "0"
     description: "Binance spot USDC transfer"
     instructions: !include "./instructions/binance-usdc-spot.yaml"
+
+  # ── Morpho steakEURCV/USDC ⇄ steakUSDC/EURCV loop (DIA-923) ──────────────────
+  #
+  # A circular two-market loop across two Morpho Blue markets curated by Steakhouse.
+  # No swap venue is involved: each market's loan token is the other market's collateral
+  # vault asset, so the legs chain directly.
+  #
+  #   USDC → steakUSDC (vault) → collateral (market A) → borrow EURCV
+  #        → steakEURCV (vault) → collateral (market B) → borrow USDC → repeat
+  #
+  # Unwind runs in reverse: repay → withdraw collateral → redeem vault shares.
+  #
+  # Market A  0xf135feb27b5f2bd2d54f344fd38dbb5161ff7f0ef4494901fb23f2fe8e58145a
+  #   collateral steakUSDC (Steakhouse Prime USDC), loan EURCV, LLTV 91.5%
+  #   oracle 0x74eC54c1FE39a7A2299C77Dd0F2D3Cb458BB44c2 → 1 share ≈ 0.9034 EURCV (scale 36)
+  # Market B  0xc498f4bfdda99e60ea8eb04c1e145654a70bc59da76ef9c6ed54a1314d78e5b5
+  #   collateral steakEURCV, loan USDC, LLTV 91.5%
+  #   oracle 0xF3EFa46246d319381F5E7023Ae83F9C23C11b0F6 → 1 share ≈ 1.1586 USDC (scale 24)
+  #
+  # Both collateral vaults are Morpho VaultV2 (not MetaMorpho V1) with all four gates unset,
+  # so deposit/redeem are permissionless. Note market A's collateral is Steakhouse **Prime**
+  # USDC 0xbeef088055857739C12CD3765F20b7679Def0f51 — NOT the classic MetaMorpho V1 steakUSDC
+  # at 0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB.
+  #
+  # All six positions reuse the Makina Core blueprints/morpho actions via the instructions-x
+  # templates — the same leaves already running on Caliber machines. The blueprints resolve
+  # MarketParams on-chain from market_id, so the ids below are the single source of truth for
+  # which markets these legs touch (both verified against Morpho.idToMarketParams).
+  #
+  # Six standalone positions with no interdependency: two vault positions, two collateral
+  # positions, two debt positions. All MANAGEMENT-only — makina-x positions are not
+  # NAV-accounted on-chain (this module runs in FENCED mode, so managePosition applies no
+  # value-preservation checks and needs no ACCOUNTING instruction). group_id is "0" throughout:
+  # makina-x ignores group ids entirely (they exist only for Makina Core interface
+  # compatibility), so there is no on-chain netting between a collateral leg and its debt leg.
+  #
+  # Loop sizing is bound by market A's borrowable EURCV (~153.6k EURCV free at time of
+  # writing), not by market B's USDC (~675k free).
+
+  # Vault leg: USDC ⇄ steakUSDC (Steakhouse Prime USDC)
+  - id: "169144170902823932410475652858126577078" # pools_db makina_id — Morpho steakUSDC vault (Steakhouse Prime USDC)
+    group_id: "0"
+    description: "Morpho steakUSDC vault (Steakhouse Prime USDC)"
+    instructions: !include "../../../instructions-x/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeef088055857739C12CD3765F20b7679Def0f51"]
+    vars:
+      label: "USDC - steakUSDC"
+      vault_address: "0xbeef088055857739C12CD3765F20b7679Def0f51"
+      asset_address: ${token_list.mainnet.USDC}
+
+  # Vault leg: EURCV ⇄ steakEURCV
+  - id: "59458554735277664577420126323691920270" # pools_db makina_id — Morpho steakEURCV vault
+    group_id: "0"
+    description: "Morpho steakEURCV vault (Steakhouse EURCV)"
+    instructions: !include "../../../instructions-x/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeef0C075Da5D01112AE5cF34d257074fB5DDB2f"]
+    vars:
+      label: "EURCV - steakEURCV"
+      vault_address: "0xbeef0C075Da5D01112AE5cF34d257074fB5DDB2f"
+      asset_address: "0x5F7827FDeb7c20b443265Fc2F40845B715385Ff2"
+
+  # Market A collateral: steakUSDC posted against EURCV debt
+  - id: "307408892578879866747136839602685451425" # pools_db makina_id — steakUSDC collateral, market A
+    group_id: "0"
+    description: "Morpho steakUSDC collateral (market: 0xf135...145a)"
+    instructions: !include "../../../instructions-x/morpho-market-collateral.yaml"
+    vars:
+      label: "steakUSDC/EURCV (0xf135...145a)"
+      market_id: "0xf135feb27b5f2bd2d54f344fd38dbb5161ff7f0ef4494901fb23f2fe8e58145a"
+      collateral_token: "0xbeef088055857739C12CD3765F20b7679Def0f51"
+
+  # Market A debt: EURCV borrowed against steakUSDC
+  - id: "122864443087807133376045893316859995968" # pools_db makina_id — EURCV debt, market A
+    group_id: "0"
+    description: "Morpho EURCV debt (market: 0xf135...145a)"
+    instructions: !include "../../../instructions-x/morpho-market-debt.yaml"
+    vars:
+      label: "steakUSDC/EURCV (0xf135...145a)"
+      market_id: "0xf135feb27b5f2bd2d54f344fd38dbb5161ff7f0ef4494901fb23f2fe8e58145a"
+      loan_token: "0x5F7827FDeb7c20b443265Fc2F40845B715385Ff2"
+
+  # Market B collateral: steakEURCV posted against USDC debt
+  - id: "164884900466608121443233705675180622542" # pools_db makina_id — steakEURCV collateral, market B
+    group_id: "0"
+    description: "Morpho steakEURCV collateral (market: 0xc498...e5b5)"
+    instructions: !include "../../../instructions-x/morpho-market-collateral.yaml"
+    vars:
+      label: "steakEURCV/USDC (0xc498...e5b5)"
+      market_id: "0xc498f4bfdda99e60ea8eb04c1e145654a70bc59da76ef9c6ed54a1314d78e5b5"
+      collateral_token: "0xbeef0C075Da5D01112AE5cF34d257074fB5DDB2f"
+
+  # Market B debt: USDC borrowed against steakEURCV
+  - id: "248102660639882891231439577703978089155" # pools_db makina_id — USDC debt, market B
+    group_id: "0"
+    description: "Morpho USDC debt (market: 0xc498...e5b5)"
+    instructions: !include "../../../instructions-x/morpho-market-debt.yaml"
+    vars:
+      label: "steakEURCV/USDC (0xc498...e5b5)"
+      market_id: "0xc498f4bfdda99e60ea8eb04c1e145654a70bc59da76ef9c6ed54a1314d78e5b5"
+      loan_token: ${token_list.mainnet.USDC}
 
   - id: "777"
     group_id: "0"

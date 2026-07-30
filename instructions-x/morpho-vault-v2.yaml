@@ -1,0 +1,125 @@
+# makina-x Morpho **VaultV2** — deposit, redeem, withdraw, emergency exit.
+#
+# Exactly ../instructions/morpho-vault-v2.yaml minus its ACCOUNTING entry (`account_vault`):
+# makina-x positions are not NAV-accounted on-chain. Every remaining entry reuses the same Makina
+# Core blueprints/morpho action as its Core sibling, with `${config.caliber_address}` replaced by
+# `${config.safe_address}` — keep it that way, so the two templates stay diffable.
+#
+# Named for the vault version, matching the Core split: only the emergency entry is
+# version-specific (`emergency_redeem_vault_v2` here vs `emergency_redeem_vault` in the V1
+# template) — the other four entries are byte-identical between the Core v1 and v2 templates.
+# A MetaMorpho V1 vault position therefore needs its own ../instructions-x/morpho-vault-v1.yaml
+# mirroring ../instructions/morpho-vault-v1.yaml; do NOT point a V1 vault at this file, since a
+# V1 vault's native maxRedeem() works and the lens path does not apply to it.
+#
+# Nothing in those blueprints is Caliber-coupled: `caliber_address` / `receiver_address` are only
+# ever passed as call *parameters* (the ERC-4626 receiver/owner), never used as a call target, so
+# supplying the Safe address is all makina-x needs. These exact leaves are already in production
+# on Caliber machines.
+#
+# The plain deposit/redeem/withdraw path is itself version-agnostic (identical selectors on
+# MetaMorpho V1 and Morpho VaultV2). `emergency_redeem_vault_v2` is the VaultV2-specific one: a V2
+# vault's native maxRedeem() returns 0, so it sizes the redeem via the Morpho VaultV2 liquidity
+# lens, which walks the vault's allocations. Use it when a straight redeem would exceed available
+# adapter liquidity.
+#
+# Expected position vars:
+#   label:         string   — e.g. "EURCV - steakEURCV"
+#   vault_address: address  — the ERC-4626 vault
+#   asset_address: address  — the vault's underlying asset
+#
+# Expected config:
+#   safe_address
+#   unsigned_math_helper_address
+#   morpho_v2_liquidity_lens_address
+
+# deposit asset into the vault
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/deposit.yaml:deposit_vault"
+    inputs:
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.safe_address}"
+
+# redeem an explicit number of shares back to the underlying asset.
+# For a loop leg, only the shares NOT posted as Morpho collateral sit in the Safe's balance, so
+# pair this with a withdraw_collateral of the same share amount.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      receiver_address:
+        type: "address"
+        value: "${config.safe_address}"
+
+# redeem a bps fraction of the Safe's share balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:redeem_vault_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      receiver_address:
+        type: "address"
+        value: "${config.safe_address}"
+      unsigned_math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+# withdraw an explicit amount of the underlying asset (shares computed by the vault)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/withdraw.yaml:withdraw_vault"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      receiver_address:
+        type: "address"
+        value: "${config.safe_address}"
+
+# emergency exit: size the redeem from the VaultV2 liquidity lens, then redeem that
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/emergency.yaml:emergency_redeem_vault_v2"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      receiver_address:
+        type: "address"
+        value: "${config.safe_address}"
+      liquidity_lens:
+        type: "address"
+        value: "${config.morpho_v2_liquidity_lens_address}"

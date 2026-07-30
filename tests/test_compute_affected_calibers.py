@@ -1,3 +1,4 @@
+import re
 import subprocess
 import sys
 import tempfile
@@ -30,6 +31,10 @@ class TestAffectedCalibers(unittest.TestCase):
 
     def test_global_blueprints_change_affects_all_calibers(self):
         changed = ["blueprints/aave/deposit.yaml"]
+        self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), sorted(ALL_CALIBERS))
+
+    def test_global_instructions_x_change_affects_all_calibers(self):
+        changed = ["instructions-x/morpho-market-debt.yaml"]
         self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), sorted(ALL_CALIBERS))
 
     def test_blueprints_x_change_affects_all_calibers(self):
@@ -91,6 +96,79 @@ class TestAffectedCalibers(unittest.TestCase):
     def test_deprecated_instruction_change_is_excluded(self):
         changed = ["machines/.deprecated/mteth/mainnet/instructions/foo.yaml"]
         self.assertEqual(cac.affected_calibers(changed, ALL_CALIBERS), [])
+
+
+INCLUDE_RE = re.compile(r'!include\s+"([^"]+)"')
+BLUEPRINT_PATH_RE = re.compile(r'^\s*path:\s*"([^"]+)"', re.MULTILINE)
+
+
+class TestGlobalPrefixesCoverRealSourceGraph(unittest.TestCase):
+    """GLOBAL_PREFIXES is an allowlist, so a shared source directory nobody adds to it is
+    silently skipped by the PR gate — a caliber depending on it would not be re-transpiled,
+    and the drift would only surface at release time. Instead of trusting the tuple to be
+    maintained by hand, walk the real dependency graph of every caliber and assert that every
+    shared path it reaches is covered.
+
+    Both `!include` targets in a caliber.yaml and the blueprint `path:` refs inside the files
+    they pull in resolve relative to the caliber.yaml's own directory.
+    """
+
+    def _shared_deps(self, repo_root):
+        """Yield (caliber, repo-relative dependency) for every dep outside machines/."""
+        for caliber in sorted(repo_root.glob("machines/*/*/caliber.yaml")):
+            rel_caliber = caliber.relative_to(repo_root).as_posix()
+            if rel_caliber.startswith(cac.DEPRECATED_PREFIX):
+                continue
+
+            for include in INCLUDE_RE.findall(caliber.read_text()):
+                included = (caliber.parent / include).resolve()
+                deps = [included]
+                if included.is_file():
+                    deps += [
+                        (caliber.parent / ref.rsplit(":", 1)[0]).resolve()
+                        for ref in BLUEPRINT_PATH_RE.findall(included.read_text())
+                    ]
+
+                for dep in deps:
+                    try:
+                        rel_dep = dep.relative_to(repo_root).as_posix()
+                    except ValueError:  # escapes the repo entirely — not our concern here
+                        continue
+                    if not rel_dep.startswith("machines/"):
+                        yield rel_caliber, rel_dep
+
+    def test_every_shared_source_reachable_from_a_caliber_is_covered(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        uncovered = sorted(
+            {
+                (dep, caliber)
+                for caliber, dep in self._shared_deps(repo_root)
+                if not dep.startswith(cac.GLOBAL_PREFIXES)
+            }
+        )
+        self.assertEqual(
+            uncovered,
+            [],
+            "shared source(s) reachable from a caliber are not covered by GLOBAL_PREFIXES — "
+            "add the missing top-level prefix to scripts/compute_affected_calibers.py:\n"
+            + "\n".join(f"  {dep}  (via {caliber})" for dep, caliber in uncovered),
+        )
+
+    def test_every_shared_source_reachable_from_a_caliber_exists(self):
+        repo_root = Path(__file__).resolve().parents[1]
+        missing = sorted(
+            {
+                (dep, caliber)
+                for caliber, dep in self._shared_deps(repo_root)
+                if not (repo_root / dep).is_file()
+            }
+        )
+        self.assertEqual(
+            missing,
+            [],
+            "caliber references a shared source that does not exist:\n"
+            + "\n".join(f"  {dep}  (via {caliber})" for dep, caliber in missing),
+        )
 
 
 class TestDiscoverCalibers(unittest.TestCase):

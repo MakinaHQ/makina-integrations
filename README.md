@@ -56,7 +56,8 @@ It is in the instructions files that we feed the pool/caliber/machine-specific i
 #### Updating the rootfiles
 
 Rootfiles are **generated, not hand-authored**. Contributors only ever edit source files —
-`caliber.yaml`, `instructions/`, `blueprints/`, `blueprints-x/`, and the token lists. A CI
+`caliber.yaml`, `instructions/`, `instructions-x/`, `blueprints/`, `blueprints-x/`, and the token
+lists. A CI
 check (`rootfiles-guard`) rejects any PR that adds or modifies a file under a `rootfiles/`
 directory.
 

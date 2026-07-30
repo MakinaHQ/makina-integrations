@@ -22,15 +22,22 @@ import sys
 from pathlib import Path
 
 # Any change under these prefixes could alter *any* caliber's transpiled
-# output, so touching one sweeps every caliber. instructions/blueprints/
-# blueprints-x are shared across machines and the token list is a transpiler
-# input for all of them. `.github/actions/` is included because it holds the
-# transpile-validate composite action, which defines *how* every caliber is
-# transpiled — including the pinned transpiler version. Workflow files are
-# deliberately NOT here: they orchestrate when transpiling happens and cannot
-# change its output, so sweeping all calibers for a workflow tweak is noise.
+# output, so touching one sweeps every caliber. instructions/instructions-x/
+# blueprints/blueprints-x are shared across machines and the token list is a
+# transpiler input for all of them. `.github/actions/` is included because it
+# holds the transpile-validate composite action, which defines *how* every
+# caliber is transpiled — including the pinned transpiler version. Workflow
+# files are deliberately NOT here: they orchestrate when transpiling happens and
+# cannot change its output, so sweeping all calibers for a workflow tweak is noise.
+#
+# This is an allowlist, so a NEW shared source directory that is not added here
+# would be silently skipped by the PR gate. `tests/test_compute_affected_calibers.py`
+# guards against that by walking every caliber's actual !include / blueprint-path
+# graph and asserting each shared directory it reaches is covered below — add the
+# prefix here and that test goes green again.
 GLOBAL_PREFIXES = (
     "instructions/",
+    "instructions-x/",
     "blueprints/",
     "blueprints-x/",
     "token-lists/",

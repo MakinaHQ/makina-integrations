@@ -8,7 +8,9 @@ Automated DeFi pool integration pipeline using Claude agents.
 
 makina-x calibers are configured with `safe_address` + `makina_lite_module` (not `caliber_address`), positions are **held by the Safe** (`on_behalf_of`/`to`/holder = `${config.safe_address}`), and they are **not NAV-accounted on-chain** — so their instructions are **MANAGEMENT-only with no ACCOUNTING action**. Compile makina-x/lite calibers with the transpiler `--lite` flag.
 
-**`blueprints-x/`** is the makina-x parallel to `blueprints/`: same per-protocol/per-action layout, but no `account.yaml` (no accounting needed). Reference makina-x integrations: `machines/uniswap-x-filler/` (Aave USDC supply), `machines/morpho-curator/` (vault curation), `machines/chronograph-x/mainnet/` (Aave Horizon RLUSD supply, via `blueprints-x/aave-horizon`).
+**`blueprints-x/`** is the makina-x parallel to `blueprints/`: same per-protocol/per-action layout, but no `account.yaml` (no accounting needed). **`instructions-x/`** is likewise the makina-x parallel to `instructions/`: generic, `vars`-parameterized instruction templates that a makina-x caliber `!include`s, MANAGEMENT-only and pointing at `blueprints-x/`. Reference makina-x integrations: `machines/uniswap-x-filler/` (Aave USDC supply), `machines/morpho-curator/` (vault curation), `machines/chronograph-x/mainnet/` (Aave Horizon RLUSD supply via `blueprints-x/aave-horizon`; Morpho steakEURCV/USDC ⇄ steakUSDC/EURCV loop via `instructions-x/morpho-market-*`).
+
+Adding a new shared source directory (a future `instructions-y/`, `blueprints-z/`) means adding its prefix to `GLOBAL_PREFIXES` in `scripts/compute_affected_calibers.py`, or the PR gate silently stops re-transpiling the calibers that depend on it. `tests/test_compute_affected_calibers.py` walks every caliber's real `!include`/`path:` graph and fails if a reachable shared directory is not covered.
 
 ## Commands
 
