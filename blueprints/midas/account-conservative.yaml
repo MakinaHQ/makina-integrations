@@ -1,0 +1,333 @@
+protocol: "midas"
+
+# Midas mToken pending-redemption accounting, valued conservatively.
+#
+# Alternative to account.yaml:account, which reports the raw escrowed amount. This one
+# caps the reported amount at the LOWER of the request-time and current mToken rate, so
+# an in-flight request is never marked above the escrowed mToken's own current worth.
+# account.yaml remains the home of `account` and `account_0`.
+#
+# Read `## The residual basis gap` below before relying on these marks for NAV: they are
+# conservative with respect to the mToken RATE, but they inherit the Caliber's base-token
+# pricing basis, which sits above what Midas actually pays out.
+#
+# ## Why cap it
+# Settlement pays `amountMToken * newMTokenRate / request.tokenOutRate`, and the Midas
+# operator picks newMTokenRate at approval time:
+#   safeBulkApproveRequest(ids)             -> the CURRENT rate
+#   safeBulkApproveRequestAtSavedRate(ids)  -> the request-time snapshot
+#   safeApproveRequest(id, rate)            -> operator's, within variationTolerance of
+#                                              the snapshot (20/10000 on mWIN redeemer)
+#   approveRequest(id, rate)                -> operator's, unbounded
+# The rate we will be paid at is therefore not knowable in advance, so we take the min
+# of the two candidates rather than betting on either.
+#
+# ## Both rates must be read in the SAME unit, so read Midas's own feed
+# Deliberately NOT OracleRegistry.getPrice(mToken, quote): that prices the mToken in the
+# QUOTE token (it divides the mToken/USD feed by the quote/USD feed), whereas
+# request.mTokenRate is mToken/USD. Comparing them is a unit mismatch whose gap is the
+# quote's depeg, so min() would pick the snapshot every time and bleed that depeg
+# permanently (2.58bps on mWIN/USDC) even with the mToken rate flat.
+#
+# `mtoken_data_feed_address` is the vault's own mTokenDataFeed. Its _getMTokenRate() is
+# exactly IDataFeed(mTokenDataFeed).getDataInBase18() with stable=false, so this is the
+# same number, in the same base-18 mToken/USD unit, that request.mTokenRate was
+# snapshotted from and that settlement will use. The min() then compares request-time
+# against now, which is the intent.
+#
+# ## tokenOutRate plays no part here, and the reason is NOT symmetry
+# Settlement divides by request.tokenOutRate. For a tokenOut configured `stable = true`
+# in the vault's tokensConfig — which USDC is on both the mWIN depositor and redeemer —
+# `_getTokenRate` returns the constant STABLECOIN_RATE (1e18) and ignores the tokenOut/USD
+# feed entirely. Verified in source and in every live request tuple, all of which carry
+# tokenOutRate == 1e18 exactly. So Midas settles mToken -> tokenOut AT PAR.
+#
+# We therefore cannot usefully apply it: dividing by 1e18 is a no-op. (The earlier
+# `max(tokenOutRate, 1e18)` clamp in this file's two-bucket predecessor was likewise a
+# no-op, not a value leak.) It would only become live if Midas ever set stable = false.
+#
+# ## The residual basis gap — marks sit ABOVE payout, by design of the base-token route
+# The Caliber prices reserved_slots[0] via its own oracle route for the mToken, which is
+# mToken/USD DIVIDED BY tokenOut/USD (mWIN: 0x1725A66D810C0775f6B3B0FD85646D371dA19517
+# and 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6 — the very feeds Midas reads). Midas
+# settles at par. So whenever tokenOut trades below a dollar the Caliber values the
+# mToken ABOVE its redemption proceeds. Measured on a mainnet-fork e2e: 500,000 USDC in
+# minted mWIN the Caliber valued at 500,129.03 USDC and Midas redeemed for exactly
+# 500,000.00 — a 2.58bps spread, first-order in a depeg.
+#
+# This is deliberately NOT compensated here, for two reasons:
+#  1. The same spread applies to UNESCROWED mToken sitting in the Caliber, which this
+#     action cannot touch. Correcting only the pending leg would make the two
+#     inconsistent while leaving the larger exposure unchanged.
+#  2. Keeping the pending mark on the same basis as the wallet balance makes requesting
+#     a redemption NAV-neutral (e2e measured: 0.000000 AUM change across the request).
+#     Compensating here would instead book the spread as an immediate loss on the
+#     MANAGEMENT leg, netted against affected_tokens, where it can trip the caliber's
+#     loss tolerance and block exits. The spread is realised at settlement either way.
+# The right place to fix it is the mToken's oracle route (should it divide by the
+# tokenOut's USD rate when Midas settles at par?), which would also cover mGLOBAL.
+#
+# ## Slot 0 is an mToken AMOUNT, not a value
+# Like blueprints/morpho/account.yaml:account_collateral, reserved_slots[0] is a raw
+# affected-token amount the Caliber prices itself, so the mToken MUST be a registered
+# base token on the machine. Verify caliber.isBaseToken(mToken) before shipping.
+#
+# ## One in-flight request per KV key
+# One KV key, matching account.yaml and instructions/midas-redemption.yaml. The key
+# holds the raw requestId and a request counts only when
+#   request.status == Pending(0)  AND  request.sender == caliber
+# withdraw.yaml's header explains why this matches on the caliber rather than on
+# `sender != 0`. It applies the identical predicate on its guard and the two MUST stay
+# in sync, or the guard and this reset can disagree and desync the KV.
+#
+# ## Not netted here
+# The Midas per-token redemption fee (tokensConfig(tokenOut).fee, 0 on the mWIN redeemer
+# as of 2026-08-04) is NOT subtracted. If Midas raises it via changeTokenFee this
+# over-reports by that fee until the blueprint is updated.
+
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # Makina ContextHelper; blueprint-helpers.md
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # Makina MathHelper; blueprint-helpers.md
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353" # Makina BooleanHelper; blueprint-helpers.md
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3" # Makina Bytes32Helper; blueprint-helpers.md
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D" # Makina CaliberHelper; blueprint-helpers.md
+
+inputs:
+  redeemer_address:
+    type: "address"
+  # The vault's own mTokenDataFeed. Must be kept equal to
+  # `<redeemer>.mTokenDataFeed()` — it cannot be read dynamically because a blueprint
+  # target must be a constant or input, never a returned value.
+  mtoken_data_feed_address:
+    type: "address"
+  kv_store_address:
+    type: "address"
+  kv_storage_key:
+    type: "bytes32"
+
+actions:
+  account:
+    calls:
+      # ---- Current mToken rate, in the SAME base-18 mToken/USD unit as the snapshot --
+      # Needs no zero-guard before being used as a divisor below: DataFeed's
+      # _getDataInBase18 does `require(_answer > 0, "DF: feed is deprecated")` and
+      # additionally rejects anything outside [minExpectedAnswer, maxExpectedAnswer]
+      # (1e7..1.5e13 at 8 decimals on the mWIN feed), so it reverts rather than
+      # returning 0, and the base-18 conversion only scales up.
+      - description: "Read current mToken rate from the vault's own data feed (base 18, mToken/USD)"
+        target: "${inputs.mtoken_data_feed_address}"
+        selector: "getDataInBase18()"
+        parameters: []
+        return:
+          name: "live_rate_e18"
+          type: "uint256"
+
+      - description: "Get caliber address word for the ownership check"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address_b32"
+          type: "bytes32"
+
+      # ---- Recover and read the tracked request ----------------------------------
+      - description: "Read tracked requestId from KV (raw id; 0 is ambiguous)"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+        return:
+          name: "tracked_request_id"
+          type: "uint256"
+
+      - description: "Read redeemRequests(id) — (sender, tokenOut, status, amountMToken, mTokenRate, tokenOutRate)"
+        target: "${inputs.redeemer_address}"
+        selector: "redeemRequests(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.tracked_request_id}"
+        return:
+          name: "request_tuple"
+          type: "(address,address,uint8,uint256,uint256,uint256)"
+
+      - description: "Extract sender (index 0) as bytes32 for the ownership check"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "request_sender_b32"
+          type: "bytes32"
+
+      - description: "Extract status (index 2)"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "request_status"
+          type: "uint256"
+
+      - description: "Extract amountMToken (index 3)"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "request_amount_mtoken"
+          type: "uint256"
+
+      - description: "Extract snapshot mTokenRate (index 4, base 18, mToken/USD)"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,uint8,uint256,uint256,uint256)"
+            value: "${returns.request_tuple}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "request_snapshot_rate"
+          type: "uint256"
+
+      # ---- is_pending = (status == Pending) AND (sender == caliber) ---------------
+      - description: "Check status == 0 (Pending enum value)"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_status}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "status_is_pending"
+          type: "bool"
+
+      - description: "Check request sender equals the executing caliber"
+        target: "${constants.bytes32_helper_address}"
+        selector: "eq(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${returns.request_sender_b32}"
+          - type: "bytes32"
+            value: "${returns.caliber_address_b32}"
+        return:
+          name: "sender_is_caliber"
+          type: "bool"
+
+      - description: "is_pending_bool = (status == Pending) AND (sender == caliber)"
+        target: "${constants.boolean_helper_address}"
+        selector: "and(bool,bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.status_is_pending}"
+          - type: "bool"
+            value: "${returns.sender_is_caliber}"
+        return:
+          name: "is_pending_bool"
+          type: "bool"
+
+      - description: "Convert is_pending bool to a 0/1 uint mask"
+        target: "${constants.math_helper_address}"
+        selector: "ternary(bool,uint256,uint256)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_pending_bool}"
+          - type: "uint256"
+            value: "1"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "is_pending_mask"
+          type: "uint256"
+
+      # ---- Cap at min(request-time rate, current rate) -----------------------------
+      # Both operands are base-18 mToken/USD from the same feed, so this is a pure
+      # time comparison. Equal rates => lower_rate == live_rate => no reduction at all.
+      - description: "Take the lower of the request-time and current mToken rates"
+        target: "${constants.math_helper_address}"
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_snapshot_rate}"
+          - type: "uint256"
+            value: "${returns.live_rate_e18}"
+        return:
+          name: "lower_rate"
+          type: "uint256"
+
+      # Re-express the escrowed amount so that (amount' * live_rate) == (amount *
+      # lower_rate); the Caliber then prices amount' at the live rate and lands on the
+      # conservative value. No tokenOutRate factor — see the header.
+      - description: "Scale escrowed amount by lower_rate / live_rate"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.request_amount_mtoken}"
+          - type: "uint256"
+            value: "${returns.lower_rate}"
+          - type: "uint256"
+            value: "${returns.live_rate_e18}"
+        return:
+          name: "conservative_amount"
+          type: "uint256"
+
+      - description: "Apply is_pending mask: 0 unless the tracked request is Pending and ours"
+        target: "${constants.math_helper_address}"
+        selector: "mul(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.conservative_amount}"
+          - type: "uint256"
+            value: "${returns.is_pending_mask}"
+        return:
+          name: "reported_amount"
+          type: "uint256"
+
+      # ---- Housekeeping: reset KV once the request is no longer Pending-and-ours --
+      - description: "Compute new KV value: tracked_request_id * is_pending_mask"
+        target: "${constants.math_helper_address}"
+        selector: "mul(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.tracked_request_id}"
+          - type: "uint256"
+            value: "${returns.is_pending_mask}"
+        return:
+          name: "new_kv_value"
+          type: "uint256"
+
+      - description: "Write back to KV (no-op while Pending, reset to 0 otherwise)"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_storage_key}"
+          - type: "uint256"
+            value: "${returns.new_kv_value}"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.reported_amount}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
