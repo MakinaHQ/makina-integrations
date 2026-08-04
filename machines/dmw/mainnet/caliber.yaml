@@ -1,0 +1,59 @@
+# DMW — "Dialectic mWIN" (share token 0x0DD85BBe...01A1, symbol DMW, 18 dec).
+# Machine 0x2FEEf245...61E3, caliber 0xa58CF14f...4efa, accounting token USDC.
+#
+# Dedicated Midas mWIN machine. mWIN is verified as a registered base token on this
+# caliber (isBaseToken(mWIN) == true) and the OracleRegistry route resolves
+# (getPrice(mWIN, USDC) = 130363163079, i.e. ~130,363.16 USDC per whole mWIN), which
+# is what makes the synthetic swap-in (account_0) and the mToken-amount accounting on
+# the redemption position price correctly.
+#
+# Position ids are the FULL keccak256 of the strings in the trailing comments, matching
+# the convention used by machines/dmg for its Midas positions — each is reproducible
+# with `cast keccak "<string>" | cast to-dec`.
+
+config:
+  caliber_address:
+    type: "address"
+    value: "0xa58CF14f5980c5f8726E10C5596EC1d91AD44efa" # DMW caliber; hubMachineEndpoint() == machine 0x2FEEf245...61E3
+  key_value_store_address:
+    type: "address"
+    # DMW KeyValueStore; caliber() == 0xa58CF14f...4efa (KV stores are bound to a single
+    # caliber, so this one is not shared with any other machine). Executable bytecode is
+    # byte-identical to the deth store 0xF5B4dF5E...7437 — only the solc metadata trailer
+    # differs — and set() from a non-caliber sender reverts NotOwner().
+    value: "0xc1aF634AEDAd129238627B0315c1D269c09460C5"
+
+positions:
+  # ── Midas mWIN ─────────────────────────────────────────────────────────────
+  # Issuance leg: USDC → mWIN via the mWIN deposit vault's depositInstant.
+  # Accounts as 0 (account_0); value is carried by the base-token registry on both
+  # sides. See instructions/midas-swap-in.yaml for why no delta check runs here.
+  - id: "41413723539189016403206809161957552609495626398130081944267132620773851447130" # keccak256("midas.mwin.swap-in")
+    group_id: "0"
+    description: "Midas mWIN Swap In (synthetic)"
+    instructions: !include "../../../instructions/midas-swap-in.yaml"
+    vars:
+      label: "mWIN Swap In"
+      asset_address: ${token_list.mainnet.USDC} # deposit vault getPaymentTokens() → [USDC, PYUSD]
+      mtoken_address: ${token_list.mainnet.mWIN}
+      depositor_address: "0xF7F1b944FCDe7805F6Ef3088817145d2eB667db4" # mWIN deposit vault; mToken() == mWIN
+
+  # Exit leg: async, admin-settled redemption, one in-flight request at a time, valued
+  # at min(request-time rate, current rate). There is no claim action — Midas operators
+  # call safeApproveRequest and the vault pushes USDC straight to the caliber.
+  #
+  # Exit sizing is constrained by TWO independent 1-mWIN (~$130k) minimums — the vault's
+  # minAmount and the mWIN residual min-balance rule. The caliber holds
+  # M_WIN_GREENLISTED_ROLE but NOT M_WIN_MIN_BALANCE_EXEMPT_ROLE, so a partial exit that
+  # would leave 0 < balance < 1 mWIN reverts. See blueprints/midas/withdraw.yaml.
+  - id: "26715866145689374721825933046266029086385158887015685471450563504882890697644" # keccak256("midas.mwin.redemption")
+    group_id: "0"
+    description: "Midas mWIN Redemption (async)"
+    instructions: !include "../../../instructions/midas-redemption-conservative.yaml"
+    vars:
+      label: "mWIN Redemption"
+      redeemer_address: "0x605704d7b36d1677a8d242ded68eD505523c7924" # mWIN redemption vault; mToken() == mWIN
+      mtoken_address: ${token_list.mainnet.mWIN}
+      token_out_address: ${token_list.mainnet.USDC} # redeemer getPaymentTokens() → [USDC, PYUSD]
+      mtoken_data_feed_address: "0xa27c1658730e4FAFb7fB8B257a64BbB6A0ea4077" # == redeemer.mTokenDataFeed(); the rate settlement uses. Re-check if Midas repoints it.
+      kv_storage_key: "${keccak256(makina.mainnet.midas.mwin-redemption)}"

@@ -264,6 +264,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x4E72025984424E52838cf8953E2863eFf036B67A",
+      "name": "Midas Wellington Income Opportunities",
+      "decimals": 18,
+      "symbol": "mWIN"
+    },
+    {
+      "chainId": 1,
       "address": "0x5086bf358635B81D8C47C66d1C8b9E567Db70c72",
       "name": "Re Protocol Deposit Token",
       "decimals": 18,

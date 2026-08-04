@@ -125,7 +125,15 @@ runs:
           # name (202605027-etherfi-lido.toml) that would otherwise sort high.
           newest=$(
             cd "$dir/rootfiles" || exit 0
-            ls -1 2>/dev/null | grep -E '^[0-9]{8}-' | while IFS= read -r f; do
+            # `|| true` is load-bearing: a brand-new machine has a rootfiles/ dir
+            # containing no dated rootfile yet (only the just-written
+            # __ci_generated__.toml). grep exits 1 on no match, and under
+            # `set -o pipefail` that propagates out of this command substitution and
+            # `set -e` kills the whole step — so a first-PR machine could never go
+            # green. Absorb it and fall through to the empty-`newest` branch below,
+            # which reports "changed (vs <none>)" exactly like a missing
+            # rootfiles/ dir already does via `cd ... || exit 0` above.
+            { ls -1 2>/dev/null | grep -E '^[0-9]{8}-' || true; } | while IFS= read -r f; do
               # commit time of the commit that added this file; 0 if unknown
               added=$(git log --diff-filter=A -1 --format=%ct -- "$f" 2>/dev/null)
               printf '%s\t%s\n' "${added:-0}" "$f"

@@ -21,17 +21,16 @@ protocol: "midas"
 # by the caliber's normal base-token registry. Including it would double-count.
 #
 # ## KV stores the raw requestId (no sentinel offset)
-# The KV holds the raw `requestId` we received from `redeemRequest`. KV == 0 is
-# ambiguous (could be "never written" or "tracking real id 0"), but we read the
-# Request struct on every account call and disambiguate via:
-#   in_flight  iff  request.status == Pending(0)  AND  request.sender != address(0)
-# A zero-init struct (sender == 0) is interpreted as "no tracked request" even
-# when KV happens to be 0. The withdraw blueprint applies the same check on its
-# pre-flight guard, so the two flows agree.
+# The KV holds the raw `requestId` we received from `redeemRequest`, and a request
+# counts as in-flight only when
+#   request.status == Pending(0)  AND  request.sender == caliber
+# withdraw.yaml's header explains why the predicate matches on the caliber rather than
+# on `sender != 0`. It applies the identical predicate on its pre-flight guard; the two
+# MUST stay in sync or the guard and the KV reset can disagree and desync KV.
 #
 # ## RequestStatus enum
 # { Pending = 0, Processed = 1, Canceled = 2 }   — NO "None" variant.
-# A real Pending request requires BOTH `status == 0` AND `sender != address(0)`.
+# A real Pending request requires BOTH `status == 0` AND `sender == caliber`.
 # (Solidity zero-initialises unwritten slots, so status==0 alone is ambiguous.)
 #
 # ## Valuation
@@ -160,36 +159,34 @@ actions:
           name: "status_is_pending"
           type: "bool"
 
-      - description: "Check sender == bytes32(0) (true if zero-init slot)"
+      - description: "Get caliber address word for the ownership check"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address_b32"
+          type: "bytes32"
+
+      - description: "Check request sender equals the executing caliber"
         target: "${constants.bytes32_helper_address}"
         selector: "eq(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${returns.request_sender_b32}"
           - type: "bytes32"
-            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            value: "${returns.caliber_address_b32}"
         return:
-          name: "sender_is_zero"
+          name: "sender_is_caliber"
           type: "bool"
 
-      - description: "Negate to get sender != 0 (real existing request)"
-        target: "${constants.boolean_helper_address}"
-        selector: "not(bool)"
-        parameters:
-          - type: "bool"
-            value: "${returns.sender_is_zero}"
-        return:
-          name: "sender_is_nonzero"
-          type: "bool"
-
-      - description: "is_pending_bool = (status == 0) AND (sender != 0)"
+      - description: "is_pending_bool = (status == 0) AND (sender == caliber)"
         target: "${constants.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
             value: "${returns.status_is_pending}"
           - type: "bool"
-            value: "${returns.sender_is_nonzero}"
+            value: "${returns.sender_is_caliber}"
         return:
           name: "is_pending_bool"
           type: "bool"
