@@ -1,0 +1,90 @@
+# AaveV3 Supply with E-Mode activation/deactivation.
+#
+# Expected position vars:
+#   label:              string   — supplied asset label
+#   asset_address:      address  — underlying asset
+#   aave_token:         address  — aToken used for accounting
+#   aave_pool_instance: address  — Aave V3 Pool
+#   e_mode_category:    uint8    — E-Mode category to activate
+#
+# Expected config:
+#   caliber_address
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "mGLOBAL Stablecoins E-Mode - Activate"
+    path: "../../../blueprints/aave/deposit.yaml:set_e_mode"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${position.aave_pool_instance}"
+      e_mode:
+        type: "uint8"
+        value: "${position.e_mode_category}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/deposit.yaml:add_collateral"
+    inputs:
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      aave_pool_instance:
+        type: "address"
+        value: "${position.aave_pool_instance}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/withdraw.yaml:withdraw_collateral"
+    inputs:
+      to:
+        type: "address"
+        value: ${config.caliber_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      aave_pool_instance:
+        type: "address"
+        value: "${position.aave_pool_instance}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "mGLOBAL Stablecoins E-Mode - Deactivate"
+    path: "../../../blueprints/aave/deposit.yaml:set_e_mode"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${position.aave_pool_instance}"
+      e_mode:
+        type: "uint8"
+        value: "0"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave/account.yaml:account"
+    inputs:
+      aave_token:
+        type: "address"
+        value: ${position.aave_token}
+      account:
+        type: "address"
+        value: "${config.caliber_address}"
