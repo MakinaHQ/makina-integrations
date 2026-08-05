@@ -21,17 +21,16 @@ protocol: "midas"
 # by the caliber's normal base-token registry. Including it would double-count.
 #
 # ## KV stores the raw requestId (no sentinel offset)
-# The KV holds the raw `requestId` we received from `redeemRequest`. KV == 0 is
-# ambiguous (could be "never written" or "tracking real id 0"), but we read the
-# Request struct on every account call and disambiguate via:
-#   in_flight  iff  request.status == Pending(0)  AND  request.sender != address(0)
-# A zero-init struct (sender == 0) is interpreted as "no tracked request" even
-# when KV happens to be 0. The withdraw blueprint applies the same check on its
-# pre-flight guard, so the two flows agree.
+# The KV holds the raw `requestId` we received from `redeemRequest`, and a request
+# counts as in-flight only when
+#   request.status == Pending(0)  AND  request.sender == caliber
+# withdraw.yaml's header explains why the predicate matches on the caliber rather than
+# on `sender != 0`. It applies the identical predicate on its pre-flight guard; the two
+# MUST stay in sync or the guard and the KV reset can disagree and desync KV.
 #
 # ## RequestStatus enum
 # { Pending = 0, Processed = 1, Canceled = 2 }   — NO "None" variant.
-# A real Pending request requires BOTH `status == 0` AND `sender != address(0)`.
+# A real Pending request requires BOTH `status == 0` AND `sender == caliber`.
 # (Solidity zero-initialises unwritten slots, so status==0 alone is ambiguous.)
 #
 # ## Valuation
@@ -45,15 +44,24 @@ protocol: "midas"
 # This is a no-op in the Pending steady state (writes the same value back) but
 # resets the KV to 0 when status transitions to Processed (1) or Canceled (2).
 
-inputs:
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
   math_helper_address:
     type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
   boolean_helper_address:
     type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
   bytes32_helper_address:
     type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3"
   caliber_helper_address:
     type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+
+inputs:
   redeemer_address:
     type: "address"
   kv_store_address:
@@ -103,7 +111,7 @@ actions:
           type: "(address,address,uint8,uint256,uint256,uint256)"
 
       - description: "Extract sender (index 0) as bytes32 for zero-check"
-        target: "${inputs.caliber_helper_address}"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -115,7 +123,7 @@ actions:
           type: "bytes32"
 
       - description: "Extract status (index 2)"
-        target: "${inputs.caliber_helper_address}"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -127,7 +135,7 @@ actions:
           type: "uint256"
 
       - description: "Extract amountMToken (index 3)"
-        target: "${inputs.caliber_helper_address}"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -140,7 +148,7 @@ actions:
 
       # ---- is_pending = (status == 0) AND (sender != address(0)) ---------
       - description: "Check status == 0 (Pending enum value)"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "eq(uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -151,43 +159,41 @@ actions:
           name: "status_is_pending"
           type: "bool"
 
-      - description: "Check sender == bytes32(0) (true if zero-init slot)"
-        target: "${inputs.bytes32_helper_address}"
+      - description: "Get caliber address word for the ownership check"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address_b32"
+          type: "bytes32"
+
+      - description: "Check request sender equals the executing caliber"
+        target: "${constants.bytes32_helper_address}"
         selector: "eq(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${returns.request_sender_b32}"
           - type: "bytes32"
-            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            value: "${returns.caliber_address_b32}"
         return:
-          name: "sender_is_zero"
+          name: "sender_is_caliber"
           type: "bool"
 
-      - description: "Negate to get sender != 0 (real existing request)"
-        target: "${inputs.boolean_helper_address}"
-        selector: "not(bool)"
-        parameters:
-          - type: "bool"
-            value: "${returns.sender_is_zero}"
-        return:
-          name: "sender_is_nonzero"
-          type: "bool"
-
-      - description: "is_pending_bool = (status == 0) AND (sender != 0)"
-        target: "${inputs.boolean_helper_address}"
+      - description: "is_pending_bool = (status == 0) AND (sender == caliber)"
+        target: "${constants.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
             value: "${returns.status_is_pending}"
           - type: "bool"
-            value: "${returns.sender_is_nonzero}"
+            value: "${returns.sender_is_caliber}"
         return:
           name: "is_pending_bool"
           type: "bool"
 
       # Cast bool → uint mask (1 if pending, 0 otherwise) via ternary.
       - description: "Convert is_pending bool to a 0/1 uint mask"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "ternary(bool,uint256,uint256)"
         parameters:
           - type: "bool"
@@ -204,7 +210,7 @@ actions:
       # Slot 0 will report this raw mToken amount (18 dec). The caliber prices
       # it via its base-token oracle (same path used for unlocked mToken).
       - description: "Apply is_pending mask: 0 if not Pending, full escrowed amount otherwise"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "mul(uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -220,7 +226,7 @@ actions:
       # - Pending steady state: writes the same sentinel back (no-op).
       # - Processed / Canceled / zero-init: writes 0 (resets the slot).
       - description: "Compute new KV value: tracked_request_id * is_pending_mask"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "mul(uint256,uint256)"
         parameters:
           - type: "uint256"

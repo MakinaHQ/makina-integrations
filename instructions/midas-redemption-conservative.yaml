@@ -1,15 +1,24 @@
-# Generic Midas Redemption Vault — async, admin-settled redemption of an mToken
-# into a stablecoin tokenOut. Submits a `redeemRequest` now, the Midas admin
-# settles later by pushing the stable directly to the caliber. One in-flight
-# request per position; an on-chain Request-struct check disambiguates the
-# id-0 KV ambiguity (see blueprints/midas/withdraw.yaml header for details).
+# Generic Midas Redemption Vault — async, admin-settled redemption of an mToken into a
+# stablecoin tokenOut, with conservative pending accounting.
+#
+# MANAGEMENT legs are identical to instructions/midas-redemption.yaml (same actions,
+# same single KV key, one in-flight request per position). The only difference is the
+# ACCOUNTING leg: midas-redemption.yaml reports the raw escrowed amount via
+# account.yaml:account, whereas this caps it at min(request-time, current) mToken rate
+# via account-conservative.yaml:account. Use it when the mToken rate can move materially
+# between request and settlement and you would rather understate than overstate NAV.
+# Migrating either way is a path swap plus the extra mtoken_data_feed_address var.
+#
+# Exit sizing is constrained by two independent 1-mToken minimums, neither guarded
+# on-chain — see the header of blueprints/midas/withdraw.yaml.
 #
 # Expected caliber vars (per-position):
-#   label:              string   — friendly label (e.g. "mGLOBAL Redemption")
-#   redeemer_address:   address  — Midas redemption vault
-#   mtoken_address:     address  — mToken being redeemed (escrowed in vault)
-#   token_out_address:  address  — stablecoin the admin will settle in
-#   kv_storage_key:     bytes32  — unique per position (e.g. keccak256("makina.<chain>.midas.<vault>"))
+#   label:                     string   — friendly label (e.g. "mWIN Redemption")
+#   redeemer_address:          address  — Midas redemption vault
+#   mtoken_address:            address  — mToken redeemed; MUST be a machine base token
+#   token_out_address:         address  — stablecoin the admin will settle in
+#   mtoken_data_feed_address:  address  — MUST equal <redeemer>.mTokenDataFeed()
+#   kv_storage_key:            bytes32  — unique per position
 #
 # Expected config:
 #   key_value_store_address
@@ -64,18 +73,22 @@
         type: "bytes32"
         value: ${position.kv_storage_key}
 
-# ACCOUNTING — value the in-flight request (and reset KV when no longer Pending)
+# ACCOUNTING — value the in-flight request at min(request-time, current) rate,
+# and reset the KV key once it is no longer Pending-and-ours.
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
     - ${position.mtoken_address}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/midas/account.yaml:account"
+    path: "../../../blueprints/midas/account-conservative.yaml:account"
     inputs:
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}
+      mtoken_data_feed_address:
+        type: "address"
+        value: ${position.mtoken_data_feed_address}
       kv_store_address:
         type: "address"
         value: "${config.key_value_store_address}"

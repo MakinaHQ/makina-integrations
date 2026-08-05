@@ -1,4 +1,18 @@
-# Synthetic "swap in" instruction for asset -> mtoken
+# Synthetic "swap in" instruction for asset -> mtoken via depositInstant.
+# Generic across Midas mTokens (mGLOBAL, mWIN, ...); keep per-token facts out.
+#
+# Value is carried by the caliber's base-token registry on both sides, so the position
+# accounts as 0. Both the asset AND the mToken must therefore be registered base tokens
+# — verify caliber.isBaseToken(mToken) before enabling the position, or the conversion
+# turns accounted value into an unpriced holding.
+#
+# The MANAGEMENT leg declares affected_tokens: [], so the caliber runs no
+# value-conservation delta check here and recoveryMode does not disable it. The operator
+# MUST always supply a tight, nonzero min_mtoken_amount; zero is unsafe. This is
+# pre-existing to the mGLOBAL pattern and wants a broader Makina-team control review.
+#
+# Midas issuance is permissioned per mToken, so the SwapModule cannot replace this path
+# unless its executor is greenlisted on the mToken.
 
 # SWAP IN
 - is_debt: false
@@ -8,12 +22,15 @@
     label: ${position.label}
     path: "../../../blueprints/midas/deposit.yaml:swap_asset_for_mtoken"
     inputs:
-      math_helper_address:
+      caliber_address:
         type: "address"
-        value: "${config.math_helper_address}"
+        value: "${config.caliber_address}"
       asset_address:
         type: "address"
         value: ${position.asset_address}
+      mtoken_address:
+        type: "address"
+        value: ${position.mtoken_address}
       depositor_address:
         type: "address"
         value: "${position.depositor_address}"

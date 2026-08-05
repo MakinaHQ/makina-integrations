@@ -1,67 +1,114 @@
 protocol: "midas"
 
-# Midas mToken Redemption Vault — Withdraw (redeem_request) Blueprint
+# Midas mToken Redemption Vault — async request blueprint (all Midas positions).
 #
 # Async, admin-settled redemption: caliber calls redeemRequest now (escrows mToken
 # in the vault contract) and later the Midas admin calls approveRequest which pushes
-# USDC directly to the recipient (= caliber). There is NO on-chain claim function;
-# settlement is detected via the request's status field.
+# token-out directly to the recipient (= caliber). There is NO on-chain claim function
+# callable by the caliber or the recipient; settlement is detected via the request's
+# status field, so consumers pair this with an ACCOUNTING action and no claim action.
 #
 # ## KV stores the raw requestId (no sentinel offset)
-# Because the very first request on this vault will be assigned id=0
-# (currentRequestId is a Counters.Counter that pre-increments), we CANNOT use
-# "KV == 0" alone to mean "no in-flight request" — it would collide with a real
-# tracked id=0. Rather than encoding KV as (id + 1), we store the raw id and prove
-# "is this tracked request actually still in flight?" by reading the request struct:
-#   in_flight  iff  request.status == Pending(0)  AND  request.sender != address(0)
-# The zero-init struct (sender == 0) tells us the slot was never written, so KV=0
-# combined with sender=0 unambiguously means "nothing to track". This costs one
-# extra contract read + a few helper ops on the guard, but withdraw is rare and
-# the read is unavoidable on the account path anyway, so the marginal cost is low.
+# The KV holds the raw `requestId` returned by `redeemRequest`. The value 0 is
+# ambiguous in isolation (could mean "never written" OR "tracking real id 0"), so we
+# disambiguate by reading the request struct and requiring BOTH:
+#   in_flight  iff  request.status == Pending(0)  AND  request.sender == caliber
+# Matching on the caliber (rather than merely `sender != 0`) matters: a zero KV points
+# at request id 0, which on a shared vault is a REAL request owned by a third party.
+# Testing only `sender != 0` would treat a stranger's Pending request as our own.
 #
-# ## One-in-flight invariant
-# The vault itself permits multiple concurrent Pending requests per caller (verified
-# on Tenderly fork). This blueprint enforces "max one Pending request per caliber"
-# via the struct check above. NOTE: this depends on the account flow keeping KV in
-# sync — if account has not run since the last request settled, KV may still point
-# at the old id whose status is now Processed/Canceled, in which case the guard
-# correctly identifies it as NOT in-flight and lets a new request through.
+# ## One-in-flight invariant per KV key
+# The vault itself permits multiple concurrent Pending requests per caller (verified on
+# mainnet: redeemRequests(0..3) all share sender 0x19C1eB...721d). This blueprint
+# enforces "max one Pending request per KV key" via the struct check above, and both
+# actions of a position share one key, so a position has at most one request in flight.
+# NOTE: the guard depends on the account flow keeping KV in sync — if account has not
+# run since the last request settled, KV may still point at an id whose status is now
+# Processed/Canceled, in which case the guard correctly reports NOT in-flight.
+#
+# ## A rejected request does NOT return the escrow on-chain — NAV writes it off
+# `rejectRequest(id)` is onlyVaultAdmin and its whole body is: validate, set
+# status = Canceled, emit RejectRequest. It performs NO mToken transfer. So the escrowed
+# mToken stays in the vault contract, while on our side the ACCOUNTING action sees
+# status != Pending, masks the position to 0 and clears the KV key — i.e. the machine
+# instantly writes off the full escrowed amount (>= 1 mToken, ~$130k+ for mWIN) and loses
+# its pointer to the request. Recovery is off the happy path: identify the amount from
+# the RejectRequest / redeemRequests(id) record and have Midas return it via the vault's
+# admin `withdrawToken`. Operationally: alert on RejectRequest and pause share
+# issuance/redemption until the position is reconciled, because NAV is understated in the
+# interim. Note this is distinct from a Processed request, where settlement pushes
+# token-out to the recipient before the status flips.
 #
 # ## Recipient = caliber
 # Use the 3-arg `redeemRequest(tokenOut, amountMTokenIn, recipient)` overload with
-# recipient = caliber so settlement USDC lands directly on the caliber. This
-# requires a single greenlist grant (on the caliber). With recipient == msg.sender,
-# the vault only runs _validateUserAccess once.
+# recipient = caliber so settlement assets land directly on the caliber. Verified
+# on the mWIN implementation (0xeb21db42...879c) that this overload RETURNS the assigned
+# requestId (`redeemRequest(address,uint256,address) -> (uint256)`), so we persist the
+# vault's own return value rather than pre-reading `currentRequestId()` and reasoning
+# about the counter's pre/post-increment semantics.
 #
-# ## Operational caveats (verify before submitting)
-# - Confirm `redeemRequest(address,uint256,address)` is not paused on the target
-#   chain. The blueprint does not pre-flight check the pause; the call reverts if
-#   it is paused.
-# - The caliber and redemption vault must satisfy the mToken's greenlist policy.
+# ## Operational prerequisites (verify per mToken before deployment)
+# - Selector `redeemRequest(address,uint256,address)` = 0x15571a04 must be unpaused:
+#   check `fnPaused(0x15571a04) == false` and `paused() == false` on the vault.
+#   (mWIN redeemer 0x6057...7924: both false as of 2026-08-04.)
+# - GREENLIST: the gate lives on the *mToken*, not the vault. mTokenPermissioned's
+#   `_beforeTokenTransfer` calls `_onlyGreenlisted(from)` and `_onlyGreenlisted(to)`
+#   UNCONDITIONALLY, so BOTH the caliber and the vault must hold the mToken's
+#   greenlist role for the escrow transfer to succeed. Do NOT rely on the vault's
+#   own `greenlistEnabled()` flag: that only gates the vault's `_validateUserAccess`
+#   (`modifier onlyGreenlisted { if (greenlistEnabled) _onlyGreenlisted(account); }`)
+#   and is currently false on the mWIN redeemer — the token-level check still applies.
+#   For mWIN the role is M_WIN_GREENLISTED_ROLE (0xc7021654...acb2) on access control
+#   0x0312A9D1...AC4B; the redeemer already holds it, the caliber must be granted it.
+#   If Midas later revokes it while the caliber holds mToken, all new exit requests
+#   are blocked while NAV keeps carrying the stranded mToken at its oracle price.
+#
+# ## TWO independent 1-mToken minimums constrain exit sizing (mWIN; verify per token)
+# 1. Vault `minAmount`: `_calcAndValidateRedeem` does
+#    `require(minAmount <= amountMTokenIn)` unless `isFreeFromMinAmount[caliber]`.
+#    mWIN redeemer: minAmount = 1e18, i.e. every request must be >= 1 mWIN.
+# 2. Token residual minimum: mTokenMinBalance's `_afterTokenTransfer` runs
+#    `require(balance == 0 || balance >= 1 ether)` on BOTH `from` and `to` unless the
+#    address holds the mToken's min-balance-exempt role. So a partial request that
+#    would leave the caliber holding 0 < balance < 1 mToken reverts with
+#    "MTMB: min balance not met". Granting the exemption to only one endpoint is
+#    insufficient — the check runs on sender and recipient.
+#    For mWIN the role is M_WIN_MIN_BALANCE_EXEMPT_ROLE (0x23e8bb45...27ab); as of
+#    2026-08-04 NEITHER the caliber nor the redeemer holds it.
+# Combined, for a caliber holding B mToken a request of size `a` needs
+# `a >= 1` AND (`B - a == 0` OR `B - a >= 1`). For B < 2 the only legal exit is the
+# FULL balance. `request_redemption_relative` with bps < 10000 therefore reverts
+# whenever it would leave a sub-1 remainder — this is NOT guarded here, the operator
+# must size the bps, and an undersized request fails inside Midas, not in the caliber.
 #
 # ## Flow
 # 1. kv.get(key) → stored_id (raw uint256, NOT offset).
 # 2. vault.redeemRequests(stored_id) → struct.
-# 3. Extract status + sender; the BooleanHelper rejects a second
-#    request when (status == Pending AND sender != 0).
-# 4. vault.currentRequestId() → next_id (pre-increment value; will be assigned).
-# 5. use configured caliber_address as the settlement recipient.
-# 6. (relative variant only) compute amount = balance * bps / 10000.
-# 7. mToken.approve(vault, amount).
-# 8. vault.redeemRequest(USDC, amount, caliber_address).
-# 9. kv.set(key, next_id).
+# 3. context_helper.msgSender() → caliber; revert only when the tracked tuple is
+#    Pending AND its sender field equals that caliber.
+# 4. (relative variant only) compute amount = balance * bps / 10000.
+# 5. mToken.approve(vault, amount).
+# 6. vault.redeemRequest(tokenOut, amount, caliber) → assigned request id.
+# 7. kv.set(key, returned request id); never reconstruct vault id-allocation behaviour.
 
-inputs:
+constants:
+  context_helper_address:
+    type: "address"
+    value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE" # Makina ContextHelper; blueprint-helpers.md
   math_helper_address:
     type: "address"
-  bytes32_helper_address:
-    type: "address"
-  caliber_helper_address:
-    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # Makina MathHelper; blueprint-helpers.md
   boolean_helper_address:
     type: "address"
-  caliber_address:
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353" # Makina BooleanHelper; blueprint-helpers.md
+  bytes32_helper_address:
     type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3" # Makina Bytes32Helper; blueprint-helpers.md
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D" # Makina CaliberHelper; blueprint-helpers.md
+
+inputs:
   redeemer_address:
     type: "address"
   mtoken_address:
@@ -75,12 +122,9 @@ inputs:
 
 actions:
   # Absolute variant: caller specifies an exact mToken amount to redeem.
-  redeem_request:
+  request_redemption:
     calls:
       # ---- Guard: no in-flight request -----------------------------------
-      # Read the previously tracked id. KV stores the raw requestId; the value 0
-      # is AMBIGUOUS (could mean "never written" OR "tracking real id 0"), so we
-      # disambiguate below by checking the on-chain request struct.
       - description: "Get previously tracked requestId from KV store (raw id; 0 is ambiguous)"
         target: "${inputs.kv_store_address}"
         selector: "get(bytes32)"
@@ -91,10 +135,6 @@ actions:
           name: "tracked_request_id"
           type: "uint256"
 
-      # The on-chain disambiguation: read the request struct. A zero-init slot
-      # has sender == address(0) and status == 0; a real Pending request has
-      # sender != 0 and status == 0. Checking BOTH lets us distinguish "KV=0
-      # meaning nothing to track" from "KV=0 meaning we're tracking id 0".
       - description: "Read redeemRequests(tracked_id) — (sender, tokenOut, status, amountMToken, mTokenRate, tokenOutRate)"
         target: "${inputs.redeemer_address}"
         selector: "redeemRequests(uint256)"
@@ -105,8 +145,8 @@ actions:
           name: "tracked_request_tuple"
           type: "(address,address,uint8,uint256,uint256,uint256)"
 
-      - description: "Extract sender (index 0) as bytes32 for zero-check"
-        target: "${inputs.caliber_helper_address}"
+      - description: "Extract sender (index 0) as bytes32 for the ownership check"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -118,7 +158,7 @@ actions:
           type: "bytes32"
 
       - description: "Extract status (index 2)"
-        target: "${inputs.caliber_helper_address}"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -130,7 +170,7 @@ actions:
           type: "uint256"
 
       - description: "status == 0 (Pending)"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "eq(uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -141,55 +181,52 @@ actions:
           name: "tracked_status_is_pending"
           type: "bool"
 
-      - description: "sender == bytes32(0) (zero-init slot)"
-        target: "${inputs.bytes32_helper_address}"
+      - description: "Get caliber address word for ownership check"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address_b32"
+          type: "bytes32"
+
+      - description: "Tracked request sender equals the executing caliber"
+        target: "${constants.bytes32_helper_address}"
         selector: "eq(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${returns.tracked_sender_b32}"
           - type: "bytes32"
-            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            value: "${returns.caliber_address_b32}"
         return:
-          name: "tracked_sender_is_zero"
+          name: "tracked_sender_is_caliber"
           type: "bool"
 
-      - description: "sender != 0 (real existing request, not zero-init slot)"
-        target: "${inputs.boolean_helper_address}"
-        selector: "not(bool)"
-        parameters:
-          - type: "bool"
-            value: "${returns.tracked_sender_is_zero}"
-        return:
-          name: "tracked_sender_is_nonzero"
-          type: "bool"
-
-      - description: "in_flight = (status == Pending) AND (sender != 0); revert if true"
-        target: "${inputs.boolean_helper_address}"
+      - description: "in_flight = Pending AND owned by caliber; revert if true"
+        target: "${constants.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
             value: "${returns.tracked_status_is_pending}"
           - type: "bool"
-            value: "${returns.tracked_sender_is_nonzero}"
+            value: "${returns.tracked_sender_is_caliber}"
         return:
           name: "tracked_is_in_flight"
           type: "bool"
 
       - description: "Enforce one-in-flight invariant"
-        target: "${inputs.boolean_helper_address}"
+        target: "${constants.boolean_helper_address}"
         selector: "revertIfTrue(bool)"
         parameters:
           - type: "bool"
             value: "${returns.tracked_is_in_flight}"
 
-      # ---- Capture the id about to be assigned ---------------------------
-      - description: "Read currentRequestId (pre-increment value = id that will be assigned)"
-        target: "${inputs.redeemer_address}"
-        selector: "currentRequestId()"
+      - description: "Get caliber address as redemption recipient"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
         parameters: []
         return:
-          name: "next_id"
-          type: "uint256"
+          name: "caliber_address"
+          type: "address"
 
       # ---- Approve + submit ----------------------------------------------
       - description: "Approve mToken spending by the vault"
@@ -210,28 +247,31 @@ actions:
           - type: "uint256"
             value: "${input_slots.amount_mtoken_in}"
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
+        return:
+          name: "submitted_request_id"
+          type: "uint256"
 
-      # ---- Persist raw requestId ----------------------------------------
-      - description: "Store raw next_id in KV (account flow resets to 0 once status != Pending)"
+      - description: "Store vault-returned request id in KV (account resets it after settlement)"
         target: "${inputs.kv_store_address}"
         selector: "set(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${inputs.kv_storage_key}"
           - type: "uint256"
-            value: "${returns.next_id}"
+            value: "${returns.submitted_request_id}"
 
     input_slots:
       amount_mtoken_in:
         type: "uint256"
-        description: "Exact mToken amount (18 dec) to redeem"
+        description: "Exact mToken amount (18 dec) to redeem; must satisfy both 1-mToken minimums (see header)"
 
   # Relative variant: caller specifies a basis-points fraction of the caliber's
-  # mToken balance to redeem.
-  redeem_request_relative:
+  # mToken balance to redeem. See the header: bps values that leave a sub-1-mToken
+  # remainder revert inside Midas, they are not guarded here.
+  request_redemption_relative:
     calls:
-      # ---- Guard: no in-flight request (see redeem_request for rationale) ----
+      # ---- Guard: no in-flight request (see request_redemption for rationale) ----
       - description: "Get previously tracked requestId from KV store (raw id; 0 is ambiguous)"
         target: "${inputs.kv_store_address}"
         selector: "get(bytes32)"
@@ -252,8 +292,8 @@ actions:
           name: "tracked_request_tuple"
           type: "(address,address,uint8,uint256,uint256,uint256)"
 
-      - description: "Extract sender (index 0) as bytes32 for zero-check"
-        target: "${inputs.caliber_helper_address}"
+      - description: "Extract sender (index 0) as bytes32 for the ownership check"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -265,7 +305,7 @@ actions:
           type: "bytes32"
 
       - description: "Extract status (index 2)"
-        target: "${inputs.caliber_helper_address}"
+        target: "${constants.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -277,7 +317,7 @@ actions:
           type: "uint256"
 
       - description: "status == 0 (Pending)"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "eq(uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -288,55 +328,52 @@ actions:
           name: "tracked_status_is_pending"
           type: "bool"
 
-      - description: "sender == bytes32(0) (zero-init slot)"
-        target: "${inputs.bytes32_helper_address}"
+      - description: "Get caliber address word for ownership check"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
+        parameters: []
+        return:
+          name: "caliber_address_b32"
+          type: "bytes32"
+
+      - description: "Tracked request sender equals the executing caliber"
+        target: "${constants.bytes32_helper_address}"
         selector: "eq(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${returns.tracked_sender_b32}"
           - type: "bytes32"
-            value: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            value: "${returns.caliber_address_b32}"
         return:
-          name: "tracked_sender_is_zero"
+          name: "tracked_sender_is_caliber"
           type: "bool"
 
-      - description: "sender != 0 (real existing request, not zero-init slot)"
-        target: "${inputs.boolean_helper_address}"
-        selector: "not(bool)"
-        parameters:
-          - type: "bool"
-            value: "${returns.tracked_sender_is_zero}"
-        return:
-          name: "tracked_sender_is_nonzero"
-          type: "bool"
-
-      - description: "in_flight = (status == Pending) AND (sender != 0); revert if true"
-        target: "${inputs.boolean_helper_address}"
+      - description: "in_flight = Pending AND owned by caliber; revert if true"
+        target: "${constants.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
             value: "${returns.tracked_status_is_pending}"
           - type: "bool"
-            value: "${returns.tracked_sender_is_nonzero}"
+            value: "${returns.tracked_sender_is_caliber}"
         return:
           name: "tracked_is_in_flight"
           type: "bool"
 
       - description: "Enforce one-in-flight invariant"
-        target: "${inputs.boolean_helper_address}"
+        target: "${constants.boolean_helper_address}"
         selector: "revertIfTrue(bool)"
         parameters:
           - type: "bool"
             value: "${returns.tracked_is_in_flight}"
 
-      # ---- Capture the id about to be assigned ---------------------------
-      - description: "Read currentRequestId (pre-increment value = id that will be assigned)"
-        target: "${inputs.redeemer_address}"
-        selector: "currentRequestId()"
+      - description: "Get caliber address as redemption recipient"
+        target: "${constants.context_helper_address}"
+        selector: "msgSender()"
         parameters: []
         return:
-          name: "next_id"
-          type: "uint256"
+          name: "caliber_address"
+          type: "address"
 
       # ---- Compute amount from bps ---------------------------------------
       - description: "Read caliber's mToken balance"
@@ -344,13 +381,13 @@ actions:
         selector: "balanceOf(address)"
         parameters:
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
         return:
           name: "mtoken_balance"
           type: "uint256"
 
       - description: "Compute amount = balance * bps / 10000"
-        target: "${inputs.math_helper_address}"
+        target: "${constants.math_helper_address}"
         selector: "mulDiv(uint256,uint256,uint256)"
         parameters:
           - type: "uint256"
@@ -382,19 +419,21 @@ actions:
           - type: "uint256"
             value: "${returns.amount_mtoken_in}"
           - type: "address"
-            value: "${inputs.caliber_address}"
+            value: "${returns.caliber_address}"
+        return:
+          name: "submitted_request_id"
+          type: "uint256"
 
-      # ---- Persist raw requestId ----------------------------------------
-      - description: "Store raw next_id in KV (account flow resets to 0 once status != Pending)"
+      - description: "Store vault-returned request id in KV (account resets it after settlement)"
         target: "${inputs.kv_store_address}"
         selector: "set(bytes32,bytes32)"
         parameters:
           - type: "bytes32"
             value: "${inputs.kv_storage_key}"
           - type: "uint256"
-            value: "${returns.next_id}"
+            value: "${returns.submitted_request_id}"
 
     input_slots:
       bps_to_redeem:
         type: "uint256"
-        description: "Basis points of caliber's mToken balance to redeem (10000 = 100%)"
+        description: "Basis points of caliber's mToken balance to redeem (10000 = 100%); must leave 0 or >= 1 mToken"
