@@ -103,6 +103,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x19ebb35279A16207Ec4ba82799CC64715065F7F6",
+      "name": "Hastra PRIME",
+      "decimals": 6,
+      "symbol": "PRIME"
+    },
+    {
+      "chainId": 1,
       "address": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
       "name": "PayPal USD",
       "decimals": 6,
@@ -383,6 +390,13 @@
     },
     {
       "chainId": 8453,
+      "address": "0xacfE6019Ed1A7Dc6f7B508C02d1b04ec88cC21bf",
+      "name": "Venice Token",
+      "decimals": 18,
+      "symbol": "VVV"
+    },
+    {
+      "chainId": 8453,
       "address": "0x4200000000000000000000000000000000000006",
       "name": "Wrapped Ether",
       "decimals": 18,
@@ -401,13 +415,6 @@
       "name": "Coinbase Wrapped Staked ETH",
       "decimals": 18,
       "symbol": "cbETH"
-    },
-    {
-      "chainId": 8453,
-      "address": "0xacfE6019Ed1A7Dc6f7B508C02d1b04ec88cC21bf",
-      "name": "Venice Token",
-      "decimals": 18,
-      "symbol": "VVV"
     },
     {
       "chainId": 42161,

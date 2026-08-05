@@ -1,0 +1,403 @@
+# ============================================================================
+# Morpho Loop Position (swap-based) — MAPLE collateral variant
+# ============================================================================
+#
+# Same as instructions/morpho-loop-swap.yaml (swap-based loop, oracle equity)
+# with two Maple-specific deltas:
+#   - ACCOUNTING adds the escrowed-redemption term (maple/account-equity.yaml)
+#   - one extra action: withdraw_collateral_and_request_maple_redeem
+#
+# Use this instead of morpho-loop-swap.yaml when the collateral is a Maple
+# syrup pool token and you want to exit at pool NAV via native redemption
+# rather than swapping the collateral out through the DEX aggregator.
+#
+# Examples:
+#   - syrupUSDC/RLUSD (pool asset USDC, loan RLUSD)
+#   - syrupUSDC/PYUSD (pool asset USDC, loan PYUSD)
+#
+# WHY NOT machines/dusd/mainnet/instructions/morpho-loop-syrupusdt-usdt.yaml's
+# accounting: that uses account_loop_and_maple_withdrawal, which values the
+# whole collateral leg in the Maple pool's asset(). Correct only when pool
+# asset == loan token (syrupUSDT/USDT); it would bake a USDC=loan_token peg
+# into the entire position here. See the header of
+# blueprints/morpho-loop/maple/account-equity.yaml.
+#
+# The redeem action itself moves SHARE amounts only (Morpho.withdrawCollateral
+# + pool.requestRedeem) and does no unit conversion, so it carries no peg
+# assumption of its own.
+#
+# Accounting:
+#   equity = max(0, collateral * oracle.price()/1e36 - debt)
+#          + mulDiv(userEscrowedShares(caliber), KV[position_key], max(KV[total_key],1))
+#            * oracle.price()/1e36
+#
+# The escrow aggregate is keyed on the CALIBER, so it is split across the
+# positions sharing a withdrawal manager rather than booked in full by each.
+# Scheme, invariant and key rules:
+# blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml.
+#
+# Required vars:
+#   label                            — Position label, used for all entries
+#   collateral_token                 — Collateral token address (the syrup pool token)
+#   loan_token                       — Loan token address (e.g. RLUSD)
+#   morpho_market_id                 — Morpho market ID (bytes32)
+#   oracle_address                   — Morpho oracle address for collateral/loan pricing
+#   maple_pool_address               — Maple pool (== the syrup token itself)
+#   maple_withdrawal_manager_address — Maple withdrawal manager (poolManager.withdrawalManager())
+#   maple_escrow_position_key        — bytes32, KV key unique to THIS position
+#   maple_escrow_total_key           — bytes32, KV key SHARED by every position on
+#                                      this caliber redeeming through the SAME
+#                                      withdrawal manager. Must match exactly, or
+#                                      the escrow double count silently returns;
+#                                      must differ across withdrawal managers, or
+#                                      one pool's escrow is prorated by another's
+#                                      weights. Guarded by
+#                                      tests/test_maple_escrow_prorate.py.
+#
+# No escrow_scale vars: the escrow term is priced by the market oracle, whose price
+# already carries the 1e36 * 10^loanDec / 10^collDec scaling. Pricing both the
+# collateral and the escrow with that one oracle is what makes the native redeem
+# value-neutral — see the VALUE NEUTRALITY note in
+# blueprints/morpho-loop/maple/account-equity.yaml.
+#
+# Available user flows:
+#   - Open / increase leverage:  Flash loan request (1) + Loop in (2)
+#   - Partial deleverage:        Flash loan request (1) + Loop out (3)
+#   - Full close:                Flash loan request (1) + Close loop (4)
+#   - Add collateral (no debt):  Add collateral (5)
+#   - Borrow more:               Borrow (6)
+#   - Repay debt:                Repay (7)
+#   - Withdraw collateral:       Withdraw collateral (8)
+#   - Native Maple exit:         Withdraw collateral + request Maple redeem (10)
+#   - Accounting:                Automatic equity + escrow reporting (9)
+# ============================================================================
+
+# 1/11 - Flash loan request (shared by loop_in, loop_out, close_loop callbacks)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/flashloan-request.yaml:flashloan_request"
+    inputs:
+      flash_loan_aggregator:
+        type: "address"
+        value: "${config.flash_loan_aggregator}"
+
+# 2/11 - Loop in: flash loan callback (swap loan -> collateral, supply, borrow to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/deposit-swap.yaml:loop_in"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 3/11 - Loop out: flash loan callback (repay debt, withdraw collateral, swap to loan to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:loop_out"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 4/11 - Close loop: flash loan callback (repay ALL debt by shares, withdraw ALL collateral, swap to loan to repay FL)
+- is_debt: false
+  instruction_type: "FLASHLOAN_MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw-swap.yaml:close_loop"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 5/11 - Add collateral: standalone swap loan -> collateral -> supply to Morpho
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/deposit-swap.yaml:add_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 6/11 - Borrow loan token from Morpho (generic)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/borrow.yaml:borrow"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# 7/11 - Repay loan token to Morpho (generic)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/repay.yaml:repay_asset"
+    inputs:
+      morpho:
+        type: "address"
+        value: "${config.morpho_address}"
+      executor_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+
+# 8/11 - Withdraw collateral: Morpho -> collateral -> swap to loan via DEX aggregator
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/withdraw.yaml:withdraw_collateral"
+    inputs:
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      swap_module:
+        type: "address"
+        value: "${config.swap_module}"
+
+# 9/11 - Accounting: equity = (collateral * oracle_price / 1e36) - debt + escrowed Maple redeem
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/maple/account-equity.yaml:account_equity_and_maple_withdrawal"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      oracle_address:
+        type: "address"
+        value: ${position.oracle_address}
+      maple_withdrawal_manager_address:
+        type: "address"
+        value: ${position.maple_withdrawal_manager_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}
+
+# 10/11 - Native Maple exit: withdraw collateral from Morpho and queue a pool redemption
+# at NAV instead of swapping the collateral out. Escrows the shares in the
+# withdrawal manager; entry 9 keeps them in NAV until the USDC lands.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml:withdraw_collateral_and_request_maple_redeem"
+    # No collateral_token input: the action recovers the collateral from
+    # idToMarketParams and never reads ${inputs.collateral_token}.
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      morpho_market_id:
+        type: "bytes32"
+        value: ${position.morpho_market_id}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      maple_pool_address:
+        type: "address"
+        value: ${position.maple_pool_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}
+
+# 11/11 - Reconcile: drop this position's escrow weight once the caliber's Maple
+# queue is fully drained. Guarded on userEscrowedShares == 0, which makes it
+# value-neutral (every term is already 0 at that point) so it cannot trip the
+# position's slippage check. Skipping it is NAV-safe — it only restores exact
+# per-position attribution.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml:release_maple_escrow_weight"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      math_helper:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      maple_withdrawal_manager_address:
+        type: "address"
+        value: ${position.maple_withdrawal_manager_address}
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}

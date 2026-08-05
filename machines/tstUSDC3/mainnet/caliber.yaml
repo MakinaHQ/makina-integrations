@@ -297,6 +297,16 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+    vars:
+      # Only syrupUSDC escrow reader on this caliber (its two syrupUSDC Morpho
+      # loops use the swap variant, which has no escrow term), so the prorate
+      # degenerates to the identity: wT == wP => mulDiv(E, wP, wP) == E. Keys are
+      # still required, and the KV store is per caliber so these strings are
+      # safely reused from dusd.
+      # keccak256("maple.mainnet.syrupusdc.escrow.royco_jt")
+      maple_escrow_position_key: "0x7276e080a62efc9f57da5b928414fda8c105e83889c29b89e1b6735375aba616"
+      # keccak256("maple.mainnet.syrupusdc.escrow_total")
+      maple_escrow_total_key: "0xae849168e6d7749681faf272835a2e925066d5475dc8b36e32c1cb9f2f5e6160"
 
   # Grove Staking
   - id: "184729365018472936501847293650"

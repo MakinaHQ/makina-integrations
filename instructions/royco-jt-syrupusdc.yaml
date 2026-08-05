@@ -1,15 +1,29 @@
 # Royco Junior Tranche syrupUSDC
 # Multi-step deposit: USDC -> syrupUSDC (Maple ERC4626) -> Junior Tranche shares
 # Queue-based withdraw: redeem JT -> syrupUSDC -> requestRedeem (manual withdrawal). USDC airdropped later.
-# Accounting: USDC-denominated (no nav) + pending syrupUSDC from Maple WithdrawalManager.
+# Accounting: USDC-denominated (no nav) + this position's prorated share of the
+# caliber's pending syrupUSDC escrow.
 #
 # Prerequisites:
 #   - Caliber must be whitelisted on Maple PoolPermissionManager for deposits
 #   - Caliber holds the Royco AccessManager (`0x7cC6fB28...`) deposit/redeem role `9623252227852051139` and the kernel sync role `15053450870919821405`. Same roles as the ST sibling — both are market-agnostic.
 #
-# WARNING: WithdrawalManager.userEscrowedShares is keyed on caliber, not tranche.
-# Do not hold simultaneous pending withdrawals from both ST and JT on the same caliber,
-# or accounting will double-count the pending USDC across the two account.yaml runs.
+# ESCROW ATTRIBUTION (design A): WithdrawalManager.userEscrowedShares is keyed on
+# the caliber, not the position, and accumulates per owner — so every position on
+# the caliber reading that manager used to book the FULL aggregate. This position
+# now books only mulDiv(aggregate, KV[position_key], max(KV[total_key], 1)).
+# The scheme, the `wT == sum(wP)` invariant and the per-withdrawal-manager key
+# namespacing are documented in
+# blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml.
+# Simultaneous pending withdrawals across positions are now permitted.
+#
+# Expected position vars:
+#   maple_escrow_position_key — bytes32, unique to THIS position
+#   maple_escrow_total_key    — bytes32, SHARED by every position on this caliber
+#                               that redeems through syrupUSDC's withdrawal
+#                               manager 0x1bc47a0Dd0FdaB96E9eF982fdf1F34DC6207cfE3.
+#                               A mismatch here silently restores the double count.
+# Expected config: key_value_store_address
 
 # DEPOSIT: USDC -> syrupUSDC -> Junior Tranche shares
 - is_debt: false
@@ -21,7 +35,7 @@
     path: "../../../blueprints/royco/jt-syrupusdc/deposit.yaml:deposit"
     inputs: {}
 
-# USDC-DENOMINATED ACCOUNTING: Active JT in syrupUSDC + pending escrow, then convertToExitAssets to USDC
+# USDC-DENOMINATED ACCOUNTING: Active JT in syrupUSDC + this position's escrow share, then convertToExitAssets to USDC
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
@@ -29,13 +43,51 @@
   instruction:
     label: "ROY-JT-syrupUSDC"
     path: "../../../blueprints/royco/jt-syrupusdc/account.yaml:account"
-    inputs: {}
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}
 
-# WITHDRAW: Redeem JT -> syrupUSDC -> requestRedeem (Maple queue)
+# WITHDRAW: Redeem JT -> syrupUSDC -> requestRedeem (Maple queue), recording this position's escrow weight
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens: []
   instruction:
     label: "ROY-JT-syrupUSDC"
     path: "../../../blueprints/royco/jt-syrupusdc/withdraw.yaml:request_redeem"
-    inputs: {}
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}
+
+# RECONCILE: drop this position's escrow weight once the caliber's queue is fully
+# drained. Value-neutral by construction (guarded on userEscrowedShares == 0), so
+# it cannot trip the position's slippage check. Skipping it is NAV-safe.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "ROY-JT-syrupUSDC"
+    path: "../../../blueprints/royco/jt-syrupusdc/withdraw.yaml:release_maple_escrow_weight"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      maple_escrow_position_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_position_key}
+      maple_escrow_total_key:
+        type: "bytes32"
+        value: ${position.maple_escrow_total_key}

@@ -234,6 +234,88 @@ positions:
       label: "PRIME/PYUSD (0x41c4...a3fa)"
       market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
       loan_token: ${token_list.mainnet.PYUSD}
+  - id: "199708234830348815037617604080094469854"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x1e9d...fc64)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"
+      market_id: "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "210115366782586714314169264674817212217"
+    group_id: "0"
+    description: "Morpho USDT loan (market: 0x6acd...14ca)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"
+      market_id: "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
+      loan_token: ${token_list.mainnet.USDT}
+
+  # ── Decomposed Morpho markets backported from prod (makina-integrations) ──
+  # These three markets were shipped straight to prod in makina-integrations#87
+  # and bypassed this repo, so validate_open_positions failed here: they are open
+  # on-chain but were undeclared. Copied verbatim from prod, ids from pools_db
+  # (NOT keccak). Collateral+debt of one market are a single liquidation set, so
+  # each market gets its own group_id; 0-3 were already taken here, so these use
+  # 4/5/6 exactly as prod does.
+  #
+  # No governance prerequisite: PRIME (0x19ebb352…, Hastra PRIME, 6 dec), reUSD
+  # and AUSD are all already registered dusd base tokens with live feed routes,
+  # verified on-chain 2026-08-04. PRIME was missing from this repo's token list
+  # and has been added (fetched on-chain, identical to prod's entry).
+  #
+  # NOT backported here: prod's "PRIME Swap In" and "PRIME Redemption" positions.
+  # Both read (0,0,false) on-chain — declared but never opened — so they do not
+  # block the gate, and they need blueprints/prime-swap/ + blueprints/common/
+  # plus two instruction files that do not exist in this repo yet.
+  - id: "37645447233873664515981871938816299267" # pools_db makina_id — market 0x41c4…a3fa PRIME collateral (lending)
+    group_id: "4"
+    description: "PRIME/PYUSD Morpho Collateral (PRIME)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      collateral_token: ${token_list.mainnet.PRIME}
+  - id: "82274847838354216265357335302519678531" # pools_db makina_id — market 0x41c4…a3fa PYUSD debt (borrowing)
+    group_id: "4"
+    description: "PRIME/PYUSD Morpho Debt (PYUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
+  - id: "5371229124908624150131427880782716527" # pools_db makina_id — market 0xf3cf…523b PRIME collateral (lending)
+    group_id: "5"
+    description: "PRIME/AUSD Morpho Collateral (PRIME)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "PRIME/AUSD (0xf3cf...523b)"
+      market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
+      collateral_token: ${token_list.mainnet.PRIME}
+  - id: "105364652794375054965418306805151713337" # pools_db makina_id — market 0xf3cf…523b AUSD debt (borrowing)
+    group_id: "5"
+    description: "PRIME/AUSD Morpho Debt (AUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "PRIME/AUSD (0xf3cf...523b)"
+      market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
+      loan_token: ${token_list.mainnet.AUSD}
+  - id: "328350624757279255217968622283478199222" # pools_db makina_id — market 0xd989…7cac reUSD collateral (lending)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Collateral (reUSD)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      collateral_token: ${token_list.mainnet.reUSD}
+  - id: "165433007824915924341521454650476721637" # pools_db makina_id — market 0xd989…7cac AUSD debt (borrowing)
+    group_id: "6"
+    description: "reUSD/AUSD Morpho Debt (AUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "reUSD/AUSD (0xd989...7cac)"
+      market_id: "0xd98939d075eebc85569dbbe3a5ef7fd46e1d3efa83452173b172eb93ae557cac"
+      loan_token: ${token_list.mainnet.AUSD}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"
@@ -376,6 +458,11 @@ positions:
     description: "Fluid GHO Vault position"
     instructions: !include "./instructions/fluid-gho.yaml"
     position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
+  - id: "280756842428125260997025717226665040346"
+    group_id: "0"
+    description: "Fluid Lite USD (deposit USDC)"
+    instructions: !include "../../../instructions/fluid-lite-usd.yaml"
+    position_tokens: ["0x273DA948ACa9261043fbdb2a857BC255ECC29012"]
 
   # ── Morpho Loops ─────────────────────────────────────────────────
   - id: "318274659201837465920183746592018374659"
@@ -417,16 +504,53 @@ positions:
       loan_token: ${token_list.mainnet.PYUSD}
       morpho_market_id: "0xc9629945524f3fde56c7e8854a6c3d48e76b9d97236abbe73c750fcc7aeb8501"
       oracle_address: "0xc8043d248551Ed19B33cbc89dCCd69148c827039"
+  # ┌──────────────────────────────────────────────────────────────────────────┐
+  # │ SHARED MAPLE ESCROW — attributed per position via the KV store            │
+  # ├──────────────────────────────────────────────────────────────────────────┤
+  # │ This position exits at pool NAV via native syrupUSDC redemption instead   │
+  # │ of swapping the collateral out, so its accounting must add Maple's        │
+  # │ escrowed shares back into equity. But                                     │
+  # │ WithdrawalManager.userEscrowedShares is keyed on the CALIBER, not the      │
+  # │ position, and accumulates per owner — and the Royco JT syrupUSDC          │
+  # │ position below (id 3244715182…) redeems through the SAME manager. Booking  │
+  # │ the raw aggregate in both would overstate DUSD NAV by the pending amount. │
+  # │                                                                          │
+  # │ Each position now books only its own prorated share:                      │
+  # │   mulDiv(aggregate, KV[position_key], max(KV[total_key], 1))              │
+  # │                                                                          │
+  # │ ==> maple_escrow_total_key MUST be IDENTICAL on every position that       │
+  # │     redeems through syrupUSDC's manager 0x1bc47a0D…cfE3, and              │
+  # │     maple_escrow_position_key MUST be unique per position. A mismatched   │
+  # │     total key silently restores the full double count. Guarded by         │
+  # │     tests/test_maple_escrow_prorate.py::CaliberKeyWiringTests.            │
+  # │                                                                          │
+  # │ The syrupUSDT loop uses a DIFFERENT manager (0x86eBDf90…eB8C) and so a    │
+  # │ different accumulator — it must never share this total key.               │
+  # │                                                                          │
+  # │ Simultaneous pending redemptions across positions are PERMITTED. Between  │
+  # │ settlement and reconcile the split is approximate while the total stays   │
+  # │ exact; reconcile with release_maple_escrow_weight once the caliber's      │
+  # │ queue is fully drained. Skipping it is NAV-safe.                          │
+  # │                                                                          │
+  # │ Design, proofs and reviewer checklist: docs/superpowers/specs/            │
+  # │ 2026-08-05-maple-escrow-attribution-design.md                             │
+  # └──────────────────────────────────────────────────────────────────────────┘
   - id: "813730204756382920165748392016574839201"
     group_id: "0"
     description: "syrupUSDC/RLUSD Morpho Loop"
-    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    instructions: !include "../../../instructions/morpho-loop-swap-maple.yaml"
     vars:
       label: "syrupUSDC/RLUSD Morpho Loop"
       collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       loan_token: ${token_list.mainnet.RLUSD}
       morpho_market_id: "0xc0ae375fd761ff19b3f04de5534c0f1ec110f80e1c2ede27c42c1c43c3040394"
       oracle_address: "0xf766F4F1Bcb0CBBF4EEF5E26FF7c7f66a713c1B5"
+      maple_pool_address: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC (pool == token)
+      maple_withdrawal_manager_address: "0x1bc47a0Dd0FdaB96E9eF982fdf1F34DC6207cfE3"
+      # keccak256("maple.mainnet.syrupusdc.escrow.morpho_loop_rlusd") — unique to this position
+      maple_escrow_position_key: "0x9f4ab16ad4a68f81d7d1de9e18ed36b4f81549e155d78736e322e200f0b5c563"
+      # keccak256("maple.mainnet.syrupusdc.escrow_total") — SHARED with the Royco JT position below
+      maple_escrow_total_key: "0xae849168e6d7749681faf272835a2e925066d5475dc8b36e32c1cb9f2f5e6160"
   - id: "912841315826493817206538461275893042156"
     group_id: "0"
     description: "sUSDe/USDtb Morpho Loop"
@@ -477,6 +601,14 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+    vars:
+      # Shares syrupUSDC's withdrawal manager 0x1bc47a0D…cfE3 with the
+      # syrupUSDC/RLUSD Morpho Loop above, so the escrow is split per position.
+      # See the boxed note on that position for the wiring rules.
+      # keccak256("maple.mainnet.syrupusdc.escrow.royco_jt") — unique to this position
+      maple_escrow_position_key: "0x7276e080a62efc9f57da5b928414fda8c105e83889c29b89e1b6735375aba616"
+      # keccak256("maple.mainnet.syrupusdc.escrow_total") — SHARED with the loop above
+      maple_escrow_total_key: "0xae849168e6d7749681faf272835a2e925066d5475dc8b36e32c1cb9f2f5e6160"
   # - id: "330570121219840820532089219331590988878"
   #   group_id: "0"
   #   description: "Royco Junior Tranche Pareto FalconX V2"
@@ -577,3 +709,19 @@ positions:
       accounting_token: ${token_list.mainnet.USDC}
       redemption_request_id_key: ${keccak256("makina.mainnet.dmg.redemption_request_id")}
       pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmg.pending_redemption_share_amount")}
+
+  # ── Makina DMW Machine ────────────────────────────────────────────
+  - id: "114955068982582201733330879397746119865"
+    group_id: "0"
+    description: "Makina DMW Machine"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"] # DMW share token
+    vars:
+      label: "DMW"
+      machine_token: "0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"
+      machine: "0x2FEEf245d510A31B242705ff627447Aa9db661E3"
+      depositor: "0xce205b5430Cd4bB207C28A2f161e97142153F127"
+      redeemer: "0xCC0F0983A96Afe7e6Ae5195D5BF59a108adC9553"
+      accounting_token: ${token_list.mainnet.USDC}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dmw.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmw.pending_redemption_share_amount")}
