@@ -1,0 +1,26 @@
+protocol: "common"
+
+# Shared no-op accounting action: reports value 0.
+#
+# Use from any MANAGEMENT-only / base-token position whose value is already
+# captured by the caliber's OracleRegistry base-token valuation, so accounting it
+# again here would double-count. Identical in behaviour to the per-protocol
+# account_0 actions in blueprints/re/account.yaml and blueprints/midas/account.yaml
+# (kept for now; they can migrate to this shared file in a follow-up).
+#
+# Reserved-slot amount 0 is priced against the paired instruction's single affected
+# token -> 0. The trailing UINT256_MAX terminates the amounts array
+# (ACCOUNTING_OUTPUT_STATE_END_OF_ARGS), so the consuming instruction must declare
+# exactly one affected token.
+
+inputs: {}
+
+actions:
+  account_0:
+    calls: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

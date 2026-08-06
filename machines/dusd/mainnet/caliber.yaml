@@ -250,24 +250,6 @@ positions:
       label: "PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"
       market_id: "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
       loan_token: ${token_list.mainnet.USDT}
-
-  # ── Decomposed Morpho markets backported from prod (makina-integrations) ──
-  # These three markets were shipped straight to prod in makina-integrations#87
-  # and bypassed this repo, so validate_open_positions failed here: they are open
-  # on-chain but were undeclared. Copied verbatim from prod, ids from pools_db
-  # (NOT keccak). Collateral+debt of one market are a single liquidation set, so
-  # each market gets its own group_id; 0-3 were already taken here, so these use
-  # 4/5/6 exactly as prod does.
-  #
-  # No governance prerequisite: PRIME (0x19ebb352…, Hastra PRIME, 6 dec), reUSD
-  # and AUSD are all already registered dusd base tokens with live feed routes,
-  # verified on-chain 2026-08-04. PRIME was missing from this repo's token list
-  # and has been added (fetched on-chain, identical to prod's entry).
-  #
-  # NOT backported here: prod's "PRIME Swap In" and "PRIME Redemption" positions.
-  # Both read (0,0,false) on-chain — declared but never opened — so they do not
-  # block the gate, and they need blueprints/prime-swap/ + blueprints/common/
-  # plus two instruction files that do not exist in this repo yet.
   - id: "37645447233873664515981871938816299267" # pools_db makina_id — market 0x41c4…a3fa PRIME collateral (lending)
     group_id: "4"
     description: "PRIME/PYUSD Morpho Collateral (PRIME)"
@@ -477,13 +459,6 @@ positions:
     group_id: "0"
     description: "wsrUSD/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
-  # PRIME/PYUSD one-legged loop (POSITION model, equity in PYUSD + async pending term).
-  # PRIME is priced by the Morpho market oracle inside accounting — NOT a base token,
-  # so no addBaseToken / OracleRegistry.setFeedRoute is required.
-  - id: "141763829504617283950461728395046172839"
-    group_id: "0"
-    description: "PRIME/PYUSD Morpho Loop"
-    instructions: !include "./instructions/morpho-loop-prime-pyusd.yaml"
   - id: "615507982534160798943526170894352617089"
     group_id: "0"
     description: "sUSDS/USDT Morpho Loop"
@@ -725,3 +700,13 @@ positions:
       accounting_token: ${token_list.mainnet.USDC}
       redemption_request_id_key: ${keccak256("makina.mainnet.dmw.redemption_request_id")}
       pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmw.pending_redemption_share_amount")}
+
+  # ── RWAs ────────────────────────────────────────────
+  - id: "88685588701895893924186462793094177949654118628018819322996153435220574076920" # keccak256("prime.swap-in")
+    group_id: "0"
+    description: "PRIME Swap In (USDC->PRIME synthetic, base-token)"
+    instructions: !include "../../../instructions/prime-swap-in.yaml"
+  - id: "72349290285513021043842986906750831638657345372251354085839905937687160017989" # keccak256("prime.redemption")
+    group_id: "0"
+    description: "PRIME Redemption (async PRIME->USDC via wYLDS)"
+    instructions: !include "../../../instructions/prime-redemption.yaml"

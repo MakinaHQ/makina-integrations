@@ -94,22 +94,15 @@ positions:
       label: "Paypal USD Main"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
-  # DIA-987. PARKED until addBaseToken(RLUSD) lands on this caliber — queued from
-  # riskManagerTimelock 0x38542447c49D24e617fc06113295D7AaA3BEc4b6, ~2026-08-06.
-  # RLUSD is this position's only affected_token and the ONLY non-base token in the
-  # DETH rootfile, so leaving it enabled fails validate_base_tokens and holds the
-  # required check red. The oracle feed route is already registered
-  # (0x26C46B7aD0012cA71F2298ada567dC9Af14E7f2A). Uncomment once
-  # Caliber.isBaseToken(RLUSD) reads true — nothing else needs to change.
-  # - id: "101479911391298992514073662718338576961"
-  #   group_id: "0"
-  #   description: "Morpho Vault Sentora RLUSD Main"
-  #   instructions: !include "../../../instructions/morpho-vault-v2.yaml"
-  #   position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
-  #   vars:
-  #     label: "Sentora RLUSD Main"
-  #     asset_address: ${token_list.mainnet.RLUSD}
-  #     vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
+  - id: "101479911391298992514073662718338576961"
+    group_id: "0"
+    description: "Morpho Vault Sentora RLUSD Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
+    vars:
+      label: "Sentora RLUSD Main"
+      asset_address: ${token_list.mainnet.RLUSD}
+      vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
 
   # ── Makina ───────────────────────────────────────────────────────
   - id: "257907866263469253975271928750178105060"
