@@ -1,0 +1,349 @@
+protocol: "morpho"
+
+# ============================================================================
+# Maple-collateral Morpho loop — native redeem WITH per-position escrow
+# attribution (design A)
+# ============================================================================
+# Same as withdraw-maple-redeem.yaml (withdraw collateral from Morpho, queue a
+# pool redemption at NAV) plus the KV bookkeeping that lets several positions
+# on ONE caliber share Maple's withdrawal queue without double-counting.
+#
+# WHY a separate file: withdraw-maple-redeem.yaml is still wired by the live
+# syrupUSDT/USDT loop (machines/dusd/mainnet/instructions/morpho-loop-syrupusdt-usdt.yaml),
+# which is the only reader of ITS withdrawal manager and needs no attribution.
+# Adding inputs there would force that position to change. This keeps it
+# byte-identical.
+#
+# THE SCHEME — Maple's WithdrawalManager.userEscrowedShares is keyed on the
+# OWNER (the caliber), not on which position queued the redemption, and it
+# accumulates per owner. With two readers on one caliber, each ACCOUNTING run
+# books the full aggregate, so NAV is overstated by one extra copy. The
+# protocol exposes no attribution (both requests are the same `owner`), so the
+# split is kept in the caliber's KV store:
+#
+#   wP = KV[position_key]   this position's requested shares
+#   wT = KV[total_key]      shared cumulative total for THIS withdrawal manager
+#
+# and each position's ACCOUNTING books mulDiv(E, wP, max(wT,1)) instead of E.
+#
+# THE INVARIANT — `wT == sum(wP)`. Both writes below move by the SAME delta in
+# this one action, so they cannot come apart (weiroll is atomic per tx, and
+# read-modify-write composes across serial txs). If wT ever drifts BELOW the
+# sum of the weights, the terms sum above E and the double count is back. See
+# tests/test_maple_escrow_prorate.py:test_broken_invariant_wt_too_low_inflates.
+#
+# KEY NAMESPACING — total_key MUST be per withdrawal manager. dusd also runs a
+# syrupUSDT loop on manager 0x86eBDf90…eB8C, a separate accumulator; sharing one
+# total key across the two would prorate syrupUSDC's escrow by syrupUSDT's
+# weights. The keys are keccak256 of a namespace string, precomputed as bytes32
+# vars (the transpiler cannot resolve ${position.*} inside keccak256()):
+#   cast keccak "maple.mainnet.syrupusdc.escrow_total"
+#   cast keccak "maple.mainnet.syrupusdc.escrow.<position_slug>"
+#
+# MIGRATION — deploy only while userEscrowedShares(caliber) == 0. Escrow that
+# predates the KV writes has no weight, so it would be booked as 0 (NAV
+# understated) until it settles. Verified 0 on dusd and tstUSDC3 2026-08-05.
+#
+# FULL DESIGN, PROOFS, REJECTED ALTERNATIVES AND THE REVIEWER CHECKLIST:
+#   docs/superpowers/specs/2026-08-05-maple-escrow-attribution-design.md
+# Branch-by-branch coverage: tests/test_maple_escrow_prorate.py
+# ============================================================================
+
+inputs:
+  morpho_address:
+    type: "address"
+  caliber_helper:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  boolean_helper:
+    type: "address"
+
+  maple_pool_address:
+    type: "address"
+  maple_withdrawal_manager_address:
+    type: "address"
+
+  kv_store_address:
+    type: "address"
+  maple_escrow_position_key:
+    type: "bytes32"
+  maple_escrow_total_key:
+    type: "bytes32"
+
+actions:
+  # --------------------------------------------------------------------------
+  # Withdraw collateral from Morpho, queue the Maple redemption, and record
+  # this position's claim on the resulting escrow.
+  # --------------------------------------------------------------------------
+  withdraw_collateral_and_request_maple_redeem:
+    calls:
+      - description: "Get market parameters from ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "lltv"
+          type: "uint256"
+
+      - description: "Withdraw collateral from Morpho"
+        target: "${inputs.morpho_address}"
+        selector: "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.loan_token}"
+              - type: "address"
+                value: "${returns.collateral_token}"
+              - type: "address"
+                value: "${returns.oracle}"
+              - type: "address"
+                value: "${returns.irm}"
+              - type: "uint256"
+                value: "${returns.lltv}"
+          - type: "uint256"
+            value: "${input_slots.withdraw_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Request Maple pool redemption via queue"
+        target: "${inputs.maple_pool_address}"
+        selector: "requestRedeem(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.withdraw_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      # ---- Attribution: paired KV writes, same delta, same action ----------
+      - description: "Read this position's current escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+        return:
+          name: "position_weight_before"
+          type: "uint256"
+
+      - description: "Position weight += requested shares (Maple accumulates the same way)"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.position_weight_before}"
+          - type: "uint256"
+            value: "${input_slots.withdraw_amount}"
+        return:
+          name: "position_weight_after"
+          type: "uint256"
+
+      - description: "Persist this position's escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+          - type: "uint256"
+            value: "${returns.position_weight_after}"
+
+      - description: "Read the shared cumulative total for this withdrawal manager"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+        return:
+          name: "escrow_total_before"
+          type: "uint256"
+
+      - description: "Shared total += requested shares (SAME delta as the position weight)"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrow_total_before}"
+          - type: "uint256"
+            value: "${input_slots.withdraw_amount}"
+        return:
+          name: "escrow_total_after"
+          type: "uint256"
+
+      - description: "Persist the shared cumulative total"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+          - type: "uint256"
+            value: "${returns.escrow_total_after}"
+
+    input_slots:
+      withdraw_amount:
+        type: "uint256"
+        description: "The amount of collateral token to withdraw from Morpho and request Maple redeem for"
+
+  # --------------------------------------------------------------------------
+  # Reconcile: drop this position's weight once the queue is fully drained.
+  #
+  # Guarded on userEscrowedShares(caliber) == 0 for two reasons:
+  #   1. Correctness of the guard is free — with E == 0 every position's term is
+  #      already mulDiv(0, …) == 0, so releasing changes NO position value.
+  #      That is what keeps this action clear of _managePosition's slippage
+  #      check. Releasing while other escrow is still pending would drop this
+  #      position's phantom term in one step and very likely revert on
+  #      maxPositionDecreaseLossBps.
+  #   2. It makes the operating rule enforced on-chain rather than documented.
+  #
+  # Skipping the reconcile is safe for NAV — the terms sum to E regardless of
+  # how stale the weights are. It only restores exact per-position attribution.
+  # --------------------------------------------------------------------------
+  release_maple_escrow_weight:
+    calls:
+      - description: "Read the caliber's aggregate escrowed shares"
+        target: "${inputs.maple_withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "escrowed_shares"
+          type: "uint256"
+
+      - description: "Check the queue is fully drained for this caliber"
+        target: "${inputs.caliber_helper}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_shares}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "escrow_is_zero"
+          type: "bool"
+
+      - description: "Revert unless drained — releasing early would move position values"
+        target: "${inputs.boolean_helper}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.escrow_is_zero}"
+
+      - description: "Read this position's escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+        return:
+          name: "position_weight"
+          type: "uint256"
+
+      - description: "Zero this position's escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+          - type: "uint256"
+            value: "0"
+
+      - description: "Read the shared cumulative total"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+        return:
+          name: "escrow_total_before"
+          type: "uint256"
+
+      - description: "Shared total -= this position's weight. sub(a, b) = b - a on 0x836C9007…, so pass (weight, total)"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.position_weight}"
+          - type: "uint256"
+            value: "${returns.escrow_total_before}"
+        return:
+          name: "escrow_total_after"
+          type: "uint256"
+
+      - description: "Persist the shared cumulative total"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+          - type: "uint256"
+            value: "${returns.escrow_total_after}"
