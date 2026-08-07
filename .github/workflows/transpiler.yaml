@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout config repo
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # full history needed to diff against base branch
           persist-credentials: false
@@ -134,7 +134,7 @@ jobs:
 
       - name: Checkout transpiler repository
         if: steps.changed-rootfiles.outputs.added_files_count > 0
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: MakinaHQ/transpiler
           ref: 82d14d45ee9a5bc78a5ee8215f5b1607da547994 # main as of 2026-08-07
