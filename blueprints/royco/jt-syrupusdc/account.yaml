@@ -5,18 +5,30 @@ protocol: "royco-jt-syrupusdc"
 # syrupUSDC.convertToExitAssets. Mirrors blueprints/royco/st-syrupusdc/account.yaml;
 # only the tranche address differs.
 #
-# WARNING (double-counting): Maple_WithdrawalManager.userEscrowedShares is keyed on
-# the caliber address, not on which tranche fed the queue. If the same caliber has
-# pending withdrawals from BOTH the ST and JT positions simultaneously, both
-# account.yaml files will each count the full escrow — double-counting the pending
-# USDC. Operating constraint: keep pending withdrawals on at most one tranche per
-# caliber. Documented in docs/superpowers/specs/2026-05-08-royco-junior-tranches-design.md.
+# DOUBLE-COUNTING — SOLVED by per-position attribution (design A).
+# Maple_WithdrawalManager.userEscrowedShares is keyed on the caliber, not on
+# which position fed the queue, and accumulates per OWNER. So ONE pending
+# withdrawal used to be counted by EVERY position on that caliber reading this
+# manager — the ST tranche, and (on dusd) the syrupUSDC/RLUSD Morpho loop via
+# blueprints/morpho-loop/maple/account-equity.yaml. Simultaneity was not
+# required for the double count.
+#
+# This blueprint now books only its own prorated share, using the caliber's KV
+# store. The scheme, the `wT == sum(wP)` invariant and the per-withdrawal-manager
+# key namespacing are documented in
+# blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml; branch
+# coverage is in tests/test_maple_escrow_prorate.py. Because the LIVE aggregate
+# is the multiplicand, a stale weight misattributes between positions but cannot
+# inflate NAV, and settlement self-clears every term.
+# Design note: docs/superpowers/specs/2026-05-08-royco-junior-tranches-design.md.
 #
 # Components:
 #   1. Active JT position: JT.convertToAssets(jt_shares) -> (stAssets, jtAssets, nav)
 #      Both stAssets and jtAssets are in TRANCHE_UNIT = syrupUSDC (6 dec) and both are
 #      populated for JT (kernel distributes pro-rata claim across both accumulators).
-#   2. Pending Maple withdrawal: WithdrawalManager.userEscrowedShares(caliber)  (syrupUSDC, 6 dec)
+#   2. This position's share of the pending Maple withdrawal:
+#      mulDiv(WM.userEscrowedShares(caliber), KV[position_key], max(KV[total_key], 1))
+#      (syrupUSDC, 6 dec)
 #   3. total_syrup = stAssets + jtAssets + escrowed_syrup
 #   4. usdc_value = syrupUSDC.convertToExitAssets(total_syrup)
 
@@ -43,7 +55,15 @@ constants:
     type: "address"
     value: "0x1bc47a0Dd0FdaB96E9eF982fdf1F34DC6207cfE3"
 
-inputs: {}
+inputs:
+  # Per-position attribution of the caliber-wide Maple escrow (design A). See
+  # blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml.
+  kv_store_address:
+    type: "address"
+  maple_escrow_position_key:
+    type: "bytes32"
+  maple_escrow_total_key:
+    type: "bytes32"
 
 actions:
   account:
@@ -105,12 +125,59 @@ actions:
           name: "active_jt_assets"
           type: "uint256"
 
-      - description: "Get escrowed syrupUSDC shares from Maple WithdrawalManager"
+      - description: "Get escrowed syrupUSDC shares for the CALIBER (all positions)"
         target: "${constants.withdrawal_manager_address}"
         selector: "userEscrowedShares(address)"
         parameters:
           - type: "address"
             value: "${returns.caliber_address}"
+        return:
+          name: "escrowed_syrup_aggregate"
+          type: "uint256"
+
+      # ---- Take only THIS position's share of that aggregate ---------------
+      - description: "Read this position's escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+        return:
+          name: "escrow_position_weight"
+          type: "uint256"
+
+      - description: "Read the shared cumulative escrow total for this withdrawal manager"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+        return:
+          name: "escrow_total_weight"
+          type: "uint256"
+
+      - description: "Guard the denominator: mulDiv(x, 0, 0) reverts (Panic 0x12) and idle is the common state"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrow_total_weight}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "escrow_total_weight_safe"
+          type: "uint256"
+
+      - description: "This position's escrowed shares = mulDiv(aggregate, my weight, total weight)"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_syrup_aggregate}"
+          - type: "uint256"
+            value: "${returns.escrow_position_weight}"
+          - type: "uint256"
+            value: "${returns.escrow_total_weight_safe}"
         return:
           name: "escrowed_syrup"
           type: "uint256"

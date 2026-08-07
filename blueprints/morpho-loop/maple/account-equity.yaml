@@ -1,0 +1,461 @@
+protocol: "morpho"
+
+# ============================================================================
+# Maple-collateral Morpho loop — ACCOUNT (oracle equity + escrowed-redeem term)
+# ============================================================================
+# Identical to blueprints/morpho-loop/account.yaml:account_equity (oracle-based)
+# with ONE addition: the Maple escrowed-redemption term.
+#
+#   equity_loan = max(0, collateral * oracle.price()/1e36 - debt)
+#               + my_share_of_escrow * oracle.price()/1e36
+#   my_share_of_escrow = mulDiv(WM.userEscrowedShares(caliber),
+#                               KV[position_key], max(KV[total_key], 1))
+#
+# VALUE NEUTRALITY — both legs use the SAME market oracle and the market is accrued
+# at the top of this action, so moving X of collateral into Maple escrow changes the
+# position value by 0. That is a hard requirement, not a nicety:
+# withdraw_collateral_and_request_maple_redeem receives NO base tokens, so
+# _managePosition compares the position change against an affected-token change of 0
+# (Caliber.sol:711-715). Any nonzero decrease is an infinite relative loss and reverts
+# with MaxValueLossExceeded, regardless of maxPositionDecreaseLossBps. A change of
+# exactly 0 skips the check entirely.
+#
+# DECIMALS — the rescale is NOT optional. The equity leg is in LOAN TOKEN
+# decimals (Morpho scales its oracle by 1e36 * 10^loanDec / 10^collDec), while
+# convertToExitAssets returns the POOL ASSET's decimals. For syrupUSDC/RLUSD
+# that is 18 vs 6: adding them raw understates the escrow term by 1e12, which
+# silently defeats the whole point (see the slippage note below). Callers must
+# pass escrow_scale_mul/div. blueprints/morpho-loop/prime/account.yaml gets away
+# with no rescale ONLY because its loan token and pool asset are both 6-decimal.
+#
+# DOUBLE-COUNTING — SOLVED by per-position attribution (design A), no longer an
+# operating constraint. userEscrowedShares is keyed on the CALIBER and
+# accumulates per OWNER (`userEscrowedShares[owner] += shares`), so every
+# position on the caliber reading this manager used to book the FULL aggregate:
+# one pending redemption was already counted twice, simultaneity not required,
+# and a fully unwound loop still reported the sibling's escrow as its own value.
+#
+# The split now comes from the caliber's KV store — see
+# blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml for the
+# scheme, the `wT == sum(wP)` invariant and the key namespacing rules. Two
+# properties matter here:
+#   * the LIVE aggregate is the multiplicand, so the terms sum to it for ANY
+#     weights — a stale or wrong weight misattributes between positions but
+#     cannot inflate NAV;
+#   * settlement drives every term to 0 regardless of KV staleness, so the
+#     scheme is self-clearing where a stored escrow AMOUNT would not be.
+# Simultaneous redemptions across positions are now permitted. During the
+# window between settlement and reconcile, attribution is approximate while the
+# total stays exact. Branch-by-branch coverage:
+# tests/test_maple_escrow_prorate.py.
+#
+# WHY this exists instead of maple/account.yaml:account_loop_and_maple_withdrawal:
+#   That variant values the WHOLE collateral balance with convertToExitAssets,
+#   i.e. in the Maple pool's asset(). That is only correct when the pool asset
+#   IS the market's loan token — true for syrupUSDT/USDT, FALSE for
+#   syrupUSDC/RLUSD and syrupUSDC/PYUSD (pool asset is USDC). Using it there
+#   would silently bake a USDC=loan_token peg into the entire collateral leg.
+#   Here the collateral leg keeps the Morpho market oracle, and the ~1:1
+#   approximation is confined to the transient escrowed term — the same trade
+#   blueprints/morpho-loop/prime/account.yaml already makes for its wYLDS
+#   pending term.
+#
+# WHY the escrowed term is needed at all (not just for reporting):
+#   withdraw_collateral_and_request_maple_redeem pulls collateral out of Morpho
+#   and calls pool.requestRedeem, which ESCROWS the shares in the withdrawal
+#   manager. They are then neither Morpho collateral nor a loose caliber
+#   balance, so plain account_equity sees collateral fall toward zero. Makina
+#   runs pre- and post-management accounting with a slippage check, so without
+#   this term the redeem request itself would most likely revert.
+#
+# SELF-CANCELLING: the redeemed asset is USDC, a base token on the calibers
+# using this, so once the Maple cycle pays out it is picked up by the caliber's
+# native base-token accounting while userEscrowedShares drops to 0.
+# NOTE: Maple settles in CYCLES. Verify on a fork that userEscrowedShares zeroes
+# in the same tx the USDC lands — any lag is a NAV dip or a double-count window.
+#
+# Both reads are safe when nothing is pending: verified on mainnet 2026-08-04
+# userEscrowedShares -> 0 and convertToExitAssets(0) -> 0 (no revert), so this
+# runs clean on every accounting cycle whether or not a redeem is outstanding.
+# ============================================================================
+
+inputs:
+  morpho_address:
+    type: "address"
+  morpho_market_id:
+    type: "bytes32"
+  caliber_helper:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  oracle_address:
+    type: "address"
+  # Maple extension: escrowed-redemption term
+  maple_withdrawal_manager_address:
+    type: "address"
+  # No decimal-bridge inputs: the escrow term now uses the market oracle, whose price
+  # already carries the 1e36 * 10^loanDec / 10^collDec scaling. See the escrow leg below.
+  #
+  # Per-position attribution of the caliber-wide escrow (design A). See
+  # blueprints/morpho-loop/maple/withdraw-maple-redeem-attributed.yaml.
+  kv_store_address:
+    type: "address"
+  maple_escrow_position_key:
+    type: "bytes32"
+  maple_escrow_total_key:
+    type: "bytes32"
+
+actions:
+  account_equity_and_maple_withdrawal:
+    calls:
+      # Accrue the market BEFORE reading it. _managePosition accounts once before the
+      # management calls and once after, in the same block; Morpho.withdrawCollateral
+      # accrues interest in between, so without this the post-accounting sees a larger
+      # debt than the pre-accounting and the position "loses" that interest. On a
+      # zero-affected-token action any loss is an infinite relative loss, so even a
+      # few seconds of accrual reverted the redeem. Accruing here makes both readings
+      # see the same debt. Harmless (and slightly fresher) for standalone accounting.
+      - description: "Resolve market params for the accrual call"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      # The tuple must be rebuilt element by element: accrueInterest takes a STATIC
+      # tuple (5 inline words), whereas ${returns.market_params} is the raw returned
+      # bytes. Passing those directly misaligns the calldata and Morpho rejects it with
+      # "market not created". Same reconstruction as withdraw-maple-redeem-attributed.yaml.
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "mp_loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "mp_collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "mp_oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "mp_irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "mp_lltv"
+          type: "uint256"
+
+      - description: "Accrue interest so pre- and post-accounting read the same debt"
+        target: "${inputs.morpho_address}"
+        selector: "accrueInterest((address,address,address,address,uint256))"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.mp_loan_token}"
+              - type: "address"
+                value: "${returns.mp_collateral_token}"
+              - type: "address"
+                value: "${returns.mp_oracle}"
+              - type: "address"
+                value: "${returns.mp_irm}"
+              - type: "uint256"
+                value: "${returns.mp_lltv}"
+
+      - description: "Get our position data"
+        target: "${inputs.morpho_address}"
+        selector: "position(bytes32,address)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "position_data"
+          type: "(uint256,uint128,uint128)"
+
+      - description: "Extract collateral amount (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "collateral_amount"
+          type: "uint256"
+
+      - description: "Extract borrow shares (index 1)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint128,uint128)"
+            value: "${returns.position_data}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "borrow_shares"
+          type: "uint256"
+
+      - description: "Get market state"
+        target: "${inputs.morpho_address}"
+        selector: "market(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.morpho_market_id}"
+        return:
+          name: "market_data"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+
+      - description: "Extract total borrow shares (index 3)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "total_borrow_shares_raw"
+          type: "uint256"
+
+      - description: "Floor to 1 to avoid mulDiv division by zero when market has no borrows"
+        target: "${inputs.math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_borrow_shares_raw}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "total_borrow_shares"
+          type: "uint256"
+
+      - description: "Extract total borrow assets (index 2)"
+        target: "${inputs.caliber_helper}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128)"
+            value: "${returns.market_data}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "total_borrow_assets"
+          type: "uint256"
+
+      - description: "Calculate debt amount: borrow_shares * total_borrow_assets / total_borrow_shares"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.borrow_shares}"
+          - type: "uint256"
+            value: "${returns.total_borrow_assets}"
+          - type: "uint256"
+            value: "${returns.total_borrow_shares}"
+        return:
+          name: "debt_amount"
+          type: "uint256"
+
+      - description: "Get collateral/loan_token price from Morpho oracle (scaled by 1e36)"
+        target: "${inputs.oracle_address}"
+        selector: "price()"
+        parameters: []
+        return:
+          name: "oracle_price"
+          type: "uint256"
+
+      - description: "collateral_in_loan_token = collateral_amount * price / 1e36"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.collateral_amount}"
+          - type: "uint256"
+            value: "${returns.oracle_price}"
+          - type: "uint256"
+            value: "1000000000000000000000000000000000000"
+        return:
+          name: "collateral_in_loan_token"
+          type: "uint256"
+
+      - description: "Cap debt at collateral value to avoid underflow when underwater"
+        target: "${inputs.math_helper}"
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.debt_amount}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "capped_debt"
+          type: "uint256"
+
+      - description: "Equity = collateral_in_loan_token - capped_debt (saturates to 0 when underwater). sub(a, b) = b - a"
+        target: "${inputs.math_helper}"
+        selector: "sub(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.capped_debt}"
+          - type: "uint256"
+            value: "${returns.collateral_in_loan_token}"
+        return:
+          name: "equity_in_loan_token"
+          type: "uint256"
+
+      # ---- Maple escrowed-redemption term (the only delta vs account_equity) ----
+      - description: "Get Maple escrowed shares for the caliber (0 when no redeem is outstanding)"
+        target: "${inputs.maple_withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "escrowed_shares_aggregate"
+          type: "uint256"
+
+      # ---- Take only THIS position's share of the caliber-wide escrow -------
+      # userEscrowedShares is keyed on the caliber, so every position reading
+      # this manager would otherwise book the full aggregate. Prorate by the
+      # KV weights instead. Because the LIVE aggregate is the multiplicand, the
+      # terms across positions sum to it exactly (modulo floor rounding) for any
+      # weights — the weights are a split key and cannot move the total — and
+      # settlement drives every term to 0 however stale the KV is.
+      - description: "Read this position's escrow weight"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_position_key}"
+        return:
+          name: "escrow_position_weight"
+          type: "uint256"
+
+      - description: "Read the shared cumulative escrow total for this withdrawal manager"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.maple_escrow_total_key}"
+        return:
+          name: "escrow_total_weight"
+          type: "uint256"
+
+      - description: "Guard the denominator: mulDiv(x, 0, 0) reverts (Panic 0x12) and idle is the common state"
+        target: "${inputs.math_helper}"
+        selector: "max(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrow_total_weight}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "escrow_total_weight_safe"
+          type: "uint256"
+
+      - description: "This position's escrowed shares = mulDiv(aggregate, my weight, total weight)"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_shares_aggregate}"
+          - type: "uint256"
+            value: "${returns.escrow_position_weight}"
+          - type: "uint256"
+            value: "${returns.escrow_total_weight_safe}"
+        return:
+          name: "escrowed_shares_attributed"
+          type: "uint256"
+
+      # Escrowed shares are valued with the SAME Morpho market oracle as the
+      # collateral leg above, NOT with pool.convertToExitAssets. That is what makes
+      # withdraw-collateral-and-escrow value-NEUTRAL: the collateral leg loses
+      # mulDiv(a, price, 1e36) and this term gains exactly the same, so the position
+      # value is unchanged and _managePosition sees change == 0. Valuing the two legs
+      # with different sources (oracle vs convertToExitAssets) left a ~1.8bps basis,
+      # and since a zero-affected-token action makes any nonzero change an infinite
+      # relative loss, that basis alone reverted the redeem with MaxValueLossExceeded.
+      #
+      # It also removes the pool-asset -> loan-token decimal bridge: the Morpho oracle
+      # price is already scaled by 1e36 * 10^loanDec / 10^collDec, so no escrow_scale
+      # inputs are needed. Realized value is unaffected — settlement pays USDC at Maple
+      # NAV and that lands as a base token; the oracle only prices the transient
+      # escrowed period, consistently with how the same shares were priced as collateral.
+      - description: "Escrowed shares -> loan token via the market oracle (same formula as the collateral leg); 0 -> 0"
+        target: "${inputs.math_helper}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.escrowed_shares_attributed}"
+          - type: "uint256"
+            value: "${returns.oracle_price}"
+          - type: "uint256"
+            value: "1000000000000000000000000000000000000"
+        return:
+          name: "escrowed_in_loan_token"
+          type: "uint256"
+
+      - description: "equity_with_escrow = position equity + rescaled escrowed assets"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.equity_in_loan_token}"
+          - type: "uint256"
+            value: "${returns.escrowed_in_loan_token}"
+        return:
+          name: "equity_with_escrow"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.equity_with_escrow}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

@@ -1,25 +1,25 @@
-# - is_debt: false
-#   instruction_type: "MANAGEMENT"
-#   affected_tokens:
-#     - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
-#   instruction:
-#     label: "WETH"
-#     path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
-#     inputs:
-#       asset_address:
-#         type: "address"
-#         value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
-#       stake_token_address:
-#         type: "address"
-#         value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
-#       umbrella_batch_helper_address:
-#         type: "address"
-#         value: "${config.aave_umbrella_batch_helper}"
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.WETH}"
+  instruction:
+    label: "WETH"
+    path: "../../../blueprints/aave-umbrella/deposit.yaml:stake"
+    inputs:
+      asset_address:
+        type: "address"
+        value: "${token_list.mainnet.WETH}"
+      stake_token_address:
+        type: "address"
+        value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
+      umbrella_batch_helper_address:
+        type: "address"
+        value: "${config.aave_umbrella_batch_helper}"
 
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+    - "${token_list.mainnet.WETH}"
   instruction:
     label: "WETH"
     path: "../../../blueprints/aave-umbrella/account.yaml:account"
@@ -37,7 +37,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+    - "${token_list.mainnet.WETH}"
   instruction:
     label: "WETH"
     path: "../../../blueprints/aave-umbrella/withdraw.yaml:start_cooldown"
@@ -49,7 +49,7 @@
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
-    - "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+    - "${token_list.mainnet.WETH}"
   instruction:
     label: "WETH"
     path: "../../../blueprints/aave-umbrella/withdraw.yaml:claim_cooldown"
@@ -59,7 +59,7 @@
         value: "0xaAFD07D53A7365D3e9fb6F3a3B09EC19676B73Ce" # stkwaEthWETH
       asset_address:
         type: "address"
-        value: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2" # WETH
+        value: "${token_list.mainnet.WETH}"
       umbrella_batch_helper_address:
         type: "address"
         value: "${config.aave_umbrella_batch_helper}"

@@ -1,0 +1,74 @@
+# Fluid Lite USD Vault (fLiteUSD) — deposit USDC. Plain ERC-4626, so it uses the
+# generic fluid-lite blueprints, not the wsteth.yaml variant.
+# Accounting reads convertToAssets, which is pre-fee: the vault takes 5 bps on
+# exit, so the position reads ~0.05% above realisable proceeds.
+
+# Deposit
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "Fluid Lite USD"
+    path: "../../../blueprints/fluid-lite/deposit.yaml:deposit"
+    inputs:
+      fluid_vault_address:
+        type: "address"
+        value: "0x273DA948ACa9261043fbdb2a857BC255ECC29012"
+      asset_address:
+        type: "address"
+        value: "${token_list.mainnet.USDC}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Accounting
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "Fluid Lite USD"
+    path: "../../../blueprints/fluid-lite/account.yaml:account"
+    inputs:
+      fluid_vault_address:
+        type: "address"
+        value: "0x273DA948ACa9261043fbdb2a857BC255ECC29012"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Redeem (absolute share amount)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "Fluid Lite USD"
+    path: "../../../blueprints/fluid-lite/withdraw.yaml:redeem"
+    inputs:
+      fluid_vault_address:
+        type: "address"
+        value: "0x273DA948ACa9261043fbdb2a857BC255ECC29012"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+# Redeem Relative (bps of share balance)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "Fluid Lite USD"
+    path: "../../../blueprints/fluid-lite/withdraw.yaml:redeem_relative"
+    inputs:
+      fluid_vault_address:
+        type: "address"
+        value: "0x273DA948ACa9261043fbdb2a857BC255ECC29012"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

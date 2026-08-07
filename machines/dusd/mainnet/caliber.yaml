@@ -234,6 +234,22 @@ positions:
       label: "PRIME/PYUSD (0x41c4...a3fa)"
       market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
       loan_token: ${token_list.mainnet.PYUSD}
+  - id: "199708234830348815037617604080094469854"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x1e9d...fc64)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"
+      market_id: "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "210115366782586714314169264674817212217"
+    group_id: "0"
+    description: "Morpho USDT loan (market: 0x6acd...14ca)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"
+      market_id: "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
+      loan_token: ${token_list.mainnet.USDT}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"
@@ -338,19 +354,10 @@ positions:
       aave_pool_instance: "${config.aavev3_core_instance}"
 
   # ── AaveV4 Supply (Hub & Spoke, group_id: 2) ──────────────────────
-  # Aave V4 Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485; reserves are keyed
-  # by numeric reserve_id. No aToken is minted — the position is tracked in Spoke
-  # storage and accounted via getUserSuppliedAssets, hence no position_tokens.
-  #
-  # group_id 2 is dedicated to this exact Spoke address. It is the liquidation
-  # bucket for this Spoke: one health factor per user across all its reserves, and
-  # liquidationCall can cross any collateral reserve against any debt reserve.
-  # Supply-only today (no debt → nothing is liquidatable, so group 0 would also be
-  # valid), but pre-allocated to group 2 so that when a borrow is opened on this
-  # Spoke its collateral + debt already share a group. A different Spoke address
-  # must get its own group_id.
+  # No aToken is minted — accounted via getUserSuppliedAssets, hence no position_tokens.
+  # group_id 2 is the liquidation bucket for Spoke 0x94e7A5dC…c485 specifically; a
+  # different Spoke must get its own group_id.
   - id: "102356596921134877304003836794819117820"
-    # group_id 2 maps to Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485.
     group_id: "2"
     description: "AaveV4 Supply USDG"
     instructions: !include "../../../instructions/aavev4-supply.yaml"
@@ -360,7 +367,6 @@ positions:
       spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
       reserve_id: "11"
   - id: "64048496748963625189377001215830228790"
-    # group_id 2 maps to Spoke 0x94e7A5dCbE816e498b89aB752661904E2F56c485.
     group_id: "2"
     description: "AaveV4 Supply frxUSD"
     instructions: !include "../../../instructions/aavev4-supply.yaml"
@@ -376,6 +382,11 @@ positions:
     description: "Fluid GHO Vault position"
     instructions: !include "./instructions/fluid-gho.yaml"
     position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
+  - id: "280756842428125260997025717226665040346"
+    group_id: "0"
+    description: "Fluid Lite USD (deposit USDC)"
+    instructions: !include "../../../instructions/fluid-lite-usd.yaml"
+    position_tokens: ["0x273DA948ACa9261043fbdb2a857BC255ECC29012"]
 
   # ── Morpho Loops ─────────────────────────────────────────────────
   - id: "318274659201837465920183746592018374659"
@@ -390,34 +401,7 @@ positions:
     group_id: "0"
     description: "wsrUSD/USDT Morpho Loop"
     instructions: !include "./instructions/morpho-loop-wsrusd-usdt.yaml"
-  # ── PRIME leverage — DECOMPOSED base-token model ──────────────────
-  #
-  # PRIME is a registered caliber base token, so leverage is assembled from
-  # independently-accounted primitives instead of one monolithic loop position:
-  # a synthetic USDC->PRIME swap-in, an async PRIME->USDC redemption, and the
-  # generic Morpho collateral/debt primitives. Leverage is opened manually by the
-  # operator (no flashloans): swap-in -> add_collateral -> borrow -> swap -> repeat.
-  #
-  # GO-LIVE PREREQUISITE (one-time governance, outside these files):
-  #   1. OracleRegistry.setFeedRoute(PRIME, feed1 0xf17c0edc…, feed2 0x8fffffd4…) on
-  #      0xC388B72AB90Be82B230D919F9C05c87F9397f485 — ALREADY DONE: the 2-hop route is
-  #      registered and getPrice(PRIME,USDC) returns 1.050733. NOTE the registered
-  #      staleness threshold is 87000s while the PRIME/wYLDS feed heartbeat is ~86412s
-  #      (24.00h) — only ~10min of slack, so any delayed daily update makes the price
-  #      read revert. Risk manager should widen it before size goes on.
-  #   2. Caliber.addBaseToken(PRIME) — STILL OUTSTANDING. Must be sent from the dusd
-  #      Machine riskManagerTimelock 0x38542447c49D24e617fc06113295D7AaA3BEc4b6.
-  #      Until done, the PRIME-affected accounting reverts InvalidAffectedToken.
-  #
-  # swap-in / redemption are standalone base-token positions (like the reUSD
-  # synthetic swap) -> group_id "0". Their ids are documented keccak preimages,
-  # matching the re/midas convention. Collateral+debt of a Morpho market are a
-  # single liquidation set, so each market gets its own group_id; their ids come
-  # from pools_db, NOT keccak. group_id "3" is already taken by AaveV3 Horizon
-  # Supply, so PRIME/PYUSD (0x41c4…a3fa) uses "4" and the DISTINCT PRIME/AUSD
-  # market (0xf3cf…523b) uses "5". AUSD is already a registered dusd base token
-  # with a direct feed route (getFeedRoute(AUSD)=0xB003…D1FD "AUSD/USD"), so the
-  # debt leg needs no extra governance; PRIME's registration above covers collateral.
+  # ── RWAs ────────────────────────────────────────────
   - id: "88685588701895893924186462793094177949654118628018819322996153435220574076920" # keccak256("prime.swap-in")
     group_id: "0"
     description: "PRIME Swap In (USDC->PRIME synthetic, base-token)"
@@ -459,13 +443,8 @@ positions:
       market_id: "0xf3cf5009b8fc39f4a4be4e5203a4412513d11e8435ede04539bbd45ebec7523b"
       loan_token: ${token_list.mainnet.AUSD}
   # ── reUSD/AUSD Morpho market (0xd989…7cac) ────────────────────────
-  # Its own liquidation set -> group_id "6". reUSD collateral / AUSD debt, 91.5%
-  # LLTV, AdaptiveCurveIRM, oracle 0xa66a4f03fd8031973f8c7718904ce32385f54e70.
-  # NO governance prerequisite: both legs are already registered dusd base tokens
-  # (isBaseToken(reUSD)=isBaseToken(AUSD)=true) with live OracleRegistry routes
-  # (getPrice(reUSD,AUSD)=1.0913), so this pair goes live with the root update
-  # alone. reUSD collateral is funded by the existing Re Protocol synthetic swap
-  # position below (USDC -> reUSD via the ICL).
+  # Own liquidation set -> group_id "6". 91.5% LLTV. Collateral is funded by the
+  # Re Protocol synthetic swap position below (USDC -> reUSD via the ICL).
   - id: "328350624757279255217968622283478199222" # pools_db makina_id — market 0xd989…7cac reUSD collateral (lending)
     group_id: "6"
     description: "reUSD/AUSD Morpho Collateral (reUSD)"
@@ -502,16 +481,31 @@ positions:
       loan_token: ${token_list.mainnet.PYUSD}
       morpho_market_id: "0xc9629945524f3fde56c7e8854a6c3d48e76b9d97236abbe73c750fcc7aeb8501"
       oracle_address: "0xc8043d248551Ed19B33cbc89dCCd69148c827039"
+  # SHARED MAPLE ESCROW. WithdrawalManager.userEscrowedShares is keyed on the caliber,
+  # not the position, and the Royco JT syrupUSDC position below redeems through the same
+  # manager — so each books only its prorated share and neither double-counts NAV:
+  #   mulDiv(aggregate, KV[position_key], max(KV[total_key], 1))
+  # maple_escrow_total_key MUST be identical on every position redeeming through manager
+  # 0x1bc47a0D…cfE3; maple_escrow_position_key MUST be unique. A mismatched total key
+  # silently restores the full double count. The syrupUSDT loop is on a different manager
+  # (0x86eBDf90…eB8C) and must never share this total key. Concurrent pending redemptions
+  # are safe — the split is approximate until reconcile, the total stays exact.
   - id: "813730204756382920165748392016574839201"
     group_id: "0"
     description: "syrupUSDC/RLUSD Morpho Loop"
-    instructions: !include "../../../instructions/morpho-loop-swap.yaml"
+    instructions: !include "../../../instructions/morpho-loop-swap-maple.yaml"
     vars:
       label: "syrupUSDC/RLUSD Morpho Loop"
       collateral_token: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       loan_token: ${token_list.mainnet.RLUSD}
       morpho_market_id: "0xc0ae375fd761ff19b3f04de5534c0f1ec110f80e1c2ede27c42c1c43c3040394"
       oracle_address: "0xf766F4F1Bcb0CBBF4EEF5E26FF7c7f66a713c1B5"
+      maple_pool_address: "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC (pool == token)
+      maple_withdrawal_manager_address: "0x1bc47a0Dd0FdaB96E9eF982fdf1F34DC6207cfE3"
+      # keccak256("maple.mainnet.syrupusdc.escrow.morpho_loop_rlusd") — unique to this position
+      maple_escrow_position_key: "0x9f4ab16ad4a68f81d7d1de9e18ed36b4f81549e155d78736e322e200f0b5c563"
+      # keccak256("maple.mainnet.syrupusdc.escrow_total") — SHARED with the Royco JT position below
+      maple_escrow_total_key: "0xae849168e6d7749681faf272835a2e925066d5475dc8b36e32c1cb9f2f5e6160"
   - id: "912841315826493817206538461275893042156"
     group_id: "0"
     description: "sUSDe/USDtb Morpho Loop"
@@ -562,6 +556,12 @@ positions:
     position_tokens:
       - "0x80ac24aA929eaF5013f6436cdA2a7ba190f5Cc0b" # syrupUSDC
       - "0x5f340b400f892bbfded2e5c316369dcbf05c282a" # JT-syrupUSDC
+    vars:
+      # Same withdrawal manager as the syrupUSDC/RLUSD loop above — see the escrow note there.
+      # keccak256("maple.mainnet.syrupusdc.escrow.royco_jt") — unique to this position
+      maple_escrow_position_key: "0x7276e080a62efc9f57da5b928414fda8c105e83889c29b89e1b6735375aba616"
+      # keccak256("maple.mainnet.syrupusdc.escrow_total") — SHARED with the loop above
+      maple_escrow_total_key: "0xae849168e6d7749681faf272835a2e925066d5475dc8b36e32c1cb9f2f5e6160"
   # - id: "330570121219840820532089219331590988878"
   #   group_id: "0"
   #   description: "Royco Junior Tranche Pareto FalconX V2"
@@ -570,8 +570,7 @@ positions:
   #     - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # FalconX AA tranche
   #     - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC receipt
   #     - "0x8e0EC43e51B88AA2324102E1A3D667822bE51a6d" # JT-Pareto-FalconX
-  # JT on the Makina DMG machine: TRANCHE_UNIT is DMG MT (18 dec), valued via
-  # DMG_machine.convertToAssets -> USDC. Async withdraw (request-redeem + claim) like the ST sibling.
+  # TRANCHE_UNIT is DMG MT (18 dec), valued via DMG_machine.convertToAssets -> USDC.
   - id: "335772134702432832947493967330354731301"
     group_id: "0"
     description: "Royco Junior Tranche DMG (Makina DMG machine)"
@@ -590,11 +589,9 @@ positions:
       - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
 
   # ── Re Protocol (reUSD synthetic swap) ───────────────────────────
-  # Swap in  USDC -> reUSD via the ICL (synchronous mint, caliber is KYC-approved).
-  # Swap out reUSD -> sUSDe via the RedemptionGateway instant path (atomic, while
-  # the buffer has liquidity and the active payout token is sUSDe); else exit via
-  # swap_module since reUSD is a base token. reUSD is a BASE token (addBaseToken +
-  # reUSD/USD feed route); ACCOUNTING returns 0 and swaps use affected_tokens=[].
+  # In: USDC -> reUSD via the ICL (synchronous mint, caliber is KYC-approved). Out:
+  # reUSD -> sUSDe via the RedemptionGateway instant path while the buffer has liquidity,
+  # else via swap_module. reUSD is a base token, so accounting returns 0.
   - id: "24723774581854776292240868230282650037557364081183638342159551676750129660338" # keccak256("re.reusd.swap")
     group_id: "0"
     description: "Re Protocol reUSD Swap (synthetic)"
@@ -608,8 +605,6 @@ positions:
       instant_redemption_address: "0xa31deEbb3680A3007120e74bCbDf4df36F042A40"
 
   # ── 3Jane USD3 / sUSD3 (tranched credit money market, ERC4626) ───────
-  # USD3 (senior): deposit USDC->USD3, withdraw USD3->USDC. Synchronous ERC4626,
-  # position token valued in USDC via previewRedeem.
   - id: "252447803558201206481473565375486988428" # keccak256("3jane.usd3")
     group_id: "0"
     description: "3Jane USD3 (senior)"
@@ -619,8 +614,7 @@ positions:
       label: "USD3"
       asset_address: ${token_list.mainnet.USDC}
       vault_address: ${token_list.mainnet.USD3}
-  # sUSD3 (junior): USDC-denominated, routed USDC<->USD3<->sUSD3. Withdraw via
-  # cooldown (when active) then redeem. Position token valued in USDC via double previewRedeem.
+  # sUSD3 (junior): routed USDC<->USD3<->sUSD3; withdraw via cooldown then redeem.
   - id: "106840302463434922495902263364800865375" # keccak256("3jane.susd3")
     group_id: "0"
     description: "3Jane sUSD3 (junior)"
@@ -633,12 +627,8 @@ positions:
       vault_address: ${token_list.mainnet.sUSD3}
 
   # ── fxSAVE (f(x) Protocol fxUSD savings) ─────────────────────────
-  # Re-enabled on dusd with refreshed blueprints/fxsave/* (current f(x) contracts):
-  # deposit USDC -> fxSP -> fxSAVE directly; exit async (request_redeem -> claim) or
-  # instant (instant_withdraw, ~1% fee). Valued in (fxUSD, USDC) via the OracleRegistry.
-  # NOTE: this accounting reads raw fxSP.balanceOf(caliber). Do NOT also enable the
-  # convex-fx-fxsp stability-pool accounting on this caliber — it reads the same
-  # fxSP.balanceOf and the two would double-count any loose/cooldown fxSP.
+  # This accounting reads raw fxSP.balanceOf(caliber). Do NOT also enable the
+  # convex-fx-fxsp stability-pool accounting here — same read, double-counts fxSP.
   - id: "44945688424358326878175149972352928818"
     group_id: "0"
     description: "fxSAVE position"
@@ -662,3 +652,19 @@ positions:
       accounting_token: ${token_list.mainnet.USDC}
       redemption_request_id_key: ${keccak256("makina.mainnet.dmg.redemption_request_id")}
       pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmg.pending_redemption_share_amount")}
+
+  # ── Makina DMW Machine ────────────────────────────────────────────
+  - id: "114955068982582201733330879397746119865"
+    group_id: "0"
+    description: "Makina DMW Machine"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"] # DMW share token
+    vars:
+      label: "DMW"
+      machine_token: "0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"
+      machine: "0x2FEEf245d510A31B242705ff627447Aa9db661E3"
+      depositor: "0xce205b5430Cd4bB207C28A2f161e97142153F127"
+      redeemer: "0xCC0F0983A96Afe7e6Ae5195D5BF59a108adC9553"
+      accounting_token: ${token_list.mainnet.USDC}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dmw.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmw.pending_redemption_share_amount")}
