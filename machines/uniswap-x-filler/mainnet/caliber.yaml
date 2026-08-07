@@ -11,100 +11,124 @@ config:
   aavev3_core_instance:
     type: "address"
     value: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
-  usdc_address:
+  stable_address:
     type: "address"
     value: ${token_list.mainnet.USDC}
 
 positions:
+  # Canonical filler-governed parking — emits uniswapX/park_stable_in_aave/USDC.
+  # ONE position per profile, never per stock: parking is keyed by the stable label, so
+  # folding it into the per-stock template would emit 11 colliding keys.
+  #
+  # `label` MUST stay the bare stable symbol "USDC" — it is the last path segment the filler
+  # is configured against, so changing it silently unroutes parking.
+  #
+  # NOTE this position ADDS A LEAF and therefore changes this caliber's instruction root, so
+  # activating it requires a Safe-only setAllowedInstrRoot on the mainnet module
+  # 0xA032aFD7…0B09. The action/label renames in this release are root-neutral (TOML keys
+  # only), but the `usdc_amount` -> `stable_amount` slot rename is NOT: state[i] is
+  # keccak256(slot_name). Either way this release needs one activation.
+  - id: "0"
+    group_id: "0"
+    description: "Uniswap X filler — park idle USDC in Aave v3"
+    instructions: !include "../../../instructions-x/uniswap-x/park-aave.yaml"
+    vars:
+      label: "USDC"
+
+  # Aave liquidity sleeve, retained for OPERATOR use outside fills — supply and, crucially,
+  # withdraw, which has no canonical filler equivalent. The filler must never submit these
+  # automatically; its only parking path is position 0 above. The overlap between
+  # aavev3/add_collateral/USDC here and uniswapX/park_stable_in_aave/USDC is deliberate and
+  # mirrors the Morpho carve-out in ../robinhood/caliber.yaml.
   - id: "1"
     group_id: "0"
-    description: "Aave v3 USDC inventory"
+    description: "Aave v3 USDC inventory — operator liquidity sleeve"
     instructions: !include "./instructions/aave-usdc.yaml"
 
   - id: "2"
     group_id: "0"
     description: "Uniswap X NVDAx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "NVDAx"
-      xstock_token: ${token_list.mainnet.NVDAx}
+      stock_token: ${token_list.mainnet.NVDAx}
 
   - id: "3"
     group_id: "0"
     description: "Uniswap X GOOGLx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "GOOGLx"
-      xstock_token: ${token_list.mainnet.GOOGLx}
+      stock_token: ${token_list.mainnet.GOOGLx}
 
   - id: "4"
     group_id: "0"
     description: "Uniswap X SPCXx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "SPCXx"
-      xstock_token: ${token_list.mainnet.SPCXx}
+      stock_token: ${token_list.mainnet.SPCXx}
 
   - id: "5"
     group_id: "0"
     description: "Uniswap X HOODx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "HOODx"
-      xstock_token: ${token_list.mainnet.HOODx}
+      stock_token: ${token_list.mainnet.HOODx}
 
   - id: "6"
     group_id: "0"
     description: "Uniswap X INTCx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "INTCx"
-      xstock_token: ${token_list.mainnet.INTCx}
+      stock_token: ${token_list.mainnet.INTCx}
 
   - id: "7"
     group_id: "0"
     description: "Uniswap X COINx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "COINx"
-      xstock_token: ${token_list.mainnet.COINx}
+      stock_token: ${token_list.mainnet.COINx}
 
   - id: "8"
     group_id: "0"
     description: "Uniswap X AAPLx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "AAPLx"
-      xstock_token: ${token_list.mainnet.AAPLx}
+      stock_token: ${token_list.mainnet.AAPLx}
 
   - id: "9"
     group_id: "0"
     description: "Uniswap X TSLAx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "TSLAx"
-      xstock_token: ${token_list.mainnet.TSLAx}
+      stock_token: ${token_list.mainnet.TSLAx}
 
   - id: "10"
     group_id: "0"
     description: "Uniswap X AMZNx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "AMZNx"
-      xstock_token: ${token_list.mainnet.AMZNx}
+      stock_token: ${token_list.mainnet.AMZNx}
 
   - id: "11"
     group_id: "0"
     description: "Uniswap X NFLXx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "NFLXx"
-      xstock_token: ${token_list.mainnet.NFLXx}
+      stock_token: ${token_list.mainnet.NFLXx}
 
   - id: "12"
     group_id: "0"
     description: "Uniswap X MSTRx filler settlement"
-    instructions: !include "../../../instructions-x/uniswap-x.yaml"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-aave.yaml"
     vars:
       label: "MSTRx"
-      xstock_token: ${token_list.mainnet.MSTRx}
+      stock_token: ${token_list.mainnet.MSTRx}

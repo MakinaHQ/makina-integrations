@@ -1,0 +1,95 @@
+# Uniswap X direct-fill settlement for one tokenized equity, with a Morpho vault as the
+# stable-leg inventory buffer.
+#
+# The Morpho-buffered sibling of ./fills-aave.yaml, which buffers in Aave v3 instead. Same
+# three entries, same blueprint actions, with `buy_..._from_aave` swapped for
+# `buy_..._from_morpho_vault`. Keep the two diffable.
+#
+# Chain-generic: both legs of the pair arrive as position vars rather than token_list
+# references, so this works on chains that have no token_list entries yet (Robinhood Chain
+# has none — CHAIN_TO_CHAIN_ID in scripts/ has no 4663 entry either).
+#
+# Buffer semantics: the `from_morpho_vault` entry withdraws the EXACT order amount and
+# reverts if the vault cannot cover it — a fill needs the full amount, so a partial withdraw
+# would only push the same failure into reactor.execute(). Sizing an exit against actual
+# available liquidity is a separate, inventory-management concern, handled by the operator
+# sleeve (instructions-x/morpho-vault-v2.yaml — `withdraw_vault` for an explicit amount,
+# `emergency_redeem_vault_v2` for a lens-sized exit). This matters more on Morpho than it did
+# on Aave, because a Morpho VaultV2 returns 0 from every native ERC-4626 max* function, so
+# neither the filler nor the operator can size against native on-chain data without the lens.
+#
+# Selling is deliberately direct rather than sweeping proceeds back into the vault in the
+# same transaction, mirroring the Aave template: park proceeds with a separate deposit entry
+# once the fill has settled.
+#
+# Expected position vars:
+#   label:       string   e.g. "NVDA"
+#   stock_token: address  tokenized equity delivered by or received by the Safe
+#
+# Expected config:
+#   safe_address
+#   uniswap_x_reactor
+#   stable_address        — the stable leg orders settle in
+#   morpho_buffer_vault   — the ERC-4626 vault holding idle stable inventory.
+#                           Its asset() MUST be stable_address; one key each so the
+#                           settlement leg and the buffer cannot silently disagree.
+
+- name: uniswap_x_buy_stock_with_stable_direct
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${config.stable_address}
+    - ${position.stock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:buy_stock_with_stable_direct"
+    # Only the inputs this action references: it approves the stable leg to the Reactor and
+    # calls execute. The equity leg arrives from the Reactor, so it is never a call target here.
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      stable:
+        type: "address"
+        value: ${config.stable_address}
+
+- name: uniswap_x_buy_stock_with_stable_from_morpho
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${config.stable_address}
+    - ${position.stock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:buy_stock_with_stable_from_morpho_vault"
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      morpho_vault:
+        type: "address"
+        value: "${config.morpho_buffer_vault}"
+      stable:
+        type: "address"
+        value: ${config.stable_address}
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"
+
+- name: uniswap_x_sell_stock_for_stable_direct
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${config.stable_address}
+    - ${position.stock_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:sell_stock_for_stable_direct"
+    # Mirror image of the buy: approves the equity leg to the Reactor, stable arrives from it.
+    inputs:
+      reactor:
+        type: "address"
+        value: "${config.uniswap_x_reactor}"
+      stock_token:
+        type: "address"
+        value: ${position.stock_token}

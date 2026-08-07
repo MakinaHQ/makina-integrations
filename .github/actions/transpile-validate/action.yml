@@ -16,14 +16,14 @@ inputs:
   transpiler-version:
     description: Pinned MakinaHQ/transpiler release tag to download.
     required: false
-    default: v0.2.4
+    default: v0.2.7
   transpiler-sha256:
     description: >-
       Expected SHA256 of transpiler-x86_64-unknown-linux-gnu.tar.xz for
       transpiler-version. Pinned HERE, in this repo, on purpose — see the
       download step. Update both inputs together when bumping the transpiler.
     required: false
-    default: 9b42296ed74ec9a0830bd0e1f1724e730de30405ba7fae8f96b505bde2a76054
+    default: 9b6fb125510147875762031c236b0307655341e6a579c5ff6621f2ddd9af749e
 
 outputs:
   changed-calibers:

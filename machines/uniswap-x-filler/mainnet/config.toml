@@ -1,0 +1,18 @@
+# uniswap-x-filler on Ethereum mainnet. One MakinaLite module registration per network.
+#
+# A MakinaLite config holds a SINGLE chain (flat name/chain/address/rootfiles), so a
+# multi-chain filler needs one of these per network dir — see ../robinhood/config.toml. Both
+# sit inside their own network directory rather than one at the machine root, so nothing
+# chain-specific is implied by the machine root and no network is privileged.
+#
+# MOVED 2026-08-03 from machines/uniswap-x-filler/config.toml as part of that consolidation.
+# Operators must repoint their [makina_lite_modules] entry at this path.
+#
+# The operator registers each network as its own entry under [makina_lite_modules] in their
+# spellcaster config. The registry key is the identifier spellcaster uses; `name` below is
+# informational (validate_makina_lite_modules only checks a name is not in both [machines] and
+# [makina_lite_modules]), so both networks carry the machine name.
+name = "uniswap-x-filler"
+chain = "mainnet"
+address = "0xA032aFD73Fd42deb549698f5Ac93E8b373330B09"
+rootfiles = "github:MakinaHQ/config/machines/uniswap-x-filler/mainnet/rootfiles"

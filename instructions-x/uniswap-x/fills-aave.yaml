@@ -1,24 +1,29 @@
-# Uniswap X direct-fill settlement for one xStock token.
+# Uniswap X direct-fill settlement for one tokenized equity, buffering idle stable inventory
+# in Aave v3. The Morpho-buffered sibling is ./fills-morpho.yaml — keep the two diffable.
+#
+# This template pins the stable leg to config.stable_address, so it is USDC-specific in practice
+# even though the blueprint underneath is not. A chain settling in a different stable should
+# use a template that passes the stable as a position var, the way the Morpho sibling does.
 #
 # Expected position vars:
-#   label:        string   e.g. "NVDAx"
-#   xstock_token: address  xStock token delivered by or received by the Safe
+#   label:       string   e.g. "NVDAx"
+#   stock_token: address  tokenized equity delivered by or received by the Safe
 #
 # Expected config:
 #   safe_address
 #   uniswap_x_reactor
 #   aavev3_core_instance
-#   usdc_address
+#   stable_address
 
-- name: uniswap_x_buy_xstock_with_usdc_direct
+- name: uniswap_x_buy_stock_with_stable_direct
   is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
     - "${token_list.mainnet.USDC}"
-    - ${position.xstock_token}
+    - ${position.stock_token}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/uniswap-x/execute.yaml:buy_xstock_with_usdc_direct"
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:buy_stock_with_stable_direct"
     inputs:
       reactor:
         type: "address"
@@ -26,25 +31,25 @@
       aave_pool_instance:
         type: "address"
         value: "${config.aavev3_core_instance}"
-      usdc:
+      stable:
         type: "address"
-        value: "${config.usdc_address}"
+        value: "${config.stable_address}"
       safe_address:
         type: "address"
         value: "${config.safe_address}"
-      xstock_token:
+      stock_token:
         type: "address"
-        value: ${position.xstock_token}
+        value: ${position.stock_token}
 
-- name: uniswap_x_buy_xstock_with_usdc_from_aave
+- name: uniswap_x_buy_stock_with_stable_from_aave
   is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
     - "${token_list.mainnet.USDC}"
-    - ${position.xstock_token}
+    - ${position.stock_token}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/uniswap-x/execute.yaml:buy_xstock_with_usdc_from_aave"
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:buy_stock_with_stable_from_aave"
     inputs:
       reactor:
         type: "address"
@@ -52,25 +57,25 @@
       aave_pool_instance:
         type: "address"
         value: "${config.aavev3_core_instance}"
-      usdc:
+      stable:
         type: "address"
-        value: "${config.usdc_address}"
+        value: "${config.stable_address}"
       safe_address:
         type: "address"
         value: "${config.safe_address}"
-      xstock_token:
+      stock_token:
         type: "address"
-        value: ${position.xstock_token}
+        value: ${position.stock_token}
 
-- name: uniswap_x_sell_xstock_for_usdc_direct
+- name: uniswap_x_sell_stock_for_stable_direct
   is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
     - "${token_list.mainnet.USDC}"
-    - ${position.xstock_token}
+    - ${position.stock_token}
   instruction:
     label: ${position.label}
-    path: "../../../blueprints/uniswap-x/execute.yaml:sell_xstock_for_usdc_direct"
+    path: "../../../blueprints-x/uniswap-x/fill.yaml:sell_stock_for_stable_direct"
     inputs:
       reactor:
         type: "address"
@@ -78,12 +83,12 @@
       aave_pool_instance:
         type: "address"
         value: "${config.aavev3_core_instance}"
-      usdc:
+      stable:
         type: "address"
-        value: "${config.usdc_address}"
+        value: "${config.stable_address}"
       safe_address:
         type: "address"
         value: "${config.safe_address}"
-      xstock_token:
+      stock_token:
         type: "address"
-        value: ${position.xstock_token}
+        value: ${position.stock_token}

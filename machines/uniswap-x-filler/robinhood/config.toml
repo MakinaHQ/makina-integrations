@@ -1,0 +1,17 @@
+# uniswap-x-filler on Robinhood Chain (chainId 4663), running as a MakinaX Safe module.
+# One MakinaLite module registration per network — see ../mainnet/config.toml.
+#
+# The Safe is at the SAME address on both networks (0x81Aa9DA3…5C72, deterministic Safe
+# deploy) but it is a distinct Safe with its own state, and the module differs from mainnet's
+# 0xA032aFD7…0B09. That is exactly why each network carries its own `address` here.
+#
+# BLOCKED: spellcaster parses `chain` as alloy_chains::NamedChain, which derives a plain
+# string-variant Deserialize (no numeric fallback). alloy-chains has no variant for Robinhood
+# Chain mainnet (4663) as of 0.2.34 — only `robinhood-testnet` (46630). This file cannot load
+# until alloy-chains ships 4663 and makina-rs bumps to it; the engine owner owns that
+# dependency. Nothing in CI reads it: the transpiler takes only caliber.yaml + the token list,
+# and both on-chain validators bail on makina_lite_module calibers before reading config.toml.
+name = "uniswap-x-filler"
+chain = "robinhood"
+address = "0xceD40B1f1A9A9B18B5C5618291eC65ad9B98a6c7"
+rootfiles = "github:MakinaHQ/config/machines/uniswap-x-filler/robinhood/rootfiles"

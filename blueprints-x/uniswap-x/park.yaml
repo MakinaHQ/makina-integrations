@@ -1,0 +1,96 @@
+# makina-x Uniswap X filler — park idle Safe stable into the profile's liquidity source, so
+# inventory earns between fills. The inverse of ./fill.yaml's `_from_<source>` buy legs.
+# Management-only, no ACCOUNTING.
+#
+# Governed by the Uniswap-X Filler <-> Machine Contract (normative). Both files declare
+# protocol "uniswapX" so they share one rootfile namespace; splitting fill from park changes
+# no generated path.
+#
+# WHY THESE ARE NOT THE PROTOCOL BLUEPRINTS' DEPOSITS: the rootfile path's first segment is
+# this file's `protocol:` field, and the contract pins parking to
+# `uniswapX/park_stable_in_<source>/{stable_label}`. There is no blueprint-to-blueprint
+# delegation in the transpiler — an action compiles only from the calls written in its own
+# file — so the call pairs are inlined here. They are the same two calls
+# ../../blueprints/aave/deposit.yaml:add_collateral and
+# ../morpho-vault/deposit.yaml:deposit_vault make; keep them in sync if those change.
+#
+# THE OPERATOR SLEEVE IS NOT REDUNDANT WITH THIS. These actions only SUPPLY. Every unwind
+# path — Aave withdraw_collateral, Morpho withdraw_vault / redeem_vault* /
+# emergency_redeem_vault_v2 — exists only in the generic protocol namespace, so a caliber
+# keeps its generic sleeve position alongside canonical parking. The duplicate supply path is
+# the accepted cost. The filler must never submit sleeve paths automatically.
+#
+# SLOT ABI (contract section 3): exactly ONE slot, `stable_amount` at index 0 — no order, no
+# signature, since parking is not a settlement. Slot indices come from the DECLARATION ORDER
+# of `input_slots:`, not order of use, so do not reorder these blocks.
+#
+# ONE POSITION PER PROFILE. Parking is keyed by the stable label while fills are keyed by the
+# stock label, so including a parking template once per stock would emit N colliding
+# `uniswapX/park_stable_in_<source>/{stable_label}` keys.
+#
+# The Safe is both payer and beneficiary: aTokens / ERC-4626 shares are minted to
+# safe_address.
+protocol: "uniswapX"
+
+inputs:
+  aave_pool_instance:
+    type: "address"
+  morpho_vault:
+    type: "address"
+  stable:
+    type: "address"
+  safe_address:
+    type: "address"
+
+actions:
+  park_stable_in_aave:
+    calls:
+      - description: "Approve the Aave pool to spend the stable leg"
+        target: "${inputs.stable}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.aave_pool_instance}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+
+      - description: "Supply the stable leg to Aave on behalf of the Safe"
+        target: "${inputs.aave_pool_instance}"
+        selector: "supply(address,uint256,address,uint16)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stable}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+          - type: "address"
+            value: "${inputs.safe_address}"
+          - type: "uint256"
+            value: "0"
+    input_slots:
+      stable_amount:
+        type: "uint256"
+        description: "Exact stable amount to park in Aave"
+
+  park_stable_in_morpho_vault:
+    calls:
+      - description: "Approve the Morpho vault to spend the stable leg"
+        target: "${inputs.stable}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_vault}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+
+      - description: "Deposit the stable leg into the Morpho vault (shares minted to the Safe)"
+        target: "${inputs.morpho_vault}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+          - type: "address"
+            value: "${inputs.safe_address}"
+    input_slots:
+      stable_amount:
+        type: "uint256"
+        description: "Exact stable amount to park in the Morpho vault"

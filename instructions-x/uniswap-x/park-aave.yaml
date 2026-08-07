@@ -1,0 +1,44 @@
+# Uniswap X filler — park idle stable inventory in Aave v3.
+#
+# Canonical parking action for an `aave_v3` filler profile. Emits exactly
+#   uniswapX/park_stable_in_aave/{stable_label}
+#
+# ONE POSITION PER PROFILE, NOT PER STOCK. Parking is keyed by the stable label while fills
+# are keyed by the stock label, so including this from a per-stock template would emit N
+# identical `uniswapX/park_stable_in_aave/{stable_label}` keys and collide. Include it exactly
+# once, from its own position, with label set to the bare stable symbol.
+#
+# The Morpho-profile counterpart is ./park-morpho.yaml — keep the two diffable.
+#
+# This is the filler-governed parking path, and it supersedes the legacy
+# `aavev3/add_collateral/{label}` supply entry for filler use. A caliber may still carry the
+# generic Aave position for operator recovery (notably withdraw_collateral, which has no
+# canonical filler equivalent), but the filler must never submit those automatically.
+#
+# Expected position vars:
+#   label: string  — the bare stable symbol, e.g. "USDC". MUST equal the filler profile's
+#                    configured stable_label exactly; it is the last path segment.
+#
+# Expected config:
+#   safe_address
+#   stable_address         — the stable being parked
+#   aavev3_core_instance   — the Aave v3 Pool
+
+- name: uniswap_x_park_stable_in_aave
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${config.stable_address}"
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints-x/uniswap-x/park.yaml:park_stable_in_aave"
+    inputs:
+      aave_pool_instance:
+        type: "address"
+        value: "${config.aavev3_core_instance}"
+      stable:
+        type: "address"
+        value: "${config.stable_address}"
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"

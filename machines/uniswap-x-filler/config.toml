@@ -1,4 +1,59 @@
+# uniswap-x-filler — machine manifest.
+#
+# WHAT THIS IS: a discovery manifest. It enumerates the chains this fund runs on, where each
+# chain's rootfiles live, and the filler profile each chain serves. The Uniswap-X filler
+# backend points at this ONE file instead of being told about each chain out of band.
+#
+# WHAT THIS IS NOT: a spellcaster config. Spellcaster's MakinaLiteConfig is flat and
+# single-chain (name/chain/address/rootfiles), so it reads the per-network files at
+# ./<chain>/config.toml. This manifest is additive and does not replace them.
+#
+# CONVERGENCE: this is deliberately the shape proposed to spellcaster for multi-chain
+# MakinaLite support. Once makina-rs can parse `[modules.<chain>]`, this file becomes the
+# spellcaster config too and the per-network ./<chain>/config.toml files are deleted.
+#
+# DESIGN RULES, enforced by tests/test_machine_manifest.py:
+#
+#  * No top-level `chain` / `address`. A full Makina machine has them because a Machine has a
+#    hub chain and a hub contract. A makina-x fund has neither — every chain is an independent,
+#    co-equal deployment. (machines/chronograph-x/config.toml puts its mainnet config at the
+#    machine root, which makes the tree root look like it describes the machine when it
+#    describes one chain. Deliberately not copied.)
+#
+#  * No `safe` key. The Safe is read from the module: MakinaXModule.safe() is authoritative.
+#    Declaring it here would create a second source of truth that can drift from what the
+#    module actually drives. Note both chains' Safes currently share an address
+#    (0x81Aa9DA3…5C72, deterministic Safe deploy) yet are independent contracts with different
+#    nonces and different enabled modules — so a machine-level Safe would encode a CREATE2
+#    coincidence as if it were semantics.
+#
+#  * Nothing inherits. A per-chain block is a deployment manifest, and deployment manifests
+#    should not inherit addresses: add a chain, forget an override, and you silently inherit an
+#    address that may be an unrelated contract there. `name` carries the fund's identity;
+#    everything else is per-deployment and stated in full.
+#
+#  * Each table key is the network DIRECTORY name (./<key>/caliber.yaml must exist), and
+#    `chain_id` is the authoritative numeric id. Two reasons for carrying the id explicitly:
+#    it does not depend on anyone's chain-name registry, and it sidesteps spellcaster's
+#    NamedChain problem (alloy-chains 0.2.34 has no variant for 4663, so `chain = "robinhood"`
+#    cannot be parsed there, but 4663 can).
 name = "uniswap-x-filler"
-chain = "mainnet"
+kind = "makina-x"
+
+# Aave-buffered USDC profile.
+[modules.mainnet]
+chain_id = 1
 address = "0xA032aFD73Fd42deb549698f5Ac93E8b373330B09"
 rootfiles = "github:MakinaHQ/config/machines/uniswap-x-filler/mainnet/rootfiles"
+liquidity_source = "aave_v3"
+stable_label = "USDC"
+
+# Morpho-buffered USDG profile. Robinhood Chain is an Arbitrum Orbit chain; the UniswapX
+# reactor there is a V3 DutchOrderReactor, so order construction must emit V3 orders and decay
+# ticks on ArbSys.arbBlockNumber(). See blueprints-x/uniswap-x/README.md.
+[modules.robinhood]
+chain_id = 4663
+address = "0xceD40B1f1A9A9B18B5C5618291eC65ad9B98a6c7"
+rootfiles = "github:MakinaHQ/config/machines/uniswap-x-filler/robinhood/rootfiles"
+liquidity_source = "morpho_vault_v2"
+stable_label = "USDG"

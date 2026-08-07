@@ -35,6 +35,7 @@ CHAIN_TO_CHAIN_ID: dict[str, int] = {
     "base": 8453,
     "arbitrum": 42161,
     "monad": 143,
+    "robinhood": 4663,
 }
 
 

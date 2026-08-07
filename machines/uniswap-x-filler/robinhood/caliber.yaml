@@ -1,0 +1,188 @@
+# uniswap-x-filler / robinhood — Uniswap X filler on Robinhood Chain (chainId 4663), running as
+# a MakinaX module on a Safe. Management-only throughout: makina-x positions are held by the
+# Safe and are not NAV-accounted on-chain, so no position carries an ACCOUNTING entry.
+#
+# Mirrors uniswap-x-filler/mainnet, with two substitutions:
+#   - the stable leg is USDG (6 dec) rather than USDC
+#   - idle inventory is buffered in a Morpho ERC-4626 vault rather than Aave v3
+#
+# All addresses verified on-chain 2026-07-31 against https://rpc.mainnet.chain.robinhood.com.
+config:
+  # Safe v1.4.1, 2 owners, threshold 1. Same address as uniswap-x-filler/mainnet — Safe
+  # deploys deterministically — but a distinct Safe with its own state and its own module.
+  safe_address:
+    type: "address"
+    value: "0x81Aa9DA3b68ef186E34e96FB6Ae9ad16D7715C72"
+  # MakinaX module, the sole module enabled on the Safe. Unlike the Safe this is NOT the
+  # mainnet address (mainnet: 0xA032aFD73Fd42deb549698f5Ac93E8b373330B09).
+  # safe() -> the Safe above; registry() -> 0xb1ADb63B4ef72f6776d0e0C48A49813900C7bc4d.
+  makina_lite_module:
+    type: "address"
+    value: "0xceD40B1f1A9A9B18B5C5618291eC65ad9B98a6c7"
+  # UniswapX V3DutchOrderReactor, deployed 2026-06-12 via the canonical Arachnid CREATE2
+  # factory. permit2() -> 0x0000...78BA3 (canonical), owner() -> 0x2BAD8182...Be46CD, both
+  # matching Uniswap's published deployment record.
+  #
+  # NOTE this is a V3 reactor, whereas uniswap-x-filler/mainnet fills against a V2 reactor
+  # (0x00000011f84b9aa48e5f8aa8b9897600006289be). execute((bytes,bytes)) is identical across
+  # both, so the blueprint is unchanged — but the off-chain order construction must emit V3
+  # Dutch orders here. Robinhood is an Arbitrum Orbit chain, so V3 decay ticks on
+  # ArbSys.arbBlockNumber() rather than L1 block height.
+  uniswap_x_reactor:
+    type: "address"
+    value: "0x000000007A1C8e570011EeDF86A2A35593013cBA"
+  # The stable leg, on both sides of this caliber: what the buffer holds AND what Uniswap X
+  # orders settle in, so inventory moves between vault and Reactor without touching a second
+  # stable. Single key on purpose — it was previously repeated per position, which let the
+  # settlement leg drift from the buffer's actual asset.
+  # USDG "Global Dollar", 6 dec.
+  stable_address:
+    type: "address"
+    value: "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168"
+  # Morpho "Steakhouse USDG" VaultV2 — the idle-USDG buffer the filler draws settlement from.
+  # Consumed by the Uniswap X settlement entry; position 1 below manages the same vault via
+  # the shared instructions-x/morpho-vault-v2.yaml template, which takes it as a position var.
+  # INVARIANT: its asset() must equal stable_address above (verified on-chain 2026-07-31), and
+  # position 1's vault_address var must equal this key.
+  morpho_buffer_vault:
+    type: "address"
+    value: "0xBeEff033F34C046626B8D0A041844C5d1A5409dd"
+  # Weiroll helpers, deployed on Robinhood 2026-07-31. Both stateless and pure; fund-wide, so
+  # they belong in config per CLAUDE.md. Both are required by instructions-x/morpho-vault-v2.yaml.
+  # MathHelper (redeem_vault_relative) — verified live: mulDiv(100,50,10)=500, min(7,9)=7,
+  # sub(9,7)=2 (normal order).
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0xA12712F095840cAf6127E466D7AF7FB83479AABa"
+  # Morpho VaultV2 liquidity lens (emergency_redeem_vault_v2). Required because a VaultV2
+  # returns 0 from every native ERC-4626 max* function, so nothing else reports how much can
+  # actually be withdrawn. Verified live: availableLiquidity(steakUSDG) = 31,364,991.03 USDG,
+  # reconciling exactly against idle balance + adapterLiquidity.
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0xC276E5617Ca001BaA9b2099b9D24302292A3b8E5"
+
+positions:
+  # Canonical filler-governed parking — emits uniswapX/park_stable_in_morpho_vault/USDG.
+  # ONE position per profile, never per stock: parking is keyed by the stable label, so
+  # folding it into the per-stock template would emit 10 colliding keys.
+  #
+  # `label` MUST stay the bare stable symbol "USDG" — it is the last path segment the filler
+  # is configured against, so changing it silently unroutes parking.
+  #
+  # This is the only parking path the filler may submit. Position 1's morpho.deposit_vault is
+  # the same economic action but is operator-recovery only.
+  - id: "0"
+    group_id: "0"
+    description: "Uniswap X filler — park idle USDG in the Morpho steakUSDG vault"
+    instructions: !include "../../../instructions-x/uniswap-x/park-morpho.yaml"
+    vars:
+      label: "USDG"
+
+  # Idle-USDG inventory buffer. Reuses the shared, production-proven VaultV2 template
+  # (chronograph-x/mainnet runs the same one) rather than a bespoke instruction file — it
+  # already provides deposit, exact-amount withdraw_vault, redeem_vault, a bps-relative
+  # redeem, and the lens-sized emergency_redeem_vault_v2 for when a plain redeem would exceed
+  # instantly-available liquidity. Nothing Robinhood-specific is needed on top.
+  #
+  # Vault version V2 (MORPHO() reverts, firstTotalAssets() returns), verified 2026-07-31.
+  # Gates receiveShares/sendShares/receiveAssets/sendAssets all 0x0 -> permissionless.
+  # Shares are 18-dec; the underlying USDG is 6-dec.
+  - id: "1"
+    group_id: "0"
+    description: "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+    instructions: !include "../../../instructions-x/morpho-vault-v2.yaml"
+    position_tokens: ["0xBeEff033F34C046626B8D0A041844C5d1A5409dd"]
+    vars:
+      label: "USDG - steakUSDG"
+      vault_address: "0xBeEff033F34C046626B8D0A041844C5d1A5409dd"
+      asset_address: "${token_list.robinhood.USDG}"
+
+  # Uniswap X filler settlement, one position per tokenized equity. Mirrors the mainnet set;
+  # HOODx has no Robinhood Chain counterpart, so the mainnet 11 map to 10 here.
+  #
+  # Every equity below was verified to have bytecode IDENTICAL to the canonical
+  # "• Robinhood Token" implementation (codehash
+  # 0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630), all 18 dec. That
+  # check matters: a second contract also answers symbol() "INTC" with name
+  # "Intel • Robinhood Token" at 0x751a08f6400814E764FB4F4bA754dF91955A1466, with different
+  # bytecode and a round 1e27 supply. It is a counterfeit and is deliberately NOT used.
+  - id: "2"
+    group_id: "0"
+    description: "Uniswap X NVDA filler settlement"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+    vars:
+      label: "NVDA"
+      stock_token: "${token_list.robinhood.NVDA}"
+
+  # - id: "3"
+  #   group_id: "0"
+  #   description: "Uniswap X GOOGL filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "GOOGL"
+  #     stock_token: "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+
+  # - id: "4"
+  #   group_id: "0"
+  #   description: "Uniswap X SPCX filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "SPCX"
+  #     stock_token: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+
+  # - id: "5"
+  #   group_id: "0"
+  #   description: "Uniswap X INTC filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "INTC"
+  #     stock_token: "0xc72b96e0E48ecd4DC75E1e45396e26300BC39681"
+
+  # - id: "6"
+  #   group_id: "0"
+  #   description: "Uniswap X COIN filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "COIN"
+  #     stock_token: "0x6330D8C3178a418788dF01a47479c0ce7CCF450b"
+
+  # - id: "7"
+  #   group_id: "0"
+  #   description: "Uniswap X AAPL filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "AAPL"
+  #     stock_token: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
+
+  # - id: "8"
+  #   group_id: "0"
+  #   description: "Uniswap X TSLA filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "TSLA"
+  #     stock_token: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+
+  # - id: "9"
+  #   group_id: "0"
+  #   description: "Uniswap X AMZN filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "AMZN"
+  #     stock_token: "0x12f190a9F9d7D37a250758b26824B97CE941bF54"
+
+  # - id: "10"
+  #   group_id: "0"
+  #   description: "Uniswap X NFLX filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "NFLX"
+  #     stock_token: "0xE0444EF8BF4eD74f74FD73686e2ddF4C1c5591E8"
+
+  # - id: "11"
+  #   group_id: "0"
+  #   description: "Uniswap X MSTR filler settlement"
+  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+  #   vars:
+  #     label: "MSTR"
+  #     stock_token: "0xec262a75e413fAfD0dF80480274532C79D42da09"

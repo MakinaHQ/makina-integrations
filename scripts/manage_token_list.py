@@ -29,6 +29,7 @@ CHAIN_TO_CHAIN_ID: dict[str, int] = {
     "arbitrum": 42161,
     "monad": 143,
     "hyperevm": 998,
+    "robinhood": 4663,
 }
 
 # Fallback public RPCs — overridden by RPC_<CHAIN> env vars (set in .claude/settings.local.json)
@@ -38,6 +39,7 @@ _FALLBACK_RPC: dict[str, str] = {
     "arbitrum": "https://arb1.arbitrum.io/rpc",
     "monad": "https://rpc.monad.xyz",
     "hyperevm": "https://rpc.hyperliquid.xyz/evm",
+    "robinhood": "https://rpc.mainnet.chain.robinhood.com",
 }
 
 

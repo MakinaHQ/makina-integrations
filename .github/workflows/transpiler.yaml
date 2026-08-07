@@ -43,6 +43,30 @@ jobs:
       - name: Test affected-caliber scoping
         run: uv run python -m unittest tests.test_compute_affected_calibers
 
+      # Also unconditional, and for the same reason: these guard invariants that
+      # nothing else in CI would notice.
+      #
+      #   test_uniswap_x_filler_contract — the Uniswap-X filler's runtime ABI.
+      #     Slot indices come from the DECLARATION ORDER of a blueprint's
+      #     `input_slots:` block, so an innocuous-looking reorder silently breaks
+      #     every filler on the chain while still transpiling cleanly. Also pins
+      #     canonical action names and that parking appears once per caliber
+      #     (it is keyed by stable label, so once per stock would collide).
+      #
+      #   test_machine_manifest — machine manifests restate addresses that live in
+      #     the calibers they point at. Nothing else compares the two: the
+      #     transpiler never reads config.toml, and both on-chain validators bail
+      #     on makina_lite_module calibers before reaching it.
+      #
+      # Both are pure-source: no RPC, no secrets, no transpiler. They must not be
+      # gated on the affected set — a manifest can drift from a caliber that this
+      # PR did not touch.
+      - name: Test filler contract and machine manifests
+        run: |
+          uv run --with pyyaml python -m unittest \
+            tests.test_uniswap_x_filler_contract \
+            tests.test_machine_manifest
+
       - name: Compute affected calibers
         id: affected
         env:

@@ -1,0 +1,45 @@
+# Uniswap X filler — park idle stable inventory in a Morpho ERC-4626 vault.
+#
+# Canonical parking action for a `morpho_vault_v2` filler profile. Emits exactly
+#   uniswapX/park_stable_in_morpho_vault/{stable_label}
+#
+# ONE POSITION PER PROFILE, NOT PER STOCK. Parking is keyed by the stable label while fills
+# are keyed by the stock label, so including this from a per-stock template would emit N
+# identical `uniswapX/park_stable_in_morpho_vault/{stable_label}` keys and collide. Include it
+# exactly once, from its own position, with label set to the bare stable symbol.
+#
+# The Aave-profile counterpart is ./park-aave.yaml — keep the two diffable.
+#
+# This is the filler-governed parking path. A caliber may ALSO carry the generic Morpho
+# management position (../morpho-vault-v2.yaml, which emits morpho.deposit_vault,
+# morpho.withdraw_vault, morpho.redeem_vault*, morpho.emergency_redeem_vault_v2) for operator
+# recovery — but the filler must never submit those automatically. Only this path is
+# filler-governed.
+#
+# Expected position vars:
+#   label: string  — the bare stable symbol, e.g. "USDG". MUST equal the filler profile's
+#                    configured stable_label exactly; it is the last path segment.
+#
+# Expected config:
+#   safe_address
+#   stable_address        — the stable being parked
+#   morpho_buffer_vault   — the ERC-4626 vault. Its asset() MUST equal stable_address.
+
+- name: uniswap_x_park_stable_in_morpho_vault
+  is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${config.stable_address}"
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints-x/uniswap-x/park.yaml:park_stable_in_morpho_vault"
+    inputs:
+      morpho_vault:
+        type: "address"
+        value: "${config.morpho_buffer_vault}"
+      stable:
+        type: "address"
+        value: "${config.stable_address}"
+      safe_address:
+        type: "address"
+        value: "${config.safe_address}"

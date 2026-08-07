@@ -1,0 +1,207 @@
+# makina-x Uniswap X direct-fill settlement. Management-only, no ACCOUNTING — makina-x
+# positions are held by the Safe and are not NAV-accounted on-chain.
+#
+# Governed by the Uniswap-X Filler <-> Machine Contract (normative). The parking half lives
+# in ./park.yaml; both files declare protocol "uniswapX" so they share one rootfile
+# namespace, and splitting them changes no generated path.
+#
+# NAMING: every action is `<side>_stock_<with|for>_stable[_from_<source>]`. `stable` and
+# `stock_token` name the two LEGS of a fill, never specific tokens — `stable` is whatever
+# stablecoin the order settles in and `stock_token` is the tokenized-equity leg. Today those
+# are USDC + an xStock on mainnet and USDG + a "• Robinhood Token" equity on Robinhood Chain;
+# neither is baked in, so a new chain or a new stable needs no change here.
+#
+# The `_from_<source>` suffix names where the stable leg is sourced, and is the axis this
+# file grows along: one buy action per liquidity source, sharing the same settlement tail.
+#   (no suffix)         — already sitting in the Safe's balance
+#   _from_aave          — Aave v3 supply
+#   _from_morpho_vault  — Morpho ERC-4626 vault
+# Selling is source-independent, so there is exactly one sell action for every source.
+#
+# Every `_from_` variant pulls the EXACT order amount and reverts if the source cannot cover
+# it. That is deliberate: a fill needs the full amount, so a partial withdraw would only push
+# the same failure into reactor.execute() with a worse error. Sizing an exit against actual
+# available liquidity is an inventory-management concern, not a settlement one — see
+# ../../instructions-x/morpho-vault-v2.yaml for the operator sleeve.
+#
+# SLOT ABI (contract section 3): exactly three slots, `order`, `signature`, then the amount.
+# Slot indices come from the DECLARATION ORDER of each `input_slots:` block, NOT order of use
+# — `stable_amount` is consumed by the first call of the `_from_` variants yet must remain
+# declared third. Do not reorder these blocks; tests/test_uniswap_x_filler_contract.py exists
+# to catch exactly that.
+#
+# The external Reactor call must remain a normal Weiroll CALL so the Reactor sees the Safe as
+# msg.sender.
+#
+# ROOT IMPACT OF RENAMES — not uniform, see ./README.md for the verified table:
+#   action name  -> TOML key only            -> root UNCHANGED
+#   label        -> TOML key only            -> root UNCHANGED
+#   input_slots  -> state[i] = keccak(name)  -> root CHANGES, needs setAllowedInstrRoot
+# Callers must be updated in lockstep either way, since the action name is how an instruction
+# selects one.
+protocol: "uniswapX"
+
+inputs:
+  reactor:
+    type: "address"
+  aave_pool_instance:
+    type: "address"
+  morpho_vault:
+    type: "address"
+  stable:
+    type: "address"
+  safe_address:
+    type: "address"
+  stock_token:
+    type: "address"
+
+actions:
+  buy_stock_with_stable_direct:
+    calls:
+      - description: "Approve the Reactor to pull the stable leg from the Safe"
+        target: "${inputs.stable}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.reactor}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+
+      - description: "Execute Uniswap X order"
+        target: "${inputs.reactor}"
+        selector: "execute((bytes,bytes))"
+        parameters:
+          - type: "(bytes,bytes)"
+            value:
+              - type: "bytes"
+                value: "${input_slots.order}"
+              - type: "bytes"
+                value: "${input_slots.signature}"
+    input_slots:
+      order:
+        type: "bytes"
+        description: "Encoded Uniswap X order bytes"
+      signature:
+        type: "bytes"
+        description: "Uniswap X order signature bytes"
+      stable_amount:
+        type: "uint256"
+        description: "Stable amount approved for the Reactor"
+
+  buy_stock_with_stable_from_aave:
+    calls:
+      - description: "Withdraw the stable leg from Aave to the Safe"
+        target: "${inputs.aave_pool_instance}"
+        selector: "withdraw(address,uint256,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.stable}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+          - type: "address"
+            value: "${inputs.safe_address}"
+
+      - description: "Approve the Reactor to pull the stable leg from the Safe"
+        target: "${inputs.stable}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.reactor}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+
+      - description: "Execute Uniswap X order"
+        target: "${inputs.reactor}"
+        selector: "execute((bytes,bytes))"
+        parameters:
+          - type: "(bytes,bytes)"
+            value:
+              - type: "bytes"
+                value: "${input_slots.order}"
+              - type: "bytes"
+                value: "${input_slots.signature}"
+    input_slots:
+      order:
+        type: "bytes"
+        description: "Encoded Uniswap X order bytes"
+      signature:
+        type: "bytes"
+        description: "Uniswap X order signature bytes"
+      stable_amount:
+        type: "uint256"
+        description: "Stable amount to withdraw from Aave and approve for the Reactor"
+
+  buy_stock_with_stable_from_morpho_vault:
+    calls:
+      - description: "Withdraw the stable leg from the Morpho vault buffer to the Safe (exact amount; reverts if the buffer cannot cover it)"
+        target: "${inputs.morpho_vault}"
+        selector: "withdraw(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+          - type: "address"
+            value: "${inputs.safe_address}"
+          - type: "address"
+            value: "${inputs.safe_address}"
+
+      - description: "Approve the Reactor to pull the stable leg from the Safe"
+        target: "${inputs.stable}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.reactor}"
+          - type: "uint256"
+            value: "${input_slots.stable_amount}"
+
+      - description: "Execute Uniswap X order"
+        target: "${inputs.reactor}"
+        selector: "execute((bytes,bytes))"
+        parameters:
+          - type: "(bytes,bytes)"
+            value:
+              - type: "bytes"
+                value: "${input_slots.order}"
+              - type: "bytes"
+                value: "${input_slots.signature}"
+    input_slots:
+      order:
+        type: "bytes"
+        description: "Encoded Uniswap X order bytes"
+      signature:
+        type: "bytes"
+        description: "Uniswap X order signature bytes"
+      stable_amount:
+        type: "uint256"
+        description: "Stable amount to withdraw from the Morpho vault buffer and approve for the Reactor"
+
+  sell_stock_for_stable_direct:
+    calls:
+      - description: "Approve the Reactor to pull the stock leg from the Safe"
+        target: "${inputs.stock_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.reactor}"
+          - type: "uint256"
+            value: "${input_slots.stock_amount}"
+
+      - description: "Execute Uniswap X order"
+        target: "${inputs.reactor}"
+        selector: "execute((bytes,bytes))"
+        parameters:
+          - type: "(bytes,bytes)"
+            value:
+              - type: "bytes"
+                value: "${input_slots.order}"
+              - type: "bytes"
+                value: "${input_slots.signature}"
+    input_slots:
+      order:
+        type: "bytes"
+        description: "Encoded Uniswap X order bytes"
+      signature:
+        type: "bytes"
+        description: "Uniswap X order signature bytes"
+      stock_amount:
+        type: "uint256"
+        description: "Stock amount approved for the Reactor"

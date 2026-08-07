@@ -12,7 +12,7 @@
         value: "${config.safe_address}"
       asset_address:
         type: "address"
-        value: "${config.usdc_address}"
+        value: "${config.stable_address}"
       aave_pool_instance:
         type: "address"
         value: "${config.aavev3_core_instance}"
@@ -31,7 +31,7 @@
         value: "${config.safe_address}"
       asset_address:
         type: "address"
-        value: "${config.usdc_address}"
+        value: "${config.stable_address}"
       aave_pool_instance:
         type: "address"
         value: "${config.aavev3_core_instance}"

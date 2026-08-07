@@ -354,6 +354,20 @@
       "symbol": "USDC"
     },
     {
+      "chainId": 4663,
+      "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
+      "name": "NVIDIA \u2022 Robinhood Token",
+      "decimals": 18,
+      "symbol": "NVDA"
+    },
+    {
+      "chainId": 4663,
+      "address": "0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168",
+      "name": "Global Dollar",
+      "decimals": 6,
+      "symbol": "USDG"
+    },
+    {
       "chainId": 8453,
       "address": "0x63706e401c06ac8513145b7687A14804d17f814b",
       "name": "Aave Token",
