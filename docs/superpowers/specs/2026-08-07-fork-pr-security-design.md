@@ -54,7 +54,7 @@ Repository rules must require Code Owner review and two approving reviews for
 latest push, require resolved conversations, signed commits, linear history, and
 block force pushes remain enabled. A pull request authored by an owner still needs
 two other people: authors cannot approve their own pull requests. There is no
-native GitHub setting that requires one reviewer from *each* team for a single file;
+native GitHub setting that requires one reviewer from _each_ team for a single file;
 the path split above is the simple, auditable alternative.
 
 ### Unprivileged pull-request CI
