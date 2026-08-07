@@ -1,0 +1,8 @@
+# Protocol configuration and documentation
+*                    @MakinaHQ/dialectic @platykurtic-icu
+
+# CI, privileged validation, and their tests
+/.github/            @MakinaHQ/makina_dev @platykurtic-icu
+/scripts/            @MakinaHQ/makina_dev @platykurtic-icu
+/tests/              @MakinaHQ/makina_dev @platykurtic-icu
+/.github/CODEOWNERS  @MakinaHQ/makina_dev @platykurtic-icu

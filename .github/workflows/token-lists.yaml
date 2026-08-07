@@ -1,83 +1,79 @@
-# Validates token list entries against on-chain ERC-20 metadata via Alchemy.
-# Catches copy-paste bugs where an address from one chain ends up in another,
-# or where name/symbol/decimals are stale or incorrect.
+# Validates changed token list data against live ERC-20 metadata via Alchemy.
 #
-# Required repo secret:
-#   - ALCHEMY_API_KEY
-#
-# Fork PRs require the "safe-to-test" label before this workflow will run.
-# Same-repo PRs run automatically.
+# This is deliberately a pull_request_target workflow: it checks out only the
+# trusted base SHA and materializes an allowlisted subset of fork data through the
+# GitHub API. It never checks out or executes fork code.
 
 name: Token Lists
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, labeled]
-  workflow_dispatch:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
+  detect-inputs:
+    name: Detect token list validation inputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      token_lists: ${{ steps.classify.outputs.token_lists }}
+    steps:
+      - name: Checkout trusted base revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+
+      - name: Classify changed data files
+        id: classify
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          uv run python scripts/materialize_pr_validation_inputs.py classify \
+            --repository "${{ github.repository }}" \
+            --pull-number "${{ github.event.pull_request.number }}"
+
   validate-token-lists:
     name: Validate changed token lists
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.pull_request.head.repo.full_name == github.repository ||
-      contains(github.event.pull_request.labels.*.name, 'safe-to-test')
+    needs: detect-inputs
+    if: needs.detect-inputs.outputs.token_lists == 'true'
+    environment: pr-validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout PR head
-        uses: actions/checkout@v6
+      - name: Checkout trusted base revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-
-      - name: Detect changes
-        id: changes
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          if [ "$EVENT_NAME" = "pull_request_target" ]; then
-            CHANGED_FILES=$(git diff --name-only --diff-filter=AM "origin/$BASE_REF" -- 'token-lists/*.json')
-            SCRIPT_CHANGED=$(git diff --name-only "origin/$BASE_REF" -- 'scripts/validate_token_lists.py' 'tests/test_validate_token_lists.py')
-          else
-            CHANGED_FILES=$(find token-lists -maxdepth 1 -type f -name '*.json' | sort)
-            SCRIPT_CHANGED=""
-          fi
-
-          if [ -z "$CHANGED_FILES" ]; then
-            echo "changed_files=" >> "$GITHUB_OUTPUT"
-            echo "changed_files_count=0" >> "$GITHUB_OUTPUT"
-          else
-            {
-              echo "changed_files<<TOKEN_LISTS_EOF"
-              echo "$CHANGED_FILES"
-              echo "TOKEN_LISTS_EOF"
-            } >> "$GITHUB_OUTPUT"
-            echo "changed_files_count=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
-          fi
-
-          if [ -n "$SCRIPT_CHANGED" ]; then
-            echo "script_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "script_changed=false" >> "$GITHUB_OUTPUT"
-          fi
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Install uv
-        if: steps.changes.outputs.changed_files_count > 0 || steps.changes.outputs.script_changed == 'true'
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
 
-      - name: Run unit tests
-        if: steps.changes.outputs.changed_files_count > 0 || steps.changes.outputs.script_changed == 'true'
-        run: uv run python -m unittest tests.test_validate_token_lists -v
+      - name: Materialize trusted token list inputs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          uv run python scripts/materialize_pr_validation_inputs.py materialize \
+            --repository "${{ github.repository }}" \
+            --pull-number "${{ github.event.pull_request.number }}" \
+            --head-repository "${{ github.event.pull_request.head.repo.full_name }}" \
+            --head-sha "${{ github.event.pull_request.head.sha }}" \
+            --destination "$RUNNER_TEMP/pr-validation-inputs" \
+            --token-lists
 
       - name: Validate token lists against live ERC-20 metadata
-        if: steps.changes.outputs.changed_files_count > 0
         env:
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-          CHANGED_TOKEN_LISTS: ${{ steps.changes.outputs.changed_files }}
-        run: uv run python scripts/validate_token_lists.py ${CHANGED_TOKEN_LISTS}
-
-      - name: Skip when no token lists changed
-        if: steps.changes.outputs.changed_files_count == 0 && steps.changes.outputs.script_changed == 'false'
-        run: echo "No token list files to validate."
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_PR_VALIDATION_KEY }}
+        run: |
+          find "$RUNNER_TEMP/pr-validation-inputs/token-lists" -maxdepth 1 -type f -name '*.json' -print0 |
+            xargs -0 --no-run-if-empty uv run python scripts/validate_token_lists.py
