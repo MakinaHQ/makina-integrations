@@ -2,7 +2,9 @@
 
 Unit tests use a FakeReader to avoid RPC calls. The integration test at the
 bottom (test_dusd_mainnet_fixed_block_rootfile_outcomes) hits a real RPC and
-is skipped unless ALCHEMY_API_KEY is set.
+is skipped unless ALCHEMY_API_KEY is set. Set REQUIRE_LIVE_RPC_TESTS=1 to turn
+that skip into a failure — the `Validator Integration Tests` workflow does, so a
+missing key cannot make it report a green run that exercised nothing.
 
 Fixtures live in tests/fixtures/dusd/mainnet/ — a caliber.yaml and two rootfiles
 that represent a known scenario: the older rootfile is missing accounting for
@@ -60,6 +62,41 @@ class ValidateOpenPositionsTests(unittest.TestCase):
                 ("deth", "base", "20251103-empty.toml"),
                 ("dusd", "mainnet", "20260311-reservoir-morpho-vault.toml"),
             ],
+        )
+
+    def test_select_latest_rootfiles_resolves_paths_against_an_input_root(self) -> None:
+        """CI materializes fork data outside the workspace but still passes
+        repository-relative paths, so the input root is where they are read from."""
+        input_root = Path("/tmp/pr-validation-inputs")
+
+        targets = validate_open_positions.select_latest_rootfiles(
+            ["machines/dusd/mainnet/rootfiles/20260311-reservoir-morpho-vault.toml"],
+            input_root,
+        )
+
+        self.assertEqual(len(targets), 1)
+        target = targets[0]
+        self.assertEqual(target.machine, "dusd")
+        self.assertEqual(target.chain, "mainnet")
+        self.assertEqual(
+            target.rootfile_path,
+            input_root / "machines/dusd/mainnet/rootfiles/20260311-reservoir-morpho-vault.toml",
+        )
+        self.assertEqual(
+            target.caliber_path, input_root / "machines/dusd/mainnet/caliber.yaml"
+        )
+
+    def test_select_latest_rootfiles_rejects_paths_it_cannot_recognize(self) -> None:
+        """Dropping an unmatched path silently would make the whole check pass
+        while validating nothing — which is exactly what absolute paths did."""
+        with self.assertRaises(ValueError):
+            validate_open_positions.select_latest_rootfiles(
+                ["/tmp/pr-validation-inputs/machines/dusd/mainnet/rootfiles/20260311-x.toml"]
+            )
+
+    def test_main_exits_nonzero_when_given_unrecognized_rootfile_paths(self) -> None:
+        self.assertEqual(
+            validate_open_positions.main(["/absolute/machines/d/c/rootfiles/x.toml"]), 1
         )
 
     def test_extract_caliber_metadata_reads_address_and_positions(self) -> None:
@@ -175,6 +212,12 @@ class ValidateOpenPositionsTests(unittest.TestCase):
         newer one passes. Skipped without RPC env vars."""
         api_key = os.getenv("ALCHEMY_API_KEY")
         if not api_key:
+            # Secret-free CI runs this file without a key, so skipping is correct
+            # there. The workflow that exists to exercise this test sets
+            # REQUIRE_LIVE_RPC_TESTS so a missing key fails loudly instead of
+            # reporting a green run that validated nothing.
+            if os.getenv("REQUIRE_LIVE_RPC_TESTS"):
+                self.fail("REQUIRE_LIVE_RPC_TESTS is set but ALCHEMY_API_KEY is missing")
             self.skipTest("ALCHEMY_API_KEY is required")
         block_number = 24635682
 

@@ -45,9 +45,17 @@ contributions.
 3. **Update required status checks.** Retain `Verify new rootfiles correctness
    with the transpiler`, `formatting`, and `Validate changed token lists`. Add
    `Run validator unit tests` and `Validate open positions coverage in latest added
-   rootfiles`. The trusted validation jobs may skip only when base-revision
-   classification finds no relevant data change; GitHub treats that case as a
-   successful check.
+   rootfiles`.
+
+   Both validation check names belong to always-running gate jobs
+   (`token-lists-status` and `open-positions-status`), not to the privileged
+   validation jobs themselves. This matters: GitHub reports a _skipped_ required
+   check as a success, so a required check attached to a conditional job would go
+   green whenever classification failed. The gate jobs run unconditionally,
+   inspect the classifier and validator results, and fail unless the outcome is
+   conclusively "validated" or "there was nothing to validate". Do not make the
+   privileged `validate-*` jobs the required checks, and do not add an `if:` to a
+   gate job — `tests/test_workflow_security.py` enforces both.
 4. **Lock down Actions supply chain.** Under **Actions > General > Actions
    permissions**, select only the action repositories used by this repository:
    `actions/checkout`, `astral-sh/setup-uv`, `dprint/check`, and
@@ -59,6 +67,31 @@ contributions.
    base SHA, wait for a `pr-validation` reviewer, and report against only the
    changed allowlisted data. Push one new commit to confirm it creates a fresh
    environment approval point.
+6. **Run `Validator Integration Tests` once from the Actions tab.** The RPC-backed
+   test in `tests/test_validate_open_positions.py` cannot run in `Validator Tests`,
+   which is `pull_request`-triggered and executes fork-authored test code, so it
+   must never hold a secret. The manual workflow runs the same test against a live
+   RPC using the `pr-validation` environment and sets `REQUIRE_LIVE_RPC_TESTS`, so a
+   missing key fails the run instead of skipping silently. Run it after any change
+   to `RpcCaliberReader`, the Caliber ABI, or the Alchemy chain-slug map.
+
+## Operational consequences
+
+**Internal pull requests also wait for a deployment approval.** The privileged
+validation jobs carry `environment: pr-validation` regardless of whether the head
+branch is a fork, so a maintainer's own PR that touches a token list or adds a
+rootfile is held at "Waiting for review" until a _second_ maintainer approves the
+deployment — "Prevent self-review" is enabled and admin bypass is disabled. This is
+deliberate: `ALCHEMY_PR_VALIDATION_KEY` is an environment secret, and making
+same-repo PRs skip the gate would require either a second environment or a
+repository-level copy of the key, which widens the blast radius the environment
+exists to contain. Budget for the second approver on routine token-list and
+rootfile changes.
+
+**Pushing during an approval wait invalidates the run.** The materializer compares
+the pull request's current head against the approved head SHA and fails if they
+differ, rather than classifying one commit and downloading another. A push creates
+a fresh run and a fresh approval point; the stale run's failure is expected.
 
 ## Secret lifecycle
 

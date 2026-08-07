@@ -1,6 +1,11 @@
 # Validates that every open on-chain Caliber position has accounting in newly
 # added rootfiles. The workflow runs only trusted base-revision code; fork data is
 # downloaded as allowlisted TOML/YAML input after an environment reviewer approves.
+#
+# Job layout matters for branch protection: the required status check is the
+# always-running `open-positions-status` gate, never the conditional privileged
+# job. A job-level `if` that skips is reported to branch protection as a success,
+# so gating the required check that way would let a failed classification merge.
 
 name: Open Positions
 
@@ -34,13 +39,16 @@ jobs:
         id: classify
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BASE_REPOSITORY: ${{ github.repository }}
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          set -euo pipefail
           uv run python scripts/materialize_pr_validation_inputs.py classify \
-            --repository "${{ github.repository }}" \
-            --pull-number "${{ github.event.pull_request.number }}"
+            --repository "$BASE_REPOSITORY" \
+            --pull-number "$PULL_NUMBER"
 
   validate-open-positions:
-    name: Validate open positions coverage in latest added rootfiles
+    name: Run open positions validation
     needs: detect-inputs
     if: needs.detect-inputs.outputs.rootfiles == 'true'
     environment: pr-validation
@@ -60,18 +68,73 @@ jobs:
       - name: Materialize trusted rootfile inputs
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BASE_REPOSITORY: ${{ github.repository }}
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          set -euo pipefail
           uv run python scripts/materialize_pr_validation_inputs.py materialize \
-            --repository "${{ github.repository }}" \
-            --pull-number "${{ github.event.pull_request.number }}" \
-            --head-repository "${{ github.event.pull_request.head.repo.full_name }}" \
-            --head-sha "${{ github.event.pull_request.head.sha }}" \
+            --repository "$BASE_REPOSITORY" \
+            --pull-number "$PULL_NUMBER" \
+            --head-repository "$HEAD_REPOSITORY" \
+            --head-sha "$HEAD_SHA" \
             --destination "$RUNNER_TEMP/pr-validation-inputs" \
             --rootfiles
 
       - name: Validate latest added rootfiles against live Caliber positions
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_PR_VALIDATION_KEY }}
+          INPUT_ROOT: ${{ runner.temp }}/pr-validation-inputs
         run: |
-          find "$RUNNER_TEMP/pr-validation-inputs/machines" -path '*/rootfiles/*.toml' -type f -print0 |
-            xargs -0 --no-run-if-empty uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_open_positions.py
+          set -euo pipefail
+          # Paths are collected relative to the materialized tree because the
+          # validator only accepts repository-relative machines/... paths;
+          # --input-root tells it where to read them from. The empty check below
+          # is the real guard: a `find` failure inside a process substitution
+          # does not fail the step, so silence here must be treated as an error.
+          rootfiles=()
+          while IFS= read -r -d '' rootfile; do
+            rootfiles+=("$rootfile")
+          done < <(cd "$INPUT_ROOT" && find machines -path '*/rootfiles/*.toml' -type f -print0)
+          if [ "${#rootfiles[@]}" -eq 0 ]; then
+            echo "Classification reported added rootfiles but none were materialized." >&2
+            exit 1
+          fi
+          printf 'Validating %d rootfile(s):\n' "${#rootfiles[@]}"
+          printf '  %s\n' "${rootfiles[@]}"
+          uv run --with 'web3==7.14.1' --with pyyaml python scripts/validate_open_positions.py \
+            --input-root "$INPUT_ROOT" "${rootfiles[@]}"
+
+  open-positions-status:
+    name: Validate open positions coverage in latest added rootfiles
+    needs: [detect-inputs, validate-open-positions]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require a conclusive validation outcome
+        env:
+          DETECT_RESULT: ${{ needs.detect-inputs.result }}
+          ROOTFILES_CHANGED: ${{ needs.detect-inputs.outputs.rootfiles }}
+          VALIDATE_RESULT: ${{ needs.validate-open-positions.result }}
+        run: |
+          set -euo pipefail
+          if [ "$DETECT_RESULT" != "success" ]; then
+            echo "Rootfile classification did not succeed (result: $DETECT_RESULT)." >&2
+            echo "Refusing to report success without knowing whether validation was needed." >&2
+            exit 1
+          fi
+          if [ "$ROOTFILES_CHANGED" != "true" ]; then
+            if [ "$VALIDATE_RESULT" != "skipped" ]; then
+              echo "No rootfiles were added, but validation reported '$VALIDATE_RESULT'." >&2
+              exit 1
+            fi
+            echo "No added rootfiles in this pull request; nothing to validate."
+            exit 0
+          fi
+          if [ "$VALIDATE_RESULT" != "success" ]; then
+            echo "Open positions validation did not succeed (result: $VALIDATE_RESULT)." >&2
+            exit 1
+          fi
+          echo "Open positions validation succeeded."

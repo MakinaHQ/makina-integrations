@@ -3,6 +3,11 @@
 # This is deliberately a pull_request_target workflow: it checks out only the
 # trusted base SHA and materializes an allowlisted subset of fork data through the
 # GitHub API. It never checks out or executes fork code.
+#
+# Job layout matters for branch protection: the required status check is the
+# always-running `token-lists-status` gate, never the conditional privileged job.
+# A job-level `if` that skips is reported to branch protection as a success, so
+# gating the required check that way would let a failed classification merge.
 
 name: Token Lists
 
@@ -36,13 +41,16 @@ jobs:
         id: classify
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BASE_REPOSITORY: ${{ github.repository }}
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          set -euo pipefail
           uv run python scripts/materialize_pr_validation_inputs.py classify \
-            --repository "${{ github.repository }}" \
-            --pull-number "${{ github.event.pull_request.number }}"
+            --repository "$BASE_REPOSITORY" \
+            --pull-number "$PULL_NUMBER"
 
   validate-token-lists:
-    name: Validate changed token lists
+    name: Run token list validation
     needs: detect-inputs
     if: needs.detect-inputs.outputs.token_lists == 'true'
     environment: pr-validation
@@ -62,18 +70,71 @@ jobs:
       - name: Materialize trusted token list inputs
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          BASE_REPOSITORY: ${{ github.repository }}
+          PULL_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          set -euo pipefail
           uv run python scripts/materialize_pr_validation_inputs.py materialize \
-            --repository "${{ github.repository }}" \
-            --pull-number "${{ github.event.pull_request.number }}" \
-            --head-repository "${{ github.event.pull_request.head.repo.full_name }}" \
-            --head-sha "${{ github.event.pull_request.head.sha }}" \
+            --repository "$BASE_REPOSITORY" \
+            --pull-number "$PULL_NUMBER" \
+            --head-repository "$HEAD_REPOSITORY" \
+            --head-sha "$HEAD_SHA" \
             --destination "$RUNNER_TEMP/pr-validation-inputs" \
             --token-lists
 
       - name: Validate token lists against live ERC-20 metadata
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_PR_VALIDATION_KEY }}
+          INPUT_ROOT: ${{ runner.temp }}/pr-validation-inputs
         run: |
-          find "$RUNNER_TEMP/pr-validation-inputs/token-lists" -maxdepth 1 -type f -name '*.json' -print0 |
-            xargs -0 --no-run-if-empty uv run python scripts/validate_token_lists.py
+          set -euo pipefail
+          # The empty check below is the real guard: a `find` failure inside a
+          # process substitution does not fail the step, so a missing
+          # materialized directory must be treated as an error rather than as
+          # "nothing to validate".
+          token_lists=()
+          while IFS= read -r -d '' token_list; do
+            token_lists+=("$token_list")
+          done < <(find "$INPUT_ROOT/token-lists" -maxdepth 1 -type f -name '*.json' -print0)
+          if [ "${#token_lists[@]}" -eq 0 ]; then
+            echo "Classification reported changed token lists but none were materialized." >&2
+            exit 1
+          fi
+          printf 'Validating %d token list file(s):\n' "${#token_lists[@]}"
+          printf '  %s\n' "${token_lists[@]}"
+          uv run python scripts/validate_token_lists.py "${token_lists[@]}"
+
+  token-lists-status:
+    name: Validate changed token lists
+    needs: [detect-inputs, validate-token-lists]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require a conclusive validation outcome
+        env:
+          DETECT_RESULT: ${{ needs.detect-inputs.result }}
+          TOKEN_LISTS_CHANGED: ${{ needs.detect-inputs.outputs.token_lists }}
+          VALIDATE_RESULT: ${{ needs.validate-token-lists.result }}
+        run: |
+          set -euo pipefail
+          if [ "$DETECT_RESULT" != "success" ]; then
+            echo "Token list classification did not succeed (result: $DETECT_RESULT)." >&2
+            echo "Refusing to report success without knowing whether validation was needed." >&2
+            exit 1
+          fi
+          if [ "$TOKEN_LISTS_CHANGED" != "true" ]; then
+            if [ "$VALIDATE_RESULT" != "skipped" ]; then
+              echo "No token lists changed, but validation reported '$VALIDATE_RESULT'." >&2
+              exit 1
+            fi
+            echo "No changed token lists in this pull request; nothing to validate."
+            exit 0
+          fi
+          if [ "$VALIDATE_RESULT" != "success" ]; then
+            echo "Token list validation did not succeed (result: $VALIDATE_RESULT)." >&2
+            exit 1
+          fi
+          echo "Token list validation succeeded."
