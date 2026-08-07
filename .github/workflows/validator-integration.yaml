@@ -2,8 +2,9 @@
 #
 # These cannot live in `Validator Tests`: that workflow runs on `pull_request`
 # and executes fork-authored test code, so it must never hold a secret. Here the
-# code is always the maintainer-selected trusted ref and the run is manual, so the
-# `pr-validation` reviewer gate is an acceptable cost for reaching the API key.
+# job runs only from the default branch and explicitly checks out that trusted
+# ref. The `pr-validation` reviewer gate is an acceptable cost for reaching the
+# API key.
 #
 # REQUIRE_LIVE_RPC_TESTS makes the RPC-backed tests fail instead of skip, so this
 # workflow cannot report success while quietly exercising nothing.
@@ -19,6 +20,7 @@ permissions:
 jobs:
   validator-integration-tests:
     name: Run validator integration tests against live RPC
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     environment: pr-validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -26,6 +28,7 @@ jobs:
       - name: Checkout trusted revision
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 1
           persist-credentials: false
 

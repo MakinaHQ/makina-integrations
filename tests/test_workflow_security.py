@@ -37,6 +37,10 @@ FORK_HEAD_REF_MARKERS = (
 )
 
 REVIEWED_ENVIRONMENT = "pr-validation"
+DEFAULT_BRANCH_REF = "${{ github.event.repository.default_branch }}"
+DEFAULT_BRANCH_ONLY_CONDITION = (
+    "github.ref == format('refs/heads/{0}', github.event.repository.default_branch)"
+)
 
 # The always-running gate job per privileged workflow, and the required status
 # check name it must carry. Branch protection reads a skipped required check as a
@@ -199,6 +203,28 @@ class WorkflowSecurityTests(unittest.TestCase):
                     continue
                 with self.subTest(workflow=path.name, job=name):
                     self.assertEqual(job.get("environment"), REVIEWED_ENVIRONMENT)
+
+    def test_manual_secret_workflows_only_run_trusted_default_branch(self) -> None:
+        """A manual run must not check out a caller-selected ref with a live secret."""
+        for path, workflow in workflows():
+            if "workflow_dispatch" not in triggers(workflow):
+                continue
+            for name, job in jobs(workflow):
+                if not contains_secret_expression(job):
+                    continue
+                with self.subTest(workflow=path.name, job=name):
+                    self.assertEqual(job.get("environment"), REVIEWED_ENVIRONMENT)
+                    self.assertEqual(job.get("if"), DEFAULT_BRANCH_ONLY_CONDITION)
+                    checkout_steps = [
+                        step
+                        for step in steps_of(job)
+                        if isinstance(step.get("uses"), str)
+                        and step["uses"].startswith("actions/checkout@")
+                    ]
+                    self.assertEqual(len(checkout_steps), 1)
+                    settings = checkout_steps[0].get("with")
+                    self.assertIsInstance(settings, dict)
+                    self.assertEqual(settings.get("ref"), DEFAULT_BRANCH_REF)
 
     def test_privileged_validators_use_base_code_and_an_approved_environment(self) -> None:
         """Removing the environment or base-SHA checkout would reintroduce secret exfiltration."""
