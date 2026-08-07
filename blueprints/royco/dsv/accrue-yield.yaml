@@ -1,0 +1,42 @@
+protocol: "royco-dsv"
+
+# Keeper position for the DSV (srRoyUSDC), the async ERC4626 holding the
+# intMkSrRoyUSDC machine. Its convertToAssets ignores fee shares pending mint, so
+# accruing off-cycle drops the share price relative to the previous block and would
+# read as a loss to a junior tranche. accrueYield() is permissionless, so the caliber
+# carries it in an ACCOUNTING instruction to fire it once per accounting cycle.
+#
+# The position holds nothing and is valued at a constant 1 wei USDC: a position that
+# accounts to 0 is closed by Caliber._accountForPosition and would stop running.
+#
+# Design and accepted limitations (not atomic with updateTotalAum; a reverting
+# accrueYield() stales the position and halts AUM updates; no close path shipped):
+# docs/superpowers/specs/2026-08-06-dsv-fee-accrual-design.md
+
+constants:
+  dsv_vault_address:
+    type: "address"
+    value: "0xcD9f5907F92818bC06c9Ad70217f089E190d2a32"
+
+actions:
+  # Bootstrap, run once. The position is created by the pre-accounting hop of
+  # Caliber._managePosition (Caliber.sol:663), not by this call.
+  open_position:
+    calls:
+      - description: "Trigger DSV yield distribution (permissionless)"
+        target: "${constants.dsv_vault_address}"
+        selector: "accrueYield()"
+        parameters: []
+
+  account:
+    calls:
+      - description: "Trigger DSV yield distribution before the machine AUM update"
+        target: "${constants.dsv_vault_address}"
+        selector: "accrueYield()"
+        parameters: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_1}" # 1 wei USDC — keeps the position open
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}" # ACCOUNTING_OUTPUT_STATE_END
