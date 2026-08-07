@@ -19,6 +19,13 @@ permissions:
   contents: read
   pull-requests: read
 
+# A push supersedes any run still waiting for a pr-validation reviewer. Without
+# this, the stale run could be approved late, fail its head-SHA check, and flip
+# the required check red after the newer run had already passed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   detect-inputs:
     name: Detect token list validation inputs
