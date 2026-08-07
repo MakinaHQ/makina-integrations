@@ -1,0 +1,22 @@
+# DSV fee-accrual keeper. Machine-local: the DSV address lives in the blueprint
+# constants, so there is nothing to parameterise.
+# Design: docs/superpowers/specs/2026-08-06-dsv-fee-accrual-design.md
+
+# Bootstrap: run once to register the position.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: "DSV Fee Accrual"
+    path: "../../../blueprints/royco/dsv/accrue-yield.yaml:open_position"
+    inputs: {}
+
+# Runs every accounting cycle: accrues DSV yield, reports a constant 1 wei USDC.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "DSV Fee Accrual"
+    path: "../../../blueprints/royco/dsv/accrue-yield.yaml:account"
+    inputs: {}
