@@ -13,6 +13,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-run-transpiler:
     name: Verify new rootfiles correctness with the transpiler
@@ -20,9 +23,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout config repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # full history needed to diff against base branch
+          persist-credentials: false
 
       # Detect added and modified rootfiles using git diff instead of a
       # third-party action to reduce attack surface.
@@ -130,20 +134,18 @@ jobs:
 
       - name: Checkout transpiler repository
         if: steps.changed-rootfiles.outputs.added_files_count > 0
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: MakinaHQ/transpiler
+          ref: 82d14d45ee9a5bc78a5ee8215f5b1607da547994 # main as of 2026-08-07
           path: transpiler
+          persist-credentials: false
 
       - name: Install Rust toolchain
         if: steps.changed-rootfiles.outputs.added_files_count > 0
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Cargo
-        if: steps.changed-rootfiles.outputs.added_files_count > 0
-        uses: Swatinem/rust-cache@v2
+        uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # stable action as of 2026-08-07
         with:
-          workspaces: transpiler
+          toolchain: stable
 
       - name: Build transpiler
         if: steps.changed-rootfiles.outputs.added_files_count > 0
