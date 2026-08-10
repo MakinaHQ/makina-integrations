@@ -214,6 +214,7 @@ class WorkflowSecurityTests(unittest.TestCase):
                     continue
                 with self.subTest(workflow=path.name, job=name):
                     self.assertEqual(job.get("environment"), REVIEWED_ENVIRONMENT)
+                    self.assertIn("${{ secrets.ALCHEMY_API_KEY }}", str(job))
                     self.assertEqual(job.get("if"), DEFAULT_BRANCH_ONLY_CONDITION)
                     checkout_steps = [
                         step
@@ -245,7 +246,7 @@ class WorkflowSecurityTests(unittest.TestCase):
             with self.subTest(workflow=workflow_name):
                 self.assertEqual(job.get("environment"), REVIEWED_ENVIRONMENT)
                 self.assertTrue(contains_secret_expression(job))
-                self.assertIn("ALCHEMY_PR_VALIDATION_KEY", str(job))
+                self.assertIn("${{ secrets.ALCHEMY_API_KEY }}", str(job))
                 self.assertIn("materialize_pr_validation_inputs.py", str(job))
 
                 checkout_steps = [
