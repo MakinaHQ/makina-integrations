@@ -37,7 +37,7 @@ jobs:
 
       - name: Run RPC-backed validator tests
         env:
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_PR_VALIDATION_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           REQUIRE_LIVE_RPC_TESTS: "1"
         run: |
           set -euo pipefail
