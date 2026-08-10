@@ -150,21 +150,41 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         type=int,
         help="Optional historical block number to pin all contract reads to.",
     )
+    parser.add_argument(
+        "--input-root",
+        type=Path,
+        default=Path("."),
+        help=(
+            "Directory the repository-relative rootfile paths are resolved against. "
+            "Defaults to the current directory; CI points it at the materialized "
+            "pull-request input tree."
+        ),
+    )
     return parser.parse_args(argv)
 
 
-def select_latest_rootfiles(rootfiles: Iterable[str]) -> list[RootfileTarget]:
+def select_latest_rootfiles(
+    rootfiles: Iterable[str], input_root: Path | None = None
+) -> list[RootfileTarget]:
     """From a list of added rootfile paths, keep only the latest one per
     (machine, chain) pair. "Latest" is determined by lexicographic filename
-    comparison, which works because rootfiles are prefixed with YYYYMMDD."""
+    comparison, which works because rootfiles are prefixed with YYYYMMDD.
+
+    Paths must be repository-relative (machines/<machine>/<chain>/rootfiles/*.toml);
+    `input_root` is the directory they are actually read from. A path that does not
+    match that shape is rejected loudly — silently dropping it would make the whole
+    check pass without validating anything."""
+    root = Path(".") if input_root is None else input_root
     latest_by_pair: dict[tuple[str, str], RootfileTarget] = {}
+    unrecognized: list[str] = []
     for raw_path in rootfiles:
         match = ROOTFILE_PATH_RE.match(raw_path)
         if not match:
+            unrecognized.append(raw_path)
             continue
 
         machine, chain, _ = match.groups()
-        rootfile_path = Path(raw_path)
+        rootfile_path = root / Path(raw_path)
         target = RootfileTarget(
             machine=machine,
             chain=chain,
@@ -175,6 +195,13 @@ def select_latest_rootfiles(rootfiles: Iterable[str]) -> list[RootfileTarget]:
         current = latest_by_pair.get(pair)
         if current is None or target.rootfile_path.name > current.rootfile_path.name:
             latest_by_pair[pair] = target
+
+    if unrecognized:
+        raise ValueError(
+            "expected repository-relative rootfile paths of the form "
+            "machines/<machine>/<chain>/rootfiles/<name>.toml, got: "
+            + ", ".join(sorted(unrecognized))
+        )
 
     return sorted(latest_by_pair.values(), key=lambda target: (target.machine, target.chain))
 
@@ -331,7 +358,11 @@ def write_github_summary(results: list[ValidationResult]) -> None:
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
-    targets = select_latest_rootfiles(args.rootfiles)
+    try:
+        targets = select_latest_rootfiles(args.rootfiles, args.input_root)
+    except ValueError as exc:
+        print(f"Invalid rootfile arguments: {exc}", file=sys.stderr)
+        return 1
     if not targets:
         print("No added rootfiles to validate.")
         return 0

@@ -3,12 +3,17 @@ name: Formatting
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   formatting:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: dprint/check@v2.3
+      - uses: dprint/check@9cb3a2b17a8e606d37aae341e49df3654933fc23 # v2.3
