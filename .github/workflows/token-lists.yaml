@@ -93,7 +93,7 @@ jobs:
 
       - name: Validate token lists against live ERC-20 metadata
         env:
-          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_PR_VALIDATION_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           INPUT_ROOT: ${{ runner.temp }}/pr-validation-inputs
         run: |
           set -euo pipefail
