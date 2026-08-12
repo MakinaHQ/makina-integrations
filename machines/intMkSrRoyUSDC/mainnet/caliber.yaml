@@ -19,6 +19,14 @@ config:
     value: "0x1b52c5d62458675597ce9b25e81af89fdd8c4029"
 
 positions:
+  # ── DSV Fee Accrual Keeper (group_id: 0) ─────────────────────────
+  # Holds nothing; valued at a constant 1 wei USDC. Fires the DSV's permissionless
+  # accrueYield() once per accounting cycle. Opened once via managePosition.
+  - id: "1"
+    group_id: "0"
+    description: "DSV Fee Accrual Keeper (srRoyUSDC)"
+    instructions: !include "./instructions/dsv-fee-accrual.yaml"
+
   # ── Harvest-only ──────────────────────────────────────────────────
   - id: "777"
     group_id: "0"
