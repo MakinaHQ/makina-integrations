@@ -1,0 +1,59 @@
+# makina-x generic ERC20 approval.
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted
+# on-chain, so no account balanceOf step is emitted.
+#
+# Fully static: token, spender AND amount are all blueprint `inputs`, so all three are
+# baked into the merkle leaf and committed to the root at governance time. The action
+# therefore declares NO `input_slots` — the operator supplies nothing at execution time
+# and the only call the root authorizes is exactly
+#   TOKEN.approve(SPENDER, AMOUNT)
+# for the one triple the instruction pinned. Contrast the approve legs inside
+# ../morpho-vault/deposit.yaml or ../uniswap-x/park.yaml, where the amount is an
+# `input_slots` value and is therefore operator-chosen at call time.
+#
+# Instantiate once per (token, spender, amount) triple; each instruction is a separate
+# leaf under `approve/approve_spender/{label}`, so give every instance a distinct label.
+# An unlimited allowance is an instance with amount
+# "115792089237316195423570985008687907853269984665640564039457584007913129639935".
+#
+# `cancel_approval` is the same call with the amount pinned to the literal 0 rather than
+# taken from an input, so it needs only (token, spender) and can be governed independently
+# of whatever allowance sizes were approved. It is intentionally a separate action — a
+# revoke is nearly always something you want authorized even when the sized approvals are
+# not, and unused inputs are simply omitted from an instruction (`amount` is not supplied
+# for this action).
+#
+# The approval is issued by the module on the Safe's behalf: the allowance is granted
+# from safe_address (the token holder) to `spender`.
+protocol: "approve"
+
+inputs:
+  token_address:
+    type: "address"
+  spender:
+    type: "address"
+  amount:
+    type: "uint256"
+
+actions:
+  approve_spender:
+    calls:
+      - description: "Approve the spender to spend the exact pinned amount of the token"
+        target: ${inputs.token_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.spender}
+          - type: "uint256"
+            value: ${inputs.amount}
+
+  cancel_approval:
+    calls:
+      - description: "Revoke the spender's allowance on the token (approve 0)"
+        target: ${inputs.token_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.spender}
+          - type: "uint256"
+            value: "0"
