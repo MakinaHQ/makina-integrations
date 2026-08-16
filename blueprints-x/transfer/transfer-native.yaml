@@ -1,0 +1,93 @@
+# makina-x native-asset transfer: unwrap wrapped native and forward it, atomically.
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted on-chain.
+#
+# THE SAFE NEVER HOLDS THE NATIVE ASSET. Both calls run in one weiroll script, and the unwrap
+# happens inside NativeUnwrapForwarder, not in the Safe: the Safe approves the forwarder for
+# exactly `amount`, the forwarder pulls the wrapper, calls `withdraw`, and forwards the native
+# asset to the recipient. The forwarder is the only transient holder, for the two opcodes
+# between `withdraw` and the forward. The allowance is granted and consumed in the same
+# transaction, so nothing is left standing afterwards.
+#
+# WHY A HELPER AND NOT A VALUE-BEARING CALL. The weiroll VM does support value calls
+# (FLAG_CT_VALUECALL), but the transpiler has no surface to emit one: a blueprint call is
+# {description, target, selector, parameters, return} and the command flags are hardcoded to
+# CommandFlags::CALL. Every weiroll command in every rootfile in this repo is a plain CALL.
+# Routing the native asset through the Safe would also mean relying on WETH9's 2300-gas
+# `transfer` stipend into the Safe's `receive()`. The forwarder sidesteps both: two ordinary
+# CALLs, and the recipient gets a full-gas call with empty calldata, so CEX deposit addresses
+# that run logic in `receive()` work.
+#
+# Same `protocol: "transfer"` namespace as ./transfer.yaml — splitting the native path into its
+# own file changes no generated rootfile path.
+#
+# ONE FORWARDER PER (CHAIN, WRAPPER). The wrapper is immutable in the forwarder's constructor,
+# so `wrapped_native_address` here MUST equal the forwarder's `wrapper()`. Mismatched, the
+# approve lands on the wrong token and the pull reverts. On mainnet that pair is WETH/ETH; on
+# HyperEVM, wHYPE/HYPE.
+#
+# TWO ACTIONS, PICK BY HOW MUCH THE ROOT SHOULD FREEZE — the same split as
+# ../approve/approve.yaml:
+#   unwrap_and_transfer_native        recipient pinned in the leaf, amount operator-chosen
+#                                     (`input_slots`), like ./transfer.yaml
+#   unwrap_and_transfer_native_fixed  recipient AND amount both pinned in the leaf; no
+#                                     `input_slots` at all, so the root authorizes exactly one
+#                                     call and the operator supplies nothing
+protocol: "transfer"
+
+inputs:
+  wrapped_native_address:
+    type: "address"
+  unwrap_forwarder:
+    type: "address"
+  to:
+    type: "address"
+  amount:
+    type: "uint256"
+
+actions:
+  unwrap_and_transfer_native:
+    calls:
+      - description: "Approve the forwarder to pull the wrapped native asset from the Safe"
+        target: ${inputs.wrapped_native_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.unwrap_forwarder}
+          - type: "uint256"
+            value: ${input_slots.amount_to_transfer}
+
+      - description: "Unwrap and forward the native asset to the destination in one call"
+        target: ${inputs.unwrap_forwarder}
+        selector: "unwrapAndSend(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.to}
+          - type: "uint256"
+            value: ${input_slots.amount_to_transfer}
+    input_slots:
+      amount_to_transfer:
+        type: "uint256"
+        description: "The amount of wrapped native to unwrap and forward"
+
+  # Fully static variant: `amount` comes from the blueprint inputs rather than a slot, so both
+  # the recipient and the size are committed to the root at governance time and the operator
+  # supplies nothing at execution time. Instantiate once per (recipient, amount) pair.
+  unwrap_and_transfer_native_fixed:
+    calls:
+      - description: "Approve the forwarder to pull the pinned amount from the Safe"
+        target: ${inputs.wrapped_native_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.unwrap_forwarder}
+          - type: "uint256"
+            value: ${inputs.amount}
+
+      - description: "Unwrap and forward the pinned amount of native asset to the destination"
+        target: ${inputs.unwrap_forwarder}
+        selector: "unwrapAndSend(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.to}
+          - type: "uint256"
+            value: ${inputs.amount}
