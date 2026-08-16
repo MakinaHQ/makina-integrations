@@ -1,0 +1,59 @@
+# makina-x generic ERC20 transferFrom — pull funds from an address that has granted the Safe
+# an allowance.
+# Management-only: no ACCOUNTING action — makina-x positions are not NAV-accounted on-chain.
+#
+# The Safe is the spender: the module executes `transferFrom` on the Safe's behalf, so the
+# allowance being drawn down is the one `from` granted to the Safe (not to the module). The
+# counterparty must have approved `${config.safe_address}` beforehand; nothing here can create
+# that allowance.
+#
+# WHAT THE ROOT PINS, AND WHAT IT DOES NOT:
+#   token   pinned, structurally. A blueprint `target` can only be an input or a literal
+#           address — never an `input_slots` value — and the target is encoded into the command
+#           word itself, which the leaf commits to via keccak256(commands). So the token is
+#           frozen whether or not it appears in the state bitmap.
+#   to      pinned, deliberately. It is a blueprint `input`, so it is hashed into the leaf and
+#           the operator cannot redirect the funds. This is the guarantee the instruction buys.
+#   from    OPEN. Operator-supplied at execution time.
+#   amount  OPEN. Operator-supplied at execution time.
+#
+# READ THAT `from` CAREFULLY. Leaving it open means this instruction authorizes pulling from
+# ANY address that has granted the Safe an allowance on this token — the root constrains the
+# destination and the asset, not the source. That is the intent (one instruction serves every
+# counterparty), but it is only safe because the funds can go nowhere except the pinned `to`.
+# If a caliber ever needs the source frozen as well, add a variant that takes `from` as an
+# `input` instead, the way ../approve/approve.yaml pins its amount.
+#
+# SLOT ORDER. Slot indices come from the DECLARATION ORDER of `input_slots:`, not order of use:
+# `from` is index 0 and `amount` is index 1. Do not reorder these blocks.
+#
+# Same `protocol: "transfer"` namespace as ./transfer.yaml and ./transfer-native.yaml —
+# splitting the pull path into its own file changes no generated rootfile path.
+protocol: "transfer"
+
+inputs:
+  asset_address:
+    type: "address"
+  to:
+    type: "address"
+
+actions:
+  transfer_from:
+    calls:
+      - description: "Pull the asset from the approving address into the pinned destination"
+        target: ${inputs.asset_address}
+        selector: "transferFrom(address,address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${input_slots.from}
+          - type: "address"
+            value: ${inputs.to}
+          - type: "uint256"
+            value: ${input_slots.amount_to_transfer}
+    input_slots:
+      from:
+        type: "address"
+        description: "The address to pull from — must have approved the Safe for at least the amount"
+      amount_to_transfer:
+        type: "uint256"
+        description: "The amount of tokens to pull"
