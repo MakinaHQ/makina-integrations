@@ -28,7 +28,7 @@ positions:
   # 0xA032aFD7…0B09. The action/label renames in this release are root-neutral (TOML keys
   # only), but the `usdc_amount` -> `stable_amount` slot rename is NOT: state[i] is
   # keccak256(slot_name). Either way this release needs one activation.
-  - id: "0"
+  - id: "1"
     group_id: "0"
     description: "Uniswap X filler — park idle USDC in Aave v3"
     instructions: !include "../../../instructions-x/uniswap-x/park-aave.yaml"
@@ -37,7 +37,7 @@ positions:
 
   # Aave liquidity sleeve, retained for OPERATOR use outside fills — supply and, crucially,
   # withdraw, which has no canonical filler equivalent. The filler must never submit these
-  # automatically; its only parking path is position 0 above. The overlap between
+  # automatically; its only parking path is the canonical action above. The overlap between
   # aavev3/add_collateral/USDC here and uniswapX/park_stable_in_aave/USDC is deliberate and
   # mirrors the Morpho carve-out in ../robinhood/caliber.yaml.
   - id: "1"

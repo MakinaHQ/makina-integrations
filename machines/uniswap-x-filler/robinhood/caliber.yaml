@@ -70,9 +70,10 @@ positions:
   # `label` MUST stay the bare stable symbol "USDG" — it is the last path segment the filler
   # is configured against, so changing it silently unroutes parking.
   #
-  # This is the only parking path the filler may submit. Position 1's morpho.deposit_vault is
-  # the same economic action but is operator-recovery only.
-  - id: "0"
+  # This is the only parking path the filler may submit. The overlap with position 1's
+  # morpho.deposit_vault below is deliberate: they are the same economic position, while
+  # the generic Morpho actions are operator-recovery only.
+  - id: "1"
     group_id: "0"
     description: "Uniswap X filler — park idle USDG in the Morpho steakUSDG vault"
     instructions: !include "../../../instructions-x/uniswap-x/park-morpho.yaml"
