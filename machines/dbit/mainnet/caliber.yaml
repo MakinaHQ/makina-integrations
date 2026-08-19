@@ -11,6 +11,9 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
   swap_module:
     type: "address"
     value: "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
@@ -111,6 +114,34 @@ positions:
       asset_address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
       vault_address: "0xbeEF346d7099865208Ff331e4f648f4154DDAa05"
 
+  - id: "319028358984478431816090771761707097811"
+    group_id: "0"
+    description: "Morpho Vault 3Jane Ecosystem"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xe05faDf242331808f504661BEA65972594869826"]
+    vars:
+      label: "3Jane Ecosystem Vault"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xe05faDf242331808f504661BEA65972594869826"
+  - id: "304842766591321364733133397329774721882"
+    group_id: "0"
+    description: "Morpho Vault Sentora mWIN Main (PYUSD)"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"]
+    vars:
+      label: "Sentora mWIN Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"
+  - id: "101479911391298992514073662718338576961"
+    group_id: "0"
+    description: "Morpho Vault Sentora RLUSD Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
+    vars:
+      label: "Sentora RLUSD Main"
+      asset_address: ${token_list.mainnet.RLUSD}
+      vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
+
   # ── Morpho Lending ────────────────────────────────────────────────
   - id: "71113914840865297411820908650005851500"
     group_id: "0"
@@ -143,6 +174,14 @@ positions:
     vars:
       label: "PT-reUSD-25JUN2026/USDC (0x9bc9...d79)"
       market_id: "0x9bc98c2f20ac58287ef2c860eea53a2fdc27c17a7817ff1206c0b7840cc7cd79"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "199708234830348815037617604080094469854"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x1e9d...fc64)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"
+      market_id: "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
       loan_token: ${token_list.mainnet.USDC}
   - id: "120965581111816380909241012581664688373"
     group_id: "0"
