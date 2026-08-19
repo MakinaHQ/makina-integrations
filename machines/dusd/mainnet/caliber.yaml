@@ -250,6 +250,14 @@ positions:
       label: "PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"
       market_id: "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
       loan_token: ${token_list.mainnet.USDT}
+  - id: "39138221810512683469067584028855335565"
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0xf8c5...ba89)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"
+      market_id: "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89"
+      loan_token: ${token_list.mainnet.USDC}
 
   # ── Aave Umbrella ─────────────────────────────────────────────────
   - id: "176021688445186810403025048632929053161"
