@@ -241,6 +241,7 @@ positions:
     group_id: "2"
     description: "AaveV3 Borrow USDC"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x72E95b8931767C79bA4EeE721354d6E99a61D004"]
     vars:
       label: "USDC - Borrow"
       asset_address: ${token_list.mainnet.USDC}
@@ -250,6 +251,7 @@ positions:
     group_id: "2"
     description: "AaveV3 Borrow USDT"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x6df1C1E379bC5a00a7b4C6e67A203333772f45A8"]
     vars:
       label: "USDT - Borrow"
       asset_address: ${token_list.mainnet.USDT}
@@ -259,6 +261,7 @@ positions:
     group_id: "2"
     description: "AaveV3 Borrow USDtb"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xeA85A065f87FE28aA8FBF0D6c7dEC472b106252c"]
     vars:
       label: "USDtb - Borrow"
       asset_address: ${token_list.mainnet.USDtb}
@@ -268,6 +271,7 @@ positions:
     group_id: "2"
     description: "AaveV3 Borrow USDe"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0x015396E1F286289aE23a762088E863b3ec465145"]
     vars:
       label: "USDe - Borrow"
       asset_address: ${token_list.mainnet.USDe}
