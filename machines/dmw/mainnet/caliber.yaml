@@ -26,6 +26,11 @@ config:
   morpho_address:
     type: "address"
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb" # Morpho Blue
+  # Required by instructions/morpho-vault-v2.yaml: emergency_redeem_vault_v2 sizes its
+  # exit off the lens because VaultV2's own maxRedeem/maxDeposit return 0.
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690" # Morpho VaultV2LiquidityLib
   caliber_helper_address:
     type: "address"
     value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
@@ -34,9 +39,10 @@ config:
   #
   # Safe WITHOUT touching any blueprint: no blueprint reachable from this caliber calls
   # sub() on the config-supplied helper at all. The only math-helper function reachable
-  # from instructions/morpho-market-{collateral,debt}.yaml is mulDiv, at
-  # blueprints/morpho/account.yaml:112 and :192, and mulDiv is identical on both helpers
-  # (compared on five inputs plus the zero-denominator Panic 0x12).
+  # from instructions/morpho-market-{collateral,debt}.yaml and morpho-vault-v2.yaml is
+  # mulDiv, at blueprints/morpho/account.yaml:112 and withdraw.yaml:148, and mulDiv is
+  # identical on both helpers (compared on five inputs plus the zero-denominator
+  # Panic 0x12).
   #
   # !! This key is machine-wide. The loop-family blueprints — morpho-loop/**,
   # morpho-pendle-pt-loop/**, curve-llamalend/repay.yaml — DO call sub() on it and are
@@ -48,6 +54,12 @@ config:
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
 
 positions:
+  # ── Harvest-only ───────────────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+
   # ── Midas mWIN ─────────────────────────────────────────────────────────────
   # Issuance leg: USDC → mWIN via the mWIN deposit vault's depositInstant.
   # Accounts as 0 (account_0); value is carried by the base-token registry on both
@@ -143,3 +155,19 @@ positions:
       label: "mWIN/PYUSD (0xeecb...c774)"
       market_id: "0xeecbfa4b6caa83c5000ce68a77808c80504e2ff56e81095c7742a615ecd9c774"
       loan_token: ${token_list.mainnet.PYUSD}
+
+  # ── Morpho Vault: Sentora mWIN Main (PYUSD) ────────────────────────────────
+  # Supply side of the mWIN loop, via the vault rather than the 0xeecb...c774 market
+  # directly: the vault's one adapter holds ~all of that market's supply shares, so the
+  # exposure matches, but only the vault carries the Merkl campaign (~7.58% APR on
+  # 2026-08-18; the market has none). VaultV2 per scripts/morpho_vault_version.py.
+  # group_id 0, not the borrow pair's group 1 — grouping is for offsetting legs only.
+  - id: "304842766591321364733133397329774721882"
+    group_id: "0"
+    description: "Morpho Vault Sentora mWIN Main (PYUSD)"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"]
+    vars:
+      label: "Sentora mWIN Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"
