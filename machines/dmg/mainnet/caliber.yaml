@@ -34,6 +34,11 @@ positions:
     description: "Merkl Harvest"
     instructions: !include "./instructions/merkl.yaml"
 
+  - id: "1"
+    group_id: "0"
+    description: "DMG USDC One-Time Transfer"
+    instructions: !include "./instructions/one-time-transfer-usdc.yaml"
+
   # ── Midas ────────────────────────────────────────────────────────
   - id: "74279913377154171133723219389628797435147974258238735195930105321760025303591" # keccak256("midas.mglobal.swap-in")
     group_id: "0"
@@ -86,6 +91,16 @@ positions:
       aave_token: "0x49d3cdE03813eE32DFD47F6aA3957d5F9CbAB985"
       aave_pool_instance: "${config.aave_horizon_pool_address}"
       e_mode_category: "5"
+  - id: "87224421864707228069930864185331520862"
+    group_id: "2"
+    description: "AaveV3 Horizon Supply USDC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x68215B6533c47ff9f7125aC95adf00fE4a62f79e"]
+    vars:
+      label: "USDC - Lend"
+      asset_address: ${token_list.mainnet.USDC}
+      aave_token: "0x68215B6533c47ff9f7125aC95adf00fE4a62f79e"
+      aave_pool_instance: "${config.aave_horizon_pool_address}"
   - id: "133495794982505815817947498041694656764"
     group_id: "2"
     description: "AaveV3 Horizon Borrow RLUSD"
