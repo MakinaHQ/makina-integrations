@@ -1,0 +1,34 @@
+# One-time transfer of 3000 USDC out of the DMG caliber.
+#
+# HARVEST so the transfer bypasses the manage-time slippage check (the caliber
+# loses value with no offsetting position). The KV-store flag makes it
+# single-shot: the second attempt reverts on revertIfTrue.
+#
+# Expected config:
+#   key_value_store_address, boolean_helper_address
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: "DMG USDC One-Time Transfer"
+    path: "../../../blueprints/makina/one-time-transfer.yaml:one_time_transfer"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      token_address:
+        type: "address"
+        value: ${token_list.mainnet.USDC}
+      recipient_address:
+        type: "address"
+        value: "0x8e87Caf1FC5a0d4aebe0E0c976b24a3A9e3672C4"
+      transfer_amount:
+        type: "uint256"
+        value: "3000000000" # 3000 USDC with 6 decimals
+      kv_store_key:
+        type: "bytes32"
+        value: "0x1baa847f6bbb34e3225a02ade7b0a96aced1ca32286da368b0b8f0b80bcff36c" # keccak256("makina.dmg.usdc.one-time-transfer.done")
