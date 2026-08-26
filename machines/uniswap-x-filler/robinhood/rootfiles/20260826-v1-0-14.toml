@@ -1,0 +1,634 @@
+# this is a generated file - do not edit manually
+# root: 0xd46e1b456da61ee69874230be635151e4268c6eca62df5ae14a1c04cb03c8fed
+
+[tokens."${token_list.robinhood.GOOGL}"]
+chainId = 4663
+address = "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3"
+name = "Alphabet Class A • Robinhood Token"
+decimals = 18
+symbol = "GOOGL"
+
+[tokens."${token_list.robinhood.NVDA}"]
+chainId = 4663
+address = "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec"
+name = "NVIDIA • Robinhood Token"
+decimals = 18
+symbol = "NVDA"
+
+[tokens."${token_list.robinhood.SPCX}"]
+chainId = 4663
+address = "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea"
+name = "Space Exploration Technologies Corp. Class A Common Stock • Robinhood Token"
+decimals = 18
+symbol = "SPCX"
+
+[tokens."${token_list.robinhood.TSLA}"]
+chainId = 4663
+address = "0x322f0929c4625ed5bad873c95208d54e1c003b2d"
+name = "Tesla • Robinhood Token"
+decimals = 18
+symbol = "TSLA"
+
+[tokens."${token_list.robinhood.USDG}"]
+chainId = 4663
+address = "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
+name = "Global Dollar"
+decimals = 6
+symbol = "USDG"
+
+[instructions.morpho.deposit_vault."USDG - steakUSDG"]
+position_id = "1"
+description = "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x6e553f65010002ff000000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."USDG - steakUSDG".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.emergency_redeem_vault_v2."USDG - steakUSDG"]
+position_id = "1"
+description = "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff00000000c276e5617ca001baa9b2099b9d24302292a3b8e5",
+  "0xba08765201000101ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+]
+state = [
+  "0x000000000000000000000000beeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.redeem_vault."USDG - steakUSDG"]
+position_id = "1"
+description = "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."USDG - steakUSDG".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDG - steakUSDG"]
+position_id = "1"
+description = "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0xaa9a091201030001ff000003a12712f095840caf6127e466d7af7fb83479aaba",
+  "0xba08765201030202ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."USDG - steakUSDG".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDG - steakUSDG"]
+position_id = "1"
+description = "Morpho Steakhouse USDG vault — filler USDG inventory buffer"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."USDG - steakUSDG".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_direct.GOOGL]
+position_id = "3"
+description = "Uniswap X GOOGL filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.GOOGL.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.GOOGL.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.GOOGL.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_direct.NVDA]
+position_id = "2"
+description = "Uniswap X NVDA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.NVDA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.NVDA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.NVDA.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_direct.SPCX]
+position_id = "4"
+description = "Uniswap X SPCX filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.SPCX.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.SPCX.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.SPCX.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_direct.TSLA]
+position_id = "8"
+description = "Uniswap X TSLA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x322f0929c4625ed5bad873c95208d54e1c003b2d",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.TSLA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.TSLA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_direct.TSLA.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.GOOGL]
+position_id = "3"
+description = "Uniswap X GOOGL filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+]
+position_tokens = []
+commands = [
+  "0xb460af9401020303ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x095ea7b3010402ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "31901471898837980949691369446728269824"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.GOOGL.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.GOOGL.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.GOOGL.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.NVDA]
+position_id = "2"
+description = "Uniswap X NVDA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+]
+position_tokens = []
+commands = [
+  "0xb460af9401020303ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x095ea7b3010402ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "31901471898837980949691369446728269824"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.NVDA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.NVDA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.NVDA.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.SPCX]
+position_id = "4"
+description = "Uniswap X SPCX filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+]
+position_tokens = []
+commands = [
+  "0xb460af9401020303ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x095ea7b3010402ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "31901471898837980949691369446728269824"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.SPCX.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.SPCX.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.SPCX.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.TSLA]
+position_id = "8"
+description = "Uniswap X TSLA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x322f0929c4625ed5bad873c95208d54e1c003b2d",
+]
+position_tokens = []
+commands = [
+  "0xb460af9401020303ff0000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x095ea7b3010402ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "31901471898837980949691369446728269824"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.TSLA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.TSLA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.buy_stock_with_stable_from_morpho_vault.TSLA.inputs_slots]]
+index = 2
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.park_stable_in_morpho_vault.USDG]
+position_id = "1"
+description = "Uniswap X filler — park idle USDG in the Morpho steakUSDG vault"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x5fc5360d0400a0fd4f2af552add042d716f1d168"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x6e553f65010002ff000000ffbeeff033f34c046626b8d0a041844c5d1a5409dd",
+]
+state = [
+  "0xefe54415105a053da4f309b7490f50d7a3c511164c80ae64738ba4fed2783269",
+  "0x000000000000000000000000beeff033f34c046626b8d0a041844c5d1a5409dd",
+  "0x00000000000000000000000081aa9da3b68ef186e34e96fb6ae9ad16d7715c72",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.uniswapX.park_stable_in_morpho_vault.USDG.inputs_slots]]
+index = 0
+name = "stable_amount"
+type = "Uint"
+
+[instructions.uniswapX.sell_stock_for_stable_direct.GOOGL]
+position_id = "3"
+description = "Uniswap X GOOGL filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff2e0847e8910a9732eb3fb1bb4b70a580adad4fe3",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0x81afc3ecbbda51f394a45b0878cd0df1a0801cedf48fd4332e5848fe47ba20e7",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.GOOGL.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.GOOGL.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.GOOGL.inputs_slots]]
+index = 2
+name = "stock_amount"
+type = "Uint"
+
+[instructions.uniswapX.sell_stock_for_stable_direct.NVDA]
+position_id = "2"
+description = "Uniswap X NVDA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ffd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0x81afc3ecbbda51f394a45b0878cd0df1a0801cedf48fd4332e5848fe47ba20e7",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.NVDA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.NVDA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.NVDA.inputs_slots]]
+index = 2
+name = "stock_amount"
+type = "Uint"
+
+[instructions.uniswapX.sell_stock_for_stable_direct.SPCX]
+position_id = "4"
+description = "Uniswap X SPCX filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff4a0e65a3eccec6dbe60ae065f2e7bb85fae35eea",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0x81afc3ecbbda51f394a45b0878cd0df1a0801cedf48fd4332e5848fe47ba20e7",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.SPCX.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.SPCX.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.SPCX.inputs_slots]]
+index = 2
+name = "stock_amount"
+type = "Uint"
+
+[instructions.uniswapX.sell_stock_for_stable_direct.TSLA]
+position_id = "8"
+description = "Uniswap X TSLA filler settlement"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+  "0x322f0929c4625ed5bad873c95208d54e1c003b2d",
+]
+position_tokens = []
+commands = [
+  "0x095ea7b3010302ff000000ff322f0929c4625ed5bad873c95208d54e1c003b2d",
+  "0x3f62192e01fc8081fbff00ff000000007a1c8e570011eedf86a2a35593013cba",
+]
+state = [
+  "0x21c0107378acb490e7190da71596effe409c128f08adcc5467b293f1f3a66431",
+  "0x838f7b521e7905679d639e84410a3a3d07b9b568b2fc0922c31b364ee245be8d",
+  "0x81afc3ecbbda51f394a45b0878cd0df1a0801cedf48fd4332e5848fe47ba20e7",
+  "0x000000000000000000000000000000007a1c8e570011eedf86a2a35593013cba",
+]
+bitmap = "21267647932558653966460912964485513216"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.TSLA.inputs_slots]]
+index = 0
+name = "order"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.TSLA.inputs_slots]]
+index = 1
+name = "signature"
+type = "Bytes"
+
+[[instructions.uniswapX.sell_stock_for_stable_direct.TSLA.inputs_slots]]
+index = 2
+name = "stock_amount"
+type = "Uint"
