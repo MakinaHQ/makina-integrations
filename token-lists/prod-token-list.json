@@ -355,10 +355,31 @@
     },
     {
       "chainId": 4663,
+      "address": "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3",
+      "name": "Alphabet Class A \u2022 Robinhood Token",
+      "decimals": 18,
+      "symbol": "GOOGL"
+    },
+    {
+      "chainId": 4663,
       "address": "0xd0601CE157Db5bdC3162BbaC2a2C8aF5320D9EEC",
       "name": "NVIDIA \u2022 Robinhood Token",
       "decimals": 18,
       "symbol": "NVDA"
+    },
+    {
+      "chainId": 4663,
+      "address": "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa",
+      "name": "Space Exploration Technologies Corp. Class A Common Stock \u2022 Robinhood Token",
+      "decimals": 18,
+      "symbol": "SPCX"
+    },
+    {
+      "chainId": 4663,
+      "address": "0x322F0929c4625eD5bAd873c95208D54E1c003b2d",
+      "name": "Tesla \u2022 Robinhood Token",
+      "decimals": 18,
+      "symbol": "TSLA"
     },
     {
       "chainId": 4663,

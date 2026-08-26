@@ -102,10 +102,12 @@ positions:
   # Uniswap X filler settlement, one position per tokenized equity. Mirrors the mainnet set;
   # HOODx has no Robinhood Chain counterpart, so the mainnet 11 map to 10 here.
   #
-  # Every equity below was verified to have bytecode IDENTICAL to the canonical
-  # "• Robinhood Token" implementation (codehash
+  # Every equity below was verified to have runtime bytecode IDENTICAL to the canonical
+  # "• Robinhood Token" beacon proxy (proxy codehash
   # 0x6c1fdd40002dcb440c7fff6a84171404d279ccb057803b65826f7546acd65630), all 18 dec. That
-  # check matters: a second contract also answers symbol() "INTC" with name
+  # hash identifies the proxy shell, not the upgradeable beacon implementation, so exact
+  # token addresses remain the asset-identity boundary. The check still matters: a second
+  # contract also answers symbol() "INTC" with name
   # "Intel • Robinhood Token" at 0x751a08f6400814E764FB4F4bA754dF91955A1466, with different
   # bytecode and a round 1e27 supply. It is a counterfeit and is deliberately NOT used.
   - id: "2"
@@ -116,21 +118,21 @@ positions:
       label: "NVDA"
       stock_token: "${token_list.robinhood.NVDA}"
 
-  # - id: "3"
-  #   group_id: "0"
-  #   description: "Uniswap X GOOGL filler settlement"
-  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
-  #   vars:
-  #     label: "GOOGL"
-  #     stock_token: "0x2e0847E8910a9732eB3fb1bb4b70a580ADAD4FE3"
+  - id: "3"
+    group_id: "0"
+    description: "Uniswap X GOOGL filler settlement"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+    vars:
+      label: "GOOGL"
+      stock_token: "${token_list.robinhood.GOOGL}"
 
-  # - id: "4"
-  #   group_id: "0"
-  #   description: "Uniswap X SPCX filler settlement"
-  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
-  #   vars:
-  #     label: "SPCX"
-  #     stock_token: "0x4a0E65A3EcceC6dBe60AE065F2e7bb85Fae35eEa"
+  - id: "4"
+    group_id: "0"
+    description: "Uniswap X SPCX filler settlement"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+    vars:
+      label: "SPCX"
+      stock_token: "${token_list.robinhood.SPCX}"
 
   # - id: "5"
   #   group_id: "0"
@@ -156,13 +158,13 @@ positions:
   #     label: "AAPL"
   #     stock_token: "0xaF3D76f1834A1d425780943C99Ea8A608f8a93f9"
 
-  # - id: "8"
-  #   group_id: "0"
-  #   description: "Uniswap X TSLA filler settlement"
-  #   instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
-  #   vars:
-  #     label: "TSLA"
-  #     stock_token: "0x322F0929c4625eD5bAd873c95208D54E1c003b2d"
+  - id: "8"
+    group_id: "0"
+    description: "Uniswap X TSLA filler settlement"
+    instructions: !include "../../../instructions-x/uniswap-x/fills-morpho.yaml"
+    vars:
+      label: "TSLA"
+      stock_token: "${token_list.robinhood.TSLA}"
 
   # - id: "9"
   #   group_id: "0"

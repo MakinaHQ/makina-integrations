@@ -58,6 +58,9 @@ LEGACY_ACTION_NAMES = (
 # Every contract-governed instruction template lives in this one directory, so the
 # governed surface is enumerable rather than pattern-matched out of a flat folder.
 TEMPLATE_DIR = REPO_ROOT / "instructions-x" / "uniswap-x"
+ROBINHOOD_CALIBER = (
+    REPO_ROOT / "machines" / "uniswap-x-filler" / "robinhood" / "caliber.yaml"
+)
 
 PARKING_TEMPLATES = {
     "park-aave.yaml": "park_stable_in_aave",
@@ -270,6 +273,25 @@ class TestCaliberWiring(unittest.TestCase):
                         r"^[A-Za-z0-9]+$",
                         "parking label must be a bare stable symbol",
                     )
+
+    def test_robinhood_active_fill_positions_are_the_four_name_canary(self) -> None:
+        positions = _load(ROBINHOOD_CALIBER)["positions"]
+        active_fills = {
+            position["vars"]["label"]: position["vars"]["stock_token"]
+            for position in positions
+            if position["instructions"]["__include__"].endswith("fills-morpho.yaml")
+        }
+
+        self.assertEqual(
+            active_fills,
+            {
+                "NVDA": "${token_list.robinhood.NVDA}",
+                "SPCX": "${token_list.robinhood.SPCX}",
+                "GOOGL": "${token_list.robinhood.GOOGL}",
+                "TSLA": "${token_list.robinhood.TSLA}",
+            },
+            "the Robinhood instruction allowlist must expose exactly the approved canary",
+        )
 
 
 if __name__ == "__main__":
