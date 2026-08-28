@@ -1,0 +1,190 @@
+protocol: "centrifuge-v3"
+
+# Centrifuge V3 (ERC-7540 AsyncVault) — DEPOSIT side.
+#
+# Generic across every Centrifuge V3 pool: JAAA (pool 281474976710663) and JTRSY
+# (pool 281474976710662) share the same router, AsyncRequestManager, Spoke and
+# BalanceSheet and differ ONLY in vault / share token / pool escrow. Everything
+# pool-specific is therefore an `input`, not a constant — unlike blueprints/prime-swap,
+# whose USDC->wYLDS->PRIME topology really is fixed.
+#
+# ## Why "request"/"claim" and NOT "swap"/"mint"
+# There is no atomic acquisition here. The caliber's USDC leaves in the request tx and
+# the shares arrive in a DIFFERENT tx, hours later, and the mint itself happens in a
+# transaction the caliber never sends (the pool operator's `issueShares`). Naming this
+# `swap_asset_for_jaaa` (the prime-swap/midas convention) would name a lie; ERC-7540's
+# own vocabulary maps 1:1 onto the on-chain calls.
+#
+# ## Four-step lifecycle (only steps 1 and 4 are ours)
+#   1. [caliber] requestDeposit          -> USDC to PoolEscrow, NOTHING minted yet
+#   2. [operator] approveDeposits         -> epoch sealed, no token moves
+#   3. [operator] issueShares/notifyDeposit -> THE MINT, 0x0 -> PoolEscrow, sets the price
+#   4. [caliber] claim_deposit            -> escrow -> caliber (supply unchanged)
+# Verified on mainnet: JTRSY 500,000 USDC -> 449,067.483068 shares at
+# pricePoolPerShare 1.1134184033629073, exact, no fee or slippage term
+# (tx 0x49d248eb…, 0x76a34a43…, 0xcb8ac18f…).
+#
+# ## No VaultRouter
+# The VaultRouter exists for the `enable`/operator dance and cross-chain gas prepayment.
+# Pool …663 is same-chain (Hub and Spoke both on Ethereum) and the caliber is its own
+# `owner` and `controller`, so `requestDeposit(assets, caliber, caliber)` is accepted
+# directly. Going direct removes the operator state, the `payable` plumbing and one call.
+#
+# ## No slippage floor is POSSIBLE on the request
+# Unlike blueprints/prime-swap/deposit.yaml, which bounds its synchronous mint with a
+# `gte(prime_shares, min_shares)` guard, the share price here is chosen by the operator
+# in step 3, AFTER our transaction is mined. There is no value to bound at request time
+# and no on-chain way to bound it. This is a governance/counterparty risk that the
+# blueprint cannot express — it is bounded by position sizing, not by a call.
+#
+# ## No KV sentinel
+# Every ERC-7540 getter returns 0 (never reverts) for an address with no position —
+# verified against a never-whitelisted address on mainnet. Unlike blueprints/makina
+# (id-keyed requests needing a KV sentinel to disambiguate id 0), the vault's own state
+# is authoritative and self-describing. ERC-7540 also lets repeat requests accumulate
+# into the same epoch bucket, so no one-in-flight guard is required either.
+#
+# ## The USDC approval goes to the VAULT, not the router
+# Verified on mainnet (tx 0xf28a943d…): an exact-amount `approve(vault, assets)`.
+#
+# Expected inputs (from instructions/centrifuge-v3-deposit.yaml).
+
+inputs:
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+
+actions:
+  # Absolute variant: request a deposit of an exact amount of the entry asset.
+  request_deposit:
+    calls:
+      - description: "Approve the AsyncVault to pull the entry asset (approval goes to the VAULT, not the router)"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Request the async deposit — asset moves to the PoolEscrow, no shares minted yet"
+        target: "${inputs.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of the entry asset (USDC, 6-dec) to request a deposit for"
+
+  # Relative variant: request a deposit of a basis-points fraction of the caliber's balance.
+  request_deposit_relative:
+    calls:
+      - description: "Read the caliber's entry-asset balance"
+        target: "${inputs.asset_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+
+      - description: "Compute asset amount = balance * bps / 10000"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_deposit}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "asset_amount"
+          type: "uint256"
+
+      - description: "Approve the AsyncVault to pull the entry asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+
+      - description: "Request the async deposit — asset moves to the PoolEscrow, no shares minted yet"
+        target: "${inputs.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_deposit:
+        type: "uint256"
+        description: "Basis points of the caliber's entry-asset balance to deposit (10000 = 100%)"
+
+  # Claim shares the operator has already issued into the PoolEscrow (step 4).
+  # Pull-only — the protocol never pushes. Claims the FULL claimable amount:
+  # maxDeposit(controller) is exactly what the VaultRouter's claimDeposit uses.
+  claim_deposit:
+    calls:
+      - description: "Read the claimable asset amount (0 unless the operator has issued shares)"
+        target: "${inputs.vault_address}"
+        selector: "maxDeposit(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "claimable_assets"
+          type: "uint256"
+
+      - description: "has_claimable = (claimable assets > 0)"
+        target: "${inputs.caliber_helper_address}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_assets}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "has_claimable"
+          type: "bool"
+
+      - description: "Revert on a no-op claim rather than burning a management call silently"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.has_claimable}"
+
+      - description: "Claim: move the already-minted shares from the PoolEscrow to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "deposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_assets}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"

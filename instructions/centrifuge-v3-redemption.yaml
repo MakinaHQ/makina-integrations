@@ -1,0 +1,133 @@
+# Centrifuge V3 (ERC-7540 AsyncVault) — REDEMPTION position.
+#
+# Pairs with instructions/centrifuge-v3-deposit.yaml; see that file's header for the
+# go-live prerequisites (whitelist, base-token registration, token list), which apply
+# identically here and are NOT repeated.
+#
+# Expected position vars:
+#   label:        string   — position label, e.g. "JAAA"
+#   vault:        address  — the ERC-7540 AsyncVault
+#   share_token:  address  — the vault's share token (a REGISTERED CALIBER BASE TOKEN)
+#   asset_token:  address  — the vault's underlying / payout asset (e.g. USDC)
+#
+# Expected config:
+#   caliber_address, unsigned_math_helper_address, caliber_helper_address,
+#   boolean_helper_address
+#
+# ## The ACCOUNTING leg declares affected_tokens=[asset_token], NOT [share_token]
+# This is a DELIBERATE deviation from the obvious choice (the token the MANAGEMENT legs
+# move), and the same call blueprints/prime-swap/withdraw.yaml made. The reserved slot is
+# reported in ASSET terms — pendingRedeemRequest is converted through convertToAssets in
+# the blueprint — so the Caliber must price it via the asset's registry route. Declaring
+# [share_token] would price an asset-denominated amount as shares and inflate it by the
+# share premium (JAAA ~4.7%): a silent NAV bump at request_redeem and a matching drop at
+# claim_redeem.
+#
+# ## Settlement is NOT a caliber instruction
+# Between request_redeem and claim_redeem the pool operator must call approveRedeems and
+# then revokeShares/notifyRedeem. The caliber cannot self-settle and cannot bound the
+# price it settles at. Observed mainnet latency on JAAA was ~6.5h, but nothing on-chain
+# guarantees it — this is counterparty risk bounded by position sizing, not by a call.
+
+# 1/4 - MANAGEMENT: request redemption of an exact share amount
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_token} # shares leave the caliber; pending term rises
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:request_redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      share_address:
+        type: "address"
+        value: ${position.share_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 2/4 - MANAGEMENT: request redemption of a bps fraction of the caliber's share balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_token} # shares leave the caliber; pending term rises
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:request_redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      share_address:
+        type: "address"
+        value: ${position.share_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 3/4 - MANAGEMENT: claim the asset the operator has already reserved in the PoolEscrow
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_token} # asset arrives in the caliber; claimable term falls
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:claim_redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      share_address:
+        type: "address"
+        value: ${position.share_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 4/4 - ACCOUNTING: redeem-side in-flight value (asset-denominated, see header)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_token} # converted pending + maxWithdraw are both asset-denominated
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/account.yaml:account_redeem_pending"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"

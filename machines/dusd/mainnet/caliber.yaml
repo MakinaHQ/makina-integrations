@@ -718,3 +718,25 @@ positions:
     group_id: "0"
     description: "PRIME Redemption (async PRIME->USDC via wYLDS)"
     instructions: !include "../../../instructions/prime-redemption.yaml"
+  # JAAA — Janus Henderson AAA CLO Fund, Centrifuge V3 pool 281474976710663 (ERC-7540).
+  # Blocked on the go-live prerequisites in instructions/centrifuge-v3-deposit.yaml:
+  # caliber whitelist on the vault + share-token hook, and JAAA base-token registration
+  # (rate adapter -> setFeedRoute -> addBaseToken via riskManagerTimelock 0x38542447...c4b6).
+  - id: "2865158076199512478574839875223231360192096383741814096571063742470078337951" # keccak256("centrifuge.jaaa.deposit")
+    group_id: "0"
+    description: "JAAA Deposit (async ERC-7540 request/claim, base-token)"
+    instructions: !include "../../../instructions/centrifuge-v3-deposit.yaml"
+    vars:
+      label: "JAAA"
+      vault: "0x4880799eE5200fC58DA299e965df644fBf46780B"
+      share_token: ${token_list.mainnet.JAAA}
+      asset_token: ${token_list.mainnet.USDC}
+  - id: "49533069302793019412758213926668949475427801243086893033878376412521788122203" # keccak256("centrifuge.jaaa.redemption")
+    group_id: "0"
+    description: "JAAA Redemption (async ERC-7540 request/claim)"
+    instructions: !include "../../../instructions/centrifuge-v3-redemption.yaml"
+    vars:
+      label: "JAAA"
+      vault: "0x4880799eE5200fC58DA299e965df644fBf46780B"
+      share_token: ${token_list.mainnet.JAAA}
+      asset_token: ${token_list.mainnet.USDC}

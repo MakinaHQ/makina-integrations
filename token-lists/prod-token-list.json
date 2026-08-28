@@ -110,6 +110,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x5a0F93D040De44e78F251b03c43be9CF317Dcf64",
+      "name": "Janus Henderson AAA CLO Fund",
+      "decimals": 6,
+      "symbol": "JAAA"
+    },
+    {
+      "chainId": 1,
       "address": "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
       "name": "PayPal USD",
       "decimals": 6,

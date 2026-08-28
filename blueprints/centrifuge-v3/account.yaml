@@ -1,0 +1,154 @@
+protocol: "centrifuge-v3"
+
+# Centrifuge V3 (ERC-7540 AsyncVault) — IN-FLIGHT ACCOUNTING.
+#
+# The shares the caliber actually HOLDS are valued natively by the OracleRegistry
+# (the share token is a registered caliber base token — see the go-live prerequisite in
+# instructions/centrifuge-v3-deposit.yaml). Neither action below reads `balanceOf`;
+# that is precisely what keeps them from double-counting the held position.
+#
+# What these two actions cover is the value that exists in NEITHER token balance while a
+# request is mid-flight — the ERC-7540 blind spot. Four disjoint states:
+#
+#   deposit side   pendingDepositRequest    asset sent, not yet issued        (asset-denom)
+#                  claimableDepositRequest  issued, not yet claimed           (asset-denom)
+#   redeem side    pendingRedeemRequest     shares sent, not yet revoked      (SHARE-denom)
+#                  maxWithdraw              revoked, not yet claimed          (asset-denom)
+#
+# ## Both reserved slots are reported in ASSET terms, deliberately
+# The Caliber prices each accounting reserved-slot amount via
+# getPrice(affectedToken, accountingToken) (Caliber.sol:552), so the paired instructions
+# declare affected_tokens=[<asset>], NOT [<share>]. `pendingRedeemRequest` is denominated
+# in SHARES, so it is pushed through `convertToAssets` before being summed — reporting it
+# raw and pricing it as the share token would inflate it by the share premium (JAAA ~4.7%),
+# producing a silent NAV bump at request_redeem and a matching drop at claim_redeem.
+# This is the same call blueprints/prime-swap/withdraw.yaml:account_pending makes, and for
+# the same reason.
+#
+# ## Do NOT add claimableRedeemRequest to maxWithdraw
+# They are two VIEWS OF THE SAME CLAIM (shares vs assets), both non-zero after the
+# operator's revokeShares. Summing them double-counts. The disjoint pair is
+# pendingRedeemRequest (pre-revoke) + maxWithdraw (post-revoke).
+#
+# ## NAV continuity depends on the rate adapter
+# At request_redeem the shares leave the caliber (registry value drops) and
+# convertToAssets(pendingRedeemRequest) rises by the same amount — continuous ONLY if the
+# registry's first-hop rate adapter derives from this vault's own convertToAssets /
+# pricePerShare. An independently-sourced feed would step NAV on every request.
+#
+# ## Safe when flat
+# Every getter used here returns 0 rather than reverting for an address with no position —
+# verified on mainnet against a never-whitelisted address. The reserved slot goes to 0 and
+# the position closes cleanly. No KV sentinel, no guards needed.
+#
+# Expected inputs (from the instructions/centrifuge-v3-*.yaml pair).
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  unsigned_math_helper_address:
+    type: "address"
+
+actions:
+  # Deposit-side in-flight value: asset sent but shares not yet in the caliber.
+  # Both terms are already asset-denominated. Zero when nothing is in flight.
+  account_deposit_pending:
+    calls:
+      - description: "Assets requested but not yet issued by the operator (requestId is always 0)"
+        target: "${inputs.vault_address}"
+        selector: "pendingDepositRequest(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_assets"
+          type: "uint256"
+
+      - description: "Assets issued into the PoolEscrow but not yet claimed (disjoint from pending)"
+        target: "${inputs.vault_address}"
+        selector: "claimableDepositRequest(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "claimable_assets"
+          type: "uint256"
+
+      - description: "Total deposit-side in-flight value, in asset terms"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_assets}"
+          - type: "uint256"
+            value: "${returns.claimable_assets}"
+        return:
+          name: "total_pending_assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_pending_assets}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  # Redeem-side in-flight value: shares have left the caliber but the asset has not arrived.
+  # pendingRedeemRequest is SHARE-denominated and must be converted; maxWithdraw is already
+  # asset-denominated. Zero when nothing is in flight.
+  account_redeem_pending:
+    calls:
+      - description: "Shares requested but not yet revoked by the operator (requestId is always 0)"
+        target: "${inputs.vault_address}"
+        selector: "pendingRedeemRequest(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pending_shares"
+          type: "uint256"
+
+      - description: "Convert pending shares to asset terms (see header — do NOT report raw shares)"
+        target: "${inputs.vault_address}"
+        selector: "convertToAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_shares}"
+        return:
+          name: "pending_assets"
+          type: "uint256"
+
+      - description: "Assets revoked and reserved in the PoolEscrow but not yet claimed (disjoint from pending)"
+        target: "${inputs.vault_address}"
+        selector: "maxWithdraw(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "claimable_assets"
+          type: "uint256"
+
+      - description: "Total redeem-side in-flight value, in asset terms"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pending_assets}"
+          - type: "uint256"
+            value: "${returns.claimable_assets}"
+        return:
+          name: "total_pending_assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.total_pending_assets}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

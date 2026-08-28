@@ -1,0 +1,153 @@
+# Centrifuge V3 (ERC-7540 AsyncVault) — DEPOSIT position.
+#
+# Generic across every Centrifuge V3 pool: the vault, share token and entry asset are
+# position vars, so JTRSY (pool 281474976710662) costs one more caliber block, not a
+# second blueprint. First consumer: JAAA (pool 281474976710663, Janus Henderson AAA CLO
+# Fund) in dusd/mainnet.
+#
+# Pairs with instructions/centrifuge-v3-redemption.yaml. Split into two positions —
+# mirroring prime-swap-in.yaml / prime-redemption.yaml — because the deposit-side and
+# redeem-side in-flight terms are independent and each position carries exactly one
+# ACCOUNTING leg.
+#
+# Expected position vars:
+#   label:        string   — position label, e.g. "JAAA"
+#   vault:        address  — the ERC-7540 AsyncVault
+#   share_token:  address  — the vault's share token (a REGISTERED CALIBER BASE TOKEN)
+#   asset_token:  address  — the vault's underlying / entry asset (e.g. USDC)
+#
+# Expected config:
+#   caliber_address, unsigned_math_helper_address, caliber_helper_address,
+#   boolean_helper_address
+#
+# ## GO-LIVE PREREQUISITES (outside these files)
+#   1. WHITELIST — THE LONG POLE, START IT FIRST. The caliber must be permissioned on the
+#      vault AND a member on the share token's restriction hook. Verified on mainnet: a
+#      non-member returns isPermissioned() == false and EVERY call reverts, transfers
+#      included. This is a KYC/ops process with the pool operator, not a task in this
+#      repo, and it will outlast the code. For dusd the subject is the caliber
+#      0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC.
+#   2. BASE-TOKEN REGISTRATION — deploy a <share>/<asset> rate adapter, then
+#      OracleRegistry.setFeedRoute(share_token, adapter, 87000, <asset>/USD feed, 87000)
+#      on 0xC388B72AB90Be82B230D919F9C05c87F9397f485, then Caliber.addBaseToken(share_token)
+#      sent from the dusd Machine's riskManagerTimelock 0x38542447c49D24e617fc06113295D7AaA3BEc4b6.
+#      setFeedRoute MUST precede addBaseToken (on-chain ordering).
+#      The adapter MUST derive from the vault's own convertToAssets/pricePerShare, or the
+#      registry price and the accounting price disagree and NAV steps on every request.
+#      Until both are done, accounting cannot value the share token and affected_tokens
+#      containing it reverts InvalidAffectedToken.
+#      As of this writing JAAA has no registry route (getFeedRoute reverts) and
+#      isBaseToken(JAAA) is false on the dusd caliber.
+#   3. Share token present in token-lists/prod-token-list.json.
+#
+# ## Note on affected_tokens
+# The convention followed here is prime-redemption.yaml's: list the base token whose
+# CALIBER BALANCE moves on that leg, and let the paired reserved-slot term absorb the
+# other side. request_* drops the asset balance while the pending term rises; claim_*
+# raises the share balance while the claimable term falls.
+# >> FORK-VERIFY on the Stage-2 execution run, the way the PRIME sleeve was measured
+#    ("registry NAV within -1.33 bps"): confirm NAV is continuous across request_deposit
+#    and claim_deposit before this ships.
+
+# 1/4 - MANAGEMENT: request an async deposit of an exact asset amount
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_token} # entry asset leaves the caliber; pending term rises
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:request_deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      asset_address:
+        type: "address"
+        value: ${position.asset_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 2/4 - MANAGEMENT: request an async deposit of a bps fraction of the caliber's balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_token} # entry asset leaves the caliber; pending term rises
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:request_deposit_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      asset_address:
+        type: "address"
+        value: ${position.asset_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 3/4 - MANAGEMENT: claim shares the operator has already issued into the PoolEscrow
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_token} # shares arrive in the caliber; claimable term falls
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:claim_deposit"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      asset_address:
+        type: "address"
+        value: ${position.asset_token}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# 4/4 - ACCOUNTING: deposit-side in-flight value (asset-denominated, see blueprint header)
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_token} # pending + claimable are both asset-denominated
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/account.yaml:account_deposit_pending"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
