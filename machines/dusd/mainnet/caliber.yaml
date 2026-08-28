@@ -368,6 +368,23 @@ positions:
       aave_token: "0xe3190143eB552456F88464662F0C0C4AC67A77Eb"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
+  # JAAA as Horizon collateral. Supply-only: borrowing is DISABLED on this reserve
+  # on-chain, so there is no matching borrow position. LTV 81% / LT 86% / bonus 5%.
+  # Supply cap is 30,000,000 JAAA and ~28.33M is already supplied — check headroom
+  # before sizing a supply, it will revert SupplyCapExceeded.
+  # Shares the JAAA base-token prerequisite with the centrifuge.jaaa.* positions
+  # (affected_tokens is JAAA here too).
+  - id: "203030304645823465903198375540780571081" # pools_db makina_id — AaveV3 JAAA lending (Horizon Pool 0xAe05Cd22…332C8)
+    group_id: "3"
+    description: "AaveV3 Horizon Supply JAAA"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"]
+    vars:
+      label: "JAAA - Horizon Lend"
+      asset_address: ${token_list.mainnet.JAAA}
+      aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
+
   # ── AaveV3 sUSDe E-Mode (group_id: 1) ────────────────────────────
   - id: "13362078339443395382342079025223961472"
     group_id: "1"
