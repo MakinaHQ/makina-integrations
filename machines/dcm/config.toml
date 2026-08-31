@@ -1,0 +1,14 @@
+name = "dcm"
+chain = "mainnet"
+address = "0xd2f644d0418126ffcc8f16840ed5d52aa62fd4eb"
+
+[calibers.mainnet]
+address = "0xdc385c31c322351dac9ff4d7ded24e29b5d94768"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dcm/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
