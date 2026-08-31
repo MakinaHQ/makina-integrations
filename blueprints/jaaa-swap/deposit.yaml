@@ -1,0 +1,195 @@
+protocol: "jaaa-swap"
+
+# JAAA synthetic "swap in": acquire JAAA from USDC through the Centrifuge V3 ERC-7540
+# AsyncVault (pool 281474976710663). JAAA is a registered caliber base token, so acquired
+# JAAA is valued natively by the registry and the paired ACCOUNTING action reports only the
+# in-flight value — see account.yaml.
+#
+# Asynchronous, so "request"/"claim" and not one atomic swap. The acquisition spans four
+# steps and the caliber owns only the first and the last; the mint happens in the pool
+# operator's transaction, which the caliber never sends:
+#
+#   1. [caliber]  request_deposit -> USDC to the GLOBAL escrow, NOTHING minted yet
+#   2. [operator] approveDeposits -> epoch sealed, no token movement
+#   3. [operator] issueShares     -> THE MINT; depositPrice fixed HERE
+#   4. [caliber]  claim_deposit   -> shares pool escrow -> caliber (supply unchanged)
+#
+# Observed mainnet latency between 1 and 3: ~6.5h. Nothing on-chain guarantees it.
+#
+# The USDC approval goes to the VAULT: requestDeposit runs safeTransferFrom(asset, owner,
+# globalEscrow, assets), so the vault is msg.sender of the transferFrom. Note the USDC lands
+# in the GLOBAL escrow — the pool escrow only ever holds issued shares and revoked assets.
+#
+# NO SLIPPAGE FLOOR IS POSSIBLE. depositPrice is written by the operator in step 3, in a
+# transaction mined after ours: at request time there is no realised amount to bound, and at
+# claim time the price is already fixed and refusing would only strand the shares. This is
+# counterparty risk bounded by POSITION SIZING, not by a call.
+#
+# No KV sentinel or one-in-flight guard is needed: every getter returns 0 rather than
+# reverting when flat, and requestDeposit does `pendingDepositRequest += assets`, so repeat
+# requests accumulate into the same epoch bucket and account.yaml values the sum correctly.
+#
+# GO-LIVE PREREQUISITES (neither is code — see instructions/jaaa-swap-in.yaml):
+#   1. the caliber must be a member on the JAAA restriction hook 0x3C5E7B28...680A7;
+#   2. JAAA must be a registered base token (setFeedRoute then addBaseToken).
+#
+# Expected inputs (from instructions/jaaa-swap-in.yaml):
+#   caliber_address — request owner + controller, claim receiver, position holder
+
+constants:
+  # Shared math singleton already trusted by blueprints/prime-swap and blueprints/midas.
+  # Provides add / sub / gt / gte / lt / eq / mulDiv (all probed on mainnet).
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  # Centrifuge V3 AsyncVault for JAAA — the ONLY contract this blueprint calls.
+  vault_address:
+    type: "address"
+    value: "0x4880799eE5200fC58DA299e965df644fBf46780B"
+  # Entry asset pulled from the caliber (the vault's asset(); a registered dusd base token).
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  caliber_address:
+    type: "address"
+
+actions:
+  # ── Step 1, absolute: request a deposit of an exact USDC amount ──────────────
+  request_deposit:
+    calls:
+      - description: "Approve the AsyncVault to pull USDC (the vault is the transferFrom caller, so it is the spender)"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Request the async deposit — USDC moves to the global escrow, nothing minted yet"
+        target: "${constants.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of USDC (6-dec) to request a JAAA deposit for"
+
+  # ── Step 1, relative: request a bps fraction of the caliber's USDC balance ───
+  request_deposit_relative:
+    calls:
+      - description: "Read the caliber's USDC balance"
+        target: "${constants.usdc_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+
+      - description: "Compute USDC amount = balance * bps / 10000"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_deposit}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "asset_amount"
+          type: "uint256"
+
+      - description: "Approve the AsyncVault to pull USDC"
+        target: "${constants.usdc_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.vault_address}"
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+
+      - description: "Request the async deposit — USDC moves to the global escrow, nothing minted yet"
+        target: "${constants.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_deposit:
+        type: "uint256"
+        description: "Basis points of the caliber's USDC balance to deposit (10000 = 100%)"
+
+  # ── Step 4: claim the shares the operator has already issued ─────────────────
+  #
+  # Pull-only, claims the FULL entitlement.
+  #
+  # mint(maxMint), NOT deposit(maxDeposit). _processDeposit debits the claimable ceiling by
+  # `sharesUp` but pays the caliber `sharesDown`; mint(shares) passes the caller's amount as
+  # both bounds so up == down, while deposit(assets) computes up != down. Since maxDeposit is
+  # itself shareToAsset(maxMint, Down), a deposit claim is a lossy double conversion that
+  # also leaves a residue in state.maxMint no later call can clear. mint(maxMint) drives it
+  # to exactly 0 and delivers exactly maxMint shares.
+  #
+  # maxMint is hook-gated, so a de-whitelisted caliber reverts cleanly on the gt guard rather
+  # than deeper inside balanceSheet.withdraw; the shares stay claimable in the pool escrow.
+  claim_deposit:
+    calls:
+      - description: "Read the claimable share entitlement (0 unless the operator has issued shares)"
+        target: "${constants.vault_address}"
+        selector: "maxMint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "claimable_shares"
+          type: "uint256"
+
+      - description: "has_claimable = (claimable shares > 0)"
+        target: "${constants.math_helper_address}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_shares}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "has_claimable"
+          type: "bool"
+
+      - description: "Revert on a no-op claim rather than burning a management call silently"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.has_claimable}"
+
+      - description: "Claim: move the already-issued JAAA from the pool escrow to the caliber (exact, maxMint -> 0)"
+        target: "${constants.vault_address}"
+        selector: "mint(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
