@@ -24,9 +24,19 @@
 #   2. JAAA BASE-TOKEN REGISTRATION.
 #      a. Deploy a JAAA/USDC rate adapter. It MUST derive from the vault's own
 #         convertToAssets — an independent feed makes the registry price and the accounting
-#         price disagree, and NAV steps on every request.
-#      b. OracleRegistry.setFeedRoute(JAAA, adapter, 87000, USDC/USD feed, 87000) on
+#         price disagree, and NAV steps on every request. It MUST report updatedAt as
+#         AsyncVault.priceLastUpdated(), not block.timestamp: reporting block.timestamp makes
+#         the staleness bound inert and silently prices the position off an arbitrarily old NAV.
+#      b. OracleRegistry.setFeedRoute(JAAA, adapter, 691200, USDC/USD feed, 87000) on
 #         0xC388B72AB90Be82B230D919F9C05c87F9397f485.
+#         The first-hop threshold is NOT the house 87000 used for Chainlink 24h-heartbeat
+#         feeds. JAAA NAV is published WEEKLY (priceLastUpdated advances in exact 604800s
+#         steps; measured age is routinely >250000s), so 87000 would leave the feed stale ~6
+#         days in 7. A stale first hop reverts PriceFeedStale inside _getFeedPrice, and since
+#         Caliber._getAum prices every base token with a non-zero balance, that reverts
+#         getNetAum()/getDetailedAum() for the WHOLE caliber — not just the JAAA positions —
+#         plus every leg declaring affected_tokens=[JAAA]. 691200 = 604800 + ~14% slack.
+#         Worth an alert on block.timestamp - priceLastUpdated() crossing the threshold.
 #      c. Caliber.addBaseToken(JAAA), sent from the dusd riskManagerTimelock
 #         0x38542447c49D24e617fc06113295D7AaA3BEc4b6.
 #      setFeedRoute MUST precede addBaseToken. Until both are done, accounting cannot value
