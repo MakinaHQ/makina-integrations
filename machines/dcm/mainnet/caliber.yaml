@@ -36,7 +36,212 @@ config:
   context_helper_address:
     type: "address"
     value: "0x0f431322E1fF2500D4C5a4E090A7Da7344F953BE"
+  morpho_address:
+    type: "address"
+    value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+  # Morpho Vault V2 LiquidityAdapter lens — only read by the V2 emergency redeem leg.
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
   # TODO: a per-caliber KeyValueStore has not been deployed for DCM yet.
   # Add `key_value_store_address` here before wiring any instruction that needs it.
 
-positions: []
+positions:
+  # ══ Lending ═══════════════════════════════════════════════════════
+  # ── Morpho vaults — Sentora "Main" line (Morpho Vault V2) ─────────
+  # All five share one implementation (codehash 0xd40a…6acd for mWIN /
+  # PST / Paypal USD / PRIME Main; RLUSD Main is an earlier V2 build),
+  # so they all use the shared V2 template. `position_tokens` is the
+  # vault share token, held by the caliber.
+  - id: "101479911391298992514073662718338576961" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Sentora RLUSD Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"]
+    vars:
+      label: "Sentora RLUSD Main"
+      asset_address: ${token_list.mainnet.RLUSD}
+      vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
+  - id: "273739676753663843967743313854543738189" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Paypal USD Main (Sentora)"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xb576765fB15505433aF24FEe2c0325895C559FB2"]
+    vars:
+      label: "Paypal USD Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0xb576765fB15505433aF24FEe2c0325895C559FB2"
+  - id: "244003111842323732524710741252875629950" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Sentora PRIME Main (PYUSD)"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"]
+    vars:
+      label: "Sentora PRIME Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"
+  - id: "304842766591321364733133397329774721882" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Sentora mWIN Main (PYUSD)"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"]
+    vars:
+      label: "Sentora mWIN Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"
+  # TODO(pools_db): Sentora Huma PST Main has no makina_id anywhere in this
+  # repo yet and ids are pool-global (the same pool carries the same id in
+  # every caliber), so it can't be invented here. Uncomment once the id is
+  # pulled from pools_db; everything else about the position is settled —
+  # asset is PYUSD and the vault is the same V2 implementation as mWIN Main.
+  # - id: "<pools_db makina_id>"
+  #   group_id: "0"
+  #   description: "Morpho Vault Sentora Huma PST Main (PYUSD)"
+  #   instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+  #   position_tokens: ["0x8381a156958711E230f325428B5eb4b6555C75D9"]
+  #   vars:
+  #     label: "Sentora Huma PST Main"
+  #     asset_address: ${token_list.mainnet.PYUSD}
+  #     vault_address: "0x8381a156958711E230f325428B5eb4b6555C75D9"
+
+  # ── Morpho markets — passive supply side ──────────────────────────
+  - id: "199708234830348815037617604080094469854" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x1e9d...fc64)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"
+      market_id: "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "39138221810512683469067584028855335565" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0xf8c5...ba89)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"
+      market_id: "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "113449663964260328783737869496305528290" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
+
+  # ── Aave V4 (Hub & Spoke) ─────────────────────────────────────────
+  # No aToken is minted — accounted via getUserSuppliedAssets, hence no
+  # position_tokens. group_id "1" is the liquidation bucket for Spoke
+  # 0x94e7A5dC…c485 specifically; a different Spoke must get its own group_id.
+  - id: "102356596921134877304003836794819117820" # pools_db makina_id
+    group_id: "1"
+    description: "AaveV4 Supply USDG"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "USDG"
+      asset_address: ${token_list.mainnet.USDG}
+      spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
+      reserve_id: "11"
+  # GO-LIVE PREREQUISITE: frxUSD is NOT yet a base token on this caliber
+  # (isBaseToken -> false), so the MANAGEMENT/ACCOUNTING legs revert with
+  # InvalidAffectedToken until Caliber.addBaseToken(frxUSD) is sent from the
+  # risk-manager timelock. The OracleRegistry frxUSD/USDC route already
+  # resolves (0.999987), so no setFeedRoute is needed.
+  - id: "64048496748963625189377001215830228790" # pools_db makina_id
+    group_id: "1"
+    description: "AaveV4 Supply frxUSD"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "frxUSD"
+      asset_address: ${token_list.mainnet.frxUSD}
+      spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
+      reserve_id: "12"
+
+  # ══ Looping ═══════════════════════════════════════════════════════
+  # ── PRIME/PYUSD Morpho market (0x41c4…a3fa) ───────────────────────
+  # Own liquidation set -> group_id "2". Leverage is built by composing the
+  # PRIME swap-in below with add-collateral/borrow (the dusd pattern); PRIME
+  # is NAV-priced with no DEX liquidity, so the generic flash-loan
+  # morpho-loop-swap template does not apply to this pair.
+  #
+  # GO-LIVE PREREQUISITE: PRIME is NOT yet a base token on this caliber
+  # (isBaseToken -> false) -> Caliber.addBaseToken(PRIME) from the
+  # risk-manager timelock. The OracleRegistry PRIME/USDC route already
+  # resolves (1.056933), so no setFeedRoute is needed.
+  - id: "37645447233873664515981871938816299267" # pools_db makina_id — market 0x41c4…a3fa PRIME collateral (lending)
+    group_id: "2"
+    description: "PRIME/PYUSD Morpho Collateral (PRIME)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      collateral_token: ${token_list.mainnet.PRIME}
+  - id: "82274847838354216265357335302519678531" # pools_db makina_id — market 0x41c4…a3fa PYUSD debt (borrowing)
+    group_id: "2"
+    description: "PRIME/PYUSD Morpho Debt (PYUSD)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "PRIME/PYUSD (0x41c4...a3fa)"
+      market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
+      loan_token: ${token_list.mainnet.PYUSD}
+
+  # ══ RWAs ══════════════════════════════════════════════════════════
+  # PRIME acquisition / exit — funds the collateral leg above. In: USDC ->
+  # wYLDS -> PRIME (two synchronous ERC4626 deposits). Out: async redemption
+  # back to USDC via wYLDS. Same addBaseToken(PRIME) prerequisite as above.
+  - id: "88685588701895893924186462793094177949654118628018819322996153435220574076920" # keccak256("prime.swap-in")
+    group_id: "0"
+    description: "PRIME Swap In (USDC->PRIME synthetic, base-token)"
+    instructions: !include "../../../instructions/prime-swap-in.yaml"
+  - id: "72349290285513021043842986906750831638657345372251354085839905937687160017989" # keccak256("prime.redemption")
+    group_id: "0"
+    description: "PRIME Redemption (async PRIME->USDC via wYLDS)"
+    instructions: !include "../../../instructions/prime-redemption.yaml"
+
+  # ══ Blocked on the KeyValueStore ══════════════════════════════════
+  # The three positions below are fully specified but each reads
+  # ${config.key_value_store_address}, and no KeyValueStore has been deployed
+  # for this caliber yet (see the config block above). Deploy it, add the
+  # config key, uncomment, and regenerate the rootfile.
+  #
+  # ── Pareto FalconX AA-tranche ────────────────────────────────────
+  # - id: "114753234960554942361599178742666226841" # pools_db makina_id
+  #   group_id: "0"
+  #   description: "Pareto FalconX (vanilla AA tranche)"
+  #   instructions: !include "../../../instructions/pareto-falconx.yaml"
+  #   position_tokens:
+  #     - "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C" # Pareto AA tranche (held)
+  #     - "0x17E9Ab2992dfecBe779a06A92a6cDB9fE6aEeEf3" # FalconXUSDC withdraw receipt (held during withdraw window)
+  #
+  # ── Makina DUSD Machine ──────────────────────────────────────────
+  # - id: "257907866263469253975271928750178105060" # pools_db makina_id
+  #   group_id: "0"
+  #   description: "Makina DUSD Machine"
+  #   instructions: !include "../../../instructions/makina.yaml"
+  #   position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"] # DUSD share token
+  #   vars:
+  #     label: "DUSD"
+  #     machine_token: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"
+  #     machine: "0x6b006870C83b1Cd49E766Ac9209f8d68763Df721"
+  #     depositor: "0x94B1828F91c150C5E6776198e170aCa4304903d7"
+  #     redeemer: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c"
+  #     accounting_token: ${token_list.mainnet.USDC}
+  #     redemption_request_id_key: ${keccak256("makina.mainnet.dusd.redemption_request_id")}
+  #     pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dusd.pending_redemption_share_amount")}
+  #
+  # ── Makina DMW Machine ───────────────────────────────────────────
+  # - id: "114955068982582201733330879397746119865" # pools_db makina_id
+  #   group_id: "0"
+  #   description: "Makina DMW Machine"
+  #   instructions: !include "../../../instructions/makina.yaml"
+  #   position_tokens: ["0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"] # DMW share token
+  #   vars:
+  #     label: "DMW"
+  #     machine_token: "0x0DD85BBe17e96f2E96eBa90A8c6Fef89dd9501A1"
+  #     machine: "0x2FEEf245d510A31B242705ff627447Aa9db661E3"
+  #     depositor: "0xce205b5430Cd4bB207C28A2f161e97142153F127"
+  #     redeemer: "0xCC0F0983A96Afe7e6Ae5195D5BF59a108adC9553"
+  #     accounting_token: ${token_list.mainnet.USDC}
+  #     redemption_request_id_key: ${keccak256("makina.mainnet.dmw.redemption_request_id")}
+  #     pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmw.pending_redemption_share_amount")}
