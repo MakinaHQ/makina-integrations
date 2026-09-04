@@ -1,0 +1,171 @@
+protocol: "centrifuge-v3"
+
+# Centrifuge V3 ERC-7540 in-flight accounting — PENDING-ONLY, both sides, TWO TOKENS PER LEG.
+#
+# The share token is expected to be a registered caliber base token, so shares the caliber
+# HOLDS are valued natively by the OracleRegistry. Neither action reads balanceOf, and that
+# omission is what prevents double-counting. What these actions cover is the value in NEITHER
+# token balance while a request is mid-flight — the ERC-7540 blind spot. Four disjoint
+# states, two per leg:
+#
+#   deposit side   pendingDepositRequest    assets sent, not yet issued      (ASSET-denom)
+#                  maxMint                  issued, not yet claimed          (SHARE-denom)
+#   redeem side    pendingRedeemRequest     shares sent, not yet revoked     (SHARE-denom)
+#                  maxWithdraw              revoked, not yet claimed         (ASSET-denom)
+#
+# ## Each term goes in the slot for ITS OWN token — slot 0 share, slot 1 asset
+# The Caliber prices reserved slot i with getPrice(affected_tokens[i], accountingToken). A
+# share-denominated term reported in an asset slot is valued at par, while the same shares
+# one block later, held in the caliber, go through the registry route — and the two are not
+# equal. On JAAA: getPrice(JAAA,USDC) = 1047915 against a pool price of 1047726, a 189-unit
+# spread (the route divides by USDC/USD, which is not exactly 1e8) that produced a +1.80 bps
+# NAV step at claim_deposit and -1.80 bps at request_redeem, once per leverage-loop turn.
+# Per-token slots make all four legs continuous and leave the only step on the operator's
+# settlement transaction, where the price genuinely changes.
+#
+# The size of that basis is PER PRODUCT — it depends on the vault's registry route — so each
+# position settles it for its own share token rather than inheriting another product's
+# answer. Derivation: scripts-factory/centrifuge-v3/mainnet/jaaa/execution-account.md
+# Addendum 2. Multi-token slot precedent: machines/dusd/mainnet/instructions/fxsave-usdc.yaml.
+#
+# ## Read the ungated `investments` mapping, not the vault's claimable getters
+# maxDeposit / claimableDepositRequest / maxRedeem / maxWithdraw all open with
+# `if (!_canTransfer(...)) return 0;`. A freeze with a claimable outstanding therefore removed
+# 40,000.02 USDC — 40% of the position — from NAV silently, with account-positions completing
+# normally. `investments(vault, controller)` is the public mapping on the AsyncRequestManager
+# and is not gated; one call yields all four terms, extracted by index:
+#
+#   0 maxMint      1 maxWithdraw   2 depositPrice  3 redeemPrice  4 pendingDepositRequest
+#   5 pendingRedeem   6,7 claimableCancel*   8,9 pendingCancel*
+#
+# ## Do NOT add claimableRedeemRequest, maxRedeem, maxDeposit or claimableDepositRequest
+# Each is a second view of a term already reported here, so summing a pair double-counts. The
+# asset views are also marked at the operator's epoch price rather than the current one.
+#
+# ## The cancellation terms (6, 7) are deliberately not read
+# There is no cancel leaf, and fulfillDepositRequest gates `cancelledAssets > 0` behind
+# `require(state.pendingCancelDepositRequest)`, which only the controller can set — so the
+# bucket is unreachable. The tradeoff: a request the operator never settles needs a new
+# merkle root to recover.
+#
+# ## Safe when flat
+# investments() returns ten zero words for an address with no position (verified on mainnet
+# against the never-whitelisted dusd caliber), so both slots go to 0 and the position closes.
+#
+# Expected inputs (from the instructions/centrifuge-v3-*.yaml pair):
+#   caliber_address — the controller whose in-flight requests are valued
+#   vault_address   — the AsyncVault, used only as the mapping key
+
+constants:
+  # Tuple element extraction (same helper and pattern as blueprints/morpho-loop/account.yaml).
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  # Centrifuge V3 AsyncRequestManager — the mainnet singleton every pool's vaults are filed
+  # into, and the owner of the raw, UNGATED request state.
+  async_request_manager_address:
+    type: "address"
+    value: "0xF48256AbDDf96EcDDc4B3DbD23E8C1921f9761Ae"
+
+inputs:
+  caliber_address:
+    type: "address"
+  vault_address:
+    type: "address"
+
+actions:
+  # Deposit-side in-flight value: assets have left the caliber, shares have not arrived.
+  # slot 0 = maxMint (share), slot 1 = pendingDepositRequest (asset). Both 0 when flat.
+  account_deposit_pending:
+    calls:
+      - description: "Raw, ungated request state for this controller (AsyncInvestmentState)"
+        target: "${constants.async_request_manager_address}"
+        selector: "investments(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "investment_state"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+
+      - description: "Extract maxMint (index 0) — shares issued into the pool escrow, not yet claimed"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+            value: "${returns.investment_state}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "claimable_shares"
+          type: "uint256"
+
+      - description: "Extract pendingDepositRequest (index 4) — assets escrowed, not yet issued"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+            value: "${returns.investment_state}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "pending_assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.claimable_shares}" # slot 0 -> share token
+      - type: "uint256"
+        value: "${returns.pending_assets}" # slot 1 -> entry asset
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
+
+  # Redeem-side in-flight value: shares have left the caliber, assets have not arrived.
+  # slot 0 = pendingRedeemRequest (share), slot 1 = maxWithdraw (asset). Both 0 when flat.
+  account_redeem_pending:
+    calls:
+      - description: "Raw, ungated request state for this controller (AsyncInvestmentState)"
+        target: "${constants.async_request_manager_address}"
+        selector: "investments(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "investment_state"
+          type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+
+      - description: "Extract pendingRedeemRequest (index 5) — shares escrowed, not yet revoked"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+            value: "${returns.investment_state}"
+          - type: "uint256"
+            value: "5"
+        return:
+          name: "pending_shares"
+          type: "uint256"
+
+      - description: "Extract maxWithdraw (index 1) — assets reserved in the pool escrow, not yet claimed"
+        target: "${constants.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(uint128,uint128,uint128,uint128,uint128,uint128,uint128,uint128,bool,bool)"
+            value: "${returns.investment_state}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "claimable_assets"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.pending_shares}" # slot 0 -> share token
+      - type: "uint256"
+        value: "${returns.claimable_assets}" # slot 1 -> entry asset
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

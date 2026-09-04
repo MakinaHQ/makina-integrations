@@ -1,0 +1,209 @@
+protocol: "centrifuge-v3"
+
+# Centrifuge V3 ERC-7540 AsyncVault — asynchronous, operator-settled deposit.
+#
+# Pool-generic: the vault and its entry asset are INPUTS, so one blueprint serves every
+# Centrifuge V3 vault on the chain (JAAA pool 281474976710663, JTRSY, ...). The product's
+# identity lives in the caliber position block. Only the Makina helper singletons and the
+# Centrifuge AsyncRequestManager are constants — they are shared across all deployments.
+#
+# Named `centrifuge-v3`, not `erc7540`. The call surface is standard but several
+# load-bearing decisions below are keyed to THIS implementation: requestId is hardcoded 0,
+# mint-over-deposit is correct only because _processDeposit debits sharesUp and pays
+# sharesDown, every getter returns 0 rather than reverting when flat, and repeat requests
+# accumulate instead of reverting. A different ERC-7540 vault may break all four.
+#
+# ## Async, so "request"/"claim" and not one atomic swap
+# The acquisition spans four steps and the caliber owns only the first and the last — the
+# mint happens in the operator's transaction, which the caliber never sends:
+#
+#   1. [caliber]  request_deposit  -> assets to the escrow, NOTHING minted yet
+#   2. [operator] approveDeposits   -> epoch sealed, no token movement
+#   3. [operator] issueShares       -> THE MINT (0x0 -> escrow); depositPrice fixed HERE
+#   4. [caliber]  claim_deposit     -> shares escrow -> caliber (supply unchanged)
+#
+# ## The asset approval goes to the VAULT
+# requestDeposit runs safeTransferFrom(asset, owner, baseManager.globalEscrow(), assets) with
+# the VAULT as msg.sender, so the vault is the spender. globalEscrow() returns
+# balanceSheet.escrow(poolId) — for a single-pool vault that is the pool escrow itself; the
+# "global" name is legacy.
+#
+# ## No VaultRouter, no operator dance
+# The caliber is its own owner AND controller, so requestDeposit's
+# `owner == msg.sender || isOperator[...]` check passes on the direct call.
+#
+# ## No slippage floor is POSSIBLE here
+# depositPrice is written by the operator in step 3, in a transaction mined AFTER ours, so
+# there is nothing to bound at request time and refusing the claim would only strand the
+# shares. Counterparty risk bounded by POSITION SIZING, not by a call.
+#
+# ## No KV sentinel, no one-in-flight guard
+# Every getter returns 0 rather than reverting for an address with no position, and
+# requestDeposit does `state.pendingDepositRequest += assets`, so repeat requests accumulate
+# into one epoch bucket and account.yaml values the sum correctly.
+#
+# Per-product prerequisites (share-class membership on a restriction hook, base-token
+# registration for the share token) live in the caliber position block, since they differ per
+# vault. Measurements and source derivations for the JAAA pool are in
+# scripts-factory/centrifuge-v3/mainnet/jaaa/.
+#
+# Expected inputs (from instructions/centrifuge-v3-deposit.yaml):
+#   caliber_address — request owner + controller, claim receiver, position holder
+#   vault_address   — the AsyncVault
+#   asset_address   — the vault's asset(); resolved per vault, NOT a protocol constant
+
+constants:
+  # Shared math singleton: add / sub / gt / gte / lt / eq / mulDiv.
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+
+inputs:
+  caliber_address:
+    type: "address"
+  vault_address:
+    type: "address"
+  asset_address:
+    type: "address"
+
+actions:
+  # ── Step 1, absolute: request a deposit of an exact asset amount ─────────────
+  request_deposit:
+    calls:
+      - description: "Approve the AsyncVault to pull the asset (the vault is the transferFrom caller, so it is the spender)"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Request the async deposit — assets move to the pool escrow, nothing minted yet"
+        target: "${inputs.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of the entry asset to request a deposit for"
+
+  # ── Step 1, relative: request a bps fraction of the caliber's asset balance ──
+  request_deposit_relative:
+    calls:
+      - description: "Read the caliber's asset balance"
+        target: "${inputs.asset_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+
+      - description: "Compute asset amount = balance * bps / 10000"
+        target: "${constants.math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_balance}"
+          - type: "uint256"
+            value: "${input_slots.bps_to_deposit}"
+          - type: "uint256"
+            value: "10000"
+        return:
+          name: "asset_amount"
+          type: "uint256"
+
+      - description: "Approve the AsyncVault to pull the asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.vault_address}"
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+
+      - description: "Request the async deposit — assets move to the pool escrow, nothing minted yet"
+        target: "${inputs.vault_address}"
+        selector: "requestDeposit(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      bps_to_deposit:
+        type: "uint256"
+        description: "Basis points of the caliber's asset balance to deposit (10000 = 100%)"
+
+  # ── Step 4: claim the shares the operator has already issued ─────────────────
+  #
+  # Pull-only — the protocol never pushes. Claims the FULL entitlement.
+  #
+  # ## Why mint(maxMint) and NOT deposit(maxDeposit)
+  # _processDeposit debits the claimable ceiling by a round-UP amount and pays the caliber
+  # the round-DOWN amount. mint(shares) passes the caller's amount as both bounds, so it is
+  # exact; deposit(assets) computes them separately and DESTROYS 1 wei of entitlement
+  # whenever the conversion has a remainder (measured on JAAA: 38,185,720,068 owed,
+  # 38,185,720,067 delivered, the slot still zeroed). Derivation in
+  # scripts-factory/centrifuge-v3/mainnet/jaaa/functions.md §3.
+  #
+  # maxMint is gated by the share class's transfer hook (`if (!_canTransfer(...)) return 0;`),
+  # which is why this leg reads it rather than the ungated mapping account.yaml uses: a
+  # de-whitelisted caliber reverts cleanly on the gt guard instead of failing deeper inside
+  # balanceSheet.withdraw, and the shares stay claimable until membership is restored.
+  claim_deposit:
+    calls:
+      - description: "Read the claimable share entitlement (0 unless the operator has issued shares)"
+        target: "${inputs.vault_address}"
+        selector: "maxMint(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "claimable_shares"
+          type: "uint256"
+
+      - description: "has_claimable = (claimable shares > 0)"
+        target: "${constants.math_helper_address}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_shares}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "has_claimable"
+          type: "bool"
+
+      - description: "Revert on a no-op claim rather than burning a management call silently"
+        target: "${constants.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.has_claimable}"
+
+      - description: "Claim: move the already-issued shares from the pool escrow to the caliber (exact, maxMint -> 0)"
+        target: "${inputs.vault_address}"
+        selector: "mint(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.claimable_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"

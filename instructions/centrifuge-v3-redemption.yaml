@@ -1,0 +1,113 @@
+# Centrifuge V3 ERC-7540 async redemption — GENERAL, parameterized by position vars.
+#
+# Dispose of a Centrifuge V3 share token back to its entry asset across the operator-settled
+# asynchronous gap:
+#
+#   MANAGEMENT request_redeem: shares leave the caliber into the pool escrow — ESCROWED, not
+#     burned. The registry-value drop is offset by the pending term rising by the same number
+#     of shares, so the paired ACCOUNTING keeps NAV continuous.
+#   MANAGEMENT claim_redeem: the operator has revoked the shares and reserved assets; this
+#     releases them.
+#   ACCOUNTING account_redeem_pending: pendingRedeemRequest (shares) + maxWithdraw (assets),
+#     each in its own slot.
+#
+# Pairs with instructions/centrifuge-v3-deposit.yaml; see that file's header for the
+# per-product go-live prerequisites and for how hook membership interacts with the accounting
+# leg. They apply identically here and are NOT repeated.
+#
+# Required position vars:
+#   label, vault_address, asset_address, share_address
+#
+# ## No share approval on request_redeem — structural, not observational
+# AsyncRequestManager.requestRedeem moves the shares via BalanceSheet.transferSharesFrom ->
+# ShareToken.authTransferFrom -> _transferFrom, whose entire allowance path is guarded by
+# `if (from != sender)`. With owner == msg.sender == caliber the branch is skipped and no
+# allowance is read. An approve leg here would be dead code.
+#
+# ## Settlement is NOT a caliber instruction
+# Between request_redeem and claim_redeem the pool operator must call approveRedeems and then
+# revokeShares/notifyRedeem. The caliber cannot self-settle and cannot bound the price it
+# settles at — redeemPrice is written by the operator AFTER our request is mined. Observed
+# mainnet latency on the JAAA pool was ~6.5h, but nothing on-chain guarantees it. An operator
+# can also settle at any price, including zero: a deliberate 50% haircut on a fork produced a
+# clean -26,187.83 USDC and no stuck state, with the loss landing on the settlement
+# transaction. Counterparty risk bounded by position sizing, not by a call.
+
+# 1/4 - MANAGEMENT: request redemption of an exact share amount
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_address} # share token (leaving; pending term rises)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:request_redeem"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      share_address:
+        type: "address"
+        value: ${position.share_address}
+
+# 2/4 - MANAGEMENT: request redemption of a bps fraction of the caliber's share balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_address} # share token (leaving; pending term rises)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:request_redeem_relative"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      share_address:
+        type: "address"
+        value: ${position.share_address}
+
+# 3/4 - MANAGEMENT: claim the assets the operator has already reserved in the pool escrow
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # entry asset (arriving; claimable term falls)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/withdraw.yaml:claim_redeem"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      share_address:
+        type: "address"
+        value: ${position.share_address}
+
+# 4/4 - ACCOUNTING: redeem-side in-flight value, TWO TOKENS.
+#
+# ==> Mirror of the deposit leg: slot 0 = pendingRedeemRequest (SHARES), slot 1 = maxWithdraw
+#     (assets). The order must match the blueprint's reserved_slots. Pushing the share term
+#     through convertToAssets into an asset slot values it at par while the same shares, held
+#     one block earlier, are priced through the registry route — a NAV step at every request.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.share_address} # share token  (reserved_slot 0) — pendingRedeemRequest
+    - ${position.asset_address} # entry asset  (reserved_slot 1) — maxWithdraw
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/account.yaml:account_redeem_pending"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}

@@ -320,16 +320,43 @@ positions:
       aave_token: "0xe3190143eB552456F88464662F0C0C4AC67A77Eb"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
-  # JAAA as Horizon COLLATERAL, paired with the USDC debt leg below (same group_id).
+  # ── AaveV3 Horizon JAAA collateral + USDC debt (group_id: 7) ─────
+  #
+  # JAAA as Horizon COLLATERAL, paired with the USDC debt leg below in their OWN group.
   # Horizon splits every reserve into one of two disjoint roles: JAAA is collateral-only
-  # (LTV 81%, LT 86%, borrowing disabled), USDC/RLUSD/GHO are borrow-only (LTV 0). So
-  # "borrowing is disabled on the JAAA reserve" means JAAA cannot be BORROWED — not that it
-  # cannot be borrowed AGAINST; the 81% LTV exists precisely to back the USDC debt below.
-  # Every Horizon reserve is eModeCategory 0, so plain aavev3-supply.yaml is correct.
-  # Supply cap 40,000,000 with 30,000,000 supplied — ~10M headroom; oversizing reverts
-  # SupplyCapExceeded. Shares the JAAA base-token prerequisite with the jaaa.* positions.
+  # (LTV 81%, LT 86%, bonus 5%, borrowing disabled), USDC is borrow-only (LTV 0). So
+  # "borrowing is disabled on the JAAA reserve" means JAAA cannot be BORROWED — it does NOT
+  # mean JAAA cannot be borrowed AGAINST; the 81% LTV exists precisely to back the USDC debt
+  # position below. Per-reserve parameters for the whole instance are in
+  # scripts-factory/centrifuge-v3/mainnet/jaaa/specs.yaml.
+  #
+  # Plain aavev3-supply.yaml is correct here, not -emode: Horizon runs several live e-mode
+  # categories (VBILL GHO, USTB GHO, ACRED GHO, mGLOBAL Stablecoins, ...) but none of them
+  # is JAAA-based, so this position has no category to enter. Do NOT justify this from the
+  # reserve-config eModeCategory bits — they are deprecated in Aave v3.2+ and read 0 for
+  # every Horizon reserve regardless.
+  #
+  # The pair sits in group_id 7 rather than joining the RLUSD lend leg in group 3: grouping
+  # buys atomic accounting for an offsetting collateral/debt pair, and RLUSD (LTV 0, LT 0 on
+  # Horizon) offsets nothing. Adding it to the group would only make it a mandatory member of
+  # every accountForPositionBatch and a third _invalidateGroupedPositions trigger — every
+  # managePosition on this sleeve zeroes its siblings' lastAccountingTime, and the Machine's
+  # updateTotalAum() reverts PositionAccountingStale until the whole group is re-accounted.
+  # Same split as the PRIME/PYUSD and mWIN/PYUSD precedents.
+  #
+  # Supply cap 40,000,000 JAAA with 32,717,035 currently supplied — ~7.28M of headroom.
+  # Oversizing reverts SupplyCapExceeded, so check before sizing.
+  #
+  # RISK: the JAAA restriction hook gates LIQUIDATION too. A non-member liquidator reverts
+  # TransferBlocked() taking JAAA and Aave error 80 taking the aToken, so only KYC'd JAAA
+  # holders can liquidate this collateral — not the open keeper market. Combined with an
+  # unwind that costs one operator epoch per turn (~6.5h observed), the sleeve has both a
+  # slow exit and a restricted liquidator set. Size accordingly.
+  #
+  # Shares the JAAA base-token prerequisite with the jaaa.* positions (affected_tokens
+  # is JAAA here too).
   - id: "203030304645823465903198375540780571081" # pools_db makina_id — AaveV3 JAAA lending (Horizon Pool 0xAe05Cd22…332C8)
-    group_id: "3"
+    group_id: "7"
     description: "AaveV3 Horizon Supply JAAA"
     instructions: !include "../../../instructions/aavev3-supply.yaml"
     position_tokens: ["0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"] # aHorRwaJAAA
@@ -339,12 +366,19 @@ positions:
       aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
-  # USDC debt drawn against the Horizon collateral above. group_id 3 ties it to the JAAA and
-  # RLUSD supply legs so the caliber treats the sleeve as one risk group. Borrow cap
-  # 54,000,000 with ~2.78M drawn. affected_tokens is USDC, already a dusd base token, so this
-  # position adds no base-token prerequisite of its own — it is gated only by the collateral's.
+  # USDC debt drawn against the Horizon collateral above; group_id 7 ties the two together.
+  # USDC borrowing is ENABLED on this reserve (LTV 0, i.e. borrow-only); borrow cap
+  # 54,000,000 with ~2.78M drawn. affected_tokens is USDC, already a dusd base token, so
+  # this position adds NO new base-token prerequisite of its own — it is gated only by
+  # the JAAA collateral's prerequisites.
+  #
+  # Full repay REQUIRES type(uint256).max: an exact-amount repay leaves the interest that
+  # accrued between the read and the mine (measured 34,173 raw), so the position never
+  # closes. Note that the max path leaves a standing USDC approval to the Horizon Pool — a
+  # pre-existing blueprints/aave/repay.yaml behaviour reaching 9 borrow positions, tracked
+  # separately.
   - id: "317835433613879557430416658618884687921" # pools_db makina_id — AaveV3 Horizon borrowing USDC
-    group_id: "3"
+    group_id: "7"
     description: "AaveV3 Horizon Borrow USDC"
     instructions: !include "../../../instructions/aavev3-borrow.yaml"
     position_tokens: ["0x4139EcBe83d78ef5EFF0A6eDA6f894Be9D590FC7"] # variableDebtHorRwaUSDC
@@ -710,17 +744,60 @@ positions:
       accounting_token: ${token_list.mainnet.USDC}
       redemption_request_id_key: ${keccak256("makina.mainnet.dmw.redemption_request_id")}
       pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmw.pending_redemption_share_amount")}
-  # JAAA — Janus Henderson AAA CLO Fund, Centrifuge V3 pool 281474976710663 (ERC-7540).
-  # Async BOTH ways, so the swap is decomposed into a swap-in position and a redemption
-  # position, mirroring the PRIME pair above. Each carries exactly one ACCOUNTING leg
-  # reporting only IN-FLIGHT value; held JAAA is priced natively as a base token.
-  # BLOCKED ON TWO GO-LIVE PREREQUISITES, detailed in instructions/jaaa-swap-in.yaml:
-  # the hook whitelist on 0x3C5E7B28...680A7, and JAAA base-token registration.
+  # JAAA — Janus Henderson AAA CLO Fund, Centrifuge V3 pool 281474976710663 (ERC-7540),
+  # share class 0x00010000000000070000000000000001. Async BOTH ways, so the swap is
+  # decomposed into a swap-in position and a redemption position, mirroring the PRIME pair
+  # above. Each carries exactly one ACCOUNTING leg reporting only IN-FLIGHT value; held JAAA
+  # is priced natively as a base token.
+  #
+  # The blueprints and instructions are pool-generic (blueprints/centrifuge-v3,
+  # instructions/centrifuge-v3-*.yaml), so the product identity lives here in vars — same
+  # shape as the midas pair. A second Centrifuge product (JTRSY
+  # 0x8c213ee79581Ff4984583C6a801e5263418C4b86, own restriction hook
+  # 0x21Cdcc686fECd9Fb0d3ee300E555C06497B55EcC) is one more block, not a second blueprint.
+  #
+  # BLOCKED ON TWO GO-LIVE PREREQUISITES, both per-product and neither of them code:
+  #
+  #   1. HOOK WHITELIST — THE LONG POLE. START IT FIRST. The caliber
+  #      0xD1A1C248B253f1fc60eACd90777B9A63F8c8c1BC must be a member on the JAAA restriction
+  #      hook 0x3C5E7B28c4fF6F0bc8d9A9587992E96401e680A7 — today isPermissioned(caliber) is
+  #      false and EVERY call reverts, transfers included. The call is
+  #      hook.updateMember(JAAA_share_token, caliber, validUntil); the first argument is the
+  #      SHARE TOKEN, not the vault. KYC/ops process with the pool operator.
+  #
+  #   2. addBaseToken(JAAA) — AND DO NOT DEPLOY AN ADAPTER. The OracleRegistry route already
+  #      exists: getFeedRoute(JAAA) is (0x3BbccB2301759D2e4A5692bA72DAb4b75dC43B1a, 0x0), a
+  #      6-dec "JAAA NAV" feed whose latestAnswer() equals vault.convertToAssets(1e6) to the
+  #      unit, so it is already vault-derived; that feed is registry-wide and shared by every
+  #      machine. Outstanding: Caliber.addBaseToken(JAAA) from the riskManagerTimelock
+  #      0x38542447c49D24e617fc06113295D7AaA3BEc4b6 (NOT 0x7c405bbd...9997, which reverts
+  #      UnauthorizedCaller). It succeeds on its own, with no setFeedRoute call. That timelock
+  #      has getMinDelay() = 172800, so there is a hard 48h floor between scheduling it and
+  #      the base-token CI gate being able to pass.
+  #
+  #      CHECK THE FEED CADENCE FIRST: the JAAA NAV feed has a 27.2h getFeedStaleThreshold
+  #      against an apparently daily publication (~3.2h of slack), and a lapsed feed makes
+  #      getPrice(JAAA, USDC) revert PriceFeedStale and the caliber's AUM read fail.
+  #      Centrifuge never expires the share price convertToAssets serves, so the two sides
+  #      disagree about what "stale" means.
+  #
+  # Position ids are keccak256 of the position name (the Centrifuge vault has no pools_db
+  # entry), the same rule the PRIME pair above uses.
   - id: "109660052859494826254547206539520047738467758490695873969818166042335919825092" # keccak256("jaaa.swap-in")
     group_id: "0"
     description: "JAAA Swap In (async USDC->JAAA via Centrifuge V3 ERC-7540, base-token)"
-    instructions: !include "../../../instructions/jaaa-swap-in.yaml"
+    instructions: !include "../../../instructions/centrifuge-v3-deposit.yaml"
+    vars:
+      label: "JAAA Swap In"
+      vault_address: "0x4880799eE5200fC58DA299e965df644fBf46780B"
+      asset_address: ${token_list.mainnet.USDC}
+      share_address: ${token_list.mainnet.JAAA}
   - id: "90824138345220121714077562256473884185386634931307045346916986563837696930051" # keccak256("jaaa.redemption")
     group_id: "0"
     description: "JAAA Redemption (async JAAA->USDC via Centrifuge V3 ERC-7540)"
-    instructions: !include "../../../instructions/jaaa-redemption.yaml"
+    instructions: !include "../../../instructions/centrifuge-v3-redemption.yaml"
+    vars:
+      label: "JAAA Redemption"
+      vault_address: "0x4880799eE5200fC58DA299e965df644fBf46780B"
+      asset_address: ${token_list.mainnet.USDC}
+      share_address: ${token_list.mainnet.JAAA}
