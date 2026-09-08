@@ -320,9 +320,9 @@ positions:
       aave_token: "0xe3190143eB552456F88464662F0C0C4AC67A77Eb"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
-  # ── AaveV3 Horizon JAAA collateral + USDC debt (group_id: 7) ─────
+  # ── AaveV3 Horizon JAAA collateral + USDC/RLUSD/GHO debt (group_id: 7) ─────
   #
-  # JAAA as Horizon COLLATERAL, paired with the USDC debt leg below in their OWN group.
+  # JAAA as Horizon COLLATERAL, grouped with the USDC, RLUSD and GHO debt legs below.
   # Horizon splits every reserve into one of two disjoint roles: JAAA is collateral-only
   # (LTV 81%, LT 86%, bonus 5%, borrowing disabled), USDC is borrow-only (LTV 0). So
   # "borrowing is disabled on the JAAA reserve" means JAAA cannot be BORROWED — it does NOT
@@ -336,10 +336,10 @@ positions:
   # reserve-config eModeCategory bits — they are deprecated in Aave v3.2+ and read 0 for
   # every Horizon reserve regardless.
   #
-  # The pair sits in group_id 7 rather than joining the RLUSD lend leg in group 3: grouping
-  # buys atomic accounting for an offsetting collateral/debt pair, and RLUSD (LTV 0, LT 0 on
-  # Horizon) offsets nothing. Adding it to the group would only make it a mandatory member of
-  # every accountForPositionBatch and a third _invalidateGroupedPositions trigger — every
+  # The collateral and all three debt legs sit in group_id 7. Account for all four together.
+  # The RLUSD lend leg stays in group 3: RLUSD supply has LTV 0 and LT 0 on Horizon,
+  # so it provides no collateral backing. Adding it would make it another mandatory member of
+  # every accountForPositionBatch and another _invalidateGroupedPositions trigger — every
   # managePosition on this sleeve zeroes its siblings' lastAccountingTime, and the Machine's
   # updateTotalAum() reverts PositionAccountingStale until the whole group is re-accounted.
   # Same split as the PRIME/PYUSD and mWIN/PYUSD precedents.
@@ -366,7 +366,7 @@ positions:
       aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
-  # USDC debt drawn against the Horizon collateral above; group_id 7 ties the two together.
+  # USDC debt drawn against the Horizon collateral above; group_id 7 ties all four together.
   # USDC borrowing is ENABLED on this reserve (LTV 0, i.e. borrow-only); borrow cap
   # 54,000,000 with ~2.78M drawn. affected_tokens is USDC, already a dusd base token, so
   # this position adds NO new base-token prerequisite of its own — it is gated only by
@@ -386,6 +386,34 @@ positions:
       label: "USDC - Horizon Borrow"
       asset_address: ${token_list.mainnet.USDC}
       debt_token: "0x4139EcBe83d78ef5EFF0A6eDA6f894Be9D590FC7"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
+
+  # Additional debt currencies against JAAA; both are already dusd base tokens.
+  # Horizon getReserveData verified borrowing enabled, active, unfrozen and unpaused
+  # for both reserves on 2026-09-08. Debt tokens match the Aave address book:
+  # https://github.com/bgd-labs/aave-address-book/blob/main/src/AaveV3EthereumHorizon.sol
+  # Centrifuge subscriptions take USDC, so looping these debts requires a swap to USDC.
+  # The full-repay requirement above also applies to these debt legs.
+  - id: "133495794982505815817947498041694656764" # pools_db makina_id — AaveV3 Horizon borrowing RLUSD
+    group_id: "7"
+    description: "AaveV3 Horizon Borrow RLUSD"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"] # variableDebtHorRwaRLUSD
+    vars:
+      label: "RLUSD - Horizon Borrow"
+      asset_address: ${token_list.mainnet.RLUSD}
+      debt_token: "0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
+
+  - id: "266935600511395729584434377419168277182" # pools_db makina_id — AaveV3 Horizon borrowing GHO
+    group_id: "7"
+    description: "AaveV3 Horizon Borrow GHO"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xdec2401c9B0B2E480e627E2a712C11AdDbf46E3e"] # variableDebtHorRwaGHO
+    vars:
+      label: "GHO - Horizon Borrow"
+      asset_address: ${token_list.mainnet.GHO}
+      debt_token: "0xdec2401c9B0B2E480e627E2a712C11AdDbf46E3e"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
 
   # ── AaveV3 sUSDe E-Mode (group_id: 1) ────────────────────────────
