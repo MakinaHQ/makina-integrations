@@ -47,6 +47,12 @@ config:
   # Add `key_value_store_address` here before wiring any instruction that needs it.
 
 positions:
+  # ── Harvest-only ──────────────────────────────────────────────────
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
+
   # ══ Lending ═══════════════════════════════════════════════════════
   # ── Morpho vaults — Sentora "Main" line (Morpho Vault V2) ─────────
   # All five share one implementation (codehash 0xd40a…6acd for mWIN /
@@ -89,20 +95,100 @@ positions:
       label: "Sentora mWIN Main"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"
-  # TODO(pools_db): Sentora Huma PST Main has no makina_id anywhere in this
-  # repo yet and ids are pool-global (the same pool carries the same id in
-  # every caliber), so it can't be invented here. Uncomment once the id is
-  # pulled from pools_db; everything else about the position is settled —
-  # asset is PYUSD and the vault is the same V2 implementation as mWIN Main.
-  # - id: "<pools_db makina_id>"
-  #   group_id: "0"
-  #   description: "Morpho Vault Sentora Huma PST Main (PYUSD)"
-  #   instructions: !include "../../../instructions/morpho-vault-v2.yaml"
-  #   position_tokens: ["0x8381a156958711E230f325428B5eb4b6555C75D9"]
-  #   vars:
-  #     label: "Sentora Huma PST Main"
-  #     asset_address: ${token_list.mainnet.PYUSD}
-  #     vault_address: "0x8381a156958711E230f325428B5eb4b6555C75D9"
+  - id: "134636115830071409511221090610756745543" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Sentora Huma PST Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x8381a156958711e230f325428b5eb4b6555c75d9"]
+    vars:
+      label: "Sentora Huma PST Main"
+      asset_address: ${token_list.mainnet.PYUSD}
+      vault_address: "0x8381a156958711e230f325428b5eb4b6555c75d9"
+
+  # ── Morpho USDC vaults (Morpho Vault V2) ─────────────────────────
+  - id: "324358356428873297091184688404142393521" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x2cA22cb25558fa2018ecb1CE4eD8AF92Ee7ea423"]
+    vars:
+      label: "RockawayX f(x) Protocol Ecosystem USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x2cA22cb25558fa2018ecb1CE4eD8AF92Ee7ea423"
+  - id: "164152994052643430541444457218525661023" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Pendle Ecosystem USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x55C1B6e461a6334B567bAF0FEb5D728715446f05"]
+    vars:
+      label: "Pendle Ecosystem USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x55C1B6e461a6334B567bAF0FEb5D728715446f05"
+  - id: "169144170902823932410475652858126577078" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Steakhouse Prime USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeef088055857739C12CD3765F20b7679Def0f51"]
+    vars:
+      label: "Steakhouse Prime USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeef088055857739C12CD3765F20b7679Def0f51"
+
+  # ── Steakhouse vaults — registered DCM assets ───────────────────
+  - id: "154947354046260442958384373569470359355" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Steakhouse High Yield USDT"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeeff07d991c04cd640de9f15c08ba59c4fedeb7"]
+    vars:
+      label: "Steakhouse High Yield USDT"
+      asset_address: ${token_list.mainnet.USDT}
+      vault_address: "0xbeeff07d991c04cd640de9f15c08ba59c4fedeb7"
+  - id: "288169706932979568417881563106913917226" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Steakhouse High Yield USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"]
+    vars:
+      label: "Steakhouse High Yield USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"
+  - id: "317674047022373827182618653676880817492" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
+    position_tokens: ["0xbeef01735c132ada46aa9aa4c54623caa92a64cb"]
+    vars:
+      label: "Steakhouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeef01735c132ada46aa9aa4c54623caa92a64cb"
+  - id: "133625183712155226969707123863934927662" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Steakhouse Prime USDT"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"]
+    vars:
+      label: "Steakhouse Prime USDT"
+      asset_address: ${token_list.mainnet.USDT}
+      vault_address: "0xbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"
+  - id: "304800154207170690672316111335694768085" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault 3F x Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeef3f3a04e28895f3d5163d910474901981183d"]
+    vars:
+      label: "3F x Steakhouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeef3f3a04e28895f3d5163d910474901981183d"
+  - id: "270598695387742845142399712882283652383" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Grove x Steakhouse USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xbeeff08df54897e7544ab01d0e86f013da354111"]
+    vars:
+      label: "Grove x Steakhouse USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xbeeff08df54897e7544ab01d0e86f013da354111"
 
   # ── Morpho markets — passive supply side ──────────────────────────
   - id: "199708234830348815037617604080094469854" # pools_db makina_id
@@ -130,34 +216,76 @@ positions:
       market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
       loan_token: ${token_list.mainnet.PYUSD}
 
+  - id: "295637733392364843843588680145141306554" # pools_db makina_id — deposit (PYUSD supply)
+    group_id: "0"
+    description: "Morpho PYUSD loan (market: 0xb497...e512)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PST/PYUSD (0xb497...e512)"
+      market_id: "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512"
+      loan_token: ${token_list.mainnet.PYUSD}
+
+  # ── AaveV3 Core Supply (group_id: 3) ────────────────────────
+  - id: "332697612920998824307877708016163852818" # pools_db makina_id
+    group_id: "3"
+    description: "AaveV3 Core Supply USDC"
+    instructions: !include "../../../instructions/aavev3-core-supply.yaml"
+    position_tokens: ["0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"]
+    vars:
+      label: "USDC - Core Lend"
+      asset_address: ${token_list.mainnet.USDC}
+      aave_token: "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+  - id: "171501072283192868280385547271945995123" # pools_db makina_id
+    group_id: "3"
+    description: "AaveV3 Core Supply DAI"
+    instructions: !include "../../../instructions/aavev3-core-supply.yaml"
+    position_tokens: ["0x018008bfb33d285247a21d44e50697654f754e63"]
+    vars:
+      label: "DAI - Core Lend"
+      asset_address: ${token_list.mainnet.DAI}
+      aave_token: "0x018008bfb33d285247a21d44e50697654f754e63"
+  - id: "232678016241942897729445069841802885622" # pools_db makina_id
+    group_id: "3"
+    description: "AaveV3 Core Supply USDT"
+    instructions: !include "../../../instructions/aavev3-core-supply.yaml"
+    position_tokens: ["0x23878914efe38d27c4d67ab83ed1b93a74d4086a"]
+    vars:
+      label: "USDT - Core Lend"
+      asset_address: ${token_list.mainnet.USDT}
+      aave_token: "0x23878914efe38d27c4d67ab83ed1b93a74d4086a"
+  - id: "306328361221440402994803566600218520284" # pools_db makina_id
+    group_id: "3"
+    description: "AaveV3 Core Supply PYUSD"
+    instructions: !include "../../../instructions/aavev3-core-supply.yaml"
+    position_tokens: ["0x0c0d01abf3e6adfca0989ebba9d6e85dd58eab1e"]
+    vars:
+      label: "PYUSD - Core Lend"
+      asset_address: ${token_list.mainnet.PYUSD}
+      aave_token: "0x0c0d01abf3e6adfca0989ebba9d6e85dd58eab1e"
   # ── Aave V4 (Hub & Spoke) ─────────────────────────────────────────
+  # See README.md for reserve identity, pool-ID provenance and exclusions.
+  # Only reserves with unambiguous pool_db.meta matches are included.
   # No aToken is minted — accounted via getUserSuppliedAssets, hence no
   # position_tokens. group_id "1" is the liquidation bucket for Spoke
   # 0x94e7A5dC…c485 specifically; a different Spoke must get its own group_id.
-  - id: "102356596921134877304003836794819117820" # pools_db makina_id
+  - id: "254774144610751365189292177429817956315" # pools_db makina_id
     group_id: "1"
-    description: "AaveV4 Supply USDG"
+    description: "AaveV4 Main Supply USDC (Core, reserve 7)"
     instructions: !include "../../../instructions/aavev4-supply.yaml"
     vars:
-      label: "USDG"
-      asset_address: ${token_list.mainnet.USDG}
+      label: "USDC - Main / Core (reserve 7)"
+      asset_address: ${token_list.mainnet.USDC}
       spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
-      reserve_id: "11"
-  # GO-LIVE PREREQUISITE: frxUSD is NOT yet a base token on this caliber
-  # (isBaseToken -> false), so the MANAGEMENT/ACCOUNTING legs revert with
-  # InvalidAffectedToken until Caliber.addBaseToken(frxUSD) is sent from the
-  # risk-manager timelock. The OracleRegistry frxUSD/USDC route already
-  # resolves (0.999987), so no setFeedRoute is needed.
-  - id: "64048496748963625189377001215830228790" # pools_db makina_id
+      reserve_id: "7"
+  - id: "123100865563681904493450028563557609293" # pools_db makina_id
     group_id: "1"
-    description: "AaveV4 Supply frxUSD"
+    description: "AaveV4 Main Supply USDT (Core, reserve 8)"
     instructions: !include "../../../instructions/aavev4-supply.yaml"
     vars:
-      label: "frxUSD"
-      asset_address: ${token_list.mainnet.frxUSD}
+      label: "USDT - Main / Core (reserve 8)"
+      asset_address: ${token_list.mainnet.USDT}
       spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
-      reserve_id: "12"
-
+      reserve_id: "8"
   # ══ Looping ═══════════════════════════════════════════════════════
   # ── PRIME/PYUSD Morpho market (0x41c4…a3fa) ───────────────────────
   # Own liquidation set -> group_id "2". Leverage is built by composing the
