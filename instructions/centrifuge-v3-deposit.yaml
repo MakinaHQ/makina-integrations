@@ -1,0 +1,116 @@
+# Centrifuge V3 ERC-7540 async deposit — GENERAL, parameterized by position vars.
+#
+# Acquire a Centrifuge V3 share token from its entry asset across the operator-settled
+# asynchronous gap. One file serves every Centrifuge V3 vault: the product identity
+# (vault, asset, share) comes from the caliber position block via ${position.*}.
+#
+# Pairs with instructions/centrifuge-v3-redemption.yaml. Deposit-side and redeem-side
+# in-flight terms are independent, so each position carries exactly one ACCOUNTING leg —
+# the same split prime-swap-in.yaml / prime-redemption.yaml uses.
+#
+# Three MANAGEMENT legs (request absolute / request relative / claim) rather than one swap
+# leg, because acquisition is ASYNCHRONOUS: the caliber's assets leave in one transaction
+# and the shares arrive in a different one, with the mint happening in the operator's
+# transaction. See blueprints/centrifuge-v3/deposit.yaml for the four-step lifecycle.
+#
+# Required position vars:
+#   label, vault_address, asset_address, share_address
+#
+# PER-PRODUCT GO-LIVE PREREQUISITES, both stated in the caliber position block because they
+# differ per vault:
+#   1. the caliber must be a member on the share class's restriction hook (a KYC/ops process
+#      with the pool operator — until then EVERY call reverts, transfers included);
+#   2. the share token must be a registered caliber base token, since the ACCOUNTING leg
+#      below declares it in affected_tokens.
+#
+# HOOK MEMBERSHIP AND THE ACCOUNTING LEG: the ACCOUNTING blueprint reads the
+# AsyncRequestManager's ungated `investments` mapping, so a frozen caliber keeps reporting
+# its in-flight value correctly. The MANAGEMENT claim leg still reads the vault's gated
+# maxMint on purpose: while frozen it reads 0 and the claim reverts on the gt guard rather
+# than failing deeper inside balanceSheet. Funds stay recoverable once membership returns.
+
+# 1/4 - MANAGEMENT: request an async deposit of an exact asset amount.
+# affected_tokens = the entry asset — it leaves the caliber balance and the deposit-side
+# pending term rises by the same amount, so the paired ACCOUNTING leg keeps NAV continuous.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # entry asset (leaving; pending term rises)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:request_deposit"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+
+# 2/4 - MANAGEMENT: request an async deposit of a bps fraction of the caliber's asset balance
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address} # entry asset (leaving; pending term rises)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:request_deposit_relative"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+
+# 3/4 - MANAGEMENT: claim the shares the operator has already issued into the pool escrow.
+# affected_tokens = the share token — it arrives in the caliber balance (valued natively by
+# the registry) and the claimable term falls by the same number of shares.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.share_address} # share token (arriving; claimable term falls)
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/deposit.yaml:claim_deposit"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+
+# 4/4 - ACCOUNTING: deposit-side in-flight value, TWO TOKENS.
+#
+# ==> Each term is declared in ITS OWN denomination, and the order here must match the
+#     blueprint's reserved_slots: slot 0 = maxMint (SHARES), slot 1 = pendingDepositRequest
+#     (assets). The Caliber prices slot i with getPrice(affected_tokens[i], accountingToken),
+#     and the registry price of a share is not the vault's par price — reporting the share
+#     term in an asset slot stepped NAV by the difference at every claim. Held shares are NOT
+#     reported here; the blueprint never reads balanceOf, which is what prevents
+#     double-counting against the base-token registry value.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.share_address} # share token  (reserved_slot 0) — maxMint, share-denominated
+    - ${position.asset_address} # entry asset  (reserved_slot 1) — pendingDepositRequest
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/centrifuge-v3/account.yaml:account_deposit_pending"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
