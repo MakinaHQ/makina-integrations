@@ -105,6 +105,22 @@ positions:
       vault_address: "0x6dC58a0FdfC8D694e571DC59B9A52EEEa780E6bf"
 
   # ── Makina ───────────────────────────────────────────────────────
+  # DCM is not yet in pool_db.meta. ID follows the canonical Makina yield hash:
+  # sha256("0xbef11279fa6db9fa284cbe7f0fa9799e06b2dcd7ethmakinayield")[:32], as uint128.
+  - id: "278484858964719262695357945750068730966"
+    group_id: "0"
+    description: "Makina DCM"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0xBEf11279fA6dB9fA284cbE7f0fA9799E06B2dcd7"]
+    vars:
+      label: "DCM"
+      machine_token: "0xBEf11279fA6dB9fA284cbE7f0fA9799E06B2dcd7"
+      machine: "0xd2f644d0418126fFCc8F16840ed5D52aa62fd4EB"
+      depositor: "0x06738e4E6C948529B0dD9958475502d7814ff234"
+      redeemer: "0xCE110A8C41be513B8b2e787f3d6CF5685a863b3E"
+      accounting_token: ${token_list.mainnet.USDC}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dcm.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dcm.pending_redemption_share_amount")}
   - id: "257907866263469253975271928750178105060"
     group_id: "0"
     description: "Makina DUSD"
