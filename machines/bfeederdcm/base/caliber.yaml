@@ -1,0 +1,7 @@
+config:
+  caliber_address:
+    type: "address"
+    value: "0xbfdc3cc9C8916300f546D7b31667731F5f6536e0"
+
+# The DCM position belongs to this machine's mainnet spoke.
+positions: []
