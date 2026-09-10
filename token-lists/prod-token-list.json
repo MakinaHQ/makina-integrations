@@ -348,6 +348,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x5a0F93D040De44e78F251b03c43be9CF317Dcf64",
+      "name": "Janus Henderson AAA CLO Fund",
+      "decimals": 6,
+      "symbol": "JAAA"
+    },
+    {
+      "chainId": 1,
       "address": "0x6aD038cA6C04e885630851278ca0a856Ad9a66Cc",
       "name": "Hastra wYLDS",
       "decimals": 6,
