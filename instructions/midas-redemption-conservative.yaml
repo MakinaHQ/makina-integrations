@@ -32,6 +32,12 @@
     label: ${position.label}
     path: "../../../blueprints/midas/withdraw.yaml:request_redemption"
     inputs:
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}
@@ -57,6 +63,12 @@
     label: ${position.label}
     path: "../../../blueprints/midas/withdraw.yaml:request_redemption_relative"
     inputs:
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}
@@ -83,6 +95,12 @@
     label: ${position.label}
     path: "../../../blueprints/midas/account-conservative.yaml:account"
     inputs:
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
       redeemer_address:
         type: "address"
         value: ${position.redeemer_address}

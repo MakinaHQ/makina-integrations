@@ -1,0 +1,115 @@
+# Generic CUSTODIAN DEPOSIT instruction. Sends funds OUT OF THE CALIBER to an off-chain
+# custodian and books them as a claim, so the outflow is a reclassification
+# (cash -> claim) rather than a NAV loss. Nothing here is protocol-specific: every value
+# comes from position vars or caliber config, so one file serves any custodian, asset
+# and chain.
+#
+# Blueprint: blueprints/makina/custodian-deposit.yaml — read its header before editing
+# either file; it records the constraints that are not visible from the calls.
+#
+# CURRENT CONSUMERS
+#   dmg / dmw — the Midas full-redemption cycle, where a deposit sized to the value to be
+#   redeemed is sent before the redemption vault is funded, and refunded once the cycle
+#   is done. Mechanism and review checklist:
+#   docs/midas-full-redemption/README.md. That pairs with
+#   instructions/midas-full-redemption.yaml — that one is the exit, this is the deposit
+#   that unlocks it. They are independent positions: the deposit goes to an EOA the
+#   custodian controls, the redemption draws from a vault, and the two never touch
+#   on-chain.
+#
+# Four legs. Only `settle_residual` needs a release; the routine deposit amount is a
+# runtime slot bounded by `max_deposit_amount`, so there is NO release per cycle.
+#
+# Wiring rules that CI cannot catch (mechanisms in the blueprint header):
+#   - affected_tokens: MANAGEMENT [token], HARVEST [], ACCOUNTING [token] — exactly one
+#     entry, and it must be the token the reported value is denominated in. `[]` on the
+#     ACCOUNTING leg reverts every accounting call AND the deposit leg with it.
+#   - The deposit asset must be a REGISTERED BASE TOKEN, or MANAGEMENT reverts
+#     `InvalidAffectedToken`.
+#   - recipient_address must not be the caliber or any Makina address: the delta check
+#     constrains the amount, never the destination.
+#   - First use against a given custodian address must be a dust deposit confirmed
+#     received — a transfer to a wrong-but-checksum-valid address succeeds silently and
+#     the delta check passes by construction. Free, since the amount is a runtime slot.
+#   - Settle when the refund LANDS, not when you notify the custodian. Settling early
+#     understates NAV and lets a depositor mint shares too cheaply.
+#
+# The `&deposit_inputs` / `*deposit_inputs` below is a YAML anchor and alias — standard
+# YAML, and the only use of it in this repo. It is not just brevity: all four legs are
+# the SAME position, so they must receive identical inputs, and the anchor makes drift
+# impossible rather than merely unlikely. Verified against the transpiler: it resolves
+# the aliases and then prunes each rootfile entry to the inputs its action actually
+# references (deposit_capped gets recipient + cap, the other three only the KV key), so
+# sharing the block costs nothing in the emitted bytecode. `affected_tokens` is
+# deliberately NOT shared — it must differ per leg.
+#
+# Expected position vars: label, token_address, recipient_address, kv_store_key,
+#   max_deposit_amount, residual_claim_amount.
+# Expected caliber config: key_value_store_address, unsigned_math_helper_address,
+#   caliber_helper_address, boolean_helper_address. Do not consolidate the helpers —
+#   the key name does not determine which contract you get.
+
+# MANAGEMENT — the routine deposit. Runtime amount, capped on cumulative outstanding.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/custodian-deposit.yaml:deposit_capped"
+    inputs: &deposit_inputs
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_store_key:
+        type: "bytes32"
+        value: ${position.kv_store_key}
+      token_address:
+        type: "address"
+        value: ${position.token_address}
+      recipient_address:
+        type: "address"
+        value: ${position.recipient_address}
+      max_deposit_amount:
+        type: "uint256"
+        value: ${position.max_deposit_amount}
+      residual_claim_amount:
+        type: "uint256"
+        value: ${position.residual_claim_amount}
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+
+# HARVEST — routine close. Run when the refund LANDS, not when you notify the custodian.
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/custodian-deposit.yaml:settle_full"
+    inputs: *deposit_inputs
+
+# HARVEST — exceptional: leave a residual booked (dispute or partial recovery).
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/custodian-deposit.yaml:settle_residual"
+    inputs: *deposit_inputs
+
+# ACCOUNTING — reports the claim. EXACTLY ONE affected token; see above.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/custodian-deposit.yaml:account_claim"
+    inputs: *deposit_inputs

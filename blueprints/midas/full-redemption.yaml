@@ -1,0 +1,68 @@
+protocol: "midas"
+
+# Midas full-redemption vault — synchronous, fixed-rate exit of an mToken into a
+# stablecoin. Generic across every Midas mToken and every chain: this file carries no
+# addresses and no helper constants.
+#
+# This is NOT the async flow in blueprints/midas/withdraw.yaml — different vault
+# instance, no request lifecycle, no KV, no escrow.
+# Mechanism, accounting and review checklist: docs/midas-full-redemption/README.md
+#
+# ## No approve, on purpose
+# `redeemInstant` calls `mToken.burn(user, amount)`, which is role-gated on the vault and
+# needs no allowance. The only path that would need one is the `WithSwapper` fallback,
+# taken when the vault is under-funded. By not approving, that fallback fails closed with
+# "ERC20: insufficient allowance" rather than moving mToken into the vault and reverting
+# deeper on a deliberately-dead liquidityProvider. Do not add an approve call.
+#
+# ## Payout is exactly computable before you send
+# tokenOut is configured `stable == true`, so `_getTokenRate` returns STABLECOIN_RATE
+# (1e18) and the tokenOut/USD feed never enters the payout:
+#
+#   payout_base18 = truncate(amount_mtoken_in * frozenRate / 1e18, tokenOutDecimals)
+#
+# Use it to set a tight `min_receive_amount`.
+#
+# ## Preconditions — verify every time before executing
+#  - The consuming caliber has `waivedFeeRestriction(caliber) == true`, and holds the
+#    mToken's greenlist role on MidasAccessControl (the vault runs
+#    `_validateUserAccess`). The vault itself needs no greenlist role for this path: a
+#    burn has `to == address(0)`, which `_beforeTokenTransfer` skips.
+#  - Vault is funded: `tokenOut.balanceOf(vault) >= expected payout`.
+#  - Frozen feed still healthy: `vault.mTokenDataFeed()` -> `getDataInBase18()` must
+#    succeed. A hard deadline that kills the vault, and shorter than it looks.
+#  - Size floors: `minAmount` applies unless `isFreeFromMinAmount`. Some mTokens also
+#    carry a residual min-balance hook, where a partial redemption leaving a nonzero
+#    balance under the floor reverts "MTMB: min balance not met".
+#  - `_requireTokenExists(tokenOut)` reverts if that stablecoin is not configured on this
+#    vault; read `getPaymentTokens()` rather than assuming.
+
+inputs:
+  redeemer_address:
+    type: "address"
+  token_out_address:
+    type: "address"
+
+actions:
+  # Redeem an exact mToken amount for tokenOut at the vault's frozen rate.
+  # Synchronous: the caliber holds tokenOut when this returns.
+  redeem_instant:
+    calls:
+      - description: "Redeem mToken for tokenOut at the vault's frozen rate (burns from caliber, pays caliber)"
+        target: "${inputs.redeemer_address}"
+        selector: "redeemInstant(address,uint256,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.token_out_address}"
+          - type: "uint256"
+            value: "${input_slots.amount_mtoken_in}"
+          - type: "uint256"
+            value: "${input_slots.min_receive_amount}"
+
+    input_slots:
+      amount_mtoken_in:
+        type: "uint256"
+        description: "Exact mToken amount to redeem, 18 dec. Must be >= the vault's minAmount (1e18); on mWIN it must also not leave a 0 < residual < 1e18 balance."
+      min_receive_amount:
+        type: "uint256"
+        description: "Slippage floor on tokenOut, in BASE-18 regardless of tokenOut decimals (330783.31458 USDC => 330783314580000000000000). A value expressed in 6-dec USDC gives NO protection. Compute as truncate(amount_mtoken_in * frozenRate / 1e18, tokenOutDecimals); never pass 0."

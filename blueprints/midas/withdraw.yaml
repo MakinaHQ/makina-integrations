@@ -91,6 +91,12 @@ protocol: "midas"
 # 6. vault.redeemRequest(tokenOut, amount, caliber) → assigned request id.
 # 7. kv.set(key, returned request id); never reconstruct vault id-allocation behaviour.
 
+# ⚠️ `boolean_helper_address` and `caliber_helper_address` are INPUTS, not constants:
+# they are the only two Makina helpers not deployed at the same address on every chain,
+# so each caliber binds its own from `${config.*}`. A hardcoded address would be codeless
+# on another chain and the guards would silently pass — see
+# docs/midas-full-redemption/README.md#chain-specific-helper-addresses.
+# The other helpers stay constants because they are the same address everywhere.
 constants:
   context_helper_address:
     type: "address"
@@ -98,17 +104,15 @@ constants:
   math_helper_address:
     type: "address"
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # Makina MathHelper; blueprint-helpers.md
-  boolean_helper_address:
-    type: "address"
-    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353" # Makina BooleanHelper; blueprint-helpers.md
   bytes32_helper_address:
     type: "address"
     value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3" # Makina Bytes32Helper; blueprint-helpers.md
-  caliber_helper_address:
-    type: "address"
-    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D" # Makina CaliberHelper; blueprint-helpers.md
 
 inputs:
+  boolean_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
   redeemer_address:
     type: "address"
   mtoken_address:
@@ -146,7 +150,7 @@ actions:
           type: "(address,address,uint8,uint256,uint256,uint256)"
 
       - description: "Extract sender (index 0) as bytes32 for the ownership check"
-        target: "${constants.caliber_helper_address}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -158,7 +162,7 @@ actions:
           type: "bytes32"
 
       - description: "Extract status (index 2)"
-        target: "${constants.caliber_helper_address}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -202,7 +206,7 @@ actions:
           type: "bool"
 
       - description: "in_flight = Pending AND owned by caliber; revert if true"
-        target: "${constants.boolean_helper_address}"
+        target: "${inputs.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
@@ -214,7 +218,7 @@ actions:
           type: "bool"
 
       - description: "Enforce one-in-flight invariant"
-        target: "${constants.boolean_helper_address}"
+        target: "${inputs.boolean_helper_address}"
         selector: "revertIfTrue(bool)"
         parameters:
           - type: "bool"
@@ -293,7 +297,7 @@ actions:
           type: "(address,address,uint8,uint256,uint256,uint256)"
 
       - description: "Extract sender (index 0) as bytes32 for the ownership check"
-        target: "${constants.caliber_helper_address}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -305,7 +309,7 @@ actions:
           type: "bytes32"
 
       - description: "Extract status (index 2)"
-        target: "${constants.caliber_helper_address}"
+        target: "${inputs.caliber_helper_address}"
         selector: "extractElementFromStaticTuple(bytes,uint256)"
         parameters:
           - type: "(address,address,uint8,uint256,uint256,uint256)"
@@ -349,7 +353,7 @@ actions:
           type: "bool"
 
       - description: "in_flight = Pending AND owned by caliber; revert if true"
-        target: "${constants.boolean_helper_address}"
+        target: "${inputs.boolean_helper_address}"
         selector: "and(bool,bool)"
         parameters:
           - type: "bool"
@@ -361,7 +365,7 @@ actions:
           type: "bool"
 
       - description: "Enforce one-in-flight invariant"
-        target: "${constants.boolean_helper_address}"
+        target: "${inputs.boolean_helper_address}"
         selector: "revertIfTrue(bool)"
         parameters:
           - type: "bool"
