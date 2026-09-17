@@ -1,0 +1,56 @@
+# Generic Midas full-redemption vault instruction — synchronous, fixed-rate exit of an
+# mToken into a stablecoin, via a dedicated per-investor vault that Midas funds and whose
+# rate is frozen for the cycle. Generic across mTokens and chains.
+#
+# The synchronous sibling of instructions/midas-redemption.yaml (async request/settle).
+# Both may coexist on the same caliber as separate positions.
+# Mechanism, accounting and review checklist: docs/midas-full-redemption/README.md
+#
+# ⚠️ Synthetic swap-out: the mToken and the stablecoin are BOTH registered base tokens on
+# the consuming caliber, so value is carried by the base-token registry on both sides and
+# the position accounts as 0. Verify `caliber.isBaseToken(mToken)` AND
+# `caliber.isBaseToken(tokenOut)` before enabling, or the conversion turns accounted value
+# into an unpriced holding.
+#
+# ⚠️ The MANAGEMENT leg declares `affected_tokens: []`, so no value-conservation delta
+# check runs and recoveryMode does not disable it. A tight, nonzero `min_receive_amount`
+# is the ONLY on-chain control on this position. Mind the units trap: it is base-18 even
+# when tokenOut is 6-decimal USDC. The payout is exactly computable in advance — see the
+# blueprint header for the formula.
+#
+# The mToken is usually collateral on Morpho/Aave rather than sitting in the caliber
+# wallet, so sequence a full unwind as: repay debt, withdraw collateral, then run this.
+# Partial redemptions all settle at the same frozen rate.
+#
+# Expected caliber vars (per-position):
+#   label:              string   — friendly label (e.g. "mGLOBAL Full Redemption")
+#   redeemer_address:   address  — the DEDICATED full-redemption vault (NOT the standard
+#                                 redeemer used by midas-redemption.yaml)
+#   mtoken_address:     address  — mToken being redeemed
+#   token_out_address:  address  — stablecoin paid out; must be configured on the vault
+#                                 (`getPaymentTokens()`) or the call reverts
+
+# MANAGEMENT — redeem_instant (exact mToken amount, frozen rate, synchronous)
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/full-redemption.yaml:redeem_instant"
+    inputs:
+      redeemer_address:
+        type: "address"
+        value: ${position.redeemer_address}
+      token_out_address:
+        type: "address"
+        value: ${position.token_out_address}
+
+# ACCOUNTING: 0 — value lives in the caliber's base-token registry on both sides
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.mtoken_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/midas/account.yaml:account_0"
+    inputs: {}

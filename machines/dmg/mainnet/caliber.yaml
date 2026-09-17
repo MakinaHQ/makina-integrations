@@ -61,6 +61,43 @@ positions:
       token_out_address: ${token_list.mainnet.USDC}
       kv_storage_key: "${keccak256(makina.mainnet.midas.mglobal-redemption)}"
 
+  # ── Midas mGLOBAL, full redemption vault (synchronous, fixed rate) ────────
+  # Dedicated vault, NOT the standard redeemer above: settles at a rate frozen when
+  # Midas funds it, avoiding the haircut the standard redeemer applies via its
+  # "mGLOBAL/USD PriceLowered" feed. Gated by waivedFeeRestriction(caliber). Requires
+  # an off-chain cycle (MPC deposit below) and the vault funded before it can execute;
+  # the frozen feed expires, so check it is healthy before starting an unwind.
+  # Mechanism and pre-flight: docs/midas-full-redemption/README.md
+  - id: "13400696197975105700529251172125123059064806206903805965480170891777051755294" # keccak256("midas.mglobal.full-redemption")
+    group_id: "0"
+    description: "Midas mGlobal Full Redemption (synthetic, fixed rate)"
+    instructions: !include "../../../instructions/midas-full-redemption.yaml"
+    vars:
+      label: "mGLOBAL Full Redemption"
+      redeemer_address: "0xdbD621E67D9cfFfFcdCD316a27285f657C178e76" # dedicated full redemption vault; mToken() == mGLOBAL
+      mtoken_address: ${token_list.mainnet.mGLOBAL}
+      token_out_address: ${token_list.mainnet.USDC}
+
+  # ── Midas mGLOBAL, MPC deposit for the full-redemption cycle ──────────────
+  # Midas asks for a deposit sized to the value to be redeemed before they de-allocate
+  # and fund the vault above; it is refunded once we tell them the cycle is done.
+  # Booked as a claim so NAV stays continuous across it — the recipient is an EOA, so
+  # the deposit and the payout never net on-chain.
+  # First use of this recipient must be a dust deposit, confirmed received — a transfer
+  # to a wrong-but-valid address succeeds silently. Close only when the refund lands.
+  # Full cycle and rationale: docs/midas-full-redemption/README.md
+  - id: "11700053247407221328952389217009027446166702428890812784458460472563724446166" # keccak256("midas.mglobal.custodian-deposit")
+    group_id: "0"
+    description: "Midas mGlobal Full Redemption MPC Deposit (claim)"
+    instructions: !include "../../../instructions/makina-custodian-deposit.yaml"
+    vars:
+      label: "mGLOBAL MPC Deposit"
+      token_address: ${token_list.mainnet.USDC}
+      recipient_address: "0x4861D1Dd5715F03609fB60584883A48f16120a2c" # Midas MPC deposit wallet for mGLOBAL (EOA). NOT the vault, NOT any Makina address.
+      kv_store_key: "${keccak256(makina.mainnet.midas.mglobal-custodian-deposit)}"
+      max_deposit_amount: "70000000000" # 70,000 USDC (6 dec) — ceiling on cumulative outstanding
+      residual_claim_amount: "0" # set only when shipping a settle_residual release
+
   # ── Morpho mGLOBAL/USDC (market: 0xfd40...50cd) ──────────────────
   - id: "230532716052901966686540582198773421275"
     group_id: "1"

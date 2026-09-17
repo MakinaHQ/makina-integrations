@@ -1,0 +1,255 @@
+protocol: "makina"
+
+# Books funds sent to an off-chain custodian as position value, so a governance-
+# authorised outflow is a reclassification (cash -> claim) rather than a NAV loss.
+# Chain-agnostic; nothing here is Midas-specific.
+#
+# OPERATORS: docs/midas-full-redemption/README.md. This header is for whoever EDITS
+# this file — it records only the constraints that are not visible from the calls.
+#
+#   MANAGEMENT  deposit_capped   send `deposit_amount` (runtime), <= max_deposit_amount
+#   HARVEST     settle_full      claim -> 0            (routine close, no release)
+#   HARVEST     settle_residual  claim -> residual_claim_amount, clamped (needs release)
+#   ACCOUNTING  account_claim    report the claim
+#
+# `KV[kv_store_key]` holds the outstanding claim AMOUNT and is the single source of
+# truth: the deposit leg adds to it, the settle legs lower it, accounting reports it
+# verbatim. There is deliberately no second copy for it to disagree with.
+#
+# ## 1. affected_tokens means three different things — get this wrong and it breaks
+#   MANAGEMENT  [<token_address>]  Both value sums loop this array. With `[]` both are
+#                                  0, no delta check runs at all, and tokens can leave
+#                                  unbooked. CI cannot catch it.
+#   HARVEST     []                 Merkle-committed but unused; harvest has no checks.
+#   ACCOUNTING  [<token_address>]  EXACTLY ONE, and it must be the token the reported
+#                                  value is DENOMINATED in. `_accountForPosition` uses
+#                                  it three ways in one loop: arity
+#                                  (`amounts.length != len` -> `InvalidAccounting`), a
+#                                  base-token firewall (`InvalidAffectedToken` fires
+#                                  here too), and denomination — `_accountingValueOf`
+#                                  re-prices via `getPrice(token, accountingToken)`
+#                                  unless they match. `account_claim` reports ONE value
+#                                  (`UINT256_MAX` is a terminator), so `[]` reverts
+#                                  every accounting call — and the deposit leg too,
+#                                  since accounting runs inside `_managePosition`
+#                                  before `_execute`. Verified on a fork: `[]` ->
+#                                  deposit reverts with the KV slot still 0.
+# `position_tokens` is `[]` everywhere: the asset is a base token, and listing it there
+# reverts registration with `PositionTokenIsBaseToken`.
+#
+# ## 2. Helper roles are split — do not consolidate
+# No deployed helper has every primitive, and the config key name does not fix which
+# contract you get: `unsigned_math_helper_address` is `0x3D623B19…e3c0` on dmg/dmw/dcm
+# but `0x836C9007…Bb91` on dusd/deth/dbit-mainnet, where `gt` is ABSENT and `sub`'s
+# operands are REVERSED.
+#   add, min      -> unsigned_math_helper_address  (bit-identical on both; both
+#                                                   commutative, so no operand order)
+#   gt            -> caliber_helper_address        (uniformly 0x6E2ED2f4…3d8D on mainnet)
+#   revertIfTrue  -> boolean_helper_address
+# There is deliberately NO `sub` here. `settle_residual` writes an absolute value
+# clamped by `min` rather than subtracting a delta, so there is no order to get wrong.
+#
+# ## 3. `revertIfTrue` fails OPEN on a codeless address
+# It declares no return, so the VM skips the output check and a CALL to a codeless
+# address succeeds silently. Config-binding is not protection — a declared key holding
+# a codeless value fails open exactly like a literal. The only real control is
+# exercising the guard on a fork before first use (an over-cap deposit MUST revert).
+# That is why the arithmetic is a backstop and not merely a convenience:
+# `settle_residual` writes `min(residual, outstanding)`, so even with a dead guard it
+# can only ever LOWER the claim. `min` declares a return, so a wrong binding reverts.
+#
+# ## 4. The delta check constrains the AMOUNT, never the DESTINATION
+# A deposit moves X out while the claim rises X, so `_checkPositionMinDelta` passes; if
+# the claim did NOT rise, `change == 0` and it reverts `MaxValueLossExceeded`, leaving
+# the tokens put. But the value sums are `balanceOf(address(this))`, and for a rising
+# non-debt claim `isDebt == isPositionIncrease` is false, so NOTHING is checked in the
+# NAV-inflating direction. A deposit whose tokens never leave books the claim AND keeps
+# the balance, and `_getAum` counts both. So `recipient_address` must not be the caliber
+# or any Makina address — a wiring-time review item, not something the contract catches.
+#
+# ## 5. Settling is HARVEST because the claim falls with no inflow in the same tx
+# The refund arrives by external transfer in an earlier block, so as MANAGEMENT the
+# delta check would reach `_checkPositionMaxDelta` and revert. Consequence: harvest runs
+# NO delta check and `accountForPosition` has none either, so a settle leg's write
+# enters NAV unchallenged — hence the clamp in 3. Also `harvest-position` has no
+# `--inputs` flag (spellcaster 0.6.1), so HARVEST actions cannot take runtime slots;
+# that is why `settle_full` takes none and `settle_residual` reads from the rootfile.
+#
+# ## 6. Closing out is a strict TWO-STEP
+# The Caliber de-registers only on the `lastValue > 0 && currentValue == 0` edge.
+# Deleting the position from config does NOT de-register it — it changes the instruction
+# root, so no merkle proof exists, accounting can never refresh, and once
+# `positionStaleThreshold` elapses `_getAum` reverts `PositionAccountingStale`:
+# `getNetAum()` dies permanently while `getDetailedAum()` keeps returning, so dashboards
+# still look healthy. So: settle to zero, `account-positions`, CONFIRM
+# `getPosition(posId) == (0, 0, false)` — and normally LEAVE THE POSITION IN PLACE.
+#
+# ## 7. There is no `deposit_exact`, on purpose
+# An earlier version had one for amounts above the ceiling. It was removed: raising
+# `max_deposit_amount` needs the same timelocked release, keeps the cumulative guard,
+# and avoids a second leg carrying its own zero-claim precondition. To exceed the
+# ceiling, ship a release that raises it.
+
+inputs:
+  kv_store_address:
+    type: "address"
+  kv_store_key:
+    type: "bytes32"
+  token_address:
+    type: "address"
+  recipient_address:
+    type: "address"
+  max_deposit_amount:
+    type: "uint256"
+  residual_claim_amount:
+    type: "uint256"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+
+actions:
+  # The routine path. Operator picks the amount; governance pins the destination and the
+  # ceiling on CUMULATIVE outstanding, so repeat calls cannot walk past it. No release
+  # per cycle. The ceiling self-relaxes as claims settle, so it bounds outstanding, not
+  # lifetime.
+  deposit_capped:
+    calls:
+      - description: "Read the currently outstanding claim"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+        return:
+          name: "outstanding"
+          type: "uint256"
+
+      - description: "new_total = outstanding + deposit_amount"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.outstanding}"
+          - type: "uint256"
+            value: "${input_slots.deposit_amount}"
+        return:
+          name: "new_total"
+          type: "uint256"
+
+      - description: "Would this push cumulative outstanding past the governance ceiling?"
+        target: "${inputs.caliber_helper_address}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.new_total}"
+          - type: "uint256"
+            value: "${inputs.max_deposit_amount}"
+        return:
+          name: "over_cap"
+          type: "bool"
+
+      # A cap must REVERT, not clamp — silently sending less than the operator asked
+      # would be worse than failing.
+      - description: "Enforce the ceiling BEFORE any funds move"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.over_cap}"
+
+      - description: "Send the deposit to the governance-pinned custodian address"
+        target: "${inputs.token_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.recipient_address}"
+          - type: "uint256"
+            value: "${input_slots.deposit_amount}"
+
+      - description: "Record the new outstanding claim — this IS the accounted value"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+          - type: "uint256"
+            value: "${returns.new_total}"
+
+    input_slots:
+      deposit_amount:
+        type: "uint256"
+        description: "Amount to send, in the token's own decimals. Reverts unless outstanding + this <= max_deposit_amount."
+
+  # Routine close, run when the refund LANDS — not when you notify the custodian; see
+  # the README on settlement sequencing. No inputs, so it works through
+  # `harvest-position`, which cannot pass slots.
+  settle_full:
+    calls:
+      - description: "Close the claim; zero here is what lets the position de-register"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+          - type: "uint256"
+            value: "${builtins.UINT256_0}"
+
+  # Exceptional: leave a residual booked (disputed or partial recovery). The rootfile
+  # value is ABSOLUTE, and `min` clamps it to the current claim, so this leg can only
+  # ever reduce reported value — structurally, without depending on a guard. A residual
+  # above the claim is a no-op rather than a revert; that fails in the safe direction
+  # and shows up as an unchanged claim after `account-positions`.
+  settle_residual:
+    calls:
+      - description: "Read the currently outstanding claim"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+        return:
+          name: "outstanding"
+          type: "uint256"
+
+      - description: "Clamp: never write more than the claim already outstanding"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "min(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.residual_claim_amount}"
+          - type: "uint256"
+            value: "${returns.outstanding}"
+        return:
+          name: "clamped_residual"
+          type: "uint256"
+
+      - description: "Record the reduced claim"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+          - type: "uint256"
+            value: "${returns.clamped_residual}"
+
+  # Report the outstanding claim. Read-only, and the single source of truth.
+  account_claim:
+    calls:
+      - description: "The outstanding claim, exactly as the deposit/settle legs left it"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+        return:
+          name: "outstanding"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.outstanding}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

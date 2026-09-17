@@ -47,6 +47,47 @@ positions:
       token_out_address: ${token_list.base.USDC}
       kv_storage_key: "${keccak256(makina.base.midas.mglo-redemption)}"
 
+  # ── Midas mGLO, full redemption vault (synchronous, fixed rate) ──
+  # Dedicated vault, NOT the standard redeemer above: settles at a rate frozen when
+  # Midas funds it, gated by waivedFeeRestriction(caliber). Requires an off-chain cycle
+  # (MPC deposit below) and the vault funded before it can execute; the frozen feed
+  # expires, so check it is healthy before starting an unwind.
+  # Mechanism and pre-flight: docs/midas-full-redemption/README.md
+  #
+  # ⚠️ This vault's frozen rate reads exactly par, unlike the other Midas vaults. If
+  # mGLO's NAV is above par, redeeming here takes a discount — confirm the rate before
+  # executing a cycle.
+  - id: "34827663898562244519577360687457401872870454636531473367629173892459358582098" # keccak256("midas.mglo.full-redemption")
+    group_id: "0"
+    description: "Midas mGLO Full Redemption (synthetic, fixed rate)"
+    instructions: !include "../../../instructions/midas-full-redemption.yaml"
+    vars:
+      label: "mGLO Full Redemption"
+      redeemer_address: "0xbC4a3a4a0d73c23C9A87F483e5244CD93FC3B84C" # dedicated full redemption vault; mToken() == mGLO
+      mtoken_address: ${token_list.base.mGLO}
+      token_out_address: ${token_list.base.USDC}
+
+  # ── Midas mGLO, MPC deposit for the full-redemption cycle ────────
+  # Midas asks for a deposit sized to the value to be redeemed before they de-allocate
+  # and fund the vault above; it is refunded once we tell them the cycle is done.
+  # Booked as a claim so NAV stays continuous across it — the recipient is an EOA, so
+  # the deposit and the payout never net on-chain.
+  # First use of this recipient must be a dust deposit, confirmed received — a transfer
+  # to a wrong-but-valid address succeeds silently. Close only when the refund lands.
+  # The ceiling is sized to THIS caliber; the Base spoke accounts separately from dmg
+  # mainnet. Full cycle and rationale: docs/midas-full-redemption/README.md
+  - id: "60734264874921592277185279724157975422458643982376017822062942572440986442461" # keccak256("midas.mglo.custodian-deposit")
+    group_id: "0"
+    description: "Midas mGLO Full Redemption MPC Deposit (claim)"
+    instructions: !include "../../../instructions/makina-custodian-deposit.yaml"
+    vars:
+      label: "mGLO MPC Deposit"
+      token_address: ${token_list.base.USDC}
+      recipient_address: "0x5Cc08Af93Ac0ca2FF11CB8A9bbd008D72b630536" # Midas MPC deposit wallet for mGLO (EOA). NOT the vault, NOT any Makina address.
+      kv_store_key: "${keccak256(makina.base.midas.mglo-custodian-deposit)}"
+      max_deposit_amount: "5000000000" # 5,000 USDC (6 dec) — ceiling on cumulative outstanding
+      residual_claim_amount: "0" # set only when shipping a settle_residual release
+
   # ── Morpho mGLO/USDC (market: 0x29ae...52d0b) ────────────────────
   - id: "125056470168347138528124109495472443889"
     group_id: "1"
