@@ -1,0 +1,166 @@
+# this is a generated file - do not edit manually
+# root: 0x7100077ba356cbd29114ef567df9e3db1854fc0364aaea765f548ce72f7578de
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.makina.account.DCM]
+position_id = "106073426461188799876802552649078405596"
+description = "Makina DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbef11279fa6db9fa284cbe7f0fa9799e06b2dcd7"]
+commands = [
+  "0x70a082310102ff0000000002bef11279fa6db9fa284cbe7f0fa9799e06b2dcd7",
+  "0x8eaa6ac00103ff000000000388f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0x771602f7010203ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0x07a2d13a0103ff0000000000d2f644d0418126ffcc8f16840ed5d52aa62fd4eb",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000bfdc3cc9c8916300f546d7b31667731f5f6536e0",
+  "0x5481fa4b375b73bc03bd406877ea22fea9bbab7e7eb2389be82b2b3456f44b83",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.makina.claim_assets.DCM]
+position_id = "106073426461188799876802552649078405596"
+description = "Makina DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x8eaa6ac00100ff000000000288f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0x661603e00102ff00000000ffce110a8c41be513b8b2e787f3d6cf5685a863b3e",
+  "0xed3c7d400100ff00000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0xed3c7d400101ff00000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+]
+state = [
+  "0xb13ab6a896606e73dd1c82e992bd5b3d5c9c642159eef7ca4fc64ce51b4af1fc",
+  "0x5481fa4b375b73bc03bd406877ea22fea9bbab7e7eb2389be82b2b3456f44b83",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.makina.deposit.DCM]
+position_id = "106073426461188799876802552649078405596"
+description = "Makina DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x86e807f80100030104ff00ff06738e4e6c948529b0dd9958475502d7814ff234",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x00000000000000000000000006738e4e6c948529b0dd9958475502d7814ff234",
+  "0x000000000000000000000000bfdc3cc9c8916300f546d7b31667731f5f6536e0",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.makina.deposit.DCM.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[[instructions.makina.deposit.DCM.inputs_slots]]
+index = 1
+name = "min_shares"
+type = "Uint"
+
+[instructions.makina.request_redeem.DCM]
+position_id = "106073426461188799876802552649078405596"
+description = "Makina DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x8eaa6ac00105ff000000000788f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0x32148d73010702ff000000076e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x711ecf590107ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010300ff000000ffbef11279fa6db9fa284cbe7f0fa9799e06b2dcd7",
+  "0x24c7e13f01000401ff000004ce110a8c41be513b8b2e787f3d6cf5685a863b3e",
+  "0xf71f7a25010504ff000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0xf71f7a25010600ff000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000ce110a8c41be513b8b2e787f3d6cf5685a863b3e",
+  "0x000000000000000000000000bfdc3cc9c8916300f546d7b31667731f5f6536e0",
+  "0xb13ab6a896606e73dd1c82e992bd5b3d5c9c642159eef7ca4fc64ce51b4af1fc",
+  "0x5481fa4b375b73bc03bd406877ea22fea9bbab7e7eb2389be82b2b3456f44b83",
+  "0x",
+]
+bitmap = "82412135738664784120036037737381363712"
+
+[[instructions.makina.request_redeem.DCM.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[[instructions.makina.request_redeem.DCM.inputs_slots]]
+index = 1
+name = "min_assets"
+type = "Uint"
+
+[instructions.makina.request_redeem_relative.DCM]
+position_id = "106073426461188799876802552649078405596"
+description = "Makina DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310105ff0000000008bef11279fa6db9fa284cbe7f0fa9799e06b2dcd7",
+  "0xaa9a091201080002ff0000083d623b199e290358416415ea7e05b635e442e3c0",
+  "0x8eaa6ac00106ff000000000288f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0x32148d73010203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x711ecf590102ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010408ff000000ffbef11279fa6db9fa284cbe7f0fa9799e06b2dcd7",
+  "0x24c7e13f01080501ff000005ce110a8c41be513b8b2e787f3d6cf5685a863b3e",
+  "0xf71f7a25010605ff000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+  "0xf71f7a25010708ff000000ff88f747ced522bfbd590aa6c1e747880c0b974d37",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000ce110a8c41be513b8b2e787f3d6cf5685a863b3e",
+  "0x000000000000000000000000bfdc3cc9c8916300f546d7b31667731f5f6536e0",
+  "0xb13ab6a896606e73dd1c82e992bd5b3d5c9c642159eef7ca4fc64ce51b4af1fc",
+  "0x5481fa4b375b73bc03bd406877ea22fea9bbab7e7eb2389be82b2b3456f44b83",
+  "0x",
+]
+bitmap = "83741363734449699992939844797661708288"
+
+[[instructions.makina.request_redeem_relative.DCM.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[[instructions.makina.request_redeem_relative.DCM.inputs_slots]]
+index = 1
+name = "min_assets"
+type = "Uint"

@@ -1,0 +1,14 @@
+name = "yspcxc"
+chain = "base"
+address = "0x47b574313Bf529098e1e55F397bC9D160ba3089c"
+
+[calibers.base]
+address = "0x57A25af7F054Cd8C4f7899f4cbbE4A0D455A57A2"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/yspcxc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb2000000000000000000007b9fcbd005511aCBd5"
+decimals = 8
+name = "SPCXc"
+symbol = "SPCXc"

@@ -51,7 +51,7 @@ positions:
   - id: "777"
     group_id: "0"
     description: "Merkl Harvest"
-    instructions: !include "../../../instructions/merkl.yaml"
+    instructions: !include "./instructions/merkl.yaml"
 
   # ══ Lending ═══════════════════════════════════════════════════════
   # ── Morpho vaults — Sentora "Main" line (Morpho Vault V2) ─────────
@@ -291,6 +291,7 @@ positions:
   # including the JAAA/USDC collateral/debt loop further below. GHO/RLUSD/USDC
   # currently read LT 0, but that is an Aave governance parameter, so the
   # grouping does not depend on it.
+  # Included by request regardless of the historical README yield/TVL cutoffs.
   - id: "194059629565002162213536100515443727730" # pools_db makina_id — Horizon GHO lending
     group_id: "4"
     description: "AaveV3 Horizon Supply GHO"
@@ -323,6 +324,7 @@ positions:
       aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
   # ── Aave V4 (Hub & Spoke) ─────────────────────────────────────────
+  # See README.md for reserve identity, pool-ID provenance and exclusions.
   # Only reserves with unambiguous pool_db.meta matches are included.
   # No aToken is minted — accounted via getUserSuppliedAssets, hence no
   # position_tokens. group_id "1" is the liquidation bucket for Spoke

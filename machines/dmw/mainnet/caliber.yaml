@@ -23,14 +23,21 @@ config:
   morpho_v2_liquidity_lens_address:
     type: "address"
     value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
+  # Chain-specific: boolean and caliber helpers are bound per caliber, never hardcoded
+  # in blueprints. docs/midas-full-redemption/README.md#chain-specific-helper-addresses
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
 
 positions:
+  # ── Harvest-only ───────────────────────────────────────────────────────────
   - id: "777"
     group_id: "0"
     description: "Merkl Harvest"
-    instructions: !include "../../../instructions/merkl.yaml"
+    instructions: !include "./instructions/merkl.yaml"
   # ── Midas mWIN ─────────────────────────────────────────────────────────────
-  # Issuance leg: accounts as 0, value carried by the base-token registry on both sides.
+  # Issuance leg: USDC → mWIN via the deposit vault's depositInstant. Accounts as 0;
+  # value is carried by the base-token registry on both sides.
   - id: "41413723539189016403206809161957552609495626398130081944267132620773851447130" # keccak256("midas.mwin.swap-in")
     group_id: "0"
     description: "Midas mWIN Swap In (synthetic)"
@@ -39,28 +46,28 @@ positions:
       label: "mWIN Swap In"
       asset_address: ${token_list.mainnet.USDC}
       mtoken_address: ${token_list.mainnet.mWIN}
-      depositor_address: "0xF7F1b944FCDe7805F6Ef3088817145d2eB667db4" # mWIN deposit vault
+      depositor_address: "0xF7F1b944FCDe7805F6Ef3088817145d2eB667db4" # mWIN deposit vault; mToken() == mWIN
   # Exit leg: async, admin-settled, one in-flight request at a time. No claim action —
   # Midas operators call safeApproveRequest and the vault pushes USDC to the caliber.
-  #
-  # Exits are constrained by two independent 1-mWIN (~$130k) minimums: the vault's
-  # minAmount and the mWIN residual min-balance rule. The caliber is greenlisted but
-  # NOT min-balance exempt, so a partial exit leaving 0 < balance < 1 mWIN reverts.
+  # Exit sizing is coarse: the vault's minAmount and mWIN's residual min-balance hook
+  # are independent 1-mWIN floors. See blueprints/midas/withdraw.yaml.
   - id: "26715866145689374721825933046266029086385158887015685471450563504882890697644" # keccak256("midas.mwin.redemption")
     group_id: "0"
     description: "Midas mWIN Redemption (async)"
     instructions: !include "../../../instructions/midas-redemption-conservative.yaml"
     vars:
       label: "mWIN Redemption"
-      redeemer_address: "0x605704d7b36d1677a8d242ded68eD505523c7924" # mWIN redemption vault
+      redeemer_address: "0x605704d7b36d1677a8d242ded68eD505523c7924" # mWIN redemption vault; mToken() == mWIN
       mtoken_address: ${token_list.mainnet.mWIN}
       token_out_address: ${token_list.mainnet.USDC}
       mtoken_data_feed_address: "0xa27c1658730e4FAFb7fB8B257a64BbB6A0ea4077" # == redeemer.mTokenDataFeed(); re-check if Midas repoints it
       kv_storage_key: "${keccak256(makina.mainnet.midas.mwin-redemption)}"
 
   # ── Midas mWIN, PYUSD payment token ────────────────────────────────────────
-  # Both vaults accept USDC and PYUSD. Separate positions rather than extra actions:
-  # asset_address / token_out_address are per-position vars.
+  # Both Midas vaults accept USDC and PYUSD, and PYUSD is a registered base token here —
+  # which midas-swap-in.yaml requires, since it accounts as 0 and leans on the registry.
+  # Separate positions rather than extra actions: asset_address / token_out_address are
+  # per-position vars and the instruction files take exactly one each.
   - id: "82883051030012749801329320500576862964611524717702639969711984243153005697753" # keccak256("midas.mwin.swap-in.pyusd")
     group_id: "0"
     description: "Midas mWIN Swap In PYUSD (synthetic)"
@@ -70,8 +77,8 @@ positions:
       asset_address: ${token_list.mainnet.PYUSD}
       mtoken_address: ${token_list.mainnet.mWIN}
       depositor_address: "0xF7F1b944FCDe7805F6Ef3088817145d2eB667db4" # same vault as the USDC leg
-  # kv_storage_key MUST differ from the USDC redemption: the withdraw blueprint tracks
-  # one in-flight request per key, so sharing it lets the two overwrite each other.
+  # Distinct kv_storage_key from the USDC redemption: the withdraw blueprint tracks one
+  # in-flight request per key, so sharing it lets the two overwrite each other.
   - id: "60092410153265578229278201743193446853960595350755901197320899334101352830388" # keccak256("midas.mwin.redemption.pyusd")
     group_id: "0"
     description: "Midas mWIN Redemption PYUSD (async)"
@@ -84,8 +91,66 @@ positions:
       mtoken_data_feed_address: "0xa27c1658730e4FAFb7fB8B257a64BbB6A0ea4077" # feed prices mWIN, not the payout token
       kv_storage_key: "${keccak256(makina.mainnet.midas.mwin-redemption-pyusd)}"
 
+  # ── Midas mWIN, full redemption vault (synchronous, fixed rate) ────────────
+  # Dedicated vault, NOT the standard redeemer above: settles at a rate frozen when
+  # Midas funds it, gated by waivedFeeRestriction(caliber). Requires an off-chain cycle
+  # (MPC deposit below) and the vault funded before it can execute; the frozen feed
+  # expires, so check it is healthy before starting an unwind.
+  # Mechanism and pre-flight: docs/midas-full-redemption/README.md
+  #
+  # For mWIN the reason to use this route is ring-fenced liquidity and a rate that holds
+  # across a multi-step unwind, not a price gap — re-measure against the async path
+  # before each cycle. mWIN is held as Morpho collateral (market 0xeecb...c774), so the
+  # unwind order is: repay PYUSD -> withdraw mWIN collateral -> redeem here.
+  - id: "33896432801378592496858069643464831445431643432784620074526431203214462157699" # keccak256("midas.mwin.full-redemption")
+    group_id: "0"
+    description: "Midas mWIN Full Redemption (synthetic, fixed rate)"
+    instructions: !include "../../../instructions/midas-full-redemption.yaml"
+    vars:
+      label: "mWIN Full Redemption"
+      redeemer_address: "0x078b0858F609Beb26098379fB504763766b6f128" # dedicated full redemption vault; mToken() == mWIN
+      mtoken_address: ${token_list.mainnet.mWIN}
+      token_out_address: ${token_list.mainnet.USDC}
+
+  # PYUSD payout variant of the position above — same vault, same frozen rate, settling
+  # in PYUSD so proceeds can repay the mWIN/PYUSD Morpho loop without a swap.
+  # Pre-flight: tokensConfig(PYUSD).allowance is a decrementing budget, so a multi-tranche
+  # exit needs the running total to fit, not each tranche.
+  - id: "40829258258747697625434437221301627177060113976315786954948431085587103073573" # keccak256("midas.mwin.full-redemption-pyusd")
+    group_id: "0"
+    description: "Midas mWIN Full Redemption PYUSD (synthetic, fixed rate)"
+    instructions: !include "../../../instructions/midas-full-redemption.yaml"
+    vars:
+      label: "mWIN Full Redemption - PYUSD"
+      redeemer_address: "0x078b0858F609Beb26098379fB504763766b6f128" # dedicated full redemption vault; mToken() == mWIN
+      mtoken_address: ${token_list.mainnet.mWIN}
+      token_out_address: ${token_list.mainnet.PYUSD}
+
+  # ── Midas mWIN, MPC deposit for the full-redemption cycle ──────────────────
+  # Booked as a claim so NAV stays continuous while the deposit sits off-chain; the
+  # recipient is an EOA, so the deposit and the payout never net on-chain.
+  # First use of this recipient must be a dust deposit, confirmed received — a transfer
+  # to a wrong-but-valid address succeeds silently. Close only when the refund lands.
+  # Full cycle and rationale: docs/midas-full-redemption/README.md
+  #
+  # USDC-denominated even when the redemption pays PYUSD: the deposit and the payout are
+  # independent flows and one claim serves either leg. A second deposit position would
+  # need its own kv_store_key; a shared key merges the two claims.
+  - id: "6884477456143640895165978288398102714361816788138613541781645712214498514959" # keccak256("midas.mwin.custodian-deposit")
+    group_id: "0"
+    description: "Midas mWIN Full Redemption MPC Deposit (claim)"
+    instructions: !include "../../../instructions/makina-custodian-deposit.yaml"
+    vars:
+      label: "mWIN MPC Deposit"
+      token_address: ${token_list.mainnet.USDC}
+      recipient_address: "0x7Cd7a920458AE3567143B1BF81A13C725Ce5C267" # Midas MPC deposit wallet for mWIN (EOA). NOT the vault, NOT any Makina address.
+      kv_store_key: "${keccak256(makina.mainnet.midas.mwin-custodian-deposit)}"
+      max_deposit_amount: "30000000000" # 30,000 USDC (6 dec) — ceiling on cumulative outstanding
+      residual_claim_amount: "0" # set only when shipping a settle_residual release
+
   # ── Morpho mWIN/PYUSD (market: 0xeecb...c774) ──────────────────────────────
   # Collateral and debt share group_id 1 — one liquidation set for health accounting.
+  # `is_debt: true` on the debt side keeps the shared label unambiguous.
   - id: "311252770595977748178203904303413825288"
     group_id: "1"
     description: "Morpho mWIN collateral (market: 0xeecb...c774)"
@@ -102,6 +167,11 @@ positions:
       label: "mWIN/PYUSD (0xeecb...c774)"
       market_id: "0xeecbfa4b6caa83c5000ce68a77808c80504e2ff56e81095c7742a615ecd9c774"
       loan_token: ${token_list.mainnet.PYUSD}
+  # ── Morpho Vault: Sentora mWIN Main (PYUSD) ────────────────────────────────
+  # Supply side of the mWIN loop via the vault rather than the market directly: the
+  # vault's one adapter holds ~all of that market's supply shares, so the exposure
+  # matches, but only the vault carries the Merkl campaign. group_id 0, not the borrow
+  # pair's group 1 — grouping is for offsetting legs only.
   - id: "304842766591321364733133397329774721882"
     group_id: "0"
     description: "Morpho Vault Sentora mWIN Main (PYUSD)"

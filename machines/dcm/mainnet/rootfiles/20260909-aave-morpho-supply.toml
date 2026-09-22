@@ -1,0 +1,3194 @@
+# this is a generated file - do not edit manually
+# root: 0x94437f7f38dafe3d3d61e9eb5157bfc5f37cc4f218064ddb26987d2c560a8730
+
+[tokens."${token_list.mainnet.DAI}"]
+chainId = 1
+address = "0x6b175474e89094c44da98b954eedeac495271d0f"
+name = "Dai Stablecoin"
+decimals = 18
+symbol = "DAI"
+
+[tokens."${token_list.mainnet.PRIME}"]
+chainId = 1
+address = "0x19ebb35279a16207ec4ba82799cc64715065f7f6"
+name = "Hastra PRIME"
+decimals = 6
+symbol = "PRIME"
+
+[tokens."${token_list.mainnet.PYUSD}"]
+chainId = 1
+address = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+name = "PayPal USD"
+decimals = 6
+symbol = "PYUSD"
+
+[tokens."${token_list.mainnet.RLUSD}"]
+chainId = 1
+address = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+name = "RLUSD"
+decimals = 18
+symbol = "RLUSD"
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.mainnet.USDT}"]
+chainId = 1
+address = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+name = "Tether USD"
+decimals = 6
+symbol = "USDT"
+
+[instructions.aave-v4.account."USDC - Main / Core (reserve 7)"]
+position_id = "254774144610751365189292177429817956315"
+description = "AaveV4 Main Supply USDC (Core, reserve 7)"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aave-v4.account."USDT - Main / Core (reserve 8)"]
+position_id = "123100865563681904493450028563557609293"
+description = "AaveV4 Main Supply USDT (Core, reserve 8)"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0xf1568a89010203ff0000000094e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000008",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aave-v4.supply."USDC - Main / Core (reserve 7)"]
+position_id = "254774144610751365189292177429817956315"
+description = "AaveV4 Main Supply USDC (Core, reserve 7)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.aave-v4.supply."USDC - Main / Core (reserve 7)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aave-v4.supply."USDT - Main / Core (reserve 8)"]
+position_id = "123100865563681904493450028563557609293"
+description = "AaveV4 Main Supply USDT (Core, reserve 8)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x852a56a501020003ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000094e7a5dcbe816e498b89ab752661904e2f56c485",
+  "0x0000000000000000000000000000000000000000000000000000000000000008",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.aave-v4.supply."USDT - Main / Core (reserve 8)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aave-v4.withdraw."USDC - Main / Core (reserve 7)"]
+position_id = "254774144610751365189292177429817956315"
+description = "AaveV4 Main Supply USDC (Core, reserve 7)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aave-v4.withdraw."USDC - Main / Core (reserve 7)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.aave-v4.withdraw."USDT - Main / Core (reserve 8)"]
+position_id = "123100865563681904493450028563557609293"
+description = "AaveV4 Main Supply USDT (Core, reserve 8)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0x0ad58d2f01010002ff0000ff94e7a5dcbe816e498b89ab752661904e2f56c485"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x0000000000000000000000000000000000000000000000000000000000000008",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aave-v4.withdraw."USDT - Main / Core (reserve 8)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.account."DAI - Core Lend"]
+position_id = "171501072283192868280385547271945995123"
+description = "AaveV3 Core Supply DAI"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0x6b175474e89094c44da98b954eedeac495271d0f"]
+position_tokens = ["0x018008bfb33d285247a21d44e50697654f754e63"]
+commands = ["0x70a082310102ff0000000000018008bfb33d285247a21d44e50697654f754e63"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account."PYUSD - Core Lend"]
+position_id = "306328361221440402994803566600218520284"
+description = "AaveV3 Core Supply PYUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0x0c0d01abf3e6adfca0989ebba9d6e85dd58eab1e"]
+commands = ["0x70a082310102ff00000000000c0d01abf3e6adfca0989ebba9d6e85dd58eab1e"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account."USDC - Core Lend"]
+position_id = "332697612920998824307877708016163852818"
+description = "AaveV3 Core Supply USDC"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"]
+commands = ["0x70a082310102ff000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.account."USDT - Core Lend"]
+position_id = "232678016241942897729445069841802885622"
+description = "AaveV3 Core Supply USDT"
+is_debt = false
+group_id = "3"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = ["0x23878914efe38d27c4d67ab83ed1b93a74d4086a"]
+commands = ["0x70a082310102ff000000000023878914efe38d27c4d67ab83ed1b93a74d4086a"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.aavev3.add_collateral."DAI - Core Lend"]
+position_id = "171501072283192868280385547271945995123"
+description = "AaveV3 Core Supply DAI"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x6b175474e89094c44da98b954eedeac495271d0f"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6b175474e89094c44da98b954eedeac495271d0f",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."DAI - Core Lend".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral."PYUSD - Core Lend"]
+position_id = "306328361221440402994803566600218520284"
+description = "AaveV3 Core Supply PYUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x0000000000000000000000006c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."PYUSD - Core Lend".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral."USDC - Core Lend"]
+position_id = "332697612920998824307877708016163852818"
+description = "AaveV3 Core Supply USDC"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."USDC - Core Lend".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.add_collateral."USDT - Core Lend"]
+position_id = "232678016241942897729445069841802885622"
+description = "AaveV3 Core Supply USDT"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x617ba0370102000304ff00ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "0x000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev3.add_collateral."USDT - Core Lend".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."DAI - Core Lend"]
+position_id = "171501072283192868280385547271945995123"
+description = "AaveV3 Core Supply DAI"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x6b175474e89094c44da98b954eedeac495271d0f"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x0000000000000000000000006b175474e89094c44da98b954eedeac495271d0f",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."DAI - Core Lend".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."PYUSD - Core Lend"]
+position_id = "306328361221440402994803566600218520284"
+description = "AaveV3 Core Supply PYUSD"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x0000000000000000000000006c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."PYUSD - Core Lend".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."USDC - Core Lend"]
+position_id = "332697612920998824307877708016163852818"
+description = "AaveV3 Core Supply USDC"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."USDC - Core Lend".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."USDT - Core Lend"]
+position_id = "232678016241942897729445069841802885622"
+description = "AaveV3 Core Supply USDT"
+is_debt = false
+group_id = "3"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0x69328dec01010002ff0000ff87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"]
+state = [
+  "0x6b41094225069206bb7443fc2fbdf9698c69e15d2d7d25fe544b99f46e1d06cd",
+  "0x000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev3.withdraw_collateral."USDT - Core Lend".inputs_slots]]
+index = 0
+name = "amount_collateral_to_withdraw"
+type = "Uint"
+
+[instructions.common.account_0."PRIME Swap In"]
+position_id = "88685588701895893924186462793094177949654118628018819322996153435220574076920"
+description = "PRIME Swap In (USDC->PRIME synthetic, base-token)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
+[instructions.morpho.account_collateral."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "37645447233873664515981871938816299267"
+description = "PRIME/PYUSD Morpho Collateral (PRIME)"
+is_debt = false
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = [
+  "0x93c52062810203ff00000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000006e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "159507359494189904748456847233641349120"
+inputs_slots = []
+
+[instructions.morpho.account_debt."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "82274847838354216265357335302519678531"
+description = "PRIME/PYUSD Morpho Debt (PYUSD)"
+is_debt = true
+group_id = "2"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x93c52062810402ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8104ff0000000084bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018405ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018406ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020405ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+]
+bitmap = "167482727468899399985879689595323416576"
+inputs_slots = []
+
+[instructions.morpho.account_loan."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "113449663964260328783737869496305528290"
+description = "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x93c52062810302ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018205ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.morpho.account_loan."PST/PYUSD (0xb497...e512)"]
+position_id = "295637733392364843843588680145141306554"
+description = "Morpho PYUSD loan (market: 0xb497...e512)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x93c52062810302ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018205ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.morpho.account_loan."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
+position_id = "39138221810512683469067584028855335565"
+description = "Morpho USDC loan (market: 0xf8c5...ba89)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x93c52062810302ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018205ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.morpho.account_loan."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
+position_id = "199708234830348815037617604080094469854"
+description = "Morpho USDC loan (market: 0x1e9d...fc64)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x93c52062810302ff00000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018205ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c60e39a8103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018304ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018305ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201020304ff0000003d623b199e290358416415ea7e05b635e442e3c0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "164824271477329568240072075474762727424"
+inputs_slots = []
+
+[instructions.morpho.account_vault."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbeef3f3a04e28895f3d5163d910474901981183d"]
+commands = [
+  "0x70a082310102ff0000000002beef3f3a04e28895f3d5163d910474901981183d",
+  "0x4cdad5060102ff0000000000beef3f3a04e28895f3d5163d910474901981183d",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbeeff08df54897e7544ab01d0e86f013da354111"]
+commands = [
+  "0x70a082310102ff0000000002beeff08df54897e7544ab01d0e86f013da354111",
+  "0x4cdad5060102ff0000000000beeff08df54897e7544ab01d0e86f013da354111",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0xb576765fb15505433af24fee2c0325895c559fb2"]
+commands = [
+  "0x70a082310102ff0000000002b576765fb15505433af24fee2c0325895c559fb2",
+  "0x4cdad5060102ff0000000000b576765fb15505433af24fee2c0325895c559fb2",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0x55c1b6e461a6334b567baf0feb5d728715446f05"]
+commands = [
+  "0x70a082310102ff000000000255c1b6e461a6334b567baf0feb5d728715446f05",
+  "0x4cdad5060102ff000000000055c1b6e461a6334b567baf0feb5d728715446f05",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0x2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423"]
+commands = [
+  "0x70a082310102ff00000000022ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+  "0x4cdad5060102ff00000000002ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0x8381a156958711e230f325428b5eb4b6555c75d9"]
+commands = [
+  "0x70a082310102ff00000000028381a156958711e230f325428b5eb4b6555c75d9",
+  "0x4cdad5060102ff00000000008381a156958711e230f325428b5eb4b6555c75d9",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0xc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+commands = [
+  "0x70a082310102ff0000000002c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0x4cdad5060102ff0000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = ["0x6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf"]
+commands = [
+  "0x70a082310102ff00000000026dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+  "0x4cdad5060102ff00000000006dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = ["0x7cbcfc4f64be199ede6db1d916ddcdb69f666b57"]
+commands = [
+  "0x70a082310102ff00000000027cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+  "0x4cdad5060102ff00000000007cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"]
+commands = [
+  "0x70a082310102ff0000000002beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0x4cdad5060102ff0000000000beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = ["0xbeeff07d991c04cd640de9f15c08ba59c4fedeb7"]
+commands = [
+  "0x70a082310102ff0000000002beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0x4cdad5060102ff0000000000beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbeef088055857739c12cd3765f20b7679def0f51"]
+commands = [
+  "0x70a082310102ff0000000002beef088055857739c12cd3765f20b7679def0f51",
+  "0x4cdad5060102ff0000000000beef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = ["0xbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"]
+commands = [
+  "0x70a082310102ff0000000002beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0x4cdad5060102ff0000000000beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0xbeef01735c132ada46aa9aa4c54623caa92a64cb"]
+commands = [
+  "0x70a082310102ff0000000002beef01735c132ada46aa9aa4c54623caa92a64cb",
+  "0x4cdad5060102ff0000000000beef01735c132ada46aa9aa4c54623caa92a64cb",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.add_collateral."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "37645447233873664515981871938816299267"
+description = "PRIME/PYUSD Morpho Collateral (PRIME)"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff19ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000066e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018207ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x238d657941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0304050602000889ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.add_collateral."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.borrow."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "82274847838354216265357335302519678531"
+description = "PRIME/PYUSD Morpho Debt (PYUSD)"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x50d8cd4b41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.borrow."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeef3f3a04e28895f3d5163d910474901981183d",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef3f3a04e28895f3d5163d910474901981183d",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."3F x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeeff08df54897e7544ab01d0e86f013da354111",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff08df54897e7544ab01d0e86f013da354111",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Grove x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x6e553f65010002ff000000ffb576765fb15505433af24fee2c0325895c559fb2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000b576765fb15505433af24fee2c0325895c559fb2",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Paypal USD Main".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ff55c1b6e461a6334b567baf0feb5d728715446f05",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000055c1b6e461a6334b567baf0feb5d728715446f05",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Pendle Ecosystem USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ff2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000002ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."RockawayX f(x) Protocol Ecosystem USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x6e553f65010002ff000000ff8381a156958711e230f325428b5eb4b6555c75d9",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000008381a156958711e230f325428b5eb4b6555c75d9",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Sentora Huma PST Main".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x6e553f65010002ff000000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Sentora PRIME Main".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff8292bb45bf1ee4d140127049757c2e0ff06317ed",
+  "0x6e553f65010002ff000000ff6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000006dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Sentora RLUSD Main".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x6e553f65010002ff000000ff7cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x0000000000000000000000007cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Sentora mWIN Main".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse High Yield USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x6e553f65010002ff000000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse High Yield USDT".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef088055857739c12cd3765f20b7679def0f51",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffdac17f958d2ee523a2206206994597c13d831ec7",
+  "0x6e553f65010002ff000000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse Prime USDT".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010002ff000000ffbeef01735c132ada46aa9aa4c54623caa92a64cb",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse USDC".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.morpho.emergency_redeem_vault."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310100ff0000000001beef01735c132ada46aa9aa4c54623caa92a64cb",
+  "0xba08765201010000ff0000ffbeef01735c132ada46aa9aa4c54623caa92a64cb",
+]
+state = [
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeef3f3a04e28895f3d5163d910474901981183d",
+]
+state = [
+  "0x000000000000000000000000beef3f3a04e28895f3d5163d910474901981183d",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeeff08df54897e7544ab01d0e86f013da354111",
+]
+state = [
+  "0x000000000000000000000000beeff08df54897e7544ab01d0e86f013da354111",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffb576765fb15505433af24fee2c0325895c559fb2",
+]
+state = [
+  "0x000000000000000000000000b576765fb15505433af24fee2c0325895c559fb2",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ff55c1b6e461a6334b567baf0feb5d728715446f05",
+]
+state = [
+  "0x00000000000000000000000055c1b6e461a6334b567baf0feb5d728715446f05",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ff2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+]
+state = [
+  "0x0000000000000000000000002ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ff8381a156958711e230f325428b5eb4b6555c75d9",
+]
+state = [
+  "0x0000000000000000000000008381a156958711e230f325428b5eb4b6555c75d9",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0x000000000000000000000000c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ff6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+]
+state = [
+  "0x0000000000000000000000006dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ff7cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+]
+state = [
+  "0x0000000000000000000000007cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0x000000000000000000000000beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0x000000000000000000000000beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0x000000000000000000000000beef088055857739c12cd3765f20b7679def0f51",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault_v2."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x95b734fb010001ff000000005171bc00da5fc7ae1ede189d88b980caefb6c690",
+  "0xba08765201000101ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0x000000000000000000000000beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.lend_to_market."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "113449663964260328783737869496305528290"
+description = "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xa99aad8941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050200070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4872f2a740e3fd7abac17246438d21c32afc362f2a2f6f8e9f5e3e5942a83ad2",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.lend_to_market."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_lend"
+type = "Uint"
+
+[instructions.morpho.lend_to_market."PST/PYUSD (0xb497...e512)"]
+position_id = "295637733392364843843588680145141306554"
+description = "Morpho PYUSD loan (market: 0xb497...e512)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xa99aad8941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050200070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4872f2a740e3fd7abac17246438d21c32afc362f2a2f6f8e9f5e3e5942a83ad2",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.lend_to_market."PST/PYUSD (0xb497...e512)".inputs_slots]]
+index = 0
+name = "amount_to_lend"
+type = "Uint"
+
+[instructions.morpho.lend_to_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
+position_id = "39138221810512683469067584028855335565"
+description = "Morpho USDC loan (market: 0xf8c5...ba89)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xa99aad8941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050200070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4872f2a740e3fd7abac17246438d21c32afc362f2a2f6f8e9f5e3e5942a83ad2",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.lend_to_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)".inputs_slots]]
+index = 0
+name = "amount_to_lend"
+type = "Uint"
+
+[instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
+position_id = "199708234830348815037617604080094469854"
+description = "Morpho USDC loan (market: 0x1e9d...fc64)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xa99aad8941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050200070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0x4872f2a740e3fd7abac17246438d21c32afc362f2a2f6f8e9f5e3e5942a83ad2",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
+index = 0
+name = "amount_to_lend"
+type = "Uint"
+
+[instructions.morpho.redeem_from_market_relative."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "113449663964260328783737869496305528290"
+description = "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x93c52062810208ff00000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018907ff000000096e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201090001ff0000093d623b199e290358416415ea7e05b635e442e3c0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050207090808ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "169476569462576773795235400185743933440"
+
+[[instructions.morpho.redeem_from_market_relative."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_from_market_relative."PST/PYUSD (0xb497...e512)"]
+position_id = "295637733392364843843588680145141306554"
+description = "Morpho PYUSD loan (market: 0xb497...e512)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x93c52062810208ff00000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018907ff000000096e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201090001ff0000093d623b199e290358416415ea7e05b635e442e3c0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050207090808ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "169476569462576773795235400185743933440"
+
+[[instructions.morpho.redeem_from_market_relative."PST/PYUSD (0xb497...e512)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_from_market_relative."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
+position_id = "39138221810512683469067584028855335565"
+description = "Morpho USDC loan (market: 0xf8c5...ba89)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x93c52062810208ff00000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018907ff000000096e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201090001ff0000093d623b199e290358416415ea7e05b635e442e3c0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050207090808ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "169476569462576773795235400185743933440"
+
+[[instructions.morpho.redeem_from_market_relative."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_from_market_relative."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
+position_id = "199708234830348815037617604080094469854"
+description = "Morpho USDC loan (market: 0x1e9d...fc64)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x93c52062810208ff00000089bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018907ff000000096e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0xaa9a091201090001ff0000093d623b199e290358416415ea7e05b635e442e3c0",
+  "0x2c3c91578102ff0000000082bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018207ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018203ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018204ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018205ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018206ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x010304050207090808ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "169476569462576773795235400185743933440"
+
+[[instructions.morpho.redeem_from_market_relative."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeef3f3a04e28895f3d5163d910474901981183d"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."3F x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff08df54897e7544ab01d0e86f013da354111"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Grove x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffb576765fb15505433af24fee2c0325895c559fb2"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Paypal USD Main".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff55c1b6e461a6334b567baf0feb5d728715446f05"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Pendle Ecosystem USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."RockawayX f(x) Protocol Ecosystem USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff8381a156958711e230f325428b5eb4b6555c75d9"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Sentora Huma PST Main".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Sentora PRIME Main".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Sentora RLUSD Main".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff7cbcfc4f64be199ede6db1d916ddcdb69f666b57"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Sentora mWIN Main".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse High Yield USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse High Yield USDT".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeef088055857739c12cd3765f20b7679def0f51"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse Prime USDT".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeef01735c132ada46aa9aa4c54623caa92a64cb"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse USDC".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beef3f3a04e28895f3d5163d910474901981183d",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef3f3a04e28895f3d5163d910474901981183d",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."3F x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff08df54897e7544ab01d0e86f013da354111",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff08df54897e7544ab01d0e86f013da354111",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Grove x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003b576765fb15505433af24fee2c0325895c559fb2",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffb576765fb15505433af24fee2c0325895c559fb2",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Paypal USD Main".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff000000000355c1b6e461a6334b567baf0feb5d728715446f05",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff55c1b6e461a6334b567baf0feb5d728715446f05",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Pendle Ecosystem USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000032ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."RockawayX f(x) Protocol Ecosystem USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000038381a156958711e230f325428b5eb4b6555c75d9",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff8381a156958711e230f325428b5eb4b6555c75d9",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Sentora Huma PST Main".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003c21b08c16458202593d4d9b26b9984ee67b38bbd",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Sentora PRIME Main".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000036dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Sentora RLUSD Main".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff00000000037cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff7cbcfc4f64be199ede6db1d916ddcdb69f666b57",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Sentora mWIN Main".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse High Yield USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff07d991c04cd640de9f15c08ba59c4fedeb7",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse High Yield USDT".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beef088055857739c12cd3765f20b7679def0f51",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef088055857739c12cd3765f20b7679def0f51",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse Prime USDT".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beef01735c132ada46aa9aa4c54623caa92a64cb",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeef01735c132ada46aa9aa4c54623caa92a64cb",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse USDC".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.morpho.repay_asset."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "82274847838354216265357335302519678531"
+description = "PRIME/PYUSD Morpho Debt (PYUSD)"
+is_debt = true
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018107ff0000000a6e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x095ea7b3010600ff000000ff6c3ea9036406852006290770bedfcaba0e23a0e8",
+  "0x20b76e8141000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0a0203040100070889ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "169808876461523002763461351950814019584"
+
+[[instructions.morpho.repay_asset."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.morpho.withdraw_collateral."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "37645447233873664515981871938816299267"
+description = "PRIME/PYUSD Morpho Collateral (PRIME)"
+is_debt = false
+group_id = "2"
+instruction_type = 0
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000056e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018106ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x8720316d41000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0203040501000707ff0000000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_collateral."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_from_market."PRIME/PYUSD (0x41c4...a3fa)"]
+position_id = "113449663964260328783737869496305528290"
+description = "Morpho PYUSD loan (market: 0x41c4...a3fa)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_from_market."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_from_market."PST/PYUSD (0xb497...e512)"]
+position_id = "295637733392364843843588680145141306554"
+description = "Morpho PYUSD loan (market: 0xb497...e512)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_from_market."PST/PYUSD (0xb497...e512)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_from_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
+position_id = "39138221810512683469067584028855335565"
+description = "Morpho USDC loan (market: 0xf8c5...ba89)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0xf8c5aa31ea6b2a068a9eddb46dd110cae57bf0f12be9583a3f9a818effecba89",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_from_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
+position_id = "199708234830348815037617604080094469854"
+description = "Morpho USDC loan (market: 0x1e9d...fc64)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x2c3c91578101ff0000000081bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e9018106ff000000086e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018102ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018103ff000000036e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018104ff000000046e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x62de91e9018105ff000000016e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x5c2bea4941000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x080203040100060707ff00000000000000000000000000000000000000000000",
+]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "168811955464684315858783496655603761152"
+
+[[instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."3F x Steakhouse USDC"]
+position_id = "304800154207170690672316111335694768085"
+description = "Morpho Vault 3F x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeef3f3a04e28895f3d5163d910474901981183d"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."3F x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Grove x Steakhouse USDC"]
+position_id = "270598695387742845142399712882283652383"
+description = "Morpho Vault Grove x Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff08df54897e7544ab01d0e86f013da354111"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Grove x Steakhouse USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Paypal USD Main"]
+position_id = "273739676753663843967743313854543738189"
+description = "Morpho Vault Paypal USD Main (Sentora)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffb576765fb15505433af24fee2c0325895c559fb2"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Paypal USD Main".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Pendle Ecosystem USDC"]
+position_id = "164152994052643430541444457218525661023"
+description = "Morpho Vault Pendle Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff55c1b6e461a6334b567baf0feb5d728715446f05"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Pendle Ecosystem USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."RockawayX f(x) Protocol Ecosystem USDC"]
+position_id = "324358356428873297091184688404142393521"
+description = "Morpho Vault RockawayX f(x) Protocol Ecosystem USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff2ca22cb25558fa2018ecb1ce4ed8af92ee7ea423"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."RockawayX f(x) Protocol Ecosystem USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Sentora Huma PST Main"]
+position_id = "134636115830071409511221090610756745543"
+description = "Morpho Vault Sentora Huma PST Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff8381a156958711e230f325428b5eb4b6555c75d9"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Sentora Huma PST Main".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Sentora PRIME Main"]
+position_id = "244003111842323732524710741252875629950"
+description = "Morpho Vault Sentora PRIME Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffc21b08c16458202593d4d9b26b9984ee67b38bbd"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Sentora PRIME Main".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Sentora RLUSD Main"]
+position_id = "101479911391298992514073662718338576961"
+description = "Morpho Vault Sentora RLUSD Main"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x8292bb45bf1ee4d140127049757c2e0ff06317ed"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Sentora RLUSD Main".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Sentora mWIN Main"]
+position_id = "304842766591321364733133397329774721882"
+description = "Morpho Vault Sentora mWIN Main (PYUSD)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x6c3ea9036406852006290770bedfcaba0e23a0e8"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff7cbcfc4f64be199ede6db1d916ddcdb69f666b57"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Sentora mWIN Main".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse High Yield USDC"]
+position_id = "288169706932979568417881563106913917226"
+description = "Morpho Vault Steakhouse High Yield USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse High Yield USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse High Yield USDT"]
+position_id = "154947354046260442958384373569470359355"
+description = "Morpho Vault Steakhouse High Yield USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff07d991c04cd640de9f15c08ba59c4fedeb7"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse High Yield USDT".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse Prime USDC"]
+position_id = "169144170902823932410475652858126577078"
+description = "Morpho Vault Steakhouse Prime USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeef088055857739c12cd3765f20b7679def0f51"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse Prime USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse Prime USDT"]
+position_id = "133625183712155226969707123863934927662"
+description = "Morpho Vault Steakhouse Prime USDT"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xdac17f958d2ee523a2206206994597c13d831ec7"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse Prime USDT".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse USDC"]
+position_id = "317674047022373827182618653676880817492"
+description = "Morpho Vault Steakhouse USDC"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeef01735c132ada46aa9aa4c54623caa92a64cb"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse USDC".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+type = "Uint"
+
+[instructions.prime-swap.account_pending."PRIME Redemption Request"]
+position_id = "72349290285513021043842986906750831638657345372251354085839905937687160017989"
+description = "PRIME Redemption (async PRIME->USDC via wYLDS)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0xe50fe9b98102ff00000000826ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x0f8be3fc018203ff0000000074dc739b8f98ad0f76cd8900695dd8d5083e45d3",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.prime-swap.redeem_request."PRIME Redemption Request"]
+position_id = "72349290285513021043842986906750831638657345372251354085839905937687160017989"
+description = "PRIME Redemption (async PRIME->USDC via wYLDS)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = [
+  "0xe50fe9b98102ff00000000836ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x0f8be3fc018301ff0000000374dc739b8f98ad0f76cd8900695dd8d5083e45d3",
+  "0x32148d73010301ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0x711ecf590103ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0xba08765201000202ff00000219ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0xaa2f892d0102ff00000000ff6ad038ca6c04e885630851278ca0a856ad9a66cc",
+]
+state = [
+  "0xda9290d52dcc90ba356dd22034e20e236406268bf3147cd070da90eb2b19fb9a",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.prime-swap.redeem_request."PRIME Redemption Request".inputs_slots]]
+index = 0
+name = "prime_shares_to_redeem"
+type = "Uint"
+
+[instructions.prime-swap.redeem_request_relative."PRIME Redemption Request (relative)"]
+position_id = "72349290285513021043842986906750831638657345372251354085839905937687160017989"
+description = "PRIME Redemption (async PRIME->USDC via wYLDS)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x19ebb35279a16207ec4ba82799cc64715065f7f6"]
+position_tokens = []
+commands = [
+  "0xe50fe9b98103ff00000000846ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x0f8be3fc018401ff0000000474dc739b8f98ad0f76cd8900695dd8d5083e45d3",
+  "0x32148d73010401ff000000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0x711ecf590104ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x70a082310103ff000000000419ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0xaa9a091201040002ff0000043d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201040303ff00000419ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0xaa2f892d0104ff00000000ff6ad038ca6c04e885630851278ca0a856ad9a66cc",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.prime-swap.redeem_request_relative."PRIME Redemption Request (relative)".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[instructions.prime-swap.swap_asset_for_prime."PRIME Swap In"]
+position_id = "88685588701895893924186462793094177949654118628018819322996153435220574076920"
+description = "PRIME Swap In (USDC->PRIME synthetic, base-token)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x6e553f65010004ff000000026ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x095ea7b3010302ff000000ff6ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x6e553f65010204ff0000000219ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0xb4773329010201ff000000023d623b199e290358416415ea7e05b635e442e3c0",
+  "0x711ecf590102ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+]
+state = [
+  "0x7373e813b271fa34d6ee6ba052fd3c8ff5caba8ef5e78aae732dc62bea5eb921",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x0000000000000000000000006ad038ca6c04e885630851278ca0a856ad9a66cc",
+  "0x00000000000000000000000019ebb35279a16207ec4ba82799cc64715065f7f6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.prime-swap.swap_asset_for_prime."PRIME Swap In".inputs_slots]]
+index = 0
+name = "asset_amount"
+type = "Uint"
+
+[[instructions.prime-swap.swap_asset_for_prime."PRIME Swap In".inputs_slots]]
+index = 1
+name = "min_shares"
+type = "Uint"
