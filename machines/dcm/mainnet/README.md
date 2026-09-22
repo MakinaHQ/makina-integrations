@@ -1,5 +1,7 @@
 # DCM Ethereum integration coverage
 
+> **Superseded in part (2026-09-21).** `caliber.yaml` now mirrors the config repo caliber (MakinaHQ/config v1.0.30) at 43 positions. Positions this document records as excluded were reinstated there by request, so the yield and TVL cutoffs below are the historical rationale for the 29-position snapshot, not the current inventory: Aave V3 Horizon GHO and RLUSD, and Aave V4 Main USDG (reserve 11) and frxUSD (reserve 12). The tables below are otherwise unchanged and still describe the positions they cover.
+
 DCM gains **17 supply integrations** and **Merkl reward harvesting** on Ethereum, bringing the configuration to **29 positions** (11 retained pre-existing; 2 pre-existing Aave V4 supplies removed). The PR covers Aave V3/V4 stablecoin supplies, Steakhouse and Sentora vaults, Pendle Ecosystem USDC, RockawayX f(x) Protocol Ecosystem USDC and PST/PYUSD lending.
 
 **$5m Aave cutoff:** removed 36 Aave positions whose individual reserve had less than $5 million directly supplied at the snapshot. The remaining 6 Aave positions meet both that threshold and the APR cutoff below. For V4 the cutoff uses the Spoke reserve’s direct supplied balance, even when its shared Hub holds more liquidity.
