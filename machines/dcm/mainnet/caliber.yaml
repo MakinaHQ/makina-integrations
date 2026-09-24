@@ -234,6 +234,14 @@ positions:
       label: "PRIME/PYUSD (0x41c4...a3fa)"
       market_id: "0x41c41d0c9aadbf4751f5ee215ed5a16954a4b34e1b70fca5393d4b08858fa3fa"
       loan_token: ${token_list.mainnet.PYUSD}
+  - id: "253394370256926176322791491125438846475" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0x17f7...6b84)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "fxSAVE/USDC (0x17f7...6b84)"
+      market_id: "0x17f7ae1b52670010976b3fe41324cbb2b1eb7dd8f492e51764b2828371b86b84"
+      loan_token: ${token_list.mainnet.USDC}
 
   - id: "295637733392364843843588680145141306554" # pools_db makina_id — deposit (PYUSD supply)
     group_id: "0"
