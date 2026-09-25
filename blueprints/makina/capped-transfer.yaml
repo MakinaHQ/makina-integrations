@@ -1,0 +1,117 @@
+protocol: "makina"
+
+# CAPPED TRANSFER — send a fixed token to a fixed recipient, in as many transfers as
+# you like, as long as the CUMULATIVE total stays <= a fixed cap.
+#
+#   token_address, recipient_address, max_cumulative_amount  -> fixed in the rootfile
+#   amount                                                   -> picked at run time
+#
+# KV[kv_store_key] is the running total already sent. Each call does:
+#   new_total = KV + amount;  revert if new_total > cap;  transfer amount;  KV = new_total
+# so the sum of all successful transfers can never exceed the cap. The total never
+# resets: once the cap is used up every further call reverts. To send more, ship a
+# release with a higher cap (same key: the cap is a lifetime total) or a fresh key.
+#
+# WIRING (instructions/makina-capped-transfer.yaml does this for you)
+#   - HARVEST, affected_tokens: []. Harvest runs no value-loss check, which is what
+#     lets tokens leave the caliber with nothing coming back (as MANAGEMENT it would
+#     revert MaxValueLossExceeded). The outflow is a real NAV loss, and there is no
+#     ACCOUNTING leg: nothing stays booked.
+#   - kv_store_key must be unique per budget. Two positions sharing a key share a total.
+#   - Amounts are in the token's own decimals (USDC: 10,000 = "10000000000").
+#   - Helpers: add -> unsigned_math_helper_address, gt -> caliber_helper_address,
+#     revertIfTrue -> boolean_helper_address. Do not point gt at the math helper: some
+#     deployments of it have no gt (see custodian-deposit.yaml §2).
+#
+# RUNNING IT
+#   Interactive spellcaster -> harvest -> pick this instruction -> enter `amount`.
+#   Non-interactive `harvest-position` has no --inputs flag, so it cannot pass `amount`.
+#
+# CHECK BEFORE FIRST USE
+#   revertIfTrue returns nothing, so if boolean_helper_address has no code the cap check
+#   silently passes. On a fork, confirm a call with amount > remaining cap reverts.
+
+inputs:
+  kv_store_address:
+    type: "address"
+  kv_store_key:
+    type: "bytes32"
+  token_address:
+    type: "address"
+  recipient_address:
+    type: "address"
+  max_cumulative_amount:
+    type: "uint256"
+  unsigned_math_helper_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+
+actions:
+  capped_transfer:
+    calls:
+      - description: "Read the total already sent"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+        return:
+          name: "sent_so_far"
+          type: "uint256"
+
+      - description: "new_total = sent_so_far + amount"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.sent_so_far}"
+          - type: "uint256"
+            value: "${input_slots.amount}"
+        return:
+          name: "new_total"
+          type: "uint256"
+
+      - description: "Would this push the cumulative total past the cap?"
+        target: "${inputs.caliber_helper_address}"
+        selector: "gt(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.new_total}"
+          - type: "uint256"
+            value: "${inputs.max_cumulative_amount}"
+        return:
+          name: "over_cap"
+          type: "bool"
+
+      - description: "Revert BEFORE any funds move if over the cap"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfTrue(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.over_cap}"
+
+      - description: "Send the amount to the fixed recipient"
+        target: "${inputs.token_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.recipient_address}"
+          - type: "uint256"
+            value: "${input_slots.amount}"
+
+      - description: "Record the new cumulative total"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.kv_store_key}"
+          - type: "uint256"
+            value: "${returns.new_total}"
+
+    input_slots:
+      amount:
+        type: "uint256"
+        description: "Amount to send, in the token's own decimals. Reverts unless sent_so_far + amount <= max_cumulative_amount."
