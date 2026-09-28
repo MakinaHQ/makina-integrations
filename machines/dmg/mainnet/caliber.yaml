@@ -39,6 +39,19 @@ positions:
     description: "DMG USDC One-Time Transfer"
     instructions: !include "./instructions/one-time-transfer-usdc.yaml"
 
+  # Up to 10,000 USDC in total, over any number of transfers (amount picked at run
+  # time). HARVEST, so each transfer is a NAV loss. See blueprints/makina/capped-transfer.yaml.
+  - id: "2"
+    group_id: "0"
+    description: "DMG USDC Capped Transfer"
+    instructions: !include "../../../instructions/makina-capped-transfer.yaml"
+    vars:
+      label: "DMG USDC Capped Transfer"
+      token_address: ${token_list.mainnet.USDC}
+      recipient_address: "0x7D51ADf77332c5BbD33f91de00646ebA099C0D2F"
+      max_cumulative_amount: "10000000000" # 10,000 USDC (6 dec), lifetime total
+      kv_store_key: "${keccak256(makina.mainnet.dmg.usdc.capped-transfer)}"
+
   # ── Midas ────────────────────────────────────────────────────────
   - id: "74279913377154171133723219389628797435147974258238735195930105321760025303591" # keccak256("midas.mglobal.swap-in")
     group_id: "0"

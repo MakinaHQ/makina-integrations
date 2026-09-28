@@ -1,0 +1,52 @@
+# Generic CAPPED TRANSFER: send `token_address` to `recipient_address` in any number of
+# transfers, as long as the cumulative total stays <= `max_cumulative_amount`. Each
+# transfer's amount is picked at run time. How it works and how to run it:
+# blueprints/makina/capped-transfer.yaml.
+#
+# Usage in a caliber.yaml (harvest-only, so group "0" and no position_tokens):
+#
+#   - id: "2"
+#     group_id: "0"
+#     description: "DMG USDC Capped Transfer"
+#     instructions: !include "../../../instructions/makina-capped-transfer.yaml"
+#     vars:
+#       label: "DMG USDC Capped Transfer"    # must be unique among makina capped_transfer labels
+#       token_address: ${token_list.mainnet.USDC}
+#       recipient_address: "0x..."
+#       max_cumulative_amount: "10000000000" # token decimals (10,000 USDC)
+#       kv_store_key: "${keccak256(makina.mainnet.<machine>.<token>.capped-transfer)}" # unique per budget
+#
+# Expected caliber config: key_value_store_address, unsigned_math_helper_address,
+#   caliber_helper_address, boolean_helper_address.
+
+- is_debt: false
+  instruction_type: "HARVEST"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/makina/capped-transfer.yaml:capped_transfer"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      kv_store_key:
+        type: "bytes32"
+        value: ${position.kv_store_key}
+      token_address:
+        type: "address"
+        value: ${position.token_address}
+      recipient_address:
+        type: "address"
+        value: ${position.recipient_address}
+      max_cumulative_amount:
+        type: "uint256"
+        value: ${position.max_cumulative_amount}
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
