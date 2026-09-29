@@ -1,0 +1,320 @@
+# this is a generated file - do not edit manually
+# root: 0xac76cf0f5a9928d638154041e161167eeae2448970dfc83f52dc867ea11f73d3
+
+[tokens."${token_list.base.METAc}"]
+chainId = 8453
+address = "0xb2000000000000000000008bc8786b856e61707c"
+name = "Meta Platforms Inc."
+decimals = 8
+symbol = "METAc"
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.aavev4.account.METAc]
+position_id = "164477993691477541973532769186793484387"
+description = "AaveV4 Coinbase Stocks Supply METAc (collateral)"
+is_debt = false
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0xb2000000000000000000008bc8786b856e61707c"]
+position_tokens = []
+commands = ["0xf1568a89010203ff0000000017905db0e4a3514467539956c084180616ae7b8d"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aavev4.account_debt.USDC]
+position_id = "77971314729137725550919142258454806961"
+description = "AaveV4 Coinbase Stocks Borrow USDC"
+is_debt = true
+group_id = "1"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0x9b7172a6010203ff0000000017905db0e4a3514467539956c084180616ae7b8d"]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.aavev4.borrow.USDC]
+position_id = "77971314729137725550919142258454806961"
+description = "AaveV4 Coinbase Stocks Borrow USDC"
+is_debt = true
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xd6bda0c001010002ff0000ff17905db0e4a3514467539956c084180616ae7b8d"]
+state = [
+  "0x7bf7fd7e769077d7833cc51152c191499c412cb44e574448aaa15d7905e659ab",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev4.borrow.USDC.inputs_slots]]
+index = 0
+name = "amount_to_borrow"
+type = "Uint"
+
+[instructions.aavev4.repay.USDC]
+position_id = "77971314729137725550919142258454806961"
+description = "AaveV4 Coinbase Stocks Borrow USDC"
+is_debt = true
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010300ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xb1e8f8ef01010002ff0000ff17905db0e4a3514467539956c084180616ae7b8d",
+  "0x095ea7b3010304ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0xcd8f13c73aa652248c1ba054b6ca149fe5a6c3063a6349058230971585172114",
+  "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+  "0x00000000000000000000000017905db0e4a3514467539956c084180616ae7b8d",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "159507359494189904748456847233641349120"
+
+[[instructions.aavev4.repay.USDC.inputs_slots]]
+index = 0
+name = "amount_to_repay"
+type = "Uint"
+
+[instructions.aavev4.set_using_as_collateral.METAc]
+position_id = "164477993691477541973532769186793484387"
+description = "AaveV4 Coinbase Stocks Supply METAc (collateral)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = ["0x9e35c53301000102ff0000ff17905db0e4a3514467539956c084180616ae7b8d"]
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "297747071055821155530452781502797185024"
+inputs_slots = []
+
+[instructions.aavev4.supply.METAc]
+position_id = "164477993691477541973532769186793484387"
+description = "AaveV4 Coinbase Stocks Supply METAc (collateral)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xb2000000000000000000008bc8786b856e61707c"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ffb2000000000000000000008bc8786b856e61707c",
+  "0x852a56a501020003ff0000ff17905db0e4a3514467539956c084180616ae7b8d",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x00000000000000000000000017905db0e4a3514467539956c084180616ae7b8d",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "148873535527910577765226390751398592512"
+
+[[instructions.aavev4.supply.METAc.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[instructions.aavev4.withdraw.METAc]
+position_id = "164477993691477541973532769186793484387"
+description = "AaveV4 Coinbase Stocks Supply METAc (collateral)"
+is_debt = false
+group_id = "1"
+instruction_type = 0
+affected_tokens = ["0xb2000000000000000000008bc8786b856e61707c"]
+position_tokens = []
+commands = ["0x0ad58d2f01010002ff0000ff17905db0e4a3514467539956c084180616ae7b8d"]
+state = [
+  "0xc8ec1b03137c10dead6fc458e7412518d4adf491a7ca8466e434483d2a6ee4aa",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.aavev4.withdraw.METAc.inputs_slots]]
+index = 0
+name = "amount_to_withdraw"
+type = "Uint"
+
+[instructions.makina.account.bfeederdcm]
+position_id = "89389141397253094759523781707743722241"
+description = "Makina Base Feeder DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = ["0x7244fe8a06848f0f2bdf77ca109c455472175fbf"]
+commands = [
+  "0x70a082310102ff00000000027244fe8a06848f0f2bdf77ca109c455472175fbf",
+  "0x8eaa6ac00103ff0000000003d8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0x771602f7010203ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0x07a2d13a0103ff000000000091582e8f7684cb41261bb136c691d82b4ecede8a",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+  "0x34c524580ab141c2048d7b426bc8d4106f88ae934eb2149d28b865227707332d",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.makina.claim_assets.bfeederdcm]
+position_id = "89389141397253094759523781707743722241"
+description = "Makina Base Feeder DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x8eaa6ac00100ff0000000002d8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0x661603e00102ff00000000ff236300916876b7bc96ff7670a44f8937ce1f8ae6",
+  "0xed3c7d400100ff00000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0xed3c7d400101ff00000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+]
+state = [
+  "0x86a83c0740816367833e5854d3b2462cff7e4823509c4d3b3afe381676ab4d38",
+  "0x34c524580ab141c2048d7b426bc8d4106f88ae934eb2149d28b865227707332d",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.makina.deposit.bfeederdcm]
+position_id = "89389141397253094759523781707743722241"
+description = "Makina Base Feeder DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x86e807f80100030104ff00ffb9bafd4cef6d6d875cf62d9847a703c134f0d57c",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x000000000000000000000000b9bafd4cef6d6d875cf62d9847a703c134f0d57c",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.makina.deposit.bfeederdcm.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+type = "Uint"
+
+[[instructions.makina.deposit.bfeederdcm.inputs_slots]]
+index = 1
+name = "min_shares"
+type = "Uint"
+
+[instructions.makina.request_redeem.bfeederdcm]
+position_id = "89389141397253094759523781707743722241"
+description = "Makina Base Feeder DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x8eaa6ac00105ff0000000007d8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0x32148d73010702ff00000007c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590107ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010300ff000000ff7244fe8a06848f0f2bdf77ca109c455472175fbf",
+  "0x24c7e13f01000401ff000004236300916876b7bc96ff7670a44f8937ce1f8ae6",
+  "0xf71f7a25010504ff000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0xf71f7a25010600ff000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000236300916876b7bc96ff7670a44f8937ce1f8ae6",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+  "0x86a83c0740816367833e5854d3b2462cff7e4823509c4d3b3afe381676ab4d38",
+  "0x34c524580ab141c2048d7b426bc8d4106f88ae934eb2149d28b865227707332d",
+  "0x",
+]
+bitmap = "82412135738664784120036037737381363712"
+
+[[instructions.makina.request_redeem.bfeederdcm.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+type = "Uint"
+
+[[instructions.makina.request_redeem.bfeederdcm.inputs_slots]]
+index = 1
+name = "min_assets"
+type = "Uint"
+
+[instructions.makina.request_redeem_relative.bfeederdcm]
+position_id = "89389141397253094759523781707743722241"
+description = "Makina Base Feeder DCM"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310105ff00000000087244fe8a06848f0f2bdf77ca109c455472175fbf",
+  "0xaa9a091201080002ff0000083d623b199e290358416415ea7e05b635e442e3c0",
+  "0x8eaa6ac00106ff0000000002d8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0x32148d73010203ff00000002c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590102ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010408ff000000ff7244fe8a06848f0f2bdf77ca109c455472175fbf",
+  "0x24c7e13f01080501ff000005236300916876b7bc96ff7670a44f8937ce1f8ae6",
+  "0xf71f7a25010605ff000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+  "0xf71f7a25010708ff000000ffd8c6feb1296b3d03c636a09a49dc5719942230d6",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000236300916876b7bc96ff7670a44f8937ce1f8ae6",
+  "0x0000000000000000000000007772edccc6cbc297917421b6b13963e48f357f66",
+  "0x86a83c0740816367833e5854d3b2462cff7e4823509c4d3b3afe381676ab4d38",
+  "0x34c524580ab141c2048d7b426bc8d4106f88ae934eb2149d28b865227707332d",
+  "0x",
+]
+bitmap = "83741363734449699992939844797661708288"
+
+[[instructions.makina.request_redeem_relative.bfeederdcm.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+type = "Uint"
+
+[[instructions.makina.request_redeem_relative.bfeederdcm.inputs_slots]]
+index = 1
+name = "min_assets"
+type = "Uint"

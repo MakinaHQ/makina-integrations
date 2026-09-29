@@ -458,6 +458,28 @@ positions:
       debt_token: "0x4139EcBe83d78ef5EFF0A6eDA6f894Be9D590FC7"
       aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
+  - id: "133495794982505815817947498041694656764"
+    group_id: "4"
+    description: "AaveV3 Horizon Borrow RLUSD"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"]
+    vars:
+      label: "RLUSD - Horizon Borrow"
+      asset_address: ${token_list.mainnet.RLUSD}
+      debt_token: "0xACE8a1c0eC12aE81814377491265b47F4eE5D3dD"
+      aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+
+  - id: "266935600511395729584434377419168277182"
+    group_id: "4"
+    description: "AaveV3 Horizon Borrow GHO"
+    instructions: !include "../../../instructions/aavev3-borrow.yaml"
+    position_tokens: ["0xdec2401c9B0B2E480e627E2a712C11AdDbf46E3e"]
+    vars:
+      label: "GHO - Horizon Borrow"
+      asset_address: ${token_list.mainnet.GHO}
+      debt_token: "0xdec2401c9B0B2E480e627E2a712C11AdDbf46E3e"
+      aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+
   # ══ RWAs ══════════════════════════════════════════════════════════
   # PRIME acquisition / exit — funds both PRIME collateral legs above. In: USDC ->
   # wYLDS -> PRIME (two synchronous ERC4626 deposits). Out: async redemption

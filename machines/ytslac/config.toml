@@ -1,0 +1,14 @@
+name = "ytslac"
+chain = "base"
+address = "0x584BEC800e3C0AE5B12FC329C9bCb30fD424f758"
+
+[calibers.base]
+address = "0x77741552161b1451214231af85d3f65d354fdc30"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/ytslac/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb2000000000000000000001e800a7f5189430cD0"
+decimals = 8
+name = "Tesla Inc."
+symbol = "TSLAc"

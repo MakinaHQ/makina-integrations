@@ -1,4 +1,4 @@
-protocol: "aave-v4"
+protocol: "aavev4"
 
 # Aave V4 (Hub & Spoke) — account a supplied (non-debt) position.
 #
@@ -36,5 +36,24 @@ actions:
     reserved_slots:
       - type: "uint256"
         value: ${returns.supplied_assets}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}
+
+  account_debt:
+    calls:
+      - description: "Read the total debt (drawn + premium, in underlying) for the account"
+        target: ${inputs.spoke_address}
+        selector: "getUserTotalDebt(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "address"
+            value: ${inputs.account}
+        return:
+          name: "total_debt"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.total_debt}
       - type: "uint256"
         value: ${builtins.UINT256_MAX}

@@ -1,0 +1,14 @@
+name = "ynvdac"
+chain = "base"
+address = "0x473aD980F67487C03A8cf2A50C2a501C488bF9a3"
+
+[calibers.base]
+address = "0x7775d6dbfc5cd57e9f78ebce070eed11e63640a5"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/ynvdac/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb20000000000000000000078ee7ce2fE4908108C"
+decimals = 8
+name = "NVIDIA Corporation"
+symbol = "NVDAc"

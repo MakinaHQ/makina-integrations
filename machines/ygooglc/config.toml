@@ -1,0 +1,14 @@
+name = "ygooglc"
+chain = "base"
+address = "0x82FC5772a6fd76D308444963359c796954Ff3651"
+
+[calibers.base]
+address = "0x7773845add6ab5921e1d8cf0ea6df23310b069fe"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/ygooglc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb2000000000000000000002D0BA3164cc74f58B7"
+decimals = 8
+name = "Alphabet Inc."
+symbol = "GOOGLc"

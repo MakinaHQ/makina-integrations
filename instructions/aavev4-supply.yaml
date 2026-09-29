@@ -36,6 +36,23 @@
 
 - is_debt: false
   instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/deposit.yaml:set_using_as_collateral"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
   affected_tokens:
     - ${position.asset_address}
   instruction:

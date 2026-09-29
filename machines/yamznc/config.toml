@@ -1,0 +1,14 @@
+name = "yamznc"
+chain = "base"
+address = "0x55f1B3CB53d2bfbC67F7cb01D3D84d240Af7c2c4"
+
+[calibers.base]
+address = "0x7771bb36365cc151db950481d5681c7ab5cc8648"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/yamznc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb200000000000000000000d9192b6B456483C2E8"
+decimals = 8
+name = "Amazon.com Inc."
+symbol = "AMZNc"

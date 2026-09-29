@@ -1,0 +1,14 @@
+name = "ymsftc"
+chain = "base"
+address = "0x073d562A17815e0266be74CAF15FbBD9D0f9B9a1"
+
+[calibers.base]
+address = "0x777702e6a7ba5bffa7bbe033c1444f3ffd208c37"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/ymsftc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xB200000000000000000000Ab99cFa739E253872B"
+decimals = 8
+name = "Microsoft Corporation"
+symbol = "MSFTc"

@@ -17,6 +17,9 @@ config:
   key_value_store_address:
     type: "address"
     value: "0x1b52c5d62458675597ce9b25e81af89fdd8c4029"
+  morpho_v2_liquidity_lens_address:
+    type: "address"
+    value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
 
 positions:
   # ── DSV Fee Accrual Keeper (group_id: 0) ─────────────────────────
@@ -47,7 +50,7 @@ positions:
   - id: "273739676753663843967743313854543738189"
     group_id: "0"
     description: "Morpho Vault Sentora PYUSD Main (V2)"
-    instructions: !include "../../../instructions/morpho-vault-v1.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
     position_tokens:
       - "0xb576765fB15505433aF24FEe2c0325895C559FB2"
     vars:
@@ -178,6 +181,13 @@ positions:
     instructions: !include "../../../instructions/royco-st-snusd.yaml"
     position_tokens:
       - "0x2070Af1C865f5d764F673Baf5654822947e71243" # ST-sNUSD
+  - id: "272794084645133069231168011596865429685"
+    group_id: "0"
+    description: "Royco Senior Tranche bbqUSDC V2"
+    instructions: !include "../../../instructions/royco-st-smokehouse-usdc.yaml"
+    position_tokens:
+      - "0xBEeFFF209270748ddd194831b3fa287a5386f5bC"
+      - "0xa225F24654b8995036606D5Cd0634133a4BE169c"
   - id: "194837215653509666367263068364758760256"
     group_id: "0"
     description: "Royco Senior Tranche stcUSD (Cap Protocol)"
