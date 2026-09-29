@@ -1,0 +1,73 @@
+protocol: "pareto-falconx"
+
+constants:
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  cdo_address:
+    type: "address"
+    value: "0x433D5B175148dA32Ffe1e1A37a939E1b7e79be4d"
+  aa_tranche_address:
+    type: "address"
+    value: "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C"
+  usdc_address:
+    type: "address"
+    value: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+inputs:
+  caliber_address:
+    type: "address"
+  counterparty_address:
+    type: "address"
+
+actions:
+  otc_sell:
+    calls:
+      - description: "price = virtualPrice(AA)"
+        target: "${constants.cdo_address}"
+        selector: "virtualPrice(address)"
+        parameters:
+          - type: "address"
+            value: "${constants.aa_tranche_address}"
+        return:
+          name: "price"
+          type: "uint256"
+
+      - description: "usdc_amount = aa_amount * price / 1e18"
+        target: "${constants.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.aa_amount}"
+          - type: "uint256"
+            value: "${returns.price}"
+          - type: "uint256"
+            value: "1000000000000000000"
+        return:
+          name: "usdc_amount"
+          type: "uint256"
+
+      - description: "Pull usdc_amount from the counterparty"
+        target: "${constants.usdc_address}"
+        selector: "transferFrom(address,address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.counterparty_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.usdc_amount}"
+
+      - description: "Send aa_amount to the counterparty"
+        target: "${constants.aa_tranche_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.counterparty_address}"
+          - type: "uint256"
+            value: "${input_slots.aa_amount}"
+
+    input_slots:
+      aa_amount:
+        type: "uint256"
+        description: "AA to sell (18 dec)."

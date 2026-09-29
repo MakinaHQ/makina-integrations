@@ -1,0 +1,27 @@
+protocol: "aave-v4"
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  on_behalf_of:
+    type: "address"
+
+actions:
+  borrow:
+    calls:
+      - description: "Borrow the asset from the Aave V4 reserve"
+        target: ${inputs.spoke_address}
+        selector: "borrow(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "uint256"
+            value: ${input_slots.amount_to_borrow}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+    input_slots:
+      amount_to_borrow:
+        type: "uint256"
+        description: "The amount of the underlying asset to borrow"

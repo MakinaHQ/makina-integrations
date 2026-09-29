@@ -1,0 +1,14 @@
+name = "yaaplc"
+chain = "base"
+address = "0x2ad7de46614FefEE6702b626dACa480538132510"
+
+[calibers.base]
+address = "0x777678fb8cda63ebfb98e08d3ed20ef0c29db94f"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/yaaplc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0xb200000000000000000000C2e324d24d7eEcd1fb"
+decimals = 8
+name = "Apple Inc."
+symbol = "AAPLc"

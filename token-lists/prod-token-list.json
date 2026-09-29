@@ -452,6 +452,55 @@
       "symbol": "SPCXc"
     },
     {
+      "chainId": 8453,
+      "address": "0xb200000000000000000000C2e324d24d7eEcd1fb",
+      "name": "Apple Inc.",
+      "decimals": 8,
+      "symbol": "AAPLc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xb200000000000000000000d9192b6B456483C2E8",
+      "name": "Amazon.com Inc.",
+      "decimals": 8,
+      "symbol": "AMZNc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xb2000000000000000000002D0BA3164cc74f58B7",
+      "name": "Alphabet Inc.",
+      "decimals": 8,
+      "symbol": "GOOGLc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xb2000000000000000000008bC8786B856E61707C",
+      "name": "Meta Platforms Inc.",
+      "decimals": 8,
+      "symbol": "METAc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xB200000000000000000000Ab99cFa739E253872B",
+      "name": "Microsoft Corporation",
+      "decimals": 8,
+      "symbol": "MSFTc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xb20000000000000000000078ee7ce2fE4908108C",
+      "name": "NVIDIA Corporation",
+      "decimals": 8,
+      "symbol": "NVDAc"
+    },
+    {
+      "chainId": 8453,
+      "address": "0xb2000000000000000000001e800a7f5189430cD0",
+      "name": "Tesla Inc.",
+      "decimals": 8,
+      "symbol": "TSLAc"
+    },
+    {
       "chainId": 42161,
       "address": "0x46850aD61C2B7d64d08c9C754F45254596696984",
       "name": "PayPal USD",

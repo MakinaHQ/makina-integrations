@@ -1,0 +1,56 @@
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/borrow.yaml:borrow"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: true
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/repay.yaml:repay"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      on_behalf_of:
+        type: "address"
+        value: ${config.caliber_address}
+
+- is_debt: true
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/account.yaml:account_debt"
+    inputs:
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      account:
+        type: "address"
+        value: ${config.caliber_address}

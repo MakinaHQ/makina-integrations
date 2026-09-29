@@ -1,0 +1,47 @@
+protocol: "aave-v4"
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  asset_address:
+    type: "address"
+  on_behalf_of:
+    type: "address"
+
+actions:
+  repay:
+    calls:
+      - description: "Approve the Aave V4 Spoke to spend the asset"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.spoke_address}
+          - type: "uint256"
+            value: ${input_slots.amount_to_repay}
+
+      - description: "Repay the asset to the Aave V4 reserve"
+        target: ${inputs.spoke_address}
+        selector: "repay(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "uint256"
+            value: ${input_slots.amount_to_repay}
+          - type: "address"
+            value: ${inputs.on_behalf_of}
+
+      - description: "Reset the Spoke allowance (uint256.max repay leaves it near-unlimited)"
+        target: ${inputs.asset_address}
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: ${inputs.spoke_address}
+          - type: "uint256"
+            value: "0"
+    input_slots:
+      amount_to_repay:
+        type: "uint256"
+        description: "The amount of the underlying asset to repay (uint256.max repays in full)"

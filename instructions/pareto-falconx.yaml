@@ -122,6 +122,21 @@
         type: "bytes32"
         value: "${keccak256(pareto.mainnet.falconx.pending-withdraw)}"
 
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "${token_list.mainnet.USDC}"
+  instruction:
+    label: "Pareto-FalconX (OTC)"
+    path: "../../../blueprints/pareto/falconx/otc.yaml:otc_sell"
+    inputs:
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      counterparty_address:
+        type: "address"
+        value: "0x8e87Caf1FC5a0d4aebe0E0c976b24a3A9e3672C4"
+
 # ACCOUNTING: AA.balanceOf * virtualPrice(AA) / 1e18 + FalconXUSDC.balanceOf
 - is_debt: false
   instruction_type: "ACCOUNTING"

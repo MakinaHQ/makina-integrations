@@ -49,3 +49,16 @@ actions:
       amount_to_deposit:
         type: "uint256"
         description: "The amount of the underlying asset to supply"
+
+  set_using_as_collateral:
+    calls:
+      - description: "Enable the supplied reserve as collateral on the Spoke"
+        target: ${inputs.spoke_address}
+        selector: "setUsingAsCollateral(uint256,bool,address)"
+        parameters:
+          - type: "uint256"
+            value: ${inputs.reserve_id}
+          - type: "bool"
+            value: "true"
+          - type: "address"
+            value: ${inputs.on_behalf_of}
