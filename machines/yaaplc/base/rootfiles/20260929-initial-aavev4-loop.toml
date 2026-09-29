@@ -15,7 +15,7 @@ name = "USD Coin"
 decimals = 6
 symbol = "USDC"
 
-[instructions.aavev4.account.AAPLc]
+[instructions.aave-v4.account.AAPLc]
 position_id = "324649286701988401193538996957478840752"
 description = "AaveV4 Coinbase Stocks Supply AAPLc (collateral)"
 is_debt = false
@@ -33,7 +33,7 @@ state = [
 bitmap = "148873535527910577765226390751398592512"
 inputs_slots = []
 
-[instructions.aavev4.account_debt.USDC]
+[instructions.aave-v4.account_debt.USDC]
 position_id = "77971314729137725550919142258454806961"
 description = "AaveV4 Coinbase Stocks Borrow USDC"
 is_debt = true
@@ -51,7 +51,7 @@ state = [
 bitmap = "148873535527910577765226390751398592512"
 inputs_slots = []
 
-[instructions.aavev4.borrow.USDC]
+[instructions.aave-v4.borrow.USDC]
 position_id = "77971314729137725550919142258454806961"
 description = "AaveV4 Coinbase Stocks Borrow USDC"
 is_debt = true
@@ -67,12 +67,12 @@ state = [
 ]
 bitmap = "127605887595351923798765477786913079296"
 
-[[instructions.aavev4.borrow.USDC.inputs_slots]]
+[[instructions.aave-v4.borrow.USDC.inputs_slots]]
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
 
-[instructions.aavev4.repay.USDC]
+[instructions.aave-v4.repay.USDC]
 position_id = "77971314729137725550919142258454806961"
 description = "AaveV4 Coinbase Stocks Borrow USDC"
 is_debt = true
@@ -94,12 +94,12 @@ state = [
 ]
 bitmap = "159507359494189904748456847233641349120"
 
-[[instructions.aavev4.repay.USDC.inputs_slots]]
+[[instructions.aave-v4.repay.USDC.inputs_slots]]
 index = 0
 name = "amount_to_repay"
 type = "Uint"
 
-[instructions.aavev4.set_using_as_collateral.AAPLc]
+[instructions.aave-v4.set_using_as_collateral.AAPLc]
 position_id = "324649286701988401193538996957478840752"
 description = "AaveV4 Coinbase Stocks Supply AAPLc (collateral)"
 is_debt = false
@@ -116,7 +116,7 @@ state = [
 bitmap = "297747071055821155530452781502797185024"
 inputs_slots = []
 
-[instructions.aavev4.supply.AAPLc]
+[instructions.aave-v4.supply.AAPLc]
 position_id = "324649286701988401193538996957478840752"
 description = "AaveV4 Coinbase Stocks Supply AAPLc (collateral)"
 is_debt = false
@@ -136,12 +136,12 @@ state = [
 ]
 bitmap = "148873535527910577765226390751398592512"
 
-[[instructions.aavev4.supply.AAPLc.inputs_slots]]
+[[instructions.aave-v4.supply.AAPLc.inputs_slots]]
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
-[instructions.aavev4.withdraw.AAPLc]
+[instructions.aave-v4.withdraw.AAPLc]
 position_id = "324649286701988401193538996957478840752"
 description = "AaveV4 Coinbase Stocks Supply AAPLc (collateral)"
 is_debt = false
@@ -157,7 +157,7 @@ state = [
 ]
 bitmap = "127605887595351923798765477786913079296"
 
-[[instructions.aavev4.withdraw.AAPLc.inputs_slots]]
+[[instructions.aave-v4.withdraw.AAPLc.inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"

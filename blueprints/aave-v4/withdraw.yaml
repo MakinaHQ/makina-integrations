@@ -1,4 +1,4 @@
-protocol: "aavev4"
+protocol: "aave-v4"
 
 # Aave V4 (Hub & Spoke) — withdraw a previously supplied asset from a Spoke reserve.
 #
