@@ -91,6 +91,19 @@ positions:
       mtoken_address: ${token_list.mainnet.mGLOBAL}
       token_out_address: ${token_list.mainnet.USDC}
 
+  # Instant mGLOBAL -> USDC through Fission (on-chain pull, atomic).
+  - id: "62756116561970865551836727949222539707366789540075782069951893105628962866119" # keccak256("fission.mglobal.redemption")
+    group_id: "0"
+    description: "Fission mGLOBAL Instant Redemption (synthetic)"
+    instructions: !include "../../../instructions/fission-redemption.yaml"
+    vars:
+      label: "mGLOBAL"
+      token_address: ${token_list.mainnet.mGLOBAL}
+      token_unit: "1000000000000000000"
+      # Fission's fee is 30-48 bps (+ up to 2 bps conversion), struck daily; the Makina oracle
+      # sits ~2 bps above Fission's price. 60 bps leaves ~8 bps of headroom.
+      max_discount_bps: "60"
+
   # ── Midas mGLOBAL, MPC deposit for the full-redemption cycle ──────────────
   # Midas asks for a deposit sized to the value to be redeemed before they de-allocate
   # and fund the vault above; it is refunded once we tell them the cycle is done.

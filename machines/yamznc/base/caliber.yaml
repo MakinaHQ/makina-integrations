@@ -22,6 +22,16 @@ config:
     value: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
 
 positions:
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "../../../instructions/merkl.yaml"
+    vars:
+      label: "Merkl"
+      merkl_distributor_address: "0x3Ef3D8bA38EBe18DB133cEc108f4D14CE00Dd9Ae"
+  # GO-LIVE PREREQUISITE: the bFeederDCM DirectDepositor 0xB9BA…d57c and
+  # AsyncRedeemer 0x2363…aE6 have whitelists enabled. This caliber must be
+  # whitelisted on both (isWhitelistedUser = false as of 2026-09-28).
   - id: "89389141397253094759523781707743722241"
     group_id: "0"
     description: "Makina Base Feeder DCM"
