@@ -1,0 +1,25 @@
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: []
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fission/redeem.yaml:redeem"
+    inputs:
+      token_address:
+        type: "address"
+        value: ${position.token_address}
+      token_unit:
+        type: "uint256"
+        value: ${position.token_unit}
+      max_discount_bps:
+        type: "uint256"
+        value: ${position.max_discount_bps}
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.token_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/common/account_0.yaml:account_0"
+    inputs: {}
