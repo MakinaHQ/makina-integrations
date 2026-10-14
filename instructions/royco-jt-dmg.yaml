@@ -4,7 +4,7 @@
 #   DEPOSIT  (1 tx, sync):  USDC -> DMG MT (DirectDepositor) -> Junior Tranche shares
 #   WITHDRAW (2 txs, async MT leg):
 #     REQUEST_REDEEM (TX1): JT.redeem -> DMG MT -> AsyncRedeemer.requestRedeem (KV persist)
-#     -- wait 3 days + off-chain keeper finalizeRequests --
+#     -- wait redeemer finalizationDelay() + off-chain keeper finalizeRequests --
 #     CLAIM          (TX2): AsyncRedeemer.claimAssets -> USDC (KV clear)
 #   ACCOUNT (unified, SUPPLY-SAFE — no seed required): live JT claim in DMG MT, computed via the
 #     kernel's previewSyncTrancheAccounting(1) (full-tranche stAssets+jtAssets, /max(totalShares,1)
