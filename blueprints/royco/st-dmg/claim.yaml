@@ -10,7 +10,7 @@ protocol: "royco-st-dmg"
 constants:
   async_redeemer_address:
     type: "address"
-    value: "0x21a9c31825fa1d8bf5f2378a3c95e823290b0637"
+    value: "0xc4ecAf359a6174f9651C5Fcd7b6Fe9ae6b682Ca5"
 
 inputs:
   kv_store_address:

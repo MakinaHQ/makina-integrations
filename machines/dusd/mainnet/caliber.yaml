@@ -770,7 +770,7 @@ positions:
       machine_token: "0x761C3B16a5Afdd7A1869C4B979cFF3383d5Fe98B"
       machine: "0xc4ffab8540ac27e40d4e2930517aa711e9c00c5b"
       depositor: "0xc07b6B56561Ef8E842f36f74a04842284E94BF92"
-      redeemer: "0x21a9C31825FA1D8Bf5F2378A3C95E823290B0637"
+      redeemer: "0xc4ecAf359a6174f9651C5Fcd7b6Fe9ae6b682Ca5"
       accounting_token: ${token_list.mainnet.USDC}
       redemption_request_id_key: ${keccak256("makina.mainnet.dmg.redemption_request_id")}
       pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dmg.pending_redemption_share_amount")}
