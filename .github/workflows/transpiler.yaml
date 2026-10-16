@@ -1,9 +1,9 @@
-# Verifies that new rootfiles are correctly transpiled from their caliber.
+# Verifies existing rootfile Merkle roots and new rootfiles from their caliber.
 # For the latest added rootfile per (machine, chain), re-runs the transpiler
 # and diffs the output.
 #
 # Rules enforced:
-#   1. Existing rootfiles must not be modified (append-only history).
+#   1. Existing rootfiles may only be modified if their computed Merkle roots stay unchanged.
 #   2. Every added rootfile must be newer than all pre-existing files in its directory.
 #   3. The latest added rootfile per directory must match the transpiler output.
 
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build-and-run-transpiler:
-    name: Verify new rootfiles correctness with the transpiler
+    name: Verify rootfiles with the transpiler
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -67,16 +67,6 @@ jobs:
             } >> "$GITHUB_OUTPUT"
             echo "modified_files_count=$(echo "$MODIFIED_FILES" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Reject PR if existing rootfiles are modified
-        if: steps.changed-rootfiles.outputs.modified_files_count > 0
-        env:
-          MODIFIED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.modified_files }}
-        run: |
-          for file in ${MODIFIED_ROOTFILES}; do
-            echo "::error file=${file}::Existing rootfiles must not be modified."
-          done
-          exit 1
 
       # Every added rootfile must be newer (lexicographically) than all
       # pre-existing files in its directory. When bootstrapping a new machine
@@ -133,24 +123,49 @@ jobs:
           fi
 
       - name: Checkout transpiler repository
-        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        if: steps.changed-rootfiles.outputs.added_files_count > 0 || steps.changed-rootfiles.outputs.modified_files_count > 0
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: MakinaHQ/transpiler
-          ref: 82d14d45ee9a5bc78a5ee8215f5b1607da547994 # main as of 2026-08-07
+          ref: 2df47bfa6e49887d11072ebe266c5efcee6a102a
           path: transpiler
           persist-credentials: false
 
       - name: Install Rust toolchain
-        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        if: steps.changed-rootfiles.outputs.added_files_count > 0 || steps.changed-rootfiles.outputs.modified_files_count > 0
         uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # stable action as of 2026-08-07
         with:
           toolchain: stable
 
       - name: Build transpiler
-        if: steps.changed-rootfiles.outputs.added_files_count > 0
+        if: steps.changed-rootfiles.outputs.added_files_count > 0 || steps.changed-rootfiles.outputs.modified_files_count > 0
         working-directory: transpiler
         run: cargo build --release
+
+      - name: Verify existing rootfile Merkle roots are unchanged
+        if: steps.changed-rootfiles.outputs.modified_files_count > 0
+        working-directory: transpiler
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          MODIFIED_ROOTFILES: ${{ steps.changed-rootfiles.outputs.modified_files }}
+        run: |
+          set -euo pipefail
+          for file in ${MODIFIED_ROOTFILES}; do
+            base_rootfile=$(mktemp)
+            trap 'rm -f "$base_rootfile"' EXIT
+            git -C .. show "${BASE_SHA}:${file}" > "$base_rootfile"
+
+            base_root=$(./target/release/transpiler root --rootfile "$base_rootfile")
+            pr_root=$(./target/release/transpiler root --rootfile "../$file")
+
+            if [[ "$base_root" != "$pr_root" ]]; then
+              echo "::error file=${file}::Existing rootfile Merkle root changed from $base_root to $pr_root."
+              exit 1
+            fi
+
+            rm -f "$base_rootfile"
+            trap - EXIT
+          done
 
       - name: Verify rootfiles match transpiler output
         if: steps.changed-rootfiles.outputs.added_files_count > 0
@@ -172,6 +187,6 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: Skip when no rootfiles were added
-        if: steps.changed-rootfiles.outputs.added_files_count == 0
-        run: echo "No added rootfiles to verify."
+      - name: Skip when no rootfiles were added or modified
+        if: steps.changed-rootfiles.outputs.added_files_count == 0 && steps.changed-rootfiles.outputs.modified_files_count == 0
+        run: echo "No added or modified rootfiles to verify."
