@@ -269,6 +269,14 @@ positions:
       label: "PST/PYUSD (0xb497...e512)"
       market_id: "0xb4977179610abfecfc8b76255a002c16b33f46d077beb86e5911e1fe9ee6e512"
       loan_token: ${token_list.mainnet.PYUSD}
+  - id: "66700133325386455848540992550328945200" # pools_db makina_id — deposit (AUSD supply)
+    group_id: "0"
+    description: "Morpho AUSD loan (market: 0x13bf...88ef)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "sUSDai/AUSD (0x13bf...88ef)"
+      market_id: "0x13bf541e28081feeaea6f7894e2a9e7e3fae09f3bef554aeecba013020ef88ef"
+      loan_token: ${token_list.mainnet.AUSD}
 
   # ── AaveV3 Core Supply (group_id: 3) ────────────────────────
   - id: "332697612920998824307877708016163852818" # pools_db makina_id
