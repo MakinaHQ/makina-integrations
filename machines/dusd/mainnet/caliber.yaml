@@ -192,6 +192,15 @@ positions:
       label: "Sentora PRIME Main PYUSD"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0xC21b08C16458202593D4D9B26b9984Ee67b38BbD"
+  - id: "280388900591973387250806829097978036901"
+    group_id: "0"
+    description: "Morpho Vault sky.money USDS Flagship"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xE15fcC81118895b67b6647BBd393182dF44E11E0"]
+    vars:
+      label: "sky.money USDS Flagship"
+      asset_address: ${token_list.mainnet.USDS}
+      vault_address: "0xE15fcC81118895b67b6647BBd393182dF44E11E0"
 
   # ── Morpho Vault AUSD ──────────────────────────────────────────────
   - id: "208384069883257652684922644584564420340"

@@ -95,6 +95,15 @@ positions:
       label: "Sentora mWIN Main"
       asset_address: ${token_list.mainnet.PYUSD}
       vault_address: "0x7cBcfc4F64be199eDE6db1D916ddcdb69f666B57"
+  - id: "280388900591973387250806829097978036901" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault sky.money USDS Flagship"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xE15fcC81118895b67b6647BBd393182dF44E11E0"]
+    vars:
+      label: "sky.money USDS Flagship"
+      asset_address: ${token_list.mainnet.USDS}
+      vault_address: "0xE15fcC81118895b67b6647BBd393182dF44E11E0"
   - id: "134636115830071409511221090610756745543" # pools_db makina_id
     group_id: "0"
     description: "Morpho Vault Sentora Huma PST Main"
@@ -124,6 +133,15 @@ positions:
       label: "Pendle Ecosystem USDC"
       asset_address: ${token_list.mainnet.USDC}
       vault_address: "0x55C1B6e461a6334B567bAF0FEb5D728715446f05"
+  - id: "53755297689087815745364317517114065495" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Pendle Ecosystem High Yield USDC"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0xcf609F8327E68b42AF54F9D529b9f65d68038435"]
+    vars:
+      label: "Pendle Ecosystem High Yield USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0xcf609F8327E68b42AF54F9D529b9f65d68038435"
   - id: "169144170902823932410475652858126577078" # pools_db makina_id
     group_id: "0"
     description: "Morpho Vault Steakhouse Prime USDC"

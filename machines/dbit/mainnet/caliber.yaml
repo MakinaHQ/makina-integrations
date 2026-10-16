@@ -397,6 +397,24 @@ positions:
       market_id: "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49"
       loan_token: ${token_list.mainnet.USDC}
 
+  # ── Morpho Borrow WBTC/RLUSD (group_id: 7) ───────────────────────
+  - id: "49891150280880269452591621909513364791"
+    group_id: "7"
+    description: "Morpho WBTC collateral (market: 0xa128...ec6b)"
+    instructions: !include "../../../instructions/morpho-market-collateral.yaml"
+    vars:
+      label: "WBTC/RLUSD (0xa128...ec6b)"
+      market_id: "0xa128dddc761075df9a9a60689f3a41a989b245aad506352c509c0c3a76a9ec6b"
+      collateral_token: ${token_list.mainnet.WBTC}
+  - id: "50423821453734979690317805825244019501"
+    group_id: "7"
+    description: "Morpho RLUSD debt (market: 0xa128...ec6b)"
+    instructions: !include "../../../instructions/morpho-market-debt.yaml"
+    vars:
+      label: "WBTC/RLUSD (0xa128...ec6b)"
+      market_id: "0xa128dddc761075df9a9a60689f3a41a989b245aad506352c509c0c3a76a9ec6b"
+      loan_token: ${token_list.mainnet.RLUSD}
+
   # ── Morpho Loops ─────────────────────────────────────────────────
   - id: "219384756102938475610293847561029384756"
     group_id: "0"
