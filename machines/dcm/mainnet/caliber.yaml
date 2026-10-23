@@ -277,6 +277,22 @@ positions:
       label: "sUSDai/AUSD (0x13bf...88ef)"
       market_id: "0x13bf541e28081feeaea6f7894e2a9e7e3fae09f3bef554aeecba013020ef88ef"
       loan_token: ${token_list.mainnet.AUSD}
+  - id: "133503184428111308052981979830123698985" # pools_db makina_id — deposit (USDC supply)
+    group_id: "0"
+    description: "Morpho USDC loan (market: 0xe3df...26d7)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "USD3/USDC (0xe3df...26d7)"
+      market_id: "0xe3df58f9d3011b7481ff36b939fa5f8da642f34ea5792d25d3958dbf1efa26d7"
+      loan_token: ${token_list.mainnet.USDC}
+  - id: "6471016091011063696620472924160075130" # pools_db makina_id — deposit (AUSD supply)
+    group_id: "0"
+    description: "Morpho AUSD loan (market: 0xe90a...7541)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PST/AUSD (0xe90a...7541)"
+      market_id: "0xe90a6419afa96192cb088f63b779ddcb629a89f9126600d767d9442868087541"
+      loan_token: ${token_list.mainnet.AUSD}
 
   # ── AaveV3 Core Supply (group_id: 3) ────────────────────────
   - id: "332697612920998824307877708016163852818" # pools_db makina_id
