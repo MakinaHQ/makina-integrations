@@ -185,6 +185,96 @@ positions:
     instructions: !include "./instructions/aavev3-borrow-weth.yaml"
     position_tokens: ["0xeA51d7853EEFb32b6ee06b1C12E6dcCA88Be0fFE"]
 
+  # AaveV4: one liquidation/accounting group per Spoke. The supplied wstETH
+  # and every debt on that Spoke must share a non-zero group_id.
+  # Reserve identities verified on Ethereum block 26277314 (2026-10-26).
+  # Supply templates use is_debt=false; borrow/repay/account_debt use true.
+  - id: "213854988651334343727537269240237820174"
+    group_id: "12"
+    description: "AaveV4 Main Core wstETH collateral"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "wstETH - Main Core"
+      asset_address: ${token_list.mainnet.wstETH}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "1"
+  - id: "230947610734786707026180067067328050829"
+    group_id: "12"
+    description: "AaveV4 Main Core USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Main Core"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "7"
+  - id: "9135845337238937377623050595743726921"
+    group_id: "12"
+    description: "AaveV4 Main Core USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Main Core"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "8"
+  - id: "75361341501271893787202441942892776889"
+    group_id: "12"
+    description: "AaveV4 Main Core RLUSD debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "RLUSD - Main Core"
+      asset_address: ${token_list.mainnet.RLUSD}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "10"
+
+  # Bluechip collateral is supplied to Prime and backs debts from both Hubs.
+  # Each reserve has its own indexed position ID; all share the Spoke group.
+  - id: "22520381503265003924883168735963805517"
+    group_id: "13"
+    description: "AaveV4 Bluechip Prime wstETH collateral"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "wstETH - Bluechip Prime"
+      asset_address: ${token_list.mainnet.wstETH}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "3"
+  - id: "200558209934810390942608343595117824996"
+    group_id: "13"
+    description: "AaveV4 Bluechip Prime USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Bluechip Prime"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "4"
+  - id: "275270697744503342999550230332444889446"
+    group_id: "13"
+    description: "AaveV4 Bluechip Prime USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Bluechip Prime"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "5"
+
+  - id: "59848242613185990568265323705364939402"
+    group_id: "13"
+    description: "AaveV4 Bluechip Core USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Bluechip Core"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "7"
+  - id: "238364911602877993954939928581525611066"
+    group_id: "13"
+    description: "AaveV4 Bluechip Core USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Bluechip Core"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "10"
+
   # Morpho debt positions
   - id: "102085800190891488320502506258850684527"
     group_id: "2"

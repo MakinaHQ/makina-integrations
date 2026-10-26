@@ -208,6 +208,116 @@ positions:
   #   instructions: !include "./instructions/aave-umbrella-gho.yaml"
   #   position_tokens: ["0x4f827A63755855cDf3e8f3bcD20265C833f15033"]
 
+  # AaveV4: one liquidation/accounting group per Spoke. The supplied WBTC
+  # and every debt on that Spoke must share a non-zero group_id.
+  # Reserve identities verified on Ethereum block 26277343 (2026-10-26).
+  # Supply templates use is_debt=false; borrow/repay/account_debt use true.
+  - id: "132226786381436300829762649989626073805"
+    group_id: "8"
+    description: "AaveV4 Main Core WBTC collateral"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "WBTC - Main Core"
+      asset_address: ${token_list.mainnet.WBTC}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "3"
+  - id: "230947610734786707026180067067328050829"
+    group_id: "8"
+    description: "AaveV4 Main Core USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Main Core"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "7"
+  - id: "9135845337238937377623050595743726921"
+    group_id: "8"
+    description: "AaveV4 Main Core USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Main Core"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "8"
+  - id: "75361341501271893787202441942892776889"
+    group_id: "8"
+    description: "AaveV4 Main Core RLUSD debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "RLUSD - Main Core"
+      asset_address: ${token_list.mainnet.RLUSD}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "10"
+
+  - id: "38660284510847803267904935934560587408"
+    group_id: "8"
+    description: "AaveV4 Main Core GHO debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "GHO - Main Core"
+      asset_address: ${token_list.mainnet.GHO}
+      spoke_address: "0x94e7a5dcbe816e498b89ab752661904e2f56c485"
+      reserve_id: "13"
+
+  # Bluechip collateral is supplied to Prime and backs debts from both Hubs.
+  # Each reserve has its own indexed position ID; all share the Spoke group.
+  - id: "143568485436022133446528576889326392985"
+    group_id: "9"
+    description: "AaveV4 Bluechip Prime WBTC collateral"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "WBTC - Bluechip Prime"
+      asset_address: ${token_list.mainnet.WBTC}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "1"
+  - id: "200558209934810390942608343595117824996"
+    group_id: "9"
+    description: "AaveV4 Bluechip Prime USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Bluechip Prime"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "4"
+  - id: "275270697744503342999550230332444889446"
+    group_id: "9"
+    description: "AaveV4 Bluechip Prime USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Bluechip Prime"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "5"
+
+  - id: "295627863507759964291753076782449908093"
+    group_id: "9"
+    description: "AaveV4 Bluechip Prime GHO debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "GHO - Bluechip Prime"
+      asset_address: ${token_list.mainnet.GHO}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "6"
+
+  - id: "59848242613185990568265323705364939402"
+    group_id: "9"
+    description: "AaveV4 Bluechip Core USDC debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC - Bluechip Core"
+      asset_address: ${token_list.mainnet.USDC}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "7"
+  - id: "238364911602877993954939928581525611066"
+    group_id: "9"
+    description: "AaveV4 Bluechip Core USDT debt"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDT - Bluechip Core"
+      asset_address: ${token_list.mainnet.USDT}
+      spoke_address: "0x973a023a77420ba610f06b3858ad991df6d85a08"
+      reserve_id: "10"
+
   # ── AaveV3 Supply (group_id: 2) ────────────────────────────────────
   - id: "332697612920998824307877708016163852818"
     group_id: "2"
