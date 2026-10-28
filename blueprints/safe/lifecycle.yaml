@@ -1,0 +1,286 @@
+protocol: "safe"
+
+# The caliber's attached Safe (owner = module = caliber). `create` deploys, checks and
+# registers it, once per caliber. See docs/attached-safe/README.md.
+
+constants:
+  createx_address:
+    type: "address"
+    value: "0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed" # CreateX (same address and bytecode on every chain)
+  safe_module_setup_address:
+    type: "address"
+    value: "0x2dd68b007B46fBe91B9A7c3EDa5A7a1063cB5b47" # SafeModuleSetup, safe-modules v0.3.0 (canonical)
+  safe_sentinel_address:
+    type: "address"
+    value: "0x0000000000000000000000000000000000000001" # Safe linked-list SENTINEL
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0" # eq
+  bytes32_helper_address:
+    type: "address"
+    value: "0x74DC739B8F98ad0F76Cd8900695DD8D5083E45D3" # getTupleWord
+
+inputs:
+  # Per chain, from caliber config (docs/attached-safe/README.md)
+  boolean_helper_address: # revertIfFalse
+    type: "address"
+  caliber_helper_address: # addressEq
+    type: "address"
+  kv_store_address:
+    type: "address"
+  attached_safe_kv_key:
+    type: "bytes32"
+  caliber_address:
+    type: "address"
+  attached_safe_address:
+    type: "address"
+  salt: # caliber ++ 0x00 ++ 11 zero bytes: CreateX reserves it for the caliber (docs/attached-safe/README.md)
+    type: "bytes32"
+
+actions:
+  create:
+    calls:
+      - description: "Read the attached-Safe slot"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.attached_safe_kv_key}"
+        return:
+          name: "existing_safe"
+          type: "uint256"
+
+      - description: "Is the slot empty?"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.existing_safe}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "slot_empty"
+          type: "bool"
+
+      - description: "One attached Safe per caliber"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.slot_empty}"
+
+      - description: "Deploy an UNINITIALISED SafeProxy through CreateX; the salt is reserved for this caliber, so nobody else can deploy at this address. setup follows in this tx"
+        target: "${constants.createx_address}"
+        selector: "deployCreate2(bytes32,bytes)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.salt}"
+          - type: "bytes"
+            value: "0x608060405234801561001057600080fd5b506040516101e63803806101e68339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001806101c46022913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060ab806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea264697066735822122003d1488ee65e08fa41e58e888a9865554c535f2c77126a82cb4c0f917f31441364736f6c63430007060033496e76616c69642073696e676c65746f6e20616464726573732070726f766964656400000000000000000000000041675c099f32341bf84bfc5382af534df5c7461a" # SafeProxyFactory v1.4.1 proxyCreationCode() ++ uint256(Safe v1.4.1 L1 singleton)
+        return:
+          name: "deployed_safe"
+          type: "address"
+
+      - description: "Deployed where config predicted?"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.deployed_safe}"
+          - type: "address"
+            value: "${inputs.attached_safe_address}"
+        return:
+          name: "deployed_at_predicted"
+          type: "bool"
+
+      - description: "Revert unless the proxy landed at attached_safe_address"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.deployed_at_predicted}"
+
+      - description: "setup: owners [caliber], threshold 1, module [caliber] via SafeModuleSetup, no fallback handler, no payment"
+        target: "${inputs.attached_safe_address}"
+        selector: "setup(address[],uint256,address,bytes,address,address,uint256,address)"
+        parameters:
+          - type: "address[]"
+            value:
+              - type: "address"
+                value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "1"
+          - type: "address"
+            value: "${constants.safe_module_setup_address}"
+          - type: "bytes"
+            value:
+              abi_encode_call:
+                selector: "enableModules(address[])"
+                parameters:
+                  - type: "address[]"
+                    value:
+                      - type: "address"
+                        value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "0x0000000000000000000000000000000000000000"
+          - type: "address"
+            value: "0x0000000000000000000000000000000000000000"
+          - type: "uint256"
+            value: "0"
+          - type: "address"
+            value: "0x0000000000000000000000000000000000000000"
+
+      # ── [attached-safe security] BEGIN: owners == modules == [caliber] (docs/attached-safe/README.md) ──
+      - description: "[attached-safe security] getOwners() raw words: [offset, length, owner0, ...]"
+        target: "${inputs.attached_safe_address}"
+        selector: "getOwners()"
+        parameters: []
+        return:
+          name: "safe_owners_raw"
+          type: "(uint256,uint256,address)"
+
+      - description: "[attached-safe security] Owner count"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,address)"
+            value: "${returns.safe_owners_raw}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "safe_owner_count"
+          type: "uint256"
+
+      - description: "[attached-safe security] Exactly one owner?"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.safe_owner_count}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "safe_single_owner"
+          type: "bool"
+
+      - description: "[attached-safe security] Revert unless exactly one owner"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.safe_single_owner}"
+
+      - description: "[attached-safe security] The owner"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,uint256,address)"
+            value: "${returns.safe_owners_raw}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "safe_owner"
+          type: "address"
+
+      - description: "[attached-safe security] Owner is this caliber?"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.safe_owner}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "safe_owner_is_caliber"
+          type: "bool"
+
+      - description: "[attached-safe security] Revert unless the caliber is the owner"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.safe_owner_is_caliber}"
+
+      - description: "[attached-safe security] getModulesPaginated(SENTINEL, 2) raw words: [offset, next, length, module0, ...]"
+        target: "${inputs.attached_safe_address}"
+        selector: "getModulesPaginated(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${constants.safe_sentinel_address}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "safe_modules_raw"
+          type: "(uint256,address,uint256,address)"
+
+      - description: "[attached-safe security] Module count (page of 2, so a second module is visible)"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,address,uint256,address)"
+            value: "${returns.safe_modules_raw}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "safe_module_count"
+          type: "uint256"
+
+      - description: "[attached-safe security] Exactly one module?"
+        target: "${constants.math_helper_address}"
+        selector: "eq(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.safe_module_count}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "safe_single_module"
+          type: "bool"
+
+      - description: "[attached-safe security] Revert unless exactly one module"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.safe_single_module}"
+
+      - description: "[attached-safe security] The module"
+        target: "${constants.bytes32_helper_address}"
+        selector: "getTupleWord(bytes,uint256)"
+        parameters:
+          - type: "(uint256,address,uint256,address)"
+            value: "${returns.safe_modules_raw}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "safe_module"
+          type: "address"
+
+      - description: "[attached-safe security] Module is this caliber?"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${returns.safe_module}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "safe_module_is_caliber"
+          type: "bool"
+
+      - description: "[attached-safe security] Revert unless the caliber is the module"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.safe_module_is_caliber}"
+      # ── [attached-safe security] END ──
+
+      - description: "Register the Safe LAST — only a Safe that passed every check above gets here"
+        target: "${inputs.kv_store_address}"
+        selector: "set(bytes32,bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.attached_safe_kv_key}"
+          - type: "address"
+            value: "${inputs.attached_safe_address}"

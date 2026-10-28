@@ -43,8 +43,22 @@ config:
   morpho_v2_liquidity_lens_address:
     type: "address"
     value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
-  # TODO: a per-caliber KeyValueStore has not been deployed for DCM yet.
-  # Add `key_value_store_address` here before wiring any instruction that needs it.
+  # Per-caliber KeyValueStore (caliber() = this caliber): the Superstate claims and the
+  # attached-Safe registry.
+  key_value_store_address:
+    type: "address"
+    value: "0xDdb6683e487Eb373E9E27A2730BBeea853101762"
+  # Attached Safe (docs/attached-safe/README.md): salt = caliber ++ 12 zero bytes; the address
+  # is its CreateX deployment.
+  attached_safe_address:
+    type: "address"
+    value: "0x4d11C8ca92Ff7800457296F98C2A042a1F9Bd1f9"
+  attached_safe_salt:
+    type: "bytes32"
+    value: "0xdc385c31c322351dac9ff4d7ded24e29b5d94768000000000000000000000000"
+  attached_safe_kv_key:
+    type: "bytes32"
+    value: "${keccak256(makina.attached-safe)}"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -488,6 +502,22 @@ positions:
       asset_address: ${token_list.mainnet.JAAA}
       aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
       aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+  # ── USCC/RLUSD Horizon loop (group_id: 4) ───────────────────────
+  # USCC (Superstate) as Horizon collateral against the RLUSD borrow below. Reserve: LTV 85%,
+  # LT 88%, bonus 5%, collateral only, supply cap 7.5M USCC shared by all suppliers (dusd
+  # too). eMode 0: category 4 "USCC GHO" only allows GHO borrows.
+  # RISK: USCC transfers are Superstate-allowlist gated, so only allowlisted liquidators can
+  # take it, and a revoked allowlist freezes the exit.
+  - id: "311320401608815590130020786774191105996" # pools_db makina_id — AaveV3 Horizon USCC lending
+    group_id: "4"
+    description: "AaveV3 Horizon Supply USCC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x08b798c40b9AB931356d9aB4235F548325C4cb80"] # aHorRwaUSCC
+    vars:
+      label: "USCC - Horizon Lend"
+      asset_address: ${token_list.mainnet.USCC}
+      aave_token: "0x08b798c40b9AB931356d9aB4235F548325C4cb80"
+      aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
   - id: "317835433613879557430416658618884687921"
     group_id: "4"
@@ -555,3 +585,32 @@ positions:
       vault_address: "0x4880799eE5200fC58DA299e965df644fBf46780B"
       asset_address: ${token_list.mainnet.USDC}
       share_address: ${token_list.mainnet.JAAA}
+
+  # Attached Safe (docs/attached-safe/README.md): `create`, run once.
+  - id: "108190441586059729654767051633271106603975264136610275741002200346967568500452" # keccak256("attached-safe")
+    group_id: "0"
+    description: "Attached Safe"
+    instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # USCC subscribe/redeem through Superstate, delivered to the attached Safe
+  # (docs/superstate-offchain/README.md). Funds the Horizon USCC collateral (group 4).
+  # Disabled until enabled with this caliber's Superstate subaccount subscription address.
+  # - id: "113754801296779658453198583385743335683021126602415149242606541268952718634785" # keccak256("superstate.uscc.subscribe")
+  #   group_id: "0"
+  #   description: "USCC Subscription (USDC to Superstate, USCC minted to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
+  #   vars:
+  #     label: "USCC Subscription"
+  #     fund_token: ${token_list.mainnet.USCC}
+  #     stablecoin: ${token_list.mainnet.USDC}
+  #     deposit_address: "TODO" # Superstate subaccount USDC subscription address
+  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-subscribe)}"
+  # - id: "110504959099929678971014067507667643402574237725558963114945016510709054718133" # keccak256("superstate.uscc.redeem")
+  #   group_id: "0"
+  #   description: "USCC Redemption (USCC burned, USDC paid to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
+  #   vars:
+  #     label: "USCC Redemption"
+  #     fund_token: ${token_list.mainnet.USCC}
+  #     stablecoin: ${token_list.mainnet.USDC}
+  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-redeem)}"

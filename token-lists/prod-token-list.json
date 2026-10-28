@@ -54,6 +54,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x14d60E7FDC0D71d8611742720E4C50E7a974020c",
+      "name": "Bitwise Crypto Carry Fund",
+      "decimals": 6,
+      "symbol": "USCC"
+    },
+    {
+      "chainId": 1,
       "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "name": "USD Coin",
       "decimals": 6,

@@ -26,6 +26,17 @@ config:
   key_value_store_address:
     type: "address"
     value: "0xa81fC382489F9560211AB15aD87f001b98C92E91"
+  # Attached Safe (docs/attached-safe/README.md): salt = caliber ++ 12 zero bytes; the address
+  # is its CreateX deployment.
+  attached_safe_address:
+    type: "address"
+    value: "0x8a2d8195e24cADbBc5723A69D13419f63B13385C"
+  attached_safe_salt:
+    type: "bytes32"
+    value: "0xd1a1c248b253f1fc60eacd90777b9a63f8c8c1bc000000000000000000000000"
+  attached_safe_kv_key:
+    type: "bytes32"
+    value: "${keccak256(makina.attached-safe)}"
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
@@ -364,12 +375,14 @@ positions:
   # scripts-factory/centrifuge-v3/mainnet/jaaa/specs.yaml.
   #
   # Plain aavev3-supply.yaml is correct here, not -emode: Horizon runs several live e-mode
-  # categories (VBILL GHO, USTB GHO, ACRED GHO, mGLOBAL Stablecoins, ...) but none of them
-  # is JAAA-based, so this position has no category to enter. Do NOT justify this from the
+  # categories (VBILL GHO, USTB GHO, ACRED GHO, mGLOBAL Stablecoins, ...). Category 10
+  # "JAAA GHO" only allows GHO borrows, so it does not fit the USDC/RLUSD debt legs and this
+  # position stays in eMode 0. Do NOT justify this from the
   # reserve-config eModeCategory bits — they are deprecated in Aave v3.2+ and read 0 for
   # every Horizon reserve regardless.
   #
-  # The collateral and all three debt legs sit in group_id 7. Account for all four together.
+  # Both collaterals (JAAA, USCC) and all three debt legs sit in group_id 7. Account for all
+  # five together.
   # The RLUSD lend leg stays in group 3: RLUSD supply has LTV 0 and LT 0 on Horizon,
   # so it provides no collateral backing. Adding it would make it another mandatory member of
   # every accountForPositionBatch and another _invalidateGroupedPositions trigger — every
@@ -398,8 +411,24 @@ positions:
       asset_address: ${token_list.mainnet.JAAA}
       aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
       aave_pool_instance: "${config.aavev3_horizon_instance}"
+  # USCC (Superstate) as a second Horizon collateral in this account, against the RLUSD
+  # borrow below. Reserve: LTV 85%, LT 88%, bonus 5%, collateral only, supply cap 7.5M USCC
+  # shared by all suppliers (dcm too). eMode 0: category 4 "USCC GHO" only allows GHO
+  # borrows, and this account also holds JAAA.
+  # RISK: USCC transfers are Superstate-allowlist gated, so only allowlisted liquidators can
+  # take it, and a revoked allowlist freezes the exit.
+  - id: "311320401608815590130020786774191105996" # pools_db makina_id — AaveV3 Horizon USCC lending
+    group_id: "7"
+    description: "AaveV3 Horizon Supply USCC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x08b798c40b9AB931356d9aB4235F548325C4cb80"] # aHorRwaUSCC
+    vars:
+      label: "USCC - Horizon Lend"
+      asset_address: ${token_list.mainnet.USCC}
+      aave_token: "0x08b798c40b9AB931356d9aB4235F548325C4cb80"
+      aave_pool_instance: "${config.aavev3_horizon_instance}"
 
-  # USDC debt drawn against the Horizon collateral above; group_id 7 ties all four together.
+  # USDC debt drawn against the Horizon collateral above (group_id 7).
   # USDC borrowing is ENABLED on this reserve (LTV 0, i.e. borrow-only); borrow cap
   # 54,000,000 with ~2.78M drawn. affected_tokens is USDC, already a dusd base token, so
   # this position adds NO new base-token prerequisite of its own — it is gated only by
@@ -884,3 +913,32 @@ positions:
       vault_address: "0x4880799eE5200fC58DA299e965df644fBf46780B"
       asset_address: ${token_list.mainnet.USDC}
       share_address: ${token_list.mainnet.JAAA}
+
+  # Attached Safe (docs/attached-safe/README.md): `create`, run once.
+  - id: "108190441586059729654767051633271106603975264136610275741002200346967568500452" # keccak256("attached-safe")
+    group_id: "0"
+    description: "Attached Safe"
+    instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # USCC subscribe/redeem through Superstate, delivered to the attached Safe
+  # (docs/superstate-offchain/README.md). Funds the Horizon USCC collateral (group 7).
+  # Disabled until enabled with this caliber's Superstate subaccount subscription address.
+  # - id: "113754801296779658453198583385743335683021126602415149242606541268952718634785" # keccak256("superstate.uscc.subscribe")
+  #   group_id: "0"
+  #   description: "USCC Subscription (USDC to Superstate, USCC minted to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
+  #   vars:
+  #     label: "USCC Subscription"
+  #     fund_token: ${token_list.mainnet.USCC}
+  #     stablecoin: ${token_list.mainnet.USDC}
+  #     deposit_address: "TODO" # Superstate subaccount USDC subscription address
+  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-subscribe)}"
+  # - id: "110504959099929678971014067507667643402574237725558963114945016510709054718133" # keccak256("superstate.uscc.redeem")
+  #   group_id: "0"
+  #   description: "USCC Redemption (USCC burned, USDC paid to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
+  #   vars:
+  #     label: "USCC Redemption"
+  #     fund_token: ${token_list.mainnet.USCC}
+  #     stablecoin: ${token_list.mainnet.USDC}
+  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-redeem)}"
