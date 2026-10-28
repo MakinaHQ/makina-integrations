@@ -72,6 +72,9 @@
       delivery_token:
         type: "address"
         value: ${position.fund_token}
+      calldata_encoder_address:
+        type: "address"
+        value: "${config.calldata_encoder_address}"
 
 # The claim, in its own token. Exactly one affected token.
 - is_debt: false

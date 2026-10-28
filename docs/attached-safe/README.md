@@ -55,9 +55,30 @@ Weiroll call targets cannot come from a return value, so the Safe is a compile-t
 
 ## Module calls
 
-The caliber acts as the Safe's module: `execTransactionFromModule(to, 0, data, CALL)`, with
-`data` built by the transpiler's `abi_encode_call`. `execTransactionFromModule` returns
-`false` instead of reverting when the inner call fails, so every caller reverts on `false`.
+The caliber acts as the Safe's module: `execTransactionFromModule(to, 0, data, CALL)`.
+`execTransactionFromModule` returns `false` instead of reverting when the inner call fails,
+so every caller reverts on `false`.
+
+Weiroll cannot build `bytes`, so `data` comes from the CalldataEncoder
+(`calldata_encoder_address`, caliber config). Called with the selector and arguments of a
+call, it returns that call's calldata as `bytes`, which the next command passes on. `create`
+builds `setup`'s `enableModules([caliber])` the same way.
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.28;
+
+contract CalldataEncoder {
+    fallback(bytes calldata input) external returns (bytes memory) {
+        return abi.encode(input);
+    }
+}
+```
+
+The encoder's output is the calldata the Safe executes, so `calldata_encoder_address` must be
+this contract. The mainnet deployment, `0x6843d773eE6D6F173428EEa127b5a16E09cB041b` (runtime
+code hash `0xbec230991fca2c717f5f6efd5db938ee4d193b9bb5d936af75e6cae3af334966`), is
+**unaudited** and its source is **not verified** on Etherscan.
 
 `boolean_helper_address` and `caliber_helper_address` are caliber config inputs: they are not
 at the same address on every chain.
