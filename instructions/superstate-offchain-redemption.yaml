@@ -69,6 +69,9 @@
       delivery_token:
         type: "address"
         value: ${position.stablecoin}
+      calldata_encoder_address:
+        type: "address"
+        value: "${config.calldata_encoder_address}"
 
 # The claim, in its own token. Exactly one affected token.
 - is_debt: false

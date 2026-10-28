@@ -36,6 +36,8 @@ inputs:
     type: "address"
   salt: # caliber ++ 0x00 ++ 11 zero bytes: CreateX reserves it for the caliber (docs/attached-safe/README.md)
     type: "bytes32"
+  calldata_encoder_address: # CalldataEncoder: returns the calldata it is called with, as bytes
+    type: "address"
 
 actions:
   create:
@@ -100,6 +102,18 @@ actions:
           - type: "bool"
             value: "${returns.deployed_at_predicted}"
 
+      - description: "Encode SafeModuleSetup.enableModules([caliber]) for setup"
+        target: "${inputs.calldata_encoder_address}"
+        selector: "enableModules(address[])"
+        parameters:
+          - type: "address[]"
+            value:
+              - type: "address"
+                value: "${inputs.caliber_address}"
+        return:
+          name: "enable_modules_calldata"
+          type: "bytes"
+
       - description: "setup: owners [caliber], threshold 1, module [caliber] via SafeModuleSetup, no fallback handler, no payment"
         target: "${inputs.attached_safe_address}"
         selector: "setup(address[],uint256,address,bytes,address,address,uint256,address)"
@@ -113,14 +127,7 @@ actions:
           - type: "address"
             value: "${constants.safe_module_setup_address}"
           - type: "bytes"
-            value:
-              abi_encode_call:
-                selector: "enableModules(address[])"
-                parameters:
-                  - type: "address[]"
-                    value:
-                      - type: "address"
-                        value: "${inputs.caliber_address}"
+            value: "${returns.enable_modules_calldata}"
           - type: "address"
             value: "0x0000000000000000000000000000000000000000"
           - type: "address"

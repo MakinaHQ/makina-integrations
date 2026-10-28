@@ -37,6 +37,10 @@ config:
   attached_safe_kv_key:
     type: "bytes32"
     value: "${keccak256(makina.attached-safe)}"
+  # CalldataEncoder (docs/attached-safe/README.md). UNAUDITED, source not verified on Etherscan.
+  calldata_encoder_address:
+    type: "address"
+    value: "0x6843d773eE6D6F173428EEa127b5a16E09cB041b"
   boolean_helper_address:
     type: "address"
     value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"

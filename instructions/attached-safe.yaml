@@ -3,7 +3,7 @@
 #
 # Caliber config: caliber_address, key_value_store_address, boolean_helper_address,
 #   caliber_helper_address, attached_safe_address, attached_safe_salt,
-#   attached_safe_kv_key (keccak256("makina.attached-safe")).
+#   attached_safe_kv_key (keccak256("makina.attached-safe")), calldata_encoder_address.
 
 - is_debt: false
   instruction_type: "HARVEST"
@@ -33,3 +33,6 @@
       salt:
         type: "bytes32"
         value: "${config.attached_safe_salt}"
+      calldata_encoder_address:
+        type: "address"
+        value: "${config.calldata_encoder_address}"
