@@ -99,6 +99,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral.AUSD.inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.aavev3.add_collateral.USDC]
 position_id = "226666382788514932918636686861146238730"
 description = "AaveV3 Supply USDC"
@@ -124,6 +127,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral.USDC.inputs_slots.input_type.amount]
+token = "0x754704bc059f8c67012fed69bc8a327a5aafb603"
 
 [instructions.aavev3.add_collateral.USDT0]
 position_id = "137197543549345562682796396165999317048"
@@ -151,6 +157,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral.USDT0.inputs_slots.input_type.amount]
+token = "0xe7cd86e13ac4309349f30b3435a9d337750fc82d"
+
 [instructions.aavev3.withdraw_collateral.AUSD]
 position_id = "18883279859232606921081666227395984506"
 description = "AaveV3 Supply AUSD"
@@ -171,6 +180,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.AUSD.inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
 
 [instructions.aavev3.withdraw_collateral.USDC]
 position_id = "226666382788514932918636686861146238730"
@@ -193,6 +205,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral.USDC.inputs_slots.input_type.amount]
+token = "0x754704bc059f8c67012fed69bc8a327a5aafb603"
+
 [instructions.aavev3.withdraw_collateral.USDT0]
 position_id = "137197543549345562682796396165999317048"
 description = "AaveV3 Supply USDT0"
@@ -213,6 +228,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.USDT0.inputs_slots.input_type.amount]
+token = "0xe7cd86e13ac4309349f30b3435a9d337750fc82d"
 
 [instructions.merkl.harvest.Merkl]
 position_id = "777"

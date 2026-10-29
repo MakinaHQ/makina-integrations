@@ -74,10 +74,19 @@ actions:
     input_slots:
       amount_tokena:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.tokena_address}
         description: "The amount of asset A to deposit in the Curve pool"
       amount_tokenb:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.tokenb_address}
         description: "The amount of asset B to deposit in the Curve pool"
       min_mint_amount:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.curve_lp_token_address}
         description: "The minimum amount of LP tokens to receive from Curve"

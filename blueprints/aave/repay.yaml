@@ -41,4 +41,7 @@ actions:
     input_slots:
       amount_to_repay:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.token_address}
         description: "The amount to repay to the pool"

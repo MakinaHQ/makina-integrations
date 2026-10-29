@@ -641,6 +641,9 @@ index = 0
 name = "amount_to_stake"
 type = "Uint"
 
+[instructions."Aave Umbrella".stake.GHO.inputs_slots.input_type.amount]
+token = "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f"
+
 [instructions."Aave Umbrella".stake.USDC]
 position_id = "176021688445186810403025048632929053161"
 description = "Aave Umbrella USDC"
@@ -666,6 +669,9 @@ index = 0
 name = "amount_to_stake"
 type = "Uint"
 
+[instructions."Aave Umbrella".stake.USDC.inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions."Aave Umbrella".stake.USDT]
 position_id = "293691712937964969352275672791079139559"
 description = "Aave Umbrella USDT"
@@ -690,6 +696,9 @@ bitmap = "148873535527910577765226390751398592512"
 index = 0
 name = "amount_to_stake"
 type = "Uint"
+
+[instructions."Aave Umbrella".stake.USDT.inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions."Aave Umbrella".start_cooldown.GHO]
 position_id = "229457643934747132111107431329088218367"
@@ -1183,6 +1192,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."JAAA - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x5a0f93d040de44e78f251b03c43be9cf317dcf64"
+
 [instructions.aavev3.add_collateral."RLUSD - Horizon Lend"]
 position_id = "47445753596645566272224472924421400103"
 description = "AaveV3 Horizon Supply RLUSD"
@@ -1208,6 +1220,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral."RLUSD - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.aavev3.add_collateral.USDC]
 position_id = "332697612920998824307877708016163852818"
@@ -1235,6 +1250,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral.USDC.inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.add_collateral.USDG]
 position_id = "198834366791576294957883993689758100677"
 description = "AaveV3 Supply USDG"
@@ -1260,6 +1278,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral.USDG.inputs_slots.input_type.amount]
+token = "0xe343167631d89b6ffc58b88d6b7fb0228795491d"
 
 [instructions.aavev3.add_collateral.USDT]
 position_id = "232678016241942897729445069841802885622"
@@ -1287,6 +1308,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral.USDT.inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.aavev3.add_collateral."USDe - Lend"]
 position_id = "107076193902764124667576417126923441565"
 description = "AaveV3 Supply USDe (E-Mode)"
@@ -1312,6 +1336,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral."USDe - Lend".inputs_slots.input_type.amount]
+token = "0x4c9edd5852cd905f086c759e8383e09bff1e68b3"
 
 [instructions.aavev3.add_collateral."sUSDe - Lend"]
 position_id = "13362078339443395382342079025223961472"
@@ -1339,6 +1366,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."sUSDe - Lend".inputs_slots.input_type.amount]
+token = "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
+
 [instructions.aavev3.borrow_asset."GHO - Horizon Borrow"]
 position_id = "266935600511395729584434377419168277182"
 description = "AaveV3 Horizon Borrow GHO"
@@ -1361,6 +1391,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
+
+[instructions.aavev3.borrow_asset."GHO - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f"
 
 [instructions.aavev3.borrow_asset."RLUSD - Horizon Borrow"]
 position_id = "133495794982505815817947498041694656764"
@@ -1385,6 +1418,9 @@ index = 0
 name = "amount_to_borrow"
 type = "Uint"
 
+[instructions.aavev3.borrow_asset."RLUSD - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.aavev3.borrow_asset."USDC - Borrow"]
 position_id = "227329230297595858214811008018294296109"
 description = "AaveV3 Borrow USDC (sUSDe E-Mode)"
@@ -1407,6 +1443,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
+
+[instructions.aavev3.borrow_asset."USDC - Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.aavev3.borrow_asset."USDC - Horizon Borrow"]
 position_id = "317835433613879557430416658618884687921"
@@ -1431,6 +1470,9 @@ index = 0
 name = "amount_to_borrow"
 type = "Uint"
 
+[instructions.aavev3.borrow_asset."USDC - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.borrow_asset."USDT - Borrow"]
 position_id = "117961051486591206861124901427435972709"
 description = "AaveV3 Borrow USDT (sUSDe E-Mode)"
@@ -1453,6 +1495,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
+
+[instructions.aavev3.borrow_asset."USDT - Borrow".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.aavev3.repay_asset."GHO - Horizon Borrow"]
 position_id = "266935600511395729584434377419168277182"
@@ -1480,6 +1525,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.aavev3.repay_asset."GHO - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f"
+
 [instructions.aavev3.repay_asset."RLUSD - Horizon Borrow"]
 position_id = "133495794982505815817947498041694656764"
 description = "AaveV3 Horizon Borrow RLUSD"
@@ -1505,6 +1553,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.aavev3.repay_asset."RLUSD - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.aavev3.repay_asset."USDC - Borrow"]
 position_id = "227329230297595858214811008018294296109"
@@ -1532,6 +1583,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.aavev3.repay_asset."USDC - Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.repay_asset."USDC - Horizon Borrow"]
 position_id = "317835433613879557430416658618884687921"
 description = "AaveV3 Horizon Borrow USDC"
@@ -1558,6 +1612,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.aavev3.repay_asset."USDC - Horizon Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.repay_asset."USDT - Borrow"]
 position_id = "117961051486591206861124901427435972709"
 description = "AaveV3 Borrow USDT (sUSDe E-Mode)"
@@ -1583,6 +1640,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.aavev3.repay_asset."USDT - Borrow".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.aavev3.set_e_mode."sUSDe Stablecoins E-Mode - Activate"]
 position_id = "13362078339443395382342079025223961472"
@@ -1631,6 +1691,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."JAAA - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x5a0f93d040de44e78f251b03c43be9cf317dcf64"
+
 [instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend"]
 position_id = "47445753596645566272224472924421400103"
 description = "AaveV3 Horizon Supply RLUSD"
@@ -1651,6 +1714,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.aavev3.withdraw_collateral.USDC]
 position_id = "332697612920998824307877708016163852818"
@@ -1673,6 +1739,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral.USDC.inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.withdraw_collateral.USDG]
 position_id = "198834366791576294957883993689758100677"
 description = "AaveV3 Supply USDG"
@@ -1693,6 +1762,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.USDG.inputs_slots.input_type.amount]
+token = "0xe343167631d89b6ffc58b88d6b7fb0228795491d"
 
 [instructions.aavev3.withdraw_collateral.USDT]
 position_id = "232678016241942897729445069841802885622"
@@ -1715,6 +1787,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral.USDT.inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.aavev3.withdraw_collateral."USDe - Lend"]
 position_id = "107076193902764124667576417126923441565"
 description = "AaveV3 Supply USDe (E-Mode)"
@@ -1736,6 +1811,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."USDe - Lend".inputs_slots.input_type.amount]
+token = "0x4c9edd5852cd905f086c759e8383e09bff1e68b3"
+
 [instructions.aavev3.withdraw_collateral."sUSDe - Lend"]
 position_id = "13362078339443395382342079025223961472"
 description = "AaveV3 Supply sUSDe (E-Mode)"
@@ -1756,6 +1834,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."sUSDe - Lend".inputs_slots.input_type.amount]
+token = "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
 
 [instructions.centrifuge-v3.account_deposit_pending."JAAA Swap In"]
 position_id = "109660052859494826254547206539520047738467758490695873969818166042335919825092"
@@ -2063,15 +2144,24 @@ index = 0
 name = "amount_tokena"
 type = "Uint"
 
+[instructions.convex-curve.deposit."USDC/crvUSD".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [[instructions.convex-curve.deposit."USDC/crvUSD".inputs_slots]]
 index = 1
 name = "amount_tokenb"
 type = "Uint"
 
+[instructions.convex-curve.deposit."USDC/crvUSD".inputs_slots.input_type.amount]
+token = "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e"
+
 [[instructions.convex-curve.deposit."USDC/crvUSD".inputs_slots]]
 index = 2
 name = "min_mint_amount"
 type = "Uint"
+
+[instructions.convex-curve.deposit."USDC/crvUSD".inputs_slots.input_type.amount]
+token = "0x4dece678ceceb27446b35c672dc7d61f30bad69e"
 
 [instructions.convex-curve.deposit."USDT/crvUSD"]
 position_id = "222242215405885945120043212563500173272"
@@ -2107,15 +2197,24 @@ index = 0
 name = "amount_tokena"
 type = "Uint"
 
+[instructions.convex-curve.deposit."USDT/crvUSD".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [[instructions.convex-curve.deposit."USDT/crvUSD".inputs_slots]]
 index = 1
 name = "amount_tokenb"
 type = "Uint"
 
+[instructions.convex-curve.deposit."USDT/crvUSD".inputs_slots.input_type.amount]
+token = "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e"
+
 [[instructions.convex-curve.deposit."USDT/crvUSD".inputs_slots]]
 index = 2
 name = "min_mint_amount"
 type = "Uint"
+
+[instructions.convex-curve.deposit."USDT/crvUSD".inputs_slots.input_type.amount]
+token = "0x390f3595bca2df7d23783dfd126427cceb997bf4"
 
 [instructions.convex-curve.harvest."USDC/crvUSD"]
 position_id = "325002806383600319439358862074549790880"
@@ -2177,6 +2276,9 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.convex-curve.withdraw_balanced."USDC/crvUSD".inputs_slots.input_type.amount]
+token = "0x4dece678ceceb27446b35c672dc7d61f30bad69e"
+
 [[instructions.convex-curve.withdraw_balanced."USDC/crvUSD".inputs_slots]]
 index = 1
 name = "min_token_a"
@@ -2214,6 +2316,9 @@ bitmap = "21267647932558653966460912964485513216"
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"
+
+[instructions.convex-curve.withdraw_balanced."USDT/crvUSD".inputs_slots.input_type.amount]
+token = "0x390f3595bca2df7d23783dfd126427cceb997bf4"
 
 [[instructions.convex-curve.withdraw_balanced."USDT/crvUSD".inputs_slots]]
 index = 1
@@ -2400,15 +2505,24 @@ index = 0
 name = "amount_tokena"
 type = "Uint"
 
+[instructions.curve.deposit."PYUSD/crvUSD".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [[instructions.curve.deposit."PYUSD/crvUSD".inputs_slots]]
 index = 1
 name = "amount_tokenb"
 type = "Uint"
 
+[instructions.curve.deposit."PYUSD/crvUSD".inputs_slots.input_type.amount]
+token = "0xf939e0a03fb07f59a73314e73794be0e57ac1b4e"
+
 [[instructions.curve.deposit."PYUSD/crvUSD".inputs_slots]]
 index = 2
 name = "min_mint_amount"
 type = "Uint"
+
+[instructions.curve.deposit."PYUSD/crvUSD".inputs_slots.input_type.amount]
+token = "0x625e92624bc2d88619accc1788365a69767f6200"
 
 [instructions.curve.deposit."USDC/RLUSD"]
 position_id = "54562872644924688465793884662053422151"
@@ -2443,15 +2557,24 @@ index = 0
 name = "amount_tokena"
 type = "Uint"
 
+[instructions.curve.deposit."USDC/RLUSD".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [[instructions.curve.deposit."USDC/RLUSD".inputs_slots]]
 index = 1
 name = "amount_tokenb"
 type = "Uint"
 
+[instructions.curve.deposit."USDC/RLUSD".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [[instructions.curve.deposit."USDC/RLUSD".inputs_slots]]
 index = 2
 name = "min_mint_amount"
 type = "Uint"
+
+[instructions.curve.deposit."USDC/RLUSD".inputs_slots.input_type.amount]
+token = "0xd001ae433f254283fece51d4acce8c53263aa186"
 
 [instructions.curve.harvest."PYUSD/crvUSD"]
 position_id = "82192343698835691382596586281665913315"
@@ -2536,6 +2659,9 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.curve.withdraw_balanced."PYUSD/crvUSD".inputs_slots.input_type.amount]
+token = "0x625e92624bc2d88619accc1788365a69767f6200"
+
 [[instructions.curve.withdraw_balanced."PYUSD/crvUSD".inputs_slots]]
 index = 1
 name = "min_token_a"
@@ -2576,6 +2702,9 @@ bitmap = "26584559915698317458076141205606891520"
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"
+
+[instructions.curve.withdraw_balanced."USDC/RLUSD".inputs_slots.input_type.amount]
+token = "0xd001ae433f254283fece51d4acce8c53263aa186"
 
 [[instructions.curve.withdraw_balanced."USDC/RLUSD".inputs_slots]]
 index = 1
@@ -2722,10 +2851,16 @@ index = 0
 name = "asset_amount"
 type = "Uint"
 
+[instructions.fluid.deposit.GHO.inputs_slots.input_type.amount]
+token = "0x40d16fc0246ad3160ccc09b8d0d3a2cd28ae6c2f"
+
 [[instructions.fluid.deposit.GHO.inputs_slots]]
 index = 1
 name = "min_vault_shares"
 type = "Uint"
+
+[instructions.fluid.deposit.GHO.inputs_slots.input_type.amount]
+token = "0x6a29a46e21c730dca1d8b23d637c101cec605c5b"
 
 [instructions.fluid.harvest."ETH/USDC-USDT Fluid Rewards"]
 position_id = "782"
@@ -2937,6 +3072,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.fluid.redeem.GHO.inputs_slots.input_type.amount]
+token = "0x6a29a46e21c730dca1d8b23d637c101cec605c5b"
+
 [instructions.fluid.redeem_relative.GHO]
 position_id = "187487145492373933671944618718033568251"
 description = "Fluid GHO Vault position"
@@ -3007,6 +3145,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.fluid-lite.deposit."Fluid Lite USD".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.fluid-lite.redeem."Fluid Lite USD"]
 position_id = "280756842428125260997025717226665040346"
 description = "Fluid Lite USD (deposit USDC)"
@@ -3026,6 +3167,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.fluid-lite.redeem."Fluid Lite USD".inputs_slots.input_type.amount]
+token = "0x273da948aca9261043fbdb2a857bc255ecc29012"
 
 [instructions.fluid-lite.redeem_relative."Fluid Lite USD"]
 position_id = "280756842428125260997025717226665040346"
@@ -3387,6 +3531,9 @@ index = 0
 name = "iusd_amount"
 type = "Uint"
 
+[instructions.infinifi.deposit_iusd."liUSD 1-Week".inputs_slots.input_type.amount]
+token = "0x48f9e38f3070ad8945dfeae3fa70987722e3d89c"
+
 [instructions.infinifi.deposit_iusd."liUSD 4-Week"]
 position_id = "326610073814749020074569224194987031604"
 description = "InfiniFi liUSD 4-Week Lock"
@@ -3412,6 +3559,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "iusd_amount"
 type = "Uint"
+
+[instructions.infinifi.deposit_iusd."liUSD 4-Week".inputs_slots.input_type.amount]
+token = "0x48f9e38f3070ad8945dfeae3fa70987722e3d89c"
 
 [instructions.infinifi.deposit_usdc."liUSD 1-Week"]
 position_id = "2013457072841808719642938411712424809"
@@ -3439,6 +3589,9 @@ index = 0
 name = "usdc_amount"
 type = "Uint"
 
+[instructions.infinifi.deposit_usdc."liUSD 1-Week".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.infinifi.deposit_usdc."liUSD 4-Week"]
 position_id = "326610073814749020074569224194987031604"
 description = "InfiniFi liUSD 4-Week Lock"
@@ -3464,6 +3617,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "usdc_amount"
 type = "Uint"
+
+[instructions.infinifi.deposit_usdc."liUSD 4-Week".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.infinifi.start_unwinding_relative."liUSD 1-Week"]
 position_id = "2013457072841808719642938411712424809"
@@ -5129,6 +5285,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."PRIME/AUSD (0xf3cf...523b)".inputs_slots.input_type.amount]
+token = "0x19ebb35279a16207ec4ba82799cc64715065f7f6"
+
 [instructions.morpho.add_collateral."PRIME/PYUSD (0x41c4...a3fa)"]
 position_id = "37645447233873664515981871938816299267"
 description = "PRIME/PYUSD Morpho Collateral (PRIME)"
@@ -5167,6 +5326,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots.input_type.amount]
+token = "0x19ebb35279a16207ec4ba82799cc64715065f7f6"
+
 [instructions.morpho.add_collateral."reUSD/AUSD (0xd989...7cac)"]
 position_id = "328350624757279255217968622283478199222"
 description = "reUSD/AUSD Morpho Collateral (reUSD)"
@@ -5204,6 +5366,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."reUSD/AUSD (0xd989...7cac)".inputs_slots.input_type.amount]
+token = "0x5086bf358635b81d8c47c66d1c8b9e567db70c72"
 
 [instructions.morpho.add_collateral."sUSDS/USDT Morpho Loop"]
 position_id = "615507982534160798943526170894352617089"
@@ -5406,6 +5571,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."sUSDe/USDtb Morpho Loop - Direct".inputs_slots.input_type.amount]
+token = "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
 
 [instructions.morpho.add_collateral."syrupUSDC/PYUSD Morpho Loop"]
 position_id = "714619093645271809054637281905463728190"
@@ -6456,6 +6624,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."3Jane Ecosystem Vault".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."Flowdesk AUSD RWA"]
 position_id = "208384069883257652684922644584564420340"
 description = "Morpho Vault AUSD Flowdesk RWA Strategy"
@@ -6479,6 +6650,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Flowdesk AUSD RWA".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
 
 [instructions.morpho.deposit_vault."Gauntlet USDC Core"]
 position_id = "188442457890402398659043284211703237226"
@@ -6504,6 +6678,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Gauntlet USDC Core".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."Gauntlet USDC Frontier"]
 position_id = "11232424494326814282538250204373920286"
 description = "Morpho Vault USDC Gauntlet Frontier"
@@ -6527,6 +6704,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Gauntlet USDC Frontier".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.deposit_vault."Gauntlet eUSD Core"]
 position_id = "287972541400220405479010366660803291000"
@@ -6552,6 +6732,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Gauntlet eUSD Core".inputs_slots.input_type.amount]
+token = "0xa0d69e286b938e21cbf7e51d71f6a4c8918f482f"
+
 [instructions.morpho.deposit_vault."MEV Capital USDC"]
 position_id = "30651621090656837837542443694366525060"
 description = "Morpho Vault USDC MEV Capital"
@@ -6575,6 +6758,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."MEV Capital USDC".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.deposit_vault."Sentora PRIME Main PYUSD"]
 position_id = "244003111842323732524710741252875629950"
@@ -6600,6 +6786,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Sentora PRIME Main PYUSD".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.deposit_vault."Sentora PYUSD"]
 position_id = "273739676753663843967743313854543738189"
 description = "Morpho Vault PYUSD Sentora"
@@ -6623,6 +6812,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora PYUSD".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
 
 [instructions.morpho.deposit_vault."Sentora RLUSD"]
 position_id = "101479911391298992514073662718338576961"
@@ -6648,6 +6840,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Sentora RLUSD".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.morpho.deposit_vault."Smokehouse Reservoir USDC"]
 position_id = "128264429154381135287798106504544985667"
 description = "Morpho Vault USDC Steakhouse Reservoir"
@@ -6671,6 +6866,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Smokehouse Reservoir USDC".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.deposit_vault."Smokehouse USDC"]
 position_id = "77590748279218246310796884579338401703"
@@ -6696,6 +6894,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Smokehouse USDC".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."Steakhouse PYUSD"]
 position_id = "276843631519342658565251846836976075217"
 description = "Morpho Vault PYUSD Steakhouse"
@@ -6720,6 +6921,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Steakhouse PYUSD".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.deposit_vault."sky.money USDS Flagship"]
 position_id = "280388900591973387250806829097978036901"
 description = "Morpho Vault sky.money USDS Flagship"
@@ -6743,6 +6947,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."sky.money USDS Flagship".inputs_slots.input_type.amount]
+token = "0xdc035d45d973e3ec169d2276ddab16f1e407384f"
 
 [instructions.morpho.emergency_redeem_vault."Gauntlet USDC Core"]
 position_id = "188442457890402398659043284211703237226"
@@ -7030,6 +7237,9 @@ index = 0
 name = "amount_to_lend"
 type = "Uint"
 
+[instructions.morpho.lend_to_market."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.lend_to_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
 position_id = "39138221810512683469067584028855335565"
 description = "Morpho USDC loan (market: 0xf8c5...ba89)"
@@ -7067,6 +7277,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_lend"
 type = "Uint"
+
+[instructions.morpho.lend_to_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
 position_id = "199708234830348815037617604080094469854"
@@ -7106,6 +7319,9 @@ index = 0
 name = "amount_to_lend"
 type = "Uint"
 
+[instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"]
 position_id = "210115366782586714314169264674817212217"
 description = "Morpho USDT loan (market: 0x6acd...14ca)"
@@ -7144,6 +7360,9 @@ index = 0
 name = "amount_to_lend"
 type = "Uint"
 
+[instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDT (0x6acd...14ca)".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.morpho.lend_to_market."srRoyUSDC/USDC (0xacc4...2c67)"]
 position_id = "233812392305217120018639900280612878694"
 description = "Morpho USDC loan (market: 0xacc4...2c67)"
@@ -7181,6 +7400,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_lend"
 type = "Uint"
+
+[instructions.morpho.lend_to_market."srRoyUSDC/USDC (0xacc4...2c67)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.loop_in."sUSDS/USDT Morpho Loop"]
 position_id = "615507982534160798943526170894352617089"
@@ -8195,6 +8417,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."3Jane Ecosystem Vault".inputs_slots.input_type.amount]
+token = "0xe05fadf242331808f504661bea65972594869826"
+
 [instructions.morpho.redeem_vault."Flowdesk AUSD RWA"]
 position_id = "208384069883257652684922644584564420340"
 description = "Morpho Vault AUSD Flowdesk RWA Strategy"
@@ -8214,6 +8439,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Flowdesk AUSD RWA".inputs_slots.input_type.amount]
+token = "0x32401b9fb79065bc15949de0bd43927492f02f0c"
 
 [instructions.morpho.redeem_vault."Gauntlet USDC Core"]
 position_id = "188442457890402398659043284211703237226"
@@ -8235,6 +8463,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Gauntlet USDC Core".inputs_slots.input_type.amount]
+token = "0x8eb67a509616cd6a7c1b3c8c21d48ff57df3d458"
+
 [instructions.morpho.redeem_vault."Gauntlet USDC Frontier"]
 position_id = "11232424494326814282538250204373920286"
 description = "Morpho Vault USDC Gauntlet Frontier"
@@ -8254,6 +8485,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Gauntlet USDC Frontier".inputs_slots.input_type.amount]
+token = "0xc582f04d8a82795aa2ff9c8bb4c1c889fe7b754e"
 
 [instructions.morpho.redeem_vault."Gauntlet eUSD Core"]
 position_id = "287972541400220405479010366660803291000"
@@ -8275,6 +8509,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Gauntlet eUSD Core".inputs_slots.input_type.amount]
+token = "0xc080f56504e0278828a403269db945f6c6d6e014"
+
 [instructions.morpho.redeem_vault."MEV Capital USDC"]
 position_id = "30651621090656837837542443694366525060"
 description = "Morpho Vault USDC MEV Capital"
@@ -8294,6 +8531,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."MEV Capital USDC".inputs_slots.input_type.amount]
+token = "0xd63070114470f685b75b74d60eec7c1113d33a3d"
 
 [instructions.morpho.redeem_vault."Sentora PRIME Main PYUSD"]
 position_id = "244003111842323732524710741252875629950"
@@ -8315,6 +8555,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Sentora PRIME Main PYUSD".inputs_slots.input_type.amount]
+token = "0xc21b08c16458202593d4d9b26b9984ee67b38bbd"
+
 [instructions.morpho.redeem_vault."Sentora PYUSD"]
 position_id = "273739676753663843967743313854543738189"
 description = "Morpho Vault PYUSD Sentora"
@@ -8334,6 +8577,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora PYUSD".inputs_slots.input_type.amount]
+token = "0xb576765fb15505433af24fee2c0325895c559fb2"
 
 [instructions.morpho.redeem_vault."Sentora RLUSD"]
 position_id = "101479911391298992514073662718338576961"
@@ -8355,6 +8601,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Sentora RLUSD".inputs_slots.input_type.amount]
+token = "0x6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf"
+
 [instructions.morpho.redeem_vault."Smokehouse Reservoir USDC"]
 position_id = "128264429154381135287798106504544985667"
 description = "Morpho Vault USDC Steakhouse Reservoir"
@@ -8374,6 +8623,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Smokehouse Reservoir USDC".inputs_slots.input_type.amount]
+token = "0xbeef346d7099865208ff331e4f648f4154ddaa05"
 
 [instructions.morpho.redeem_vault."Smokehouse USDC"]
 position_id = "77590748279218246310796884579338401703"
@@ -8395,6 +8647,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Smokehouse USDC".inputs_slots.input_type.amount]
+token = "0xbeefff209270748ddd194831b3fa287a5386f5bc"
+
 [instructions.morpho.redeem_vault."Steakhouse PYUSD"]
 position_id = "276843631519342658565251846836976075217"
 description = "Morpho Vault PYUSD Steakhouse"
@@ -8415,6 +8670,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Steakhouse PYUSD".inputs_slots.input_type.amount]
+token = "0xbeef02e5e13584ab96848af90261f0c8ee04722a"
+
 [instructions.morpho.redeem_vault."sky.money USDS Flagship"]
 position_id = "280388900591973387250806829097978036901"
 description = "Morpho Vault sky.money USDS Flagship"
@@ -8434,6 +8692,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."sky.money USDS Flagship".inputs_slots.input_type.amount]
+token = "0xe15fcc81118895b67b6647bbd393182df44e11e0"
 
 [instructions.morpho.redeem_vault_relative."3Jane Ecosystem Vault"]
 position_id = "319028358984478431816090771761707097811"
@@ -8839,6 +9100,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."PRIME/AUSD (0xf3cf...523b)".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.repay_asset."PRIME/PYUSD (0x41c4...a3fa)"]
 position_id = "82274847838354216265357335302519678531"
 description = "PRIME/PYUSD Morpho Debt (PYUSD)"
@@ -8877,6 +9141,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
 
 [instructions.morpho.repay_asset."reUSD/AUSD (0xd989...7cac)"]
 position_id = "165433007824915924341521454650476721637"
@@ -8917,6 +9184,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."reUSD/AUSD (0xd989...7cac)".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.repay_asset."sUSDS/USDT Morpho Loop"]
 position_id = "615507982534160798943526170894352617089"
 description = "sUSDS/USDT Morpho Loop"
@@ -8955,6 +9225,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."sUSDS/USDT Morpho Loop".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.morpho.repay_asset."sUSDe/USDtb Morpho Loop"]
 position_id = "912841315826493817206538461275893042156"
@@ -8995,6 +9268,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."sUSDe/USDtb Morpho Loop".inputs_slots.input_type.amount]
+token = "0xc139190f447e929f090edeb554d95abb8b18ac1c"
+
 [instructions.morpho.repay_asset."syrupUSDC/PYUSD Morpho Loop"]
 position_id = "714619093645271809054637281905463728190"
 description = "syrupUSDC/PYUSD Morpho Loop"
@@ -9033,6 +9309,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."syrupUSDC/PYUSD Morpho Loop".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
 
 [instructions.morpho.repay_asset."syrupUSDC/RLUSD Morpho Loop"]
 position_id = "813730204756382920165748392016574839201"
@@ -9073,6 +9352,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."syrupUSDC/RLUSD Morpho Loop".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.morpho.repay_asset."syrupUSDT/USDT Morpho Loop - Repay"]
 position_id = "318274659201837465920183746592018374659"
 description = "syrupUSDT/USDT Morpho Loop"
@@ -9111,6 +9393,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."syrupUSDT/USDT Morpho Loop - Repay".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.morpho.repay_asset."wsrUSD/USDC Morpho Loop - Repay"]
 position_id = "417385760312948576721304958672130495867"
@@ -9151,6 +9436,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wsrUSD/USDC Morpho Loop - Repay".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.repay_asset."wsrUSD/USDT Morpho Loop - Repay"]
 position_id = "516496871423059687832415069783241506978"
 description = "wsrUSD/USDT Morpho Loop"
@@ -9189,6 +9477,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wsrUSD/USDT Morpho Loop - Repay".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.morpho.withdraw_collateral."PRIME/AUSD (0xf3cf...523b)"]
 position_id = "5371229124908624150131427880782716527"
@@ -10036,6 +10327,9 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.morpho.withdraw_from_market."PRIME/PYUSD (0x41c4...a3fa)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.withdraw_from_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)"]
 position_id = "39138221810512683469067584028855335565"
 description = "Morpho USDC loan (market: 0xf8c5...ba89)"
@@ -10071,6 +10365,9 @@ bitmap = "168811955464684315858783496655603761152"
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"
+
+[instructions.morpho.withdraw_from_market."PT-USD3-17DEC2026/USDC (0xf8c5...ba89)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
 position_id = "199708234830348815037617604080094469854"
@@ -10108,6 +10405,9 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDT (0x6acd...14ca)"]
 position_id = "210115366782586714314169264674817212217"
 description = "Morpho USDT loan (market: 0x6acd...14ca)"
@@ -10144,6 +10444,9 @@ index = 0
 name = "amount_to_withdraw"
 type = "Uint"
 
+[instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDT (0x6acd...14ca)".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.morpho.withdraw_from_market."srRoyUSDC/USDC (0xacc4...2c67)"]
 position_id = "233812392305217120018639900280612878694"
 description = "Morpho USDC loan (market: 0xacc4...2c67)"
@@ -10179,6 +10482,9 @@ bitmap = "168811955464684315858783496655603761152"
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"
+
+[instructions.morpho.withdraw_from_market."srRoyUSDC/USDC (0xacc4...2c67)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.withdraw_vault."3Jane Ecosystem Vault"]
 position_id = "319028358984478431816090771761707097811"

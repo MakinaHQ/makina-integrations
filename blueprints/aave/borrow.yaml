@@ -32,4 +32,7 @@ actions:
     input_slots:
       amount_to_borrow:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.token}
         description: "The amount of tokens to borrow"

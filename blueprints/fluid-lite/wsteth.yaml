@@ -50,6 +50,9 @@ actions:
     input_slots:
       amount_to_deposit:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.wsteth_address}
         description: "The amount of wstETH to deposit into the Fluid Lite vault"
 
   # 1. Redeem to stETH
