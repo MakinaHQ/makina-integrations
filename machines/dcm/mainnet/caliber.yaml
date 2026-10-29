@@ -598,23 +598,22 @@ positions:
 
   # USCC subscribe/redeem through Superstate, delivered to the attached Safe
   # (docs/superstate-offchain/README.md). Funds the Horizon USCC collateral (group 4).
-  # Disabled until enabled with this caliber's Superstate subaccount subscription address.
-  # - id: "113754801296779658453198583385743335683021126602415149242606541268952718634785" # keccak256("superstate.uscc.subscribe")
-  #   group_id: "0"
-  #   description: "USCC Subscription (USDC to Superstate, USCC minted to the attached Safe)"
-  #   instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
-  #   vars:
-  #     label: "USCC Subscription"
-  #     fund_token: ${token_list.mainnet.USCC}
-  #     stablecoin: ${token_list.mainnet.USDC}
-  #     deposit_address: "TODO" # Superstate subaccount USDC subscription address
-  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-subscribe)}"
-  # - id: "110504959099929678971014067507667643402574237725558963114945016510709054718133" # keccak256("superstate.uscc.redeem")
-  #   group_id: "0"
-  #   description: "USCC Redemption (USCC burned, USDC paid to the attached Safe)"
-  #   instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
-  #   vars:
-  #     label: "USCC Redemption"
-  #     fund_token: ${token_list.mainnet.USCC}
-  #     stablecoin: ${token_list.mainnet.USDC}
-  #     claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-redeem)}"
+  - id: "113754801296779658453198583385743335683021126602415149242606541268952718634785" # keccak256("superstate.uscc.subscribe")
+    group_id: "0"
+    description: "USCC Subscription (USDC to Superstate, USCC minted to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
+    vars:
+      label: "USCC Subscription"
+      fund_token: ${token_list.mainnet.USCC}
+      stablecoin: ${token_list.mainnet.USDC}
+      deposit_address: "0xc874984879f8ed6d879829D0cbFBed32a97ABaA2" # Superstate subaccount USDC subscription address
+      claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-subscribe)}"
+  - id: "110504959099929678971014067507667643402574237725558963114945016510709054718133" # keccak256("superstate.uscc.redeem")
+    group_id: "0"
+    description: "USCC Redemption (USCC burned, USDC paid to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
+    vars:
+      label: "USCC Redemption"
+      fund_token: ${token_list.mainnet.USCC}
+      stablecoin: ${token_list.mainnet.USDC}
+      claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-redeem)}"
