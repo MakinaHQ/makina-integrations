@@ -1,0 +1,14 @@
+name = "dlc"
+chain = "base"
+address = "0xa3A54CCC825fc9af87b6F2d9A2A4d0E67d641B8c"
+
+[calibers.base]
+address = "0x51609da6D79088a70E033f290F3DF43b385f67f6"
+swapper = "0xE87596d490f1118DFE64a75498C82B997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/dlc/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
