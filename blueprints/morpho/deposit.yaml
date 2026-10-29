@@ -124,6 +124,9 @@ actions:
     input_slots:
       amount_to_deposit:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.collateral_token}
         description: "Amount of collateral to deposit"
 
   deposit_vault:
@@ -149,4 +152,7 @@ actions:
     input_slots:
       amount_to_deposit:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.asset_address}
         description: "Amount of asset to deposit into the vault"

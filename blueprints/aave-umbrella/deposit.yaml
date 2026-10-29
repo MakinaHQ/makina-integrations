@@ -36,4 +36,7 @@ actions:
     input_slots:
       amount_to_stake:
         type: uint256
+        input_type:
+          amount:
+            token: ${inputs.asset_address}
         description: "The amount of the underlying asset to deposit into Aave Umbrella module."

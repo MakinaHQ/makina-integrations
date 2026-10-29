@@ -67,6 +67,9 @@
       market_id:
         type: "bytes32"
         value: ${position.market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"

@@ -122,4 +122,7 @@ actions:
     input_slots:
       amount_to_repay:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.loan_token}
         description: "The amount of loan token to repay"
