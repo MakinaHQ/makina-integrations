@@ -1,0 +1,66 @@
+# Dialectic Liquid CUSHY (DLC), hub caliber, Base. USDC in; subscribes/redeems CUSHY
+# through Superstate via the attached Safe. Go-live prerequisites: README.md.
+config:
+  caliber_address:
+    type: "address"
+    value: "0x51609da6D79088a70E033f290F3DF43b385f67f6"
+  swap_module:
+    type: "address"
+    value: "0xE87596d490f1118DFE64a75498C82B997e539d4b"
+  # Base helpers, as on the other Base calibers (the mainnet addresses have no code here)
+  caliber_helper_address:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  boolean_helper_address:
+    type: "address"
+    value: "0x8dc60173F37B34998FD5B2aeF47Dd68C68CC22C4"
+  # KeyValueStore(caliber), deployed via CreateX; caliber() == this caliber.
+  key_value_store_address:
+    type: "address"
+    value: "0x41bba463250c4c5513e1d42c03ef6f7b428be701"
+  # Attached Safe (docs/attached-safe/README.md): salt = caliber ++ 12 zero bytes; the address
+  # is its CreateX deployment.
+  attached_safe_address:
+    type: "address"
+    value: "0x2D30B1d886c7b6EFDF7E730F7fD50b3E57C72767"
+  attached_safe_salt:
+    type: "bytes32"
+    value: "0x51609da6d79088a70e033f290f3df43b385f67f6000000000000000000000000"
+  attached_safe_kv_key:
+    type: "bytes32"
+    value: "${keccak256(makina.attached-safe)}"
+  # CalldataEncoder (docs/attached-safe/README.md), Base deployment. UNAUDITED. Not the mainnet
+  # address (0x6843…041b, no code here); runtime code identical to the mainnet deployment.
+  calldata_encoder_address:
+    type: "address"
+    value: "0x1a7f03da41d0d0a09476def4f7a922acc2d63d34"
+
+positions:
+  # Attached Safe (docs/attached-safe/README.md): `create`, run once.
+  - id: "108190441586059729654767051633271106603975264136610275741002200346967568500452" # keccak256("attached-safe")
+    group_id: "0"
+    description: "Attached Safe"
+    instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # CUSHY subscribe/redeem through Superstate (docs/superstate-offchain/README.md). Disabled
+  # until the go-live prerequisites in README.md are met: then uncomment and set
+  # deposit_address.
+  # - id: "103730509674282581954549212113725759831235314781781630982837437870449742523666" # keccak256("superstate.cushy.subscribe")
+  #   group_id: "0"
+  #   description: "CUSHY Subscription (USDC to Superstate, CUSHY minted to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
+  #   vars:
+  #     label: "CUSHY Subscription"
+  #     fund_token: ${token_list.base.CUSHY}
+  #     stablecoin: ${token_list.base.USDC}
+  #     deposit_address: "TODO" # Northern Trust USDC subscription address (README.md)
+  #     claim_kv_key: "${keccak256(makina.base.superstate.cushy-subscribe)}"
+  # - id: "24573869306599016157412704393262860639369870581921388056176114156387597723732" # keccak256("superstate.cushy.redeem")
+  #   group_id: "0"
+  #   description: "CUSHY Redemption (CUSHY burned, USDC paid to the attached Safe)"
+  #   instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
+  #   vars:
+  #     label: "CUSHY Redemption"
+  #     fund_token: ${token_list.base.CUSHY}
+  #     stablecoin: ${token_list.base.USDC}
+  #     claim_kv_key: "${keccak256(makina.base.superstate.cushy-redeem)}"

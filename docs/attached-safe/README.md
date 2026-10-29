@@ -78,7 +78,9 @@ contract CalldataEncoder {
 The encoder's output is the calldata the Safe executes, so `calldata_encoder_address` must be
 this contract. The mainnet deployment, `0x6843d773eE6D6F173428EEa127b5a16E09cB041b` (runtime
 code hash `0xbec230991fca2c717f5f6efd5db938ee4d193b9bb5d936af75e6cae3af334966`), is
-**unaudited** and its source is **not verified** on Etherscan.
+**unaudited** and its source is **not verified** on Etherscan. Each chain has its own
+deployment address: on Base it is `0x1a7f03da41d0d0a09476def4f7a922acc2d63d34`, with the same
+runtime code hash (DLC and loopCUSHY).
 
 `boolean_helper_address` and `caliber_helper_address` are caliber config inputs: they are not
 at the same address on every chain.
