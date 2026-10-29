@@ -42,19 +42,21 @@ positions:
     description: "Attached Safe"
     instructions: !include "../../../instructions/attached-safe.yaml"
 
-  # CUSHY subscribe/redeem through Superstate (docs/superstate-offchain/README.md). Disabled
-  # until the go-live prerequisites in README.md are met: then uncomment and set
-  # deposit_address.
-  # - id: "103730509674282581954549212113725759831235314781781630982837437870449742523666" # keccak256("superstate.cushy.subscribe")
-  #   group_id: "0"
-  #   description: "CUSHY Subscription (USDC to Superstate, CUSHY minted to the attached Safe)"
-  #   instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
-  #   vars:
-  #     label: "CUSHY Subscription"
-  #     fund_token: ${token_list.base.CUSHY}
-  #     stablecoin: ${token_list.base.USDC}
-  #     deposit_address: "TODO" # Northern Trust USDC subscription address (README.md)
-  #     claim_kv_key: "${keccak256(makina.base.superstate.cushy-subscribe)}"
+  # CUSHY subscription through Superstate (docs/superstate-offchain/README.md), deposit only:
+  # subscribe and account, no settle until CUSHY is a base token (README.md). Then switch to
+  # superstate-offchain-subscription.yaml with the same id and claim_kv_key, and add fund_token.
+  - id: "103730509674282581954549212113725759831235314781781630982837437870449742523666" # keccak256("superstate.cushy.subscribe")
+    group_id: "0"
+    description: "CUSHY Subscription (USDC to Superstate, CUSHY minted to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-subscription-deposit.yaml"
+    vars:
+      label: "CUSHY Subscription"
+      stablecoin: ${token_list.base.USDC}
+      deposit_address: "0xd68b109b841aEa3527D382364DAD7a3F48a8a845" # CUSHY USDC subscription address
+      claim_kv_key: "${keccak256(makina.base.superstate.cushy-subscribe)}"
+
+  # CUSHY redemption through Superstate. Disabled: the redemption flow differs from
+  # Superstate's off-chain redemption and is not confirmed yet (README.md).
   # - id: "24573869306599016157412704393262860639369870581921388056176114156387597723732" # keccak256("superstate.cushy.redeem")
   #   group_id: "0"
   #   description: "CUSHY Redemption (CUSHY burned, USDC paid to the attached Safe)"

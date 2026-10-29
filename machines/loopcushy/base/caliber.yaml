@@ -1,5 +1,5 @@
-# Dialectic Looped CUSHY (loopCUSHY), hub caliber, Base. USDC in. Only the attached Safe so
-# far, no strategy positions yet: see README.md.
+# Dialectic Looped CUSHY (loopCUSHY), hub caliber, Base. USDC in. The attached Safe and the
+# CUSHY subscription (deposit only) so far: see README.md.
 config:
   caliber_address:
     type: "address"
@@ -44,3 +44,16 @@ positions:
     group_id: "0"
     description: "Attached Safe"
     instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # CUSHY subscription through Superstate (docs/superstate-offchain/README.md), deposit only:
+  # subscribe and account, no settle until CUSHY is a base token (README.md). Then switch to
+  # superstate-offchain-subscription.yaml with the same id and claim_kv_key, and add fund_token.
+  - id: "103730509674282581954549212113725759831235314781781630982837437870449742523666" # keccak256("superstate.cushy.subscribe")
+    group_id: "0"
+    description: "CUSHY Subscription (USDC to Superstate, CUSHY minted to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-subscription-deposit.yaml"
+    vars:
+      label: "CUSHY Subscription"
+      stablecoin: ${token_list.base.USDC}
+      deposit_address: "0xd68b109b841aEa3527D382364DAD7a3F48a8a845" # CUSHY USDC subscription address
+      claim_kv_key: "${keccak256(makina.base.superstate.cushy-subscribe)}"

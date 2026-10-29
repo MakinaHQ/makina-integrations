@@ -1,0 +1,62 @@
+# Superstate off-chain subscription, deposit only (docs/superstate-offchain/README.md):
+#   subscribe -> Superstate mints the fund token to the attached Safe.
+# The subscribe and account legs of superstate-offchain-subscription.yaml, without settle, for
+# a caliber whose fund token is not a base token yet. The claim is booked and reported in the
+# stablecoin; minted fund tokens wait on the Safe, counted nowhere, until settle exists.
+# To add settle, point the position at superstate-offchain-subscription.yaml with the same id
+# and claim_kv_key, and add fund_token: these two legs are identical there
+# (MakinaHQ/config tests/test_attached_safe_blocks.py), so the booked claim carries over.
+# Needs the caliber's Attached Safe position (attached-safe.yaml).
+#
+# Position vars: label, stablecoin, deposit_address, claim_kv_key.
+# Caliber config: see attached-safe.yaml.
+
+# Stablecoin to Superstate; the claim grows (stablecoin units).
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.stablecoin}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/superstate/subscribe.yaml:subscribe"
+    inputs:
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      attached_safe_kv_key:
+        type: "bytes32"
+        value: "${config.attached_safe_kv_key}"
+      claim_kv_key:
+        type: "bytes32"
+        value: ${position.claim_kv_key}
+      attached_safe_address:
+        type: "address"
+        value: "${config.attached_safe_address}"
+      stablecoin:
+        type: "address"
+        value: ${position.stablecoin}
+      deposit_address:
+        type: "address"
+        value: ${position.deposit_address}
+
+# The claim, in its own token. Exactly one affected token.
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.stablecoin}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/superstate/account.yaml:account"
+    inputs:
+      kv_store_address:
+        type: "address"
+        value: "${config.key_value_store_address}"
+      claim_kv_key:
+        type: "bytes32"
+        value: ${position.claim_kv_key}
