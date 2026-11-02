@@ -69,3 +69,26 @@ positions:
       label: "SPCXc/USDC (0xce98...ecf6)"
       market_id: "0xce983b9ee6344e16ebbcc66812f23caafc63ae83fcc14fa29b66c7e69e9cecf6"
       loan_token: ${token_list.base.USDC}
+
+  # Aave V4 Coinbase Stocks: one liquidation domain, separate from Morpho group 1.
+  # Supply alone does not enable collateral: run set_using_as_collateral before borrow.
+  # dialectic_id: 59bd43f9da12c6dd75aeeddafdb5fece
+  - id: "119284014447866937743549870889363701454"
+    group_id: "2"
+    description: "AaveV4 Coinbase Stocks Supply SPCXc (collateral)"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "SPCXc"
+      asset_address: ${token_list.base.SPCXc}
+      spoke_address: "0x17905db0e4a3514467539956c084180616ae7b8d"
+      reserve_id: "8"
+  # dialectic_id: 3aa8ba9eb22d0d8dcaaaeb091237c1b1
+  - id: "77971314729137725550919142258454806961"
+    group_id: "2"
+    description: "AaveV4 Coinbase Stocks Borrow USDC"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDC"
+      asset_address: ${token_list.base.USDC}
+      spoke_address: "0x17905db0e4a3514467539956c084180616ae7b8d"
+      reserve_id: "7"

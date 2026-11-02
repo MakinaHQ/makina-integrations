@@ -1,5 +1,13 @@
 protocol: "morpho"
 
+constants:
+  # MathHelper with a - b sub(), lte() and ternary(), pinned for the emergency
+  # actions. Funds' unsigned_math_helper_address differs (0x836C…BaBb91 on
+  # DUSD/DBIT has b - a sub() and no lte/ternary).
+  math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
 inputs:
   morpho:
     type: "address"
@@ -12,6 +20,8 @@ inputs:
   caliber_address:
     type: "address"
   unsigned_math_helper:
+    type: "address"
+  public_allocator:
     type: "address"
 
 actions:
@@ -367,3 +377,653 @@ actions:
       bps_to_redeem:
         type: "uint256"
         description: "Basis points of the lent amount to withdraw (10000 = 100%)"
+
+  # Runtime liquidity-capped exit for direct market lenders. No runtime inputs.
+  # Accrue interest first; use shares to exit fully, assets to take partial liquidity.
+  # With no position or no liquidity, Morpho rejects the zero-amount withdrawal.
+  emergency_withdraw_from_market:
+    calls:
+      - description: Read immutable market parameters
+        target: ${inputs.morpho}
+        selector: idToMarketParams(bytes32)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+        return:
+          name: market_params
+          type: (address,address,address,address,uint256)
+      - description: Extract market loan_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "0"
+        return:
+          name: loan_token
+          type: address
+      - description: Extract market collateral_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "1"
+        return:
+          name: collateral_token
+          type: address
+      - description: Extract market oracle
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "2"
+        return:
+          name: oracle
+          type: address
+      - description: Extract market irm
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "3"
+        return:
+          name: irm
+          type: address
+      - description: Extract market lltv
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "4"
+        return:
+          name: lltv
+          type: uint256
+      - description: Accrue interest before reading balances and liquidity
+        target: ${inputs.morpho}
+        selector: accrueInterest((address,address,address,address,uint256))
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value:
+              - type: address
+                value: ${returns.loan_token}
+              - type: address
+                value: ${returns.collateral_token}
+              - type: address
+                value: ${returns.oracle}
+              - type: address
+                value: ${returns.irm}
+              - type: uint256
+                value: ${returns.lltv}
+      - description: Read the caliber supply position
+        target: ${inputs.morpho}
+        selector: position(bytes32,address)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+          - type: address
+            value: ${inputs.caliber_address}
+        return:
+          name: position_data
+          type: (uint256,uint128,uint128)
+      - description: Read accrued market totals
+        target: ${inputs.morpho}
+        selector: market(bytes32)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+        return:
+          name: market_data
+          type: (uint128,uint128,uint128,uint128,uint128,uint128)
+      - description: Extract supply_shares
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint256,uint128,uint128)
+            value: ${returns.position_data}
+          - type: uint256
+            value: "0"
+        return:
+          name: supply_shares
+          type: uint256
+      - description: Extract total_supply_assets
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "0"
+        return:
+          name: total_supply_assets
+          type: uint256
+      - description: Extract total_supply_shares
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "1"
+        return:
+          name: total_supply_shares
+          type: uint256
+      - description: Extract total_borrow_assets
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "2"
+        return:
+          name: total_borrow_assets
+          type: uint256
+      - description: Include Morpho virtual assets
+        target: ${constants.math_helper_address}
+        selector: add(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_assets}
+          - type: uint256
+            value: "1"
+        return:
+          name: virtual_supply_assets
+          type: uint256
+      - description: Include Morpho virtual shares
+        target: ${constants.math_helper_address}
+        selector: add(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_shares}
+          - type: uint256
+            value: "1000000"
+        return:
+          name: virtual_supply_shares
+          type: uint256
+      - description: Value owned supply shares using Morpho toAssetsDown rounding
+        target: ${constants.math_helper_address}
+        selector: mulDiv(uint256,uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.supply_shares}
+          - type: uint256
+            value: ${returns.virtual_supply_assets}
+          - type: uint256
+            value: ${returns.virtual_supply_shares}
+        return:
+          name: owned_assets
+          type: uint256
+      - description: "Compute free market liquidity: supply assets minus borrow assets"
+        target: ${constants.math_helper_address}
+        selector: sub(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_assets}
+          - type: uint256
+            value: ${returns.total_borrow_assets}
+        return:
+          name: available_assets
+          type: uint256
+      - description: Cap withdrawal by both owned assets and current liquidity
+        target: ${constants.math_helper_address}
+        selector: min(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.owned_assets}
+          - type: uint256
+            value: ${returns.available_assets}
+        return:
+          name: assets_to_withdraw
+          type: uint256
+      - description: Check whether all owned shares can be redeemed
+        target: ${constants.math_helper_address}
+        selector: lte(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.owned_assets}
+          - type: uint256
+            value: ${returns.available_assets}
+        return:
+          name: full_exit
+          type: bool
+      - description: Use shares for a full exit so no share dust is left
+        target: ${constants.math_helper_address}
+        selector: ternary(bool,uint256,uint256)
+        parameters:
+          - type: bool
+            value: ${returns.full_exit}
+          - type: uint256
+            value: ${returns.supply_shares}
+          - type: uint256
+            value: "0"
+        return:
+          name: withdraw_shares
+          type: uint256
+      - description: Otherwise use the exact available asset amount
+        target: ${constants.math_helper_address}
+        selector: ternary(bool,uint256,uint256)
+        parameters:
+          - type: bool
+            value: ${returns.full_exit}
+          - type: uint256
+            value: "0"
+          - type: uint256
+            value: ${returns.assets_to_withdraw}
+        return:
+          name: withdraw_assets
+          type: uint256
+      - description: Withdraw the maximum available loan assets to the caliber
+        target: ${inputs.morpho}
+        selector: withdraw((address,address,address,address,uint256),uint256,uint256,address,address)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value:
+              - type: address
+                value: ${returns.loan_token}
+              - type: address
+                value: ${returns.collateral_token}
+              - type: address
+                value: ${returns.oracle}
+              - type: address
+                value: ${returns.irm}
+              - type: uint256
+                value: ${returns.lltv}
+          - type: uint256
+            value: ${returns.withdraw_assets}
+          - type: uint256
+            value: ${returns.withdraw_shares}
+          - type: address
+            value: ${inputs.caliber_address}
+          - type: address
+            value: ${inputs.caliber_address}
+
+  # Same exit as emergency_withdraw_from_market, after first pulling liquidity into this
+  # market through Morpho's Public Allocator (permissionless, MetaMorpho V1 vaults only).
+  # The vault's curator-set flow caps bound the move: maxOut on the source, maxIn on this
+  # market, plus this market's supply cap in the vault. Only the vault's own funds move,
+  # between its own enabled markets; the caliber grants nothing and sends no ETH, so a
+  # vault charging a public allocator fee reverts (IncorrectFee). One source per tx.
+  # Inputs are sized off-chain; if state moves first, the whole tx reverts.
+  emergency_reallocate_and_withdraw_from_market:
+    calls:
+      - description: Read immutable market parameters
+        target: ${inputs.morpho}
+        selector: idToMarketParams(bytes32)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+        return:
+          name: market_params
+          type: (address,address,address,address,uint256)
+      - description: Extract market loan_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "0"
+        return:
+          name: loan_token
+          type: address
+      - description: Extract market collateral_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "1"
+        return:
+          name: collateral_token
+          type: address
+      - description: Extract market oracle
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "2"
+        return:
+          name: oracle
+          type: address
+      - description: Extract market irm
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "3"
+        return:
+          name: irm
+          type: address
+      - description: Extract market lltv
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.market_params}
+          - type: uint256
+            value: "4"
+        return:
+          name: lltv
+          type: uint256
+      - description: Read the source market parameters (must be an existing market)
+        target: ${inputs.morpho}
+        selector: idToMarketParams(bytes32)
+        parameters:
+          - type: bytes32
+            value: ${input_slots.source_market_id}
+        return:
+          name: source_market_params
+          type: (address,address,address,address,uint256)
+      - description: Extract source market loan_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.source_market_params}
+          - type: uint256
+            value: "0"
+        return:
+          name: source_loan_token
+          type: address
+      - description: Extract source market collateral_token
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.source_market_params}
+          - type: uint256
+            value: "1"
+        return:
+          name: source_collateral_token
+          type: address
+      - description: Extract source market oracle
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.source_market_params}
+          - type: uint256
+            value: "2"
+        return:
+          name: source_oracle
+          type: address
+      - description: Extract source market irm
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.source_market_params}
+          - type: uint256
+            value: "3"
+        return:
+          name: source_irm
+          type: address
+      - description: Extract source market lltv
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value: ${returns.source_market_params}
+          - type: uint256
+            value: "4"
+        return:
+          name: source_lltv
+          type: uint256
+      - description: Public Allocator moves `amount` of the vault's supply from the source market into this market
+        target: ${inputs.public_allocator}
+        selector: reallocateTo(address,((address,address,address,address,uint256),uint128)[],(address,address,address,address,uint256))
+        parameters:
+          - type: address
+            value: ${input_slots.vault}
+          - type: ((address,address,address,address,uint256),uint128)[]
+            value:
+              - type: ((address,address,address,address,uint256),uint128)
+                value:
+                  - type: (address,address,address,address,uint256)
+                    value:
+                      - type: address
+                        value: ${returns.source_loan_token}
+                      - type: address
+                        value: ${returns.source_collateral_token}
+                      - type: address
+                        value: ${returns.source_oracle}
+                      - type: address
+                        value: ${returns.source_irm}
+                      - type: uint256
+                        value: ${returns.source_lltv}
+                  - type: uint128
+                    value: ${input_slots.amount}
+          - type: (address,address,address,address,uint256)
+            value:
+              - type: address
+                value: ${returns.loan_token}
+              - type: address
+                value: ${returns.collateral_token}
+              - type: address
+                value: ${returns.oracle}
+              - type: address
+                value: ${returns.irm}
+              - type: uint256
+                value: ${returns.lltv}
+      - description: Accrue interest before reading balances and liquidity
+        target: ${inputs.morpho}
+        selector: accrueInterest((address,address,address,address,uint256))
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value:
+              - type: address
+                value: ${returns.loan_token}
+              - type: address
+                value: ${returns.collateral_token}
+              - type: address
+                value: ${returns.oracle}
+              - type: address
+                value: ${returns.irm}
+              - type: uint256
+                value: ${returns.lltv}
+      - description: Read the caliber supply position
+        target: ${inputs.morpho}
+        selector: position(bytes32,address)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+          - type: address
+            value: ${inputs.caliber_address}
+        return:
+          name: position_data
+          type: (uint256,uint128,uint128)
+      - description: Read accrued market totals
+        target: ${inputs.morpho}
+        selector: market(bytes32)
+        parameters:
+          - type: bytes32
+            value: ${inputs.market_id}
+        return:
+          name: market_data
+          type: (uint128,uint128,uint128,uint128,uint128,uint128)
+      - description: Extract supply_shares
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint256,uint128,uint128)
+            value: ${returns.position_data}
+          - type: uint256
+            value: "0"
+        return:
+          name: supply_shares
+          type: uint256
+      - description: Extract total_supply_assets
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "0"
+        return:
+          name: total_supply_assets
+          type: uint256
+      - description: Extract total_supply_shares
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "1"
+        return:
+          name: total_supply_shares
+          type: uint256
+      - description: Extract total_borrow_assets
+        target: ${inputs.caliber_helper_address}
+        selector: extractElementFromStaticTuple(bytes,uint256)
+        parameters:
+          - type: (uint128,uint128,uint128,uint128,uint128,uint128)
+            value: ${returns.market_data}
+          - type: uint256
+            value: "2"
+        return:
+          name: total_borrow_assets
+          type: uint256
+      - description: Include Morpho virtual assets
+        target: ${constants.math_helper_address}
+        selector: add(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_assets}
+          - type: uint256
+            value: "1"
+        return:
+          name: virtual_supply_assets
+          type: uint256
+      - description: Include Morpho virtual shares
+        target: ${constants.math_helper_address}
+        selector: add(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_shares}
+          - type: uint256
+            value: "1000000"
+        return:
+          name: virtual_supply_shares
+          type: uint256
+      - description: Value owned supply shares using Morpho toAssetsDown rounding
+        target: ${constants.math_helper_address}
+        selector: mulDiv(uint256,uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.supply_shares}
+          - type: uint256
+            value: ${returns.virtual_supply_assets}
+          - type: uint256
+            value: ${returns.virtual_supply_shares}
+        return:
+          name: owned_assets
+          type: uint256
+      - description: "Compute free market liquidity: supply assets minus borrow assets"
+        target: ${constants.math_helper_address}
+        selector: sub(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.total_supply_assets}
+          - type: uint256
+            value: ${returns.total_borrow_assets}
+        return:
+          name: available_assets
+          type: uint256
+      - description: Cap withdrawal by both owned assets and current liquidity
+        target: ${constants.math_helper_address}
+        selector: min(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.owned_assets}
+          - type: uint256
+            value: ${returns.available_assets}
+        return:
+          name: assets_to_withdraw
+          type: uint256
+      - description: Check whether all owned shares can be redeemed
+        target: ${constants.math_helper_address}
+        selector: lte(uint256,uint256)
+        parameters:
+          - type: uint256
+            value: ${returns.owned_assets}
+          - type: uint256
+            value: ${returns.available_assets}
+        return:
+          name: full_exit
+          type: bool
+      - description: Use shares for a full exit so no share dust is left
+        target: ${constants.math_helper_address}
+        selector: ternary(bool,uint256,uint256)
+        parameters:
+          - type: bool
+            value: ${returns.full_exit}
+          - type: uint256
+            value: ${returns.supply_shares}
+          - type: uint256
+            value: "0"
+        return:
+          name: withdraw_shares
+          type: uint256
+      - description: Otherwise use the exact available asset amount
+        target: ${constants.math_helper_address}
+        selector: ternary(bool,uint256,uint256)
+        parameters:
+          - type: bool
+            value: ${returns.full_exit}
+          - type: uint256
+            value: "0"
+          - type: uint256
+            value: ${returns.assets_to_withdraw}
+        return:
+          name: withdraw_assets
+          type: uint256
+      - description: Withdraw the maximum available loan assets to the caliber
+        target: ${inputs.morpho}
+        selector: withdraw((address,address,address,address,uint256),uint256,uint256,address,address)
+        parameters:
+          - type: (address,address,address,address,uint256)
+            value:
+              - type: address
+                value: ${returns.loan_token}
+              - type: address
+                value: ${returns.collateral_token}
+              - type: address
+                value: ${returns.oracle}
+              - type: address
+                value: ${returns.irm}
+              - type: uint256
+                value: ${returns.lltv}
+          - type: uint256
+            value: ${returns.withdraw_assets}
+          - type: uint256
+            value: ${returns.withdraw_shares}
+          - type: address
+            value: ${inputs.caliber_address}
+          - type: address
+            value: ${inputs.caliber_address}
+    input_slots:
+      vault:
+        type: address
+        description: MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled
+      source_market_id:
+        type: bytes32
+        description: Market the vault withdraws from; must be enabled in the vault and differ from this market
+      amount:
+        type: uint128
+        description: Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom
