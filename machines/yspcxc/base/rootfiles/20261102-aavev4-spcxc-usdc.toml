@@ -483,6 +483,9 @@ name = "amount_to_deposit"
 description = "Amount of collateral to deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."SPCXc/USDC (0xce98...ecf6)".inputs_slots.input_type.amount]
+token = "0xb2000000000000000000007b9fcbd005511acbd5"
+
 [instructions.morpho.borrow."SPCXc/USDC (0xce98...ecf6)"]
 position_id = "214882350707676042278893489039007158131"
 description = "SPCXc/USDC Morpho Debt (USDC)"
@@ -559,6 +562,9 @@ index = 0
 name = "amount_to_repay"
 description = "The amount of loan token to repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."SPCXc/USDC (0xce98...ecf6)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.withdraw_collateral."SPCXc/USDC (0xce98...ecf6)"]
 position_id = "200865629245647587244063307511050522511"
