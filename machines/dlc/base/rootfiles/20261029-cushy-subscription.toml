@@ -104,4 +104,5 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.superstate.subscribe."CUSHY Subscription".inputs_slots]]
 index = 0
 name = "amount"
+description = "Stablecoin to subscribe, in its own decimals"
 type = "Uint"

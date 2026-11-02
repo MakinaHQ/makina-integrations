@@ -387,6 +387,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."GHO - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."GHO - Main Core"]
@@ -408,6 +409,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."GHO - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."RLUSD - Main Core"]
@@ -429,6 +431,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."RLUSD - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDC - Bluechip Core"]
@@ -450,6 +453,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDC - Bluechip Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDC - Bluechip Prime"]
@@ -471,6 +475,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDC - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDC - Main Core"]
@@ -492,6 +497,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDC - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDT - Bluechip Core"]
@@ -513,6 +519,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDT - Bluechip Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDT - Bluechip Prime"]
@@ -534,6 +541,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDT - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.borrow."USDT - Main Core"]
@@ -555,6 +563,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.borrow."USDT - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of the underlying asset to borrow"
 type = "Uint"
 
 [instructions.aave-v4.repay."GHO - Bluechip Prime"]
@@ -582,6 +591,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."GHO - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."GHO - Main Core"]
@@ -609,6 +619,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."GHO - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."RLUSD - Main Core"]
@@ -636,6 +647,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."RLUSD - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDC - Bluechip Core"]
@@ -663,6 +675,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDC - Bluechip Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDC - Bluechip Prime"]
@@ -690,6 +703,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDC - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDC - Main Core"]
@@ -717,6 +731,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDC - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDT - Bluechip Core"]
@@ -744,6 +759,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDT - Bluechip Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDT - Bluechip Prime"]
@@ -771,6 +787,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDT - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.repay."USDT - Main Core"]
@@ -798,6 +815,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aave-v4.repay."USDT - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of the underlying asset to repay (uint256.max repays in full)"
 type = "Uint"
 
 [instructions.aave-v4.set_using_as_collateral."WBTC - Bluechip Prime"]
@@ -856,6 +874,7 @@ bitmap = "148873535527910577765226390751398592512"
 [[instructions.aave-v4.supply."WBTC - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of the underlying asset to supply"
 type = "Uint"
 
 [instructions.aave-v4.supply."WBTC - Main Core"]
@@ -881,6 +900,7 @@ bitmap = "148873535527910577765226390751398592512"
 [[instructions.aave-v4.supply."WBTC - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of the underlying asset to supply"
 type = "Uint"
 
 [instructions.aave-v4.withdraw."WBTC - Bluechip Prime"]
@@ -902,6 +922,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.withdraw."WBTC - Bluechip Prime".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of the underlying asset to withdraw"
 type = "Uint"
 
 [instructions.aave-v4.withdraw."WBTC - Main Core"]
@@ -923,6 +944,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aave-v4.withdraw."WBTC - Main Core".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of the underlying asset to withdraw"
 type = "Uint"
 
 [instructions.aavev3.account."USDC - Borrow"]
@@ -1068,6 +1090,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.add_collateral."USDC - Lend".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of tokens to add as collateral"
 type = "Uint"
 
 [instructions.aavev3.add_collateral."USDT - Lend"]
@@ -1094,6 +1117,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.add_collateral."USDT - Lend".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of tokens to add as collateral"
 type = "Uint"
 
 [instructions.aavev3.add_collateral."WBTC - Lend"]
@@ -1120,6 +1144,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.add_collateral."WBTC - Lend".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of tokens to add as collateral"
 type = "Uint"
 
 [instructions.aavev3.borrow_asset."USDC - Borrow"]
@@ -1143,6 +1168,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.borrow_asset."USDC - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of tokens to borrow"
 type = "Uint"
 
 [instructions.aavev3.borrow_asset."USDT - Borrow"]
@@ -1166,6 +1192,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.borrow_asset."USDT - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of tokens to borrow"
 type = "Uint"
 
 [instructions.aavev3.borrow_asset."USDe - Borrow"]
@@ -1189,6 +1216,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.borrow_asset."USDe - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of tokens to borrow"
 type = "Uint"
 
 [instructions.aavev3.borrow_asset."USDtb - Borrow"]
@@ -1212,6 +1240,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.borrow_asset."USDtb - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount of tokens to borrow"
 type = "Uint"
 
 [instructions.aavev3.repay_asset."USDC - Borrow"]
@@ -1238,6 +1267,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.repay_asset."USDC - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount to repay to the pool"
 type = "Uint"
 
 [instructions.aavev3.repay_asset."USDT - Borrow"]
@@ -1264,6 +1294,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.repay_asset."USDT - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount to repay to the pool"
 type = "Uint"
 
 [instructions.aavev3.repay_asset."USDe - Borrow"]
@@ -1290,6 +1321,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.repay_asset."USDe - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount to repay to the pool"
 type = "Uint"
 
 [instructions.aavev3.repay_asset."USDtb - Borrow"]
@@ -1316,6 +1348,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.aavev3.repay_asset."USDtb - Borrow".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount to repay to the pool"
 type = "Uint"
 
 [instructions.aavev3.withdraw_collateral."USDC - Lend"]
@@ -1337,6 +1370,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aavev3.withdraw_collateral."USDC - Lend".inputs_slots]]
 index = 0
 name = "amount_collateral_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.aavev3.withdraw_collateral."USDT - Lend"]
@@ -1358,6 +1392,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aavev3.withdraw_collateral."USDT - Lend".inputs_slots]]
 index = 0
 name = "amount_collateral_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.aavev3.withdraw_collateral."WBTC - Lend"]
@@ -1379,6 +1414,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.aavev3.withdraw_collateral."WBTC - Lend".inputs_slots]]
 index = 0
 name = "amount_collateral_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.across-v2.account.WBTC]
@@ -1435,6 +1471,7 @@ bitmap = "164824271477329568240072075474762727424"
 [[instructions.across-v2.deposit.WBTC.inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "The amount of underlying assets to deposit into the HubPool"
 type = "Uint"
 
 [instructions.across-v2.harvest.WBTC]
@@ -1475,6 +1512,7 @@ bitmap = "159507359494189904748456847233641349120"
 [[instructions.across-v2.withdraw.WBTC.inputs_slots]]
 index = 0
 name = "lp_amount_to_withdraw"
+description = "The amount of LP tokens to withdraw from the Accelerating Distributor"
 type = "Uint"
 
 [instructions.across-v2.withdraw_relative.WBTC]
@@ -1507,6 +1545,7 @@ bitmap = "167482727468899399985879689595323416576"
 [[instructions.across-v2.withdraw_relative.WBTC.inputs_slots]]
 index = 0
 name = "bps_to_withdraw"
+description = "The percentage of LP tokens to withdraw from the Accelerating Distributor, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.convex-curve.harvest."cbBTC/WBTC"]
@@ -1584,11 +1623,13 @@ bitmap = "63802943797675961899382738893456539648"
 [[instructions.fluid.deposit.GHO.inputs_slots]]
 index = 0
 name = "asset_amount"
+description = "The amount of underlying asset to deposit into the Fluid vault"
 type = "Uint"
 
 [[instructions.fluid.deposit.GHO.inputs_slots]]
 index = 1
 name = "min_vault_shares"
+description = "The minimum amount of vault shares to receive (slippage protection)"
 type = "Uint"
 
 [instructions.fluid.harvest."ETH/USDC-USDT Fluid Rewards"]
@@ -1799,6 +1840,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.fluid.redeem.GHO.inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The exact amount of vault shares to redeem"
 type = "Uint"
 
 [instructions.fluid.redeem_relative.GHO]
@@ -1825,6 +1867,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.fluid.redeem_relative.GHO.inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of vault share balance to redeem (10000 = 100%)"
 type = "Uint"
 
 [instructions.makina.account.DCM]
@@ -1941,11 +1984,13 @@ bitmap = "74436767763955288882613195375699296256"
 [[instructions.makina.deposit.DCM.inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of AT to deposit (in AT decimals)"
 type = "Uint"
 
 [[instructions.makina.deposit.DCM.inputs_slots]]
 index = 1
 name = "min_shares"
+description = "Minimum MT shares to receive (slippage protection, 18 decimals)"
 type = "Uint"
 
 [instructions.makina.deposit.DUSD]
@@ -1972,11 +2017,13 @@ bitmap = "74436767763955288882613195375699296256"
 [[instructions.makina.deposit.DUSD.inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of AT to deposit (in AT decimals)"
 type = "Uint"
 
 [[instructions.makina.deposit.DUSD.inputs_slots]]
 index = 1
 name = "min_shares"
+description = "Minimum MT shares to receive (slippage protection, 18 decimals)"
 type = "Uint"
 
 [instructions.makina.request_redeem.DCM]
@@ -2011,11 +2058,13 @@ bitmap = "82412135738664784120036037737381363712"
 [[instructions.makina.request_redeem.DCM.inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "Amount of MT shares to redeem (18 decimals)"
 type = "Uint"
 
 [[instructions.makina.request_redeem.DCM.inputs_slots]]
 index = 1
 name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
 type = "Uint"
 
 [instructions.makina.request_redeem.DUSD]
@@ -2050,11 +2099,13 @@ bitmap = "82412135738664784120036037737381363712"
 [[instructions.makina.request_redeem.DUSD.inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "Amount of MT shares to redeem (18 decimals)"
 type = "Uint"
 
 [[instructions.makina.request_redeem.DUSD.inputs_slots]]
 index = 1
 name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
 type = "Uint"
 
 [instructions.makina.request_redeem_relative.DCM]
@@ -2092,11 +2143,13 @@ bitmap = "83741363734449699992939844797661708288"
 [[instructions.makina.request_redeem_relative.DCM.inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Percentage of MT shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [[instructions.makina.request_redeem_relative.DCM.inputs_slots]]
 index = 1
 name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
 type = "Uint"
 
 [instructions.makina.request_redeem_relative.DUSD]
@@ -2134,11 +2187,13 @@ bitmap = "83741363734449699992939844797661708288"
 [[instructions.makina.request_redeem_relative.DUSD.inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Percentage of MT shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [[instructions.makina.request_redeem_relative.DUSD.inputs_slots]]
 index = 1
 name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
 type = "Uint"
 
 [instructions.makina-flashloan.flashloan_request."syrupUSDC/USDC Morpho Loop"]
@@ -2161,21 +2216,25 @@ bitmap = "0"
 [[instructions.makina-flashloan.flashloan_request."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 0
 name = "flash_loan_token"
+description = "The token to flash loan."
 type = "Address"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 1
 name = "flash_loan_amount"
+description = "The amount of tokens to flash loan."
 type = "Uint"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 2
 name = "flash_loan_data"
+description = "Additional data for the flash loan request."
 type = "Bytes"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 3
 name = "flash_loan_venue"
+description = "Where to take the FL from. It is a makina-core enum. Morpho is 3."
 type = "Uint"
 
 [instructions.makina-flashloan.flashloan_request."syrupUSDT/USDT Morpho Loop"]
@@ -2198,21 +2257,25 @@ bitmap = "0"
 [[instructions.makina-flashloan.flashloan_request."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 0
 name = "flash_loan_token"
+description = "The token to flash loan."
 type = "Address"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 1
 name = "flash_loan_amount"
+description = "The amount of tokens to flash loan."
 type = "Uint"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 2
 name = "flash_loan_data"
+description = "Additional data for the flash loan request."
 type = "Bytes"
 
 [[instructions.makina-flashloan.flashloan_request."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 3
 name = "flash_loan_venue"
+description = "Where to take the FL from. It is a makina-core enum. Morpho is 3."
 type = "Uint"
 
 [instructions.merkl.harvest.Merkl]
@@ -3026,6 +3089,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."WBTC/RLUSD (0xa128...ec6b)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.add_collateral."WBTC/USDC (0x3a85...ee49)"]
@@ -3064,6 +3128,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."WBTC/USDC (0x3a85...ee49)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.add_collateral."WBTC/USDT (0xa921...df99)"]
@@ -3102,6 +3167,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."WBTC/USDT (0xa921...df99)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.add_collateral."cbBTC/PYUSD (0xd8a8...2323)"]
@@ -3140,6 +3206,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."cbBTC/PYUSD (0xd8a8...2323)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.add_collateral."cbBTC/RLUSD (0xffd0...39bc)"]
@@ -3178,6 +3245,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."cbBTC/RLUSD (0xffd0...39bc)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.add_collateral."cbBTC/USDC (0x64d6...cc64)"]
@@ -3216,6 +3284,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.add_collateral."cbBTC/USDC (0x64d6...cc64)".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of collateral to deposit"
 type = "Uint"
 
 [instructions.morpho.borrow."WBTC/RLUSD (0xa128...ec6b)"]
@@ -3252,6 +3321,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."WBTC/RLUSD (0xa128...ec6b)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.borrow."WBTC/USDC (0x3a85...ee49)"]
@@ -3288,6 +3358,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."WBTC/USDC (0x3a85...ee49)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.borrow."WBTC/USDT (0xa921...df99)"]
@@ -3324,6 +3395,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."WBTC/USDT (0xa921...df99)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.borrow."cbBTC/PYUSD (0xd8a8...2323)"]
@@ -3360,6 +3432,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."cbBTC/PYUSD (0xd8a8...2323)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.borrow."cbBTC/RLUSD (0xffd0...39bc)"]
@@ -3396,6 +3469,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."cbBTC/RLUSD (0xffd0...39bc)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.borrow."cbBTC/USDC (0x64d6...cc64)"]
@@ -3432,6 +3506,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.borrow."cbBTC/USDC (0x64d6...cc64)".inputs_slots]]
 index = 0
 name = "amount_to_borrow"
+description = "The amount to borrow from the market"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."3Jane Ecosystem Vault"]
@@ -3456,6 +3531,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."3Jane Ecosystem Vault".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Gauntlet USDT Frontier"]
@@ -3480,6 +3556,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Gauntlet USDT Frontier".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Sentora PYUSD Main"]
@@ -3504,6 +3581,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Sentora PYUSD Main".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Sentora RLUSD Main"]
@@ -3528,6 +3606,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Sentora RLUSD Main".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Sentora mWIN Main"]
@@ -3552,6 +3631,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Sentora mWIN Main".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Smokehouse Reservoir USDC"]
@@ -3576,6 +3656,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Smokehouse Reservoir USDC".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Smokehouse USDC"]
@@ -3600,6 +3681,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Smokehouse USDC".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Steakhouse High Yield Instant"]
@@ -3624,6 +3706,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Steakhouse High Yield Instant".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.deposit_vault."Steakhouse PYUSD"]
@@ -3648,6 +3731,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."Steakhouse PYUSD".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)"]
@@ -3718,16 +3802,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
@@ -3798,16 +3885,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)"]
@@ -3878,16 +3968,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."RLP/USDC (0xe1b6...9f33)"]
@@ -3958,16 +4051,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."siUSD/USDC (0xbbf7...c99)"]
@@ -4038,16 +4134,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_reallocate_and_withdraw_from_market."thBILL/USDT (0xfb83...6e28)"]
@@ -4118,16 +4217,19 @@ bitmap = "42369142365644193448808850046435983360"
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 0
 name = "vault"
+description = "MetaMorpho V1 vault that has the Public Allocator as allocator and this market enabled"
 type = "Address"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 1
 name = "source_market_id"
+description = "Market the vault withdraws from; must be enabled in the vault and differ from this market"
 type = "FixedBytes32"
 
 [[instructions.morpho.emergency_reallocate_and_withdraw_from_market."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 2
 name = "amount"
+description = "Loan-token amount to move; non-zero and within the source maxOut, the vault's source supply and liquidity, and this market's maxIn and cap headroom"
 type = "Uint"
 
 [instructions.morpho.emergency_redeem_vault."Smokehouse Reservoir USDC"]
@@ -4554,6 +4656,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
@@ -4592,6 +4695,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.lend_to_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)"]
@@ -4630,6 +4734,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.lend_to_market."RLP/USDC (0xe1b6...9f33)"]
@@ -4668,6 +4773,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.lend_to_market."siUSD/USDC (0xbbf7...c99)"]
@@ -4706,6 +4812,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.lend_to_market."thBILL/USDT (0xfb83...6e28)"]
@@ -4744,6 +4851,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.lend_to_market."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 0
 name = "amount_to_lend"
+description = "Amount of loan token to lend"
 type = "Uint"
 
 [instructions.morpho.loop_in."syrupUSDC/USDC Morpho Loop"]
@@ -4788,11 +4896,13 @@ bitmap = "84987514980498058623787163916674531328"
 [[instructions.morpho.loop_in."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 0
 name = "deposit_amount"
+description = "The total amount to deposit into the collateral vault (equity + flash_loan_amount)."
 type = "Uint"
 
 [[instructions.morpho.loop_in."syrupUSDC/USDC Morpho Loop".inputs_slots]]
 index = 1
 name = "flash_loan_amount"
+description = "The amount of the flash loan."
 type = "Uint"
 
 [instructions.morpho.loop_in."syrupUSDT/USDT Morpho Loop"]
@@ -4837,11 +4947,13 @@ bitmap = "84987514980498058623787163916674531328"
 [[instructions.morpho.loop_in."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 0
 name = "deposit_amount"
+description = "The total amount to deposit into the collateral vault (equity + flash_loan_amount)."
 type = "Uint"
 
 [[instructions.morpho.loop_in."syrupUSDT/USDT Morpho Loop".inputs_slots]]
 index = 1
 name = "flash_loan_amount"
+description = "The amount of the flash loan."
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."AA_FalconXUSDC/USDC (0xe83d...f52)"]
@@ -4882,6 +4994,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
@@ -4922,6 +5035,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)"]
@@ -4962,6 +5076,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."RLP/USDC (0xe1b6...9f33)"]
@@ -5002,6 +5117,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."siUSD/USDC (0xbbf7...c99)"]
@@ -5042,6 +5158,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_from_market_relative."thBILL/USDT (0xfb83...6e28)"]
@@ -5082,6 +5199,7 @@ bitmap = "169476569462576773795235400185743933440"
 [[instructions.morpho.redeem_from_market_relative."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "Basis points of the lent amount to withdraw (10000 = 100%)"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."3Jane Ecosystem Vault"]
@@ -5102,6 +5220,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."3Jane Ecosystem Vault".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Gauntlet USDT Frontier"]
@@ -5122,6 +5241,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Gauntlet USDT Frontier".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Sentora PYUSD Main"]
@@ -5142,6 +5262,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Sentora PYUSD Main".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Sentora RLUSD Main"]
@@ -5162,6 +5283,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Sentora RLUSD Main".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Sentora mWIN Main"]
@@ -5182,6 +5304,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Sentora mWIN Main".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Smokehouse Reservoir USDC"]
@@ -5202,6 +5325,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Smokehouse Reservoir USDC".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Smokehouse USDC"]
@@ -5222,6 +5346,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Smokehouse USDC".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Steakhouse High Yield Instant"]
@@ -5242,6 +5367,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Steakhouse High Yield Instant".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault."Steakhouse PYUSD"]
@@ -5262,6 +5388,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."Steakhouse PYUSD".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."3Jane Ecosystem Vault"]
@@ -5288,6 +5415,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."3Jane Ecosystem Vault".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Gauntlet USDT Frontier"]
@@ -5314,6 +5442,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Gauntlet USDT Frontier".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Sentora PYUSD Main"]
@@ -5340,6 +5469,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Sentora PYUSD Main".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Sentora RLUSD Main"]
@@ -5366,6 +5496,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Sentora RLUSD Main".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Sentora mWIN Main"]
@@ -5392,6 +5523,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Sentora mWIN Main".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Smokehouse Reservoir USDC"]
@@ -5418,6 +5550,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Smokehouse Reservoir USDC".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Smokehouse USDC"]
@@ -5444,6 +5577,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Smokehouse USDC".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Steakhouse High Yield Instant"]
@@ -5470,6 +5604,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Steakhouse High Yield Instant".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."Steakhouse PYUSD"]
@@ -5496,6 +5631,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."Steakhouse PYUSD".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.repay_asset."WBTC/RLUSD (0xa128...ec6b)"]
@@ -5535,6 +5671,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."WBTC/RLUSD (0xa128...ec6b)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.repay_asset."WBTC/USDC (0x3a85...ee49)"]
@@ -5574,6 +5711,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."WBTC/USDC (0x3a85...ee49)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.repay_asset."WBTC/USDT (0xa921...df99)"]
@@ -5613,6 +5751,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."WBTC/USDT (0xa921...df99)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.repay_asset."cbBTC/PYUSD (0xd8a8...2323)"]
@@ -5652,6 +5791,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."cbBTC/PYUSD (0xd8a8...2323)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.repay_asset."cbBTC/RLUSD (0xffd0...39bc)"]
@@ -5691,6 +5831,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."cbBTC/RLUSD (0xffd0...39bc)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.repay_asset."cbBTC/USDC (0x64d6...cc64)"]
@@ -5730,6 +5871,7 @@ bitmap = "169808876461523002763461351950814019584"
 [[instructions.morpho.repay_asset."cbBTC/USDC (0x64d6...cc64)".inputs_slots]]
 index = 0
 name = "amount_to_repay"
+description = "The amount of loan token to repay"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."WBTC/RLUSD (0xa128...ec6b)"]
@@ -5765,6 +5907,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."WBTC/RLUSD (0xa128...ec6b)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."WBTC/USDC (0x3a85...ee49)"]
@@ -5800,6 +5943,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."WBTC/USDC (0x3a85...ee49)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."WBTC/USDT (0xa921...df99)"]
@@ -5835,6 +5979,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."WBTC/USDT (0xa921...df99)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."cbBTC/PYUSD (0xd8a8...2323)"]
@@ -5870,6 +6015,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."cbBTC/PYUSD (0xd8a8...2323)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."cbBTC/RLUSD (0xffd0...39bc)"]
@@ -5905,6 +6051,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."cbBTC/RLUSD (0xffd0...39bc)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_collateral."cbBTC/USDC (0x64d6...cc64)"]
@@ -5940,6 +6087,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_collateral."cbBTC/USDC (0x64d6...cc64)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "The amount of collateral to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)"]
@@ -5976,6 +6124,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."AA_FalconXUSDC/USDC (0xe83d...f52)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)"]
@@ -6012,6 +6161,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."PT-reUSD-10DEC2026/USDC (0x1e9d...fc64)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)"]
@@ -6048,6 +6198,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."PT-reUSD-25JUN2026/USDC (0x9bc9...d79)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."RLP/USDC (0xe1b6...9f33)"]
@@ -6084,6 +6235,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."RLP/USDC (0xe1b6...9f33)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."siUSD/USDC (0xbbf7...c99)"]
@@ -6120,6 +6272,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."siUSD/USDC (0xbbf7...c99)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_from_market."thBILL/USDT (0xfb83...6e28)"]
@@ -6156,6 +6309,7 @@ bitmap = "168811955464684315858783496655603761152"
 [[instructions.morpho.withdraw_from_market."thBILL/USDT (0xfb83...6e28)".inputs_slots]]
 index = 0
 name = "amount_to_withdraw"
+description = "Amount of loan token to withdraw"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."3Jane Ecosystem Vault"]
@@ -6176,6 +6330,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."3Jane Ecosystem Vault".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."Sentora RLUSD Main"]
@@ -6196,6 +6351,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."Sentora RLUSD Main".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."Sentora mWIN Main"]
@@ -6216,6 +6372,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."Sentora mWIN Main".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."Smokehouse Reservoir USDC"]
@@ -6236,6 +6393,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."Smokehouse Reservoir USDC".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.stakedao-curve.harvest."USDC/crvUSD"]
