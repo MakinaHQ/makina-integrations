@@ -400,6 +400,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."mGLO/USDC (0x29ae...52d0b)".inputs_slots.input_type.amount]
+token = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
+
 [instructions.morpho.borrow."mGLO/USDC (0x29ae...52d0b)"]
 position_id = "282483784221449498647186934766547121044"
 description = "Morpho USDC debt (market: 0x29ae...52d0b)"
@@ -474,6 +477,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."mGLO/USDC (0x29ae...52d0b)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.withdraw_collateral."mGLO/USDC (0x29ae...52d0b)"]
 position_id = "125056470168347138528124109495472443889"

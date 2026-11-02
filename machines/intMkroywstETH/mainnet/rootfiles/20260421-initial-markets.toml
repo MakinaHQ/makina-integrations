@@ -331,6 +331,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/AUSD (0xfcd3...d20f)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/PYUSD (0xf5c5...4d27)"]
 position_id = "163478601671182982890720206633991340782"
 description = "Morpho wstETH collateral (market: 0xf5c5...4d27)"
@@ -368,6 +371,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/PYUSD (0xf5c5...4d27)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
 
 [instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)"]
 position_id = "327342762600167818033133681100900962486"
@@ -407,6 +413,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)"]
 position_id = "102085800190891488320502506258850684527"
 description = "Morpho wstETH collateral (market: 0xb323...86cc)"
@@ -445,6 +454,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/USDS (0xb374...ea5f)"]
 position_id = "308707710855887385186022045459610390231"
 description = "Morpho wstETH collateral (market: 0xb374...ea5f)"
@@ -482,6 +494,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/USDS (0xb374...ea5f)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
 
 [instructions.morpho.borrow."wstETH/AUSD (0xfcd3...d20f)"]
 position_id = "240991974569904755752905599636811274552"
@@ -702,6 +717,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/AUSD (0xfcd3...d20f)".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.repay_asset."wstETH/PYUSD (0xf5c5...4d27)"]
 position_id = "36824776297893515328125497271945688587"
 description = "Morpho PYUSD debt (market: 0xf5c5...4d27)"
@@ -740,6 +758,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/PYUSD (0xf5c5...4d27)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
 
 [instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)"]
 position_id = "70667808894144221407616324166664387747"
@@ -780,6 +801,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)"]
 position_id = "91290664943915222943338577479383966617"
 description = "Morpho USDC debt (market: 0xb323...86cc)"
@@ -819,6 +843,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.repay_asset."wstETH/USDS (0xb374...ea5f)"]
 position_id = "286085274621524117523589480215411776313"
 description = "Morpho USDS debt (market: 0xb374...ea5f)"
@@ -857,6 +884,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDS (0xb374...ea5f)".inputs_slots.input_type.amount]
+token = "0xdc035d45d973e3ec169d2276ddab16f1e407384f"
 
 [instructions.morpho.withdraw_collateral."wstETH/AUSD (0xfcd3...d20f)"]
 position_id = "190927119265135130346160414160740410205"

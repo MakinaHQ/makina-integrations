@@ -116,6 +116,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."USDC - Lend".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.add_collateral."mGLOBAL - Lend"]
 position_id = "333271207406914509852071294122931497073"
 description = "AaveV3 Horizon Supply mGLOBAL"
@@ -142,6 +145,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."mGLOBAL - Lend".inputs_slots.input_type.amount]
+token = "0x7433806912eae67919e66aea853d46fa0aef98a8"
+
 [instructions.aavev3.borrow_asset."RLUSD - Borrow"]
 position_id = "133495794982505815817947498041694656764"
 description = "AaveV3 Horizon Borrow RLUSD"
@@ -165,6 +171,9 @@ index = 0
 name = "amount_to_borrow"
 type = "Uint"
 
+[instructions.aavev3.borrow_asset."RLUSD - Borrow".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.aavev3.borrow_asset."USDC - Borrow"]
 position_id = "317835433613879557430416658618884687921"
 description = "AaveV3 Horizon Borrow USDC"
@@ -187,6 +196,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
+
+[instructions.aavev3.borrow_asset."USDC - Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.aavev3.repay_asset."RLUSD - Borrow"]
 position_id = "133495794982505815817947498041694656764"
@@ -214,6 +226,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.aavev3.repay_asset."RLUSD - Borrow".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.aavev3.repay_asset."USDC - Borrow"]
 position_id = "317835433613879557430416658618884687921"
 description = "AaveV3 Horizon Borrow USDC"
@@ -239,6 +254,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.aavev3.repay_asset."USDC - Borrow".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.aavev3.set_e_mode."mGLOBAL Stablecoins E-Mode - Activate"]
 position_id = "333271207406914509852071294122931497073"
@@ -287,6 +305,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."USDC - Lend".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.withdraw_collateral."mGLOBAL - Lend"]
 position_id = "333271207406914509852071294122931497073"
 description = "AaveV3 Horizon Supply mGLOBAL"
@@ -307,6 +328,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."mGLOBAL - Lend".inputs_slots.input_type.amount]
+token = "0x7433806912eae67919e66aea853d46fa0aef98a8"
 
 [instructions.common.account_0.mGLOBAL]
 position_id = "62756116561970865551836727949222539707366789540075782069951893105628962866119"
@@ -868,6 +892,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."mGLOBAL/USDC (0xfd40...50cd)".inputs_slots.input_type.amount]
+token = "0x7433806912eae67919e66aea853d46fa0aef98a8"
+
 [instructions.morpho.borrow."mGLOBAL/USDC (0xfd40...50cd)"]
 position_id = "86194736784976374124103433109462960943"
 description = "Morpho USDC debt (market: 0xfd40...50cd)"
@@ -942,6 +969,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."mGLOBAL/USDC (0xfd40...50cd)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.withdraw_collateral."mGLOBAL/USDC (0xfd40...50cd)"]
 position_id = "230532716052901966686540582198773421275"

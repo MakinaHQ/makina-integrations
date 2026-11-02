@@ -124,6 +124,9 @@ actions:
     input_slots:
       amount_to_lend:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.loan_token}
         description: "Amount of loan token to lend"
 
   withdraw_from_market:
@@ -226,6 +229,9 @@ actions:
     input_slots:
       amount_to_withdraw:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.loan_token}
         description: "Amount of loan token to withdraw"
 
   redeem_from_market_relative:

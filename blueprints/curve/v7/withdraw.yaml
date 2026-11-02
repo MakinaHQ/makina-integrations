@@ -40,6 +40,9 @@ actions:
     input_slots:
       amount_to_withdraw:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.pool_address}
         description: "The amount of LP tokens to withdraw from the gauge"
       min_token_a:
         type: "uint256"

@@ -37,6 +37,9 @@ actions:
     input_slots:
       amount_to_deposit:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.asset_address}
         description: "The amount of tokens to add as collateral"
 
   set_e_mode:

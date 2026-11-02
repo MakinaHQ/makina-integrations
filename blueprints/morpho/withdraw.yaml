@@ -130,6 +130,9 @@ actions:
     input_slots:
       shares_to_redeem:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.vault_address}
         description: "The number of shares to redeem from the vault"
 
   redeem_vault_relative:
