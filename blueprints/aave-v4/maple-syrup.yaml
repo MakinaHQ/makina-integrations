@@ -1,0 +1,223 @@
+protocol: "aavev4"
+
+# Aave V4 collateral leg for a Maple syrup pool token (e.g. syrupUSDG) — POSITION
+# model, same approach as the dusd syrupUSDT/USDT Morpho loop
+# (blueprints/morpho-loop/maple/account.yaml): the syrup token is NOT a caliber
+# base token and never sits idle in the caliber. It is minted and supplied in one
+# action, withdrawn and queued for Maple redemption in one action, and valued in
+# pool-asset terms via the pool's convertToExitAssets.
+#
+# Actions:
+#   mint_and_supply              asset -> pool.deposit -> spoke.supply (collateral)
+#   set_using_as_collateral      one-off, enables the reserve as collateral
+#   withdraw_and_request_redeem  spoke.withdraw -> pool.requestRedeem (Maple queue)
+#   account                      convertToExitAssets(supplied + escrowed)
+#
+# Maple processes the redemption queue and pushes the pool asset to the caliber;
+# there is no claim leg.
+#
+# PERMISSIONED: pool.deposit requires the caliber to hold Maple deposit
+# permission (PoolPermissionManager.hasPermission(poolManager, caliber,
+# "P:deposit")). requestRedeem is not permissioned.
+#
+# userEscrowedShares is keyed on the CALIBER, so only one position per caliber
+# may redeem through a given withdrawal manager, or the escrow is double counted.
+#
+# Expected inputs:
+#   spoke_address:              Aave V4 Spoke
+#   reserve_id:                 the syrup token's reserve id on the Spoke
+#   pool_address:               Maple pool (== the syrup token)
+#   asset_address:              pool asset (pool.asset())
+#   withdrawal_manager_address: poolManager.withdrawalManager()
+#   caliber_address:            position owner
+#   math_helper, boolean_helper
+
+inputs:
+  spoke_address:
+    type: "address"
+  reserve_id:
+    type: "uint256"
+  pool_address:
+    type: "address"
+  asset_address:
+    type: "address"
+  withdrawal_manager_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  math_helper:
+    type: "address"
+  boolean_helper:
+    type: "address"
+
+actions:
+  mint_and_supply:
+    calls:
+      - description: "Approve the Maple pool to spend the pool asset"
+        target: "${inputs.asset_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pool_address}"
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+
+      - description: "Deposit the pool asset into the Maple pool, minting shares to the caliber"
+        target: "${inputs.pool_address}"
+        selector: "deposit(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${input_slots.asset_amount}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares"
+          type: "uint256"
+
+      - description: "Slippage floor: realised shares >= min_shares"
+        target: "${inputs.math_helper}"
+        selector: "gte(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares}"
+          - type: "uint256"
+            value: "${input_slots.min_shares}"
+        return:
+          name: "shares_ok"
+          type: "bool"
+
+      - description: "Revert if realised shares are below the slippage floor"
+        target: "${inputs.boolean_helper}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.shares_ok}"
+
+      - description: "Approve the Spoke to spend the minted shares"
+        target: "${inputs.pool_address}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.spoke_address}"
+          - type: "uint256"
+            value: "${returns.shares}"
+
+      - description: "Supply the minted shares to the Spoke reserve"
+        target: "${inputs.spoke_address}"
+        selector: "supply(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.reserve_id}"
+          - type: "uint256"
+            value: "${returns.shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      asset_amount:
+        type: "uint256"
+        description: "Amount of pool asset to mint into shares and supply (pool asset decimals)"
+      min_shares:
+        type: "uint256"
+        description: "Minimum pool shares to mint (slippage protection, share decimals)"
+
+  set_using_as_collateral:
+    calls:
+      - description: "Enable the syrup reserve as collateral on the Spoke"
+        target: "${inputs.spoke_address}"
+        selector: "setUsingAsCollateral(uint256,bool,address)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.reserve_id}"
+          - type: "bool"
+            value: "true"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+  withdraw_and_request_redeem:
+    calls:
+      - description: "Withdraw syrup shares from the Spoke (uint256.max withdraws the full supply)"
+        target: "${inputs.spoke_address}"
+        selector: "withdraw(uint256,uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.reserve_id}"
+          - type: "uint256"
+            value: "${input_slots.shares_to_withdraw}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+      - description: "Read the caliber's syrup balance (the withdrawn shares; none sit idle otherwise)"
+        target: "${inputs.pool_address}"
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "shares_held"
+          type: "uint256"
+
+      - description: "Queue the shares for Maple redemption, escrowed by the withdrawal manager"
+        target: "${inputs.pool_address}"
+        selector: "requestRedeem(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.shares_held}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+
+    input_slots:
+      shares_to_withdraw:
+        type: "uint256"
+        description: "Syrup shares to withdraw from the Spoke and redeem (uint256.max = all)"
+
+  account:
+    calls:
+      - description: "Read the supplied syrup shares on the Spoke"
+        target: "${inputs.spoke_address}"
+        selector: "getUserSuppliedAssets(uint256,address)"
+        parameters:
+          - type: "uint256"
+            value: "${inputs.reserve_id}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "supplied_shares"
+          type: "uint256"
+
+      - description: "Read the caliber's shares escrowed in the Maple redemption queue"
+        target: "${inputs.withdrawal_manager_address}"
+        selector: "userEscrowedShares(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "escrowed_shares"
+          type: "uint256"
+
+      - description: "Total shares = supplied + escrowed"
+        target: "${inputs.math_helper}"
+        selector: "add(uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.supplied_shares}"
+          - type: "uint256"
+            value: "${returns.escrowed_shares}"
+        return:
+          name: "total_shares"
+          type: "uint256"
+
+      - description: "Convert total shares to pool-asset terms at the exit rate"
+        target: "${inputs.pool_address}"
+        selector: "convertToExitAssets(uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.total_shares}"
+        return:
+          name: "total_assets"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: ${returns.total_assets}
+      - type: "uint256"
+        value: ${builtins.UINT256_MAX}

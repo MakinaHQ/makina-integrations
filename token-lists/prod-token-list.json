@@ -215,6 +215,13 @@
     },
     {
       "chainId": 1,
+      "address": "0x87b65C4aAFFA76881f9E96F3e7ED945ddFC3Cd7A",
+      "name": "syrupUSDG",
+      "decimals": 6,
+      "symbol": "syrupUSDG"
+    },
+    {
+      "chainId": 1,
       "address": "0xC139190F447e929f090Edeb554D95AbB8b18aC1C",
       "name": "USDtb",
       "decimals": 18,
