@@ -131,6 +131,9 @@ index = 0
 name = "amount_to_lend"
 type = "Uint"
 
+[instructions.morpho.lend_to_market."cbBTC/USDC (0x9103...1836)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
 [instructions.morpho.redeem_from_market_relative."cbBTC/USDC (0x9103...1836)"]
 position_id = "59690312341088102818345637935930600458"
 description = "Morpho USDC loan (market: 0x9103...1836)"
@@ -206,3 +209,6 @@ bitmap = "168811955464684315858783496655603761152"
 index = 0
 name = "amount_to_withdraw"
 type = "Uint"
+
+[instructions.morpho.withdraw_from_market."cbBTC/USDC (0x9103...1836)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"

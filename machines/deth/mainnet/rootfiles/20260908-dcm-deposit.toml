@@ -168,6 +168,9 @@ index = 0
 name = "amount_to_stake"
 type = "Uint"
 
+[instructions."Aave Umbrella".stake.WETH.inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions."Aave Umbrella".start_cooldown.WETH]
 position_id = "3523756351941927223895267305661455553"
 description = "Aave Umbrella WETH"
@@ -258,6 +261,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."WETH (collateral)".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions.aavev3.add_collateral.weETH]
 position_id = "187700311405102813120959141419172413799"
 description = "AaveV3 weETH collateral"
@@ -284,6 +290,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral.weETH.inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
+
 [instructions.aavev3.borrow_asset.WETH]
 position_id = "168833951435768327164903999099923269368"
 description = "AaveV3 WETH debt"
@@ -306,6 +315,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_borrow"
 type = "Uint"
+
+[instructions.aavev3.borrow_asset.WETH.inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.aavev3.repay_asset.WETH]
 position_id = "168833951435768327164903999099923269368"
@@ -332,6 +344,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.aavev3.repay_asset.WETH.inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.aavev3.set_e_mode."ETH correlated"]
 position_id = "187700311405102813120959141419172413799"
@@ -367,6 +382,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."WETH (collateral)".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions.aavev3.withdraw_collateral.weETH]
 position_id = "187700311405102813120959141419172413799"
 description = "AaveV3 weETH collateral"
@@ -387,6 +405,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral.weETH.inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
 
 [instructions.fluid-lite.account."Fluid Lite USD"]
 position_id = "280756842428125260997025717226665040346"
@@ -453,6 +474,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.fluid-lite.deposit."Fluid Lite USD".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.fluid-lite.deposit."stETH (deposit wstETH)"]
 position_id = "94131231672247278449408134973807954755"
 description = "Fluid Lite stETH (deposit wstETH)"
@@ -479,6 +503,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.fluid-lite.deposit."stETH (deposit wstETH)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.fluid-lite.redeem."Fluid Lite USD"]
 position_id = "280756842428125260997025717226665040346"
 description = "Fluid Lite USD (deposit USDC)"
@@ -498,6 +525,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.fluid-lite.redeem."Fluid Lite USD".inputs_slots.input_type.amount]
+token = "0x273da948aca9261043fbdb2a857bc255ecc29012"
 
 [instructions.fluid-lite.redeem_full."stETH (deposit wstETH)"]
 position_id = "94131231672247278449408134973807954755"
@@ -2007,6 +2037,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."weETH/PYUSD (0x85d5...212c)".inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
+
 [instructions.morpho.add_collateral."weETH/USDC (0x3437...c5dd)"]
 position_id = "206455271149408088518840450283480120566"
 description = "Morpho weETH collateral (market: 0x3437...c5dd)"
@@ -2044,6 +2077,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."weETH/USDC (0x3437...c5dd)".inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
 
 [instructions.morpho.add_collateral."weETH/USDT (0xc2c5...a8f6)"]
 position_id = "257979155286564265784886542987385982045"
@@ -2083,6 +2119,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."weETH/USDT (0xc2c5...a8f6)".inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
+
 [instructions.morpho.add_collateral."weETH/WETH (0x37e7...2ba7)"]
 position_id = "66296194878735909975264388408023694049"
 description = "Morpho weETH collateral (market: 0x37e7...2ba7)"
@@ -2120,6 +2159,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."weETH/WETH (0x37e7...2ba7)".inputs_slots.input_type.amount]
+token = "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
 
 [instructions.morpho.add_collateral."wstETH/PYUSD (0xf5c5...4d27)"]
 position_id = "163478601671182982890720206633991340782"
@@ -2159,6 +2201,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/PYUSD (0xf5c5...4d27)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)"]
 position_id = "327342762600167818033133681100900962486"
 description = "Morpho wstETH collateral (market: 0x6d2f...31c2)"
@@ -2196,6 +2241,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/USDC (0x6d2f...31c2)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
 
 [instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)"]
 position_id = "102085800190891488320502506258850684527"
@@ -2235,6 +2283,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/USDC (0xb323...86cc)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/USDT (0xe7e9...87d2)"]
 position_id = "228752854137756671577525718546471569592"
 description = "Morpho wstETH collateral (market: 0xe7e9...87d2)"
@@ -2272,6 +2323,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/USDT (0xe7e9...87d2)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
 
 [instructions.morpho.add_collateral."wstETH/WETH (0xb8fc...a85e)"]
 position_id = "229248262372270670683116215637114243726"
@@ -2311,6 +2365,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."wstETH/WETH (0xb8fc...a85e)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
+
 [instructions.morpho.add_collateral."wstETH/WETH (0xd0e5...ec5d)"]
 position_id = "318645634383426469263021075027482084356"
 description = "Morpho wstETH collateral (market: 0xd0e5...ec5d)"
@@ -2348,6 +2405,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."wstETH/WETH (0xd0e5...ec5d)".inputs_slots.input_type.amount]
+token = "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0"
 
 [instructions.morpho.borrow."weETH/PYUSD (0x85d5...212c)"]
 position_id = "46161668225856735715809817413672175578"
@@ -2733,6 +2793,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."3Jane Ecosystem Vault".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."Gauntlet WETH Prime"]
 position_id = "94863143728566985956902386915891910693"
 description = "Morpho Vault WETH Gauntlet"
@@ -2756,6 +2819,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Gauntlet WETH Prime".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.morpho.deposit_vault."Paypal USD Main"]
 position_id = "273739676753663843967743313854543738189"
@@ -2781,6 +2847,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Paypal USD Main".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.deposit_vault."Sentora RLUSD Main"]
 position_id = "101479911391298992514073662718338576961"
 description = "Morpho Vault Sentora RLUSD Main"
@@ -2804,6 +2873,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Sentora RLUSD Main".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.morpho.deposit_vault."Steakhouse WETH"]
 position_id = "205295664156465280560294343765044329943"
@@ -2829,6 +2901,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Steakhouse WETH".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions.morpho.deposit_vault."Vault Bridge WETH"]
 position_id = "170715880202946670315163698633126718068"
 description = "Morpho Vault WETH Vault Bridge"
@@ -2853,6 +2928,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Vault Bridge WETH".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions.morpho.deposit_vault."Yearn OG WETH"]
 position_id = "46073922549441983303808590388878370744"
 description = "Morpho Vault WETH Yearn OG"
@@ -2876,6 +2954,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Yearn OG WETH".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.morpho.emergency_redeem_vault_v2."3Jane Ecosystem Vault"]
 position_id = "319028358984478431816090771761707097811"
@@ -2954,6 +3035,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."3Jane Ecosystem Vault".inputs_slots.input_type.amount]
+token = "0xe05fadf242331808f504661bea65972594869826"
+
 [instructions.morpho.redeem_vault."Gauntlet WETH Prime"]
 position_id = "94863143728566985956902386915891910693"
 description = "Morpho Vault WETH Gauntlet"
@@ -2973,6 +3057,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Gauntlet WETH Prime".inputs_slots.input_type.amount]
+token = "0x2371e134e3455e0593363cbf89d3b6cf53740618"
 
 [instructions.morpho.redeem_vault."Paypal USD Main"]
 position_id = "273739676753663843967743313854543738189"
@@ -2994,6 +3081,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Paypal USD Main".inputs_slots.input_type.amount]
+token = "0xb576765fb15505433af24fee2c0325895c559fb2"
+
 [instructions.morpho.redeem_vault."Sentora RLUSD Main"]
 position_id = "101479911391298992514073662718338576961"
 description = "Morpho Vault Sentora RLUSD Main"
@@ -3013,6 +3103,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora RLUSD Main".inputs_slots.input_type.amount]
+token = "0x6dc58a0fdfc8d694e571dc59b9a52eeea780e6bf"
 
 [instructions.morpho.redeem_vault."Steakhouse WETH"]
 position_id = "205295664156465280560294343765044329943"
@@ -3034,6 +3127,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Steakhouse WETH".inputs_slots.input_type.amount]
+token = "0xbeef050ecd6a16c4e7bffbb52ebba7846c4b8cd4"
+
 [instructions.morpho.redeem_vault."Vault Bridge WETH"]
 position_id = "170715880202946670315163698633126718068"
 description = "Morpho Vault WETH Vault Bridge"
@@ -3054,6 +3150,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Vault Bridge WETH".inputs_slots.input_type.amount]
+token = "0x31a5684983eee865d943a696aac155363ba024f9"
+
 [instructions.morpho.redeem_vault."Yearn OG WETH"]
 position_id = "46073922549441983303808590388878370744"
 description = "Morpho Vault WETH Yearn OG"
@@ -3073,6 +3172,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Yearn OG WETH".inputs_slots.input_type.amount]
+token = "0xe89371eaaac6d46d4c3ed23453241987916224fc"
 
 [instructions.morpho.redeem_vault_relative."3Jane Ecosystem Vault"]
 position_id = "319028358984478431816090771761707097811"
@@ -3295,6 +3397,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."weETH/PYUSD (0x85d5...212c)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.repay_asset."weETH/USDC (0x3437...c5dd)"]
 position_id = "304839825226858859869599824775632331565"
 description = "Morpho USDC debt (market: 0x3437...c5dd)"
@@ -3333,6 +3438,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."weETH/USDC (0x3437...c5dd)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.repay_asset."weETH/USDT (0xc2c5...a8f6)"]
 position_id = "117897999589525498285498123941856654865"
@@ -3373,6 +3481,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."weETH/USDT (0xc2c5...a8f6)".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.morpho.repay_asset."weETH/WETH (0x37e7...2ba7)"]
 position_id = "221367487496355189468609584383691724012"
 description = "Morpho WETH debt (market: 0x37e7...2ba7)"
@@ -3411,6 +3522,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."weETH/WETH (0x37e7...2ba7)".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.morpho.repay_asset."wstETH/PYUSD (0xf5c5...4d27)"]
 position_id = "36824776297893515328125497271945688587"
@@ -3451,6 +3565,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/PYUSD (0xf5c5...4d27)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)"]
 position_id = "70667808894144221407616324166664387747"
 description = "Morpho USDC debt (market: 0x6d2f...31c2)"
@@ -3489,6 +3606,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDC (0x6d2f...31c2)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)"]
 position_id = "91290664943915222943338577479383966617"
@@ -3529,6 +3649,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/USDC (0xb323...86cc)".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.repay_asset."wstETH/USDT (0xe7e9...87d2)"]
 position_id = "231865414965890906957476782409120809184"
 description = "Morpho USDT debt (market: 0xe7e9...87d2)"
@@ -3567,6 +3690,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/USDT (0xe7e9...87d2)".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.morpho.repay_asset."wstETH/WETH (0xb8fc...a85e)"]
 position_id = "15670928802442181581418053777565254351"
@@ -3607,6 +3733,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."wstETH/WETH (0xb8fc...a85e)".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+
 [instructions.morpho.repay_asset."wstETH/WETH (0xd0e5...ec5d)"]
 position_id = "90190535649841219979284333009586953746"
 description = "Morpho WETH debt (market: 0xd0e5...ec5d)"
@@ -3645,6 +3774,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."wstETH/WETH (0xd0e5...ec5d)".inputs_slots.input_type.amount]
+token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 [instructions.morpho.withdraw_collateral."weETH/PYUSD (0x85d5...212c)"]
 position_id = "234056643176152780215030792645294081596"

@@ -264,6 +264,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."WBTC/AUSD (0x0ce0...0955)".inputs_slots.input_type.amount]
+token = "0x0555e30da8f98308edb960aa94c0db47230d2b9c"
+
 [instructions.morpho.add_collateral."WBTC/USDT0 (0x0d4f...0ae0)"]
 position_id = "94388872034807467387073797802972737982"
 description = "Morpho WBTC collateral (market: 0x0d4f...0ae0)"
@@ -301,6 +304,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.add_collateral."WBTC/USDT0 (0x0d4f...0ae0)".inputs_slots.input_type.amount]
+token = "0x0555e30da8f98308edb960aa94c0db47230d2b9c"
 
 [instructions.morpho.borrow."WBTC/AUSD (0x0ce0...0955)"]
 position_id = "333773735664093951125921792491272579956"
@@ -398,6 +404,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Steakhouse AUSD HY".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.deposit_vault."Steakhouse USDC HY"]
 position_id = "273603320317238684265048200890149135186"
 description = "Morpho Vault USDC Steakhouse HY"
@@ -421,6 +430,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse USDC HY".inputs_slots.input_type.amount]
+token = "0x754704bc059f8c67012fed69bc8a327a5aafb603"
 
 [instructions.morpho.deposit_vault."Steakhouse USDT0 HY"]
 position_id = "281595395958690679718086294165943048531"
@@ -446,6 +458,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Steakhouse USDT0 HY".inputs_slots.input_type.amount]
+token = "0xe7cd86e13ac4309349f30b3435a9d337750fc82d"
+
 [instructions.morpho.redeem_vault."Steakhouse AUSD HY"]
 position_id = "279695748144015565204434818128346487014"
 description = "Morpho Vault AUSD Steakhouse HY"
@@ -465,6 +480,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse AUSD HY".inputs_slots.input_type.amount]
+token = "0xbeeffea75cfc4128ebe10c8d7ae22016d215060d"
 
 [instructions.morpho.redeem_vault."Steakhouse USDC HY"]
 position_id = "273603320317238684265048200890149135186"
@@ -486,6 +504,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Steakhouse USDC HY".inputs_slots.input_type.amount]
+token = "0xbeeff443c3cba3e369da795002243beac311ab83"
+
 [instructions.morpho.redeem_vault."Steakhouse USDT0 HY"]
 position_id = "281595395958690679718086294165943048531"
 description = "Morpho Vault USDT0 Steakhouse HY"
@@ -505,6 +526,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse USDT0 HY".inputs_slots.input_type.amount]
+token = "0x961a59fe249b9795fae7fa35f9e89629689d5278"
 
 [instructions.morpho.redeem_vault_relative."Steakhouse AUSD HY"]
 position_id = "279695748144015565204434818128346487014"
@@ -623,6 +647,9 @@ index = 0
 name = "amount_to_repay"
 type = "Uint"
 
+[instructions.morpho.repay_asset."WBTC/AUSD (0x0ce0...0955)".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.repay_asset."WBTC/USDT0 (0x0d4f...0ae0)"]
 position_id = "87006417204831722617669877064036272795"
 description = "Morpho USDT0 debt (market: 0x0d4f...0ae0)"
@@ -661,6 +688,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."WBTC/USDT0 (0x0d4f...0ae0)".inputs_slots.input_type.amount]
+token = "0xe7cd86e13ac4309349f30b3435a9d337750fc82d"
 
 [instructions.morpho.withdraw_collateral."WBTC/AUSD (0x0ce0...0955)"]
 position_id = "252396629863426700433351170882300824529"

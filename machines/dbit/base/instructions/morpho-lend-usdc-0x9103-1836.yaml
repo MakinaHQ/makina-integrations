@@ -42,6 +42,9 @@
       market_id:
         type: "bytes32"
         value: "0x9103c3b4e834476c9a62ea009ba2c884ee42e94e6e314a26f04d312434191836"
+      loan_token:
+        type: "address"
+        value: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" # USDC
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"

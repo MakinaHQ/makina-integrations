@@ -34,6 +34,9 @@ actions:
     input_slots:
       shares_to_redeem:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.vault_address}
         description: "The exact amount of vault shares to redeem"
 
   redeem_staked_relative:
@@ -101,6 +104,9 @@ actions:
     input_slots:
       shares_to_redeem:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.vault_address}
         description: "The exact amount of vault shares to redeem"
 
   redeem_relative:

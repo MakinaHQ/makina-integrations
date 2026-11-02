@@ -24,4 +24,7 @@ actions:
     input_slots:
       amount_collateral_to_withdraw:
         type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.asset_address}
         description: "The amount of collateral to withdraw"
