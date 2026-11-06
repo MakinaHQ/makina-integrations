@@ -72,6 +72,17 @@ positions:
     instructions: !include "./instructions/merkl.yaml"
 
   # ══ Lending ═══════════════════════════════════════════════════════
+  # ── Morpho vaults — Huma ────────────────────────────────────────
+  - id: "165186419876140346589894735443656578755" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Huma USDC Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x8aC91877b93330f52b2979a31a4879506021475c"]
+    vars:
+      label: "Huma USDC Main"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x8aC91877b93330f52b2979a31a4879506021475c"
+
   # ── Morpho vaults — Sentora "Main" line (Morpho Vault V2) ─────────
   # All five share one implementation (codehash 0xd40a…6acd for mWIN /
   # PST / Paypal USD / PRIME Main; RLUSD Main is an earlier V2 build),
@@ -238,6 +249,24 @@ positions:
       vault_address: "0xB344e331A3cDa61D329fb3Cca2Be5942da87c418"
 
   # ── Morpho markets — passive supply side ──────────────────────────
+  # PT-USDat borrowers' collateral; DCM supplies only the loan token.
+  - id: "56802554392973022153290505206532511547" # pools_db makina_id — USDT deposit
+    group_id: "0"
+    description: "Morpho USDT loan (PT-USDat-14JAN2027, market: 0xd8dd...c489)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USDat-14JAN2027/USDT (0xd8dd...c489)"
+      market_id: "0xd8dd3e1d051eee97d1353a113982afac90612c775f393edea45ef7f20caec489"
+      loan_token: ${token_list.mainnet.USDT}
+  - id: "169485757213189514062219970396618829616" # pools_db makina_id — USDC deposit
+    group_id: "0"
+    description: "Morpho USDC loan (PT-USDat-14JAN2027, market: 0xc7e4...43ea)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USDat-14JAN2027/USDC (0xc7e4...43ea)"
+      market_id: "0xc7e49dd404825da16988955201ed22ecf8a7b25f0337db8a698d70d7a9f343ea"
+      loan_token: ${token_list.mainnet.USDC}
+
   - id: "199708234830348815037617604080094469854" # pools_db makina_id
     group_id: "0"
     description: "Morpho USDC loan (market: 0x1e9d...fc64)"
@@ -435,6 +464,20 @@ positions:
       asset_address: ${token_list.mainnet.frxUSD}
       spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
       reserve_id: "12"
+
+  # ── Aave V4 Sentora Hub — RLUSD Yield spoke ──────────────────────
+  # The earn URL identifies Hub 0xD138FcB0…e9c2, but supply targets this
+  # Spoke's reserve 0. Separate liquidation domain from Main/Maple: group 7.
+  # No receipt token; account getUserSuppliedAssets in RLUSD.
+  - id: "319425040420047974359507809602190804692" # pools_db makina_id
+    group_id: "7"
+    description: "AaveV4 Sentora Supply RLUSD (RLUSD Yield, reserve 0)"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "RLUSD - RLUSD Yield / Sentora (reserve 0)"
+      asset_address: ${token_list.mainnet.RLUSD}
+      spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
+      reserve_id: "0"
 
   # ── Aave V4 Maple SyrupUSDG spoke (Global Dollar hub) ─────────────
   # syrupUSDG/USDG loop, dusd syrupUSDT-style POSITION model: syrupUSDG is not a
