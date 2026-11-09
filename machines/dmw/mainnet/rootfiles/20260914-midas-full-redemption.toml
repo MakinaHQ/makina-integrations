@@ -719,6 +719,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.add_collateral."mWIN/PYUSD (0xeecb...c774)".inputs_slots.input_type.amount]
+token = "0x4e72025984424e52838cf8953e2863eff036b67a"
+
 [instructions.morpho.borrow."mWIN/PYUSD (0xeecb...c774)"]
 position_id = "176196971610726825086751998336313413797"
 description = "Morpho PYUSD debt (market: 0xeecb...c774)"
@@ -779,6 +782,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Sentora mWIN Main".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.emergency_redeem_vault_v2."Sentora mWIN Main"]
 position_id = "304842766591321364733133397329774721882"
 description = "Morpho Vault Sentora mWIN Main (PYUSD)"
@@ -817,6 +823,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Sentora mWIN Main".inputs_slots.input_type.amount]
+token = "0x7cbcfc4f64be199ede6db1d916ddcdb69f666b57"
 
 [instructions.morpho.redeem_vault_relative."Sentora mWIN Main"]
 position_id = "304842766591321364733133397329774721882"
@@ -882,6 +891,9 @@ bitmap = "169808876461523002763461351950814019584"
 index = 0
 name = "amount_to_repay"
 type = "Uint"
+
+[instructions.morpho.repay_asset."mWIN/PYUSD (0xeecb...c774)".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
 
 [instructions.morpho.withdraw_collateral."mWIN/PYUSD (0xeecb...c774)"]
 position_id = "311252770595977748178203904303413825288"

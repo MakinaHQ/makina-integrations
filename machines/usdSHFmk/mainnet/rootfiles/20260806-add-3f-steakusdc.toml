@@ -393,6 +393,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault.3F-steakUSDC.inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."AUSD High Yield Term"]
 position_id = "83497740258054099744938802050405228295126607095228098589710251173730378877153"
 description = "Morpho - AUSD High Yield Term"
@@ -416,6 +419,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."AUSD High Yield Term".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
 
 [instructions.morpho.deposit_vault."AUSD Turbo"]
 position_id = "59240718622654600712413168424615621118428849033569937066928751029814600930804"
@@ -441,6 +447,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."AUSD Turbo".inputs_slots.input_type.amount]
+token = "0x00000000efe302beaa2b3e6e1b18d08d69a9012a"
+
 [instructions.morpho.deposit_vault."USDC High Yield Instant"]
 position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
 description = "Morpho - USDC High Yield Instant"
@@ -464,6 +473,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.deposit_vault."USDC High Yield Term"]
 position_id = "83590566332089234788126563161359194710771879875955496717246010493571215713520"
@@ -489,6 +501,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."USDC High Yield Term".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."USDC Prime Instant"]
 position_id = "92913126632701618168692101400696791611252150486759189953517405985285166360833"
 description = "Morpho - USDC Prime Instant"
@@ -512,6 +527,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.deposit_vault."USDC Turbo"]
 position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
@@ -537,6 +555,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.morpho.deposit_vault."USDT High Yield Instant"]
 position_id = "62637211969224093105524059488197642861679330667763208449264095370504718130145"
 description = "Morpho - USDT High Yield Instant"
@@ -561,6 +582,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."USDT High Yield Instant".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
+
 [instructions.morpho.deposit_vault."USDT Prime Instant"]
 position_id = "4006181232054141208147454663884125496812341165091287999287630871414616434294"
 description = "Morpho - USDT Prime Instant"
@@ -584,6 +608,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDT Prime Instant".inputs_slots.input_type.amount]
+token = "0xdac17f958d2ee523a2206206994597c13d831ec7"
 
 [instructions.morpho.emergency_redeem_vault_v2.3F-steakUSDC]
 position_id = "96567129604189436456058633741832530542476557427468719528395157170345880227191"
@@ -624,6 +651,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault.3F-steakUSDC.inputs_slots.input_type.amount]
+token = "0xbeef3f3a04e28895f3d5163d910474901981183d"
+
 [instructions.morpho.redeem_vault."AUSD High Yield Term"]
 position_id = "83497740258054099744938802050405228295126607095228098589710251173730378877153"
 description = "Morpho - AUSD High Yield Term"
@@ -643,6 +673,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."AUSD High Yield Term".inputs_slots.input_type.amount]
+token = "0xbeeff0deac1aba71ef0d88c4291354eb92ef4589"
 
 [instructions.morpho.redeem_vault."AUSD Turbo"]
 position_id = "59240718622654600712413168424615621118428849033569937066928751029814600930804"
@@ -664,6 +697,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."AUSD Turbo".inputs_slots.input_type.amount]
+token = "0xbeefff7e4eedd83a4a4ab53a68d03ec77c9a57a8"
+
 [instructions.morpho.redeem_vault."USDC High Yield Instant"]
 position_id = "113381721232607674663021988927911303225850827259126640828557600167613363278037"
 description = "Morpho - USDC High Yield Instant"
@@ -683,6 +719,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0xbeeff2c5bf38f90e3482a8b19f12e5a6d2fca757"
 
 [instructions.morpho.redeem_vault."USDC High Yield Term"]
 position_id = "83590566332089234788126563161359194710771879875955496717246010493571215713520"
@@ -704,6 +743,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."USDC High Yield Term".inputs_slots.input_type.amount]
+token = "0xbeefffc57a26fd8d3b693ba025ead597dbecebfe"
+
 [instructions.morpho.redeem_vault."USDC Prime Instant"]
 position_id = "92913126632701618168692101400696791611252150486759189953517405985285166360833"
 description = "Morpho - USDC Prime Instant"
@@ -723,6 +765,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0xbeef088055857739c12cd3765f20b7679def0f51"
 
 [instructions.morpho.redeem_vault."USDC Turbo"]
 position_id = "90921336893967830107325790067136229287057003113729923288594188276183277958283"
@@ -744,6 +789,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0xbeefff4716a49418d69c251cab8759bb107e57c8"
+
 [instructions.morpho.redeem_vault."USDT High Yield Instant"]
 position_id = "62637211969224093105524059488197642861679330667763208449264095370504718130145"
 description = "Morpho - USDT High Yield Instant"
@@ -764,6 +812,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."USDT High Yield Instant".inputs_slots.input_type.amount]
+token = "0xbeeff07d991c04cd640de9f15c08ba59c4fedeb7"
+
 [instructions.morpho.redeem_vault."USDT Prime Instant"]
 position_id = "4006181232054141208147454663884125496812341165091287999287630871414616434294"
 description = "Morpho - USDT Prime Instant"
@@ -783,6 +834,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDT Prime Instant".inputs_slots.input_type.amount]
+token = "0xbeef003c68896c7d2c3c60d363e8d71a49ab2bf9"
 
 [instructions.morpho.redeem_vault_relative.3F-steakUSDC]
 position_id = "96567129604189436456058633741832530542476557427468719528395157170345880227191"

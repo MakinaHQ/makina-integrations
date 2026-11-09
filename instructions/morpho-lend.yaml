@@ -11,6 +11,8 @@
 #   caliber_helper_address
 #   unsigned_math_helper_address
 #
+# Mainnet only: 6/6 hardcodes Morpho's mainnet Public Allocator.
+#
 # Example position block in caliber.yaml:
 #   - id: "<unique uint128>"
 #     group_id: "0"
@@ -21,7 +23,7 @@
 #       market_id: "0xbbf7ce1b40d32d3e3048f5cf27eeaa6de8cb27b80194690aab191a63381d8c99"
 #       loan_token: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" # USDC
 
-# 1/4 - Lend (supply) loan_token to the market
+# 1/6 - Lend (supply) loan_token to the market
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -49,7 +51,7 @@
         type: "address"
         value: "${config.unsigned_math_helper_address}"
 
-# 2/4 - Withdraw an exact amount of loan_token from the market
+# 2/6 - Withdraw an exact amount of loan_token from the market
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -67,6 +69,9 @@
       market_id:
         type: "bytes32"
         value: ${position.market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
       caliber_address:
         type: "address"
         value: "${config.caliber_address}"
@@ -74,7 +79,7 @@
         type: "address"
         value: "${config.unsigned_math_helper_address}"
 
-# 3/4 - Redeem a fraction (bps) of held supply shares
+# 3/6 - Redeem a fraction (bps) of held supply shares
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:
@@ -99,7 +104,7 @@
         type: "address"
         value: "${config.unsigned_math_helper_address}"
 
-# 4/4 - Accounting: outstanding loan position value (assets owed to the caliber)
+# 4/6 - Accounting: outstanding loan position value (assets owed to the caliber)
 - is_debt: false
   instruction_type: "ACCOUNTING"
   affected_tokens:
@@ -123,3 +128,56 @@
       unsigned_math_helper:
         type: "address"
         value: "${config.unsigned_math_helper_address}"
+
+# 5/6 - Emergency withdrawal capped by runtime position value and free liquidity
+- is_debt: false
+  instruction_type: MANAGEMENT
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: ../../../blueprints/morpho/lend.yaml:emergency_withdraw_from_market
+    inputs:
+      morpho:
+        type: address
+        value: ${config.morpho_address}
+      caliber_helper_address:
+        type: address
+        value: ${config.caliber_helper_address}
+      market_id:
+        type: bytes32
+        value: ${position.market_id}
+      caliber_address:
+        type: address
+        value: ${config.caliber_address}
+      unsigned_math_helper:
+        type: address
+        value: ${config.unsigned_math_helper_address}
+
+# 6/6 - Emergency withdrawal after pulling vault liquidity in through the Public Allocator
+- is_debt: false
+  instruction_type: MANAGEMENT
+  affected_tokens:
+    - ${position.loan_token}
+  instruction:
+    label: ${position.label}
+    path: ../../../blueprints/morpho/lend.yaml:emergency_reallocate_and_withdraw_from_market
+    inputs:
+      morpho:
+        type: address
+        value: ${config.morpho_address}
+      public_allocator:
+        type: address
+        value: "0xfd32fA2ca22c76dD6E550706Ad913FC6CE91c75D" # Morpho PublicAllocator (mainnet)
+      caliber_helper_address:
+        type: address
+        value: ${config.caliber_helper_address}
+      market_id:
+        type: bytes32
+        value: ${position.market_id}
+      caliber_address:
+        type: address
+        value: ${config.caliber_address}
+      unsigned_math_helper:
+        type: address
+        value: ${config.unsigned_math_helper_address}

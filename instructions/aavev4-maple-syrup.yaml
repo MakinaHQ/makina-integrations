@@ -1,0 +1,86 @@
+# AaveV4 Maple syrup collateral — POSITION model (no oracle for the syrup token).
+#
+# Supply a Maple syrup pool token (e.g. syrupUSDG) as collateral on an Aave V4
+# Spoke without registering it as a caliber base token, as dusd does for
+# syrupUSDT/USDT on Morpho. The syrup token is minted and supplied in one leg,
+# withdrawn and queued for Maple redemption in one leg, and accounted in
+# pool-asset terms (convertToExitAssets of supplied + escrowed shares). Every leg
+# therefore only touches the pool asset, which must be a base token.
+#
+# Pair with an aavev4-borrow.yaml position on the same Spoke and group_id.
+#
+# Only ONE position per caliber may redeem through a given withdrawal manager
+# (userEscrowedShares is keyed on the caliber).
+#
+# GO-LIVE PREREQUISITE: Maple grants the caliber deposit permission on the pool.
+#
+# Expected caliber vars:
+#   label:                      string
+#   spoke_address:              address  — Aave V4 Spoke
+#   reserve_id:                 uint256  — the syrup token's reserve id on the Spoke
+#   pool_address:               address  — Maple pool (== the syrup token)
+#   asset_address:              address  — pool asset (base token)
+#   withdrawal_manager_address: address  — poolManager.withdrawalManager()
+#
+# Expected config:
+#   caliber_address, math_helper_address, boolean_helper_address
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/maple-syrup.yaml:mint_and_supply"
+    inputs: &maple_syrup_inputs
+      spoke_address:
+        type: "address"
+        value: ${position.spoke_address}
+      reserve_id:
+        type: "uint256"
+        value: ${position.reserve_id}
+      pool_address:
+        type: "address"
+        value: ${position.pool_address}
+      asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      withdrawal_manager_address:
+        type: "address"
+        value: ${position.withdrawal_manager_address}
+      caliber_address:
+        type: "address"
+        value: ${config.caliber_address}
+      math_helper:
+        type: "address"
+        value: ${config.math_helper_address}
+      boolean_helper:
+        type: "address"
+        value: ${config.boolean_helper_address}
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/maple-syrup.yaml:set_using_as_collateral"
+    inputs: *maple_syrup_inputs
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/maple-syrup.yaml:withdraw_and_request_redeem"
+    inputs: *maple_syrup_inputs
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/aave-v4/maple-syrup.yaml:account"
+    inputs: *maple_syrup_inputs

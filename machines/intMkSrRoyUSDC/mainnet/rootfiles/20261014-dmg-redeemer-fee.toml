@@ -337,6 +337,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."RLUSD - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.aavev3.add_collateral."RLUSD - Lend"]
 position_id = "127941166575521302841184731003311232234"
 description = "AaveV3 Supply RLUSD"
@@ -362,6 +365,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral."RLUSD - Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.aavev3.add_collateral."USDC - Lend"]
 position_id = "332697612920998824307877708016163852818"
@@ -389,6 +395,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."USDC - Lend".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+
 [instructions.aavev3.add_collateral."USDG - Lend"]
 position_id = "198834366791576294957883993689758100677"
 description = "AaveV3 Supply USDG"
@@ -414,6 +423,9 @@ bitmap = "159507359494189904748456847233641349120"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.aavev3.add_collateral."USDG - Lend".inputs_slots.input_type.amount]
+token = "0xe343167631d89b6ffc58b88d6b7fb0228795491d"
 
 [instructions.aavev3.add_collateral."USDtb - Lend"]
 position_id = "180824950629563478123006004740707789068"
@@ -441,6 +453,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.aavev3.add_collateral."USDtb - Lend".inputs_slots.input_type.amount]
+token = "0xc139190f447e929f090edeb554d95abb8b18ac1c"
+
 [instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend"]
 position_id = "47445753596645566272224472924421400103"
 description = "AaveV3 Horizon Supply RLUSD"
@@ -461,6 +476,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."RLUSD - Horizon Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
 
 [instructions.aavev3.withdraw_collateral."RLUSD - Lend"]
 position_id = "127941166575521302841184731003311232234"
@@ -483,6 +501,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."RLUSD - Lend".inputs_slots.input_type.amount]
+token = "0x8292bb45bf1ee4d140127049757c2e0ff06317ed"
+
 [instructions.aavev3.withdraw_collateral."USDC - Lend"]
 position_id = "332697612920998824307877708016163852818"
 description = "AaveV3 Supply USDC"
@@ -503,6 +524,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."USDC - Lend".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.aavev3.withdraw_collateral."USDG - Lend"]
 position_id = "198834366791576294957883993689758100677"
@@ -525,6 +549,9 @@ index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
 
+[instructions.aavev3.withdraw_collateral."USDG - Lend".inputs_slots.input_type.amount]
+token = "0xe343167631d89b6ffc58b88d6b7fb0228795491d"
+
 [instructions.aavev3.withdraw_collateral."USDtb - Lend"]
 position_id = "180824950629563478123006004740707789068"
 description = "AaveV3 Supply USDtb"
@@ -545,6 +572,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_collateral_to_withdraw"
 type = "Uint"
+
+[instructions.aavev3.withdraw_collateral."USDtb - Lend".inputs_slots.input_type.amount]
+token = "0xc139190f447e929f090edeb554d95abb8b18ac1c"
 
 [instructions.merkl.harvest.Merkl]
 position_id = "777"
@@ -675,6 +705,9 @@ index = 0
 name = "amount_to_deposit"
 type = "Uint"
 
+[instructions.morpho.deposit_vault."Sentora PYUSD Main".inputs_slots.input_type.amount]
+token = "0x6c3ea9036406852006290770bedfcaba0e23a0e8"
+
 [instructions.morpho.deposit_vault."Steakhouse USDC"]
 position_id = "317674047022373827182618653676880817492"
 description = "Morpho Vault Steakhouse USDC"
@@ -698,6 +731,9 @@ bitmap = "127605887595351923798765477786913079296"
 index = 0
 name = "amount_to_deposit"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse USDC".inputs_slots.input_type.amount]
+token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
 
 [instructions.morpho.emergency_redeem_vault."Steakhouse USDC"]
 position_id = "317674047022373827182618653676880817492"
@@ -757,6 +793,9 @@ index = 0
 name = "shares_to_redeem"
 type = "Uint"
 
+[instructions.morpho.redeem_vault."Sentora PYUSD Main".inputs_slots.input_type.amount]
+token = "0xb576765fb15505433af24fee2c0325895c559fb2"
+
 [instructions.morpho.redeem_vault."Steakhouse USDC"]
 position_id = "317674047022373827182618653676880817492"
 description = "Morpho Vault Steakhouse USDC"
@@ -776,6 +815,9 @@ bitmap = "85070591730234615865843651857942052864"
 index = 0
 name = "shares_to_redeem"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse USDC".inputs_slots.input_type.amount]
+token = "0xbeef01735c132ada46aa9aa4c54623caa92a64cb"
 
 [instructions.morpho.redeem_vault_relative."Sentora PYUSD Main"]
 position_id = "273739676753663843967743313854543738189"

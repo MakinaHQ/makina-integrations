@@ -1,0 +1,59 @@
+# Dialectic Looped CUSHY (loopCUSHY), hub caliber, Base. USDC in. The attached Safe and the
+# CUSHY subscription (deposit only) so far: see README.md.
+config:
+  caliber_address:
+    type: "address"
+    value: "0x1986e1eb669e95a9F4488E9Ba34378805B5c15F7"
+  swap_module:
+    type: "address"
+    value: "0xE87596d490f1118DFE64a75498C82B997e539d4b"
+  # Base helpers, as on the other Base calibers (the mainnet addresses have no code here)
+  caliber_helper_address:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  boolean_helper_address:
+    type: "address"
+    value: "0x8dc60173F37B34998FD5B2aeF47Dd68C68CC22C4"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+  # KeyValueStore(caliber), deployed via CreateX; caliber() == this caliber.
+  key_value_store_address:
+    type: "address"
+    value: "0x98ef61f76cb7c16bebe1b36c43c9ed6971d7dcc9"
+  # Attached Safe (docs/attached-safe/README.md): salt = caliber ++ 12 zero bytes; the address
+  # is its CreateX deployment.
+  attached_safe_address:
+    type: "address"
+    value: "0x00506C4D0f4Ca19A4B3e17Fc0A53504C8843A1bf"
+  attached_safe_salt:
+    type: "bytes32"
+    value: "0x1986e1eb669e95a9f4488e9ba34378805b5c15f7000000000000000000000000"
+  attached_safe_kv_key:
+    type: "bytes32"
+    value: "${keccak256(makina.attached-safe)}"
+  # CalldataEncoder (docs/attached-safe/README.md), Base deployment. UNAUDITED. Not the mainnet
+  # address (0x6843…041b, no code here); runtime code identical to the mainnet deployment.
+  calldata_encoder_address:
+    type: "address"
+    value: "0x1a7f03da41d0d0a09476def4f7a922acc2d63d34"
+
+positions:
+  # Attached Safe (docs/attached-safe/README.md): `create`, run once.
+  - id: "108190441586059729654767051633271106603975264136610275741002200346967568500452" # keccak256("attached-safe")
+    group_id: "0"
+    description: "Attached Safe"
+    instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # CUSHY subscription through Superstate (docs/superstate-offchain/README.md), deposit only:
+  # subscribe and account, no settle until CUSHY is a base token (README.md). Then switch to
+  # superstate-offchain-subscription.yaml with the same id and claim_kv_key, and add fund_token.
+  - id: "103730509674282581954549212113725759831235314781781630982837437870449742523666" # keccak256("superstate.cushy.subscribe")
+    group_id: "0"
+    description: "CUSHY Subscription (USDC to Superstate, CUSHY minted to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-subscription-deposit.yaml"
+    vars:
+      label: "CUSHY Subscription"
+      stablecoin: ${token_list.base.USDC}
+      deposit_address: "0xd68b109b841aEa3527D382364DAD7a3F48a8a845" # CUSHY USDC subscription address
+      claim_kv_key: "${keccak256(makina.base.superstate.cushy-subscribe)}"

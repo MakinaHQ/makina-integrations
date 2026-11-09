@@ -1,0 +1,14 @@
+name = "loopcushy"
+chain = "base"
+address = "0x29CF13a5D5C16fD7Ca78d7357F16A0F75b0E24F0"
+
+[calibers.base]
+address = "0x1986e1eb669e95a9F4488E9Ba34378805B5c15F7"
+swapper = "0xE87596d490f1118DFE64a75498C82B997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/loopcushy/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"

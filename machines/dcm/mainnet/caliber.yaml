@@ -43,8 +43,26 @@ config:
   morpho_v2_liquidity_lens_address:
     type: "address"
     value: "0x5171Bc00DA5Fc7Ae1eDe189d88B980cAEfb6c690"
-  # TODO: a per-caliber KeyValueStore has not been deployed for DCM yet.
-  # Add `key_value_store_address` here before wiring any instruction that needs it.
+  # Per-caliber KeyValueStore (caliber() = this caliber): the Superstate claims and the
+  # attached-Safe registry.
+  key_value_store_address:
+    type: "address"
+    value: "0xDdb6683e487Eb373E9E27A2730BBeea853101762"
+  # Attached Safe (docs/attached-safe/README.md): salt = caliber ++ 12 zero bytes; the address
+  # is its CreateX deployment.
+  attached_safe_address:
+    type: "address"
+    value: "0x4d11C8ca92Ff7800457296F98C2A042a1F9Bd1f9"
+  attached_safe_salt:
+    type: "bytes32"
+    value: "0xdc385c31c322351dac9ff4d7ded24e29b5d94768000000000000000000000000"
+  attached_safe_kv_key:
+    type: "bytes32"
+    value: "${keccak256(makina.attached-safe)}"
+  # CalldataEncoder (docs/attached-safe/README.md). UNAUDITED, source not verified on Etherscan.
+  calldata_encoder_address:
+    type: "address"
+    value: "0x6843d773eE6D6F173428EEa127b5a16E09cB041b"
 
 positions:
   # ── Harvest-only ──────────────────────────────────────────────────
@@ -54,6 +72,17 @@ positions:
     instructions: !include "./instructions/merkl.yaml"
 
   # ══ Lending ═══════════════════════════════════════════════════════
+  # ── Morpho vaults — Huma ────────────────────────────────────────
+  - id: "165186419876140346589894735443656578755" # pools_db makina_id
+    group_id: "0"
+    description: "Morpho Vault Huma USDC Main"
+    instructions: !include "../../../instructions/morpho-vault-v2.yaml"
+    position_tokens: ["0x8aC91877b93330f52b2979a31a4879506021475c"]
+    vars:
+      label: "Huma USDC Main"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x8aC91877b93330f52b2979a31a4879506021475c"
+
   # ── Morpho vaults — Sentora "Main" line (Morpho Vault V2) ─────────
   # All five share one implementation (codehash 0xd40a…6acd for mWIN /
   # PST / Paypal USD / PRIME Main; RLUSD Main is an earlier V2 build),
@@ -220,6 +249,24 @@ positions:
       vault_address: "0xB344e331A3cDa61D329fb3Cca2Be5942da87c418"
 
   # ── Morpho markets — passive supply side ──────────────────────────
+  # PT-USDat borrowers' collateral; DCM supplies only the loan token.
+  - id: "56802554392973022153290505206532511547" # pools_db makina_id — USDT deposit
+    group_id: "0"
+    description: "Morpho USDT loan (PT-USDat-14JAN2027, market: 0xd8dd...c489)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USDat-14JAN2027/USDT (0xd8dd...c489)"
+      market_id: "0xd8dd3e1d051eee97d1353a113982afac90612c775f393edea45ef7f20caec489"
+      loan_token: ${token_list.mainnet.USDT}
+  - id: "169485757213189514062219970396618829616" # pools_db makina_id — USDC deposit
+    group_id: "0"
+    description: "Morpho USDC loan (PT-USDat-14JAN2027, market: 0xc7e4...43ea)"
+    instructions: !include "../../../instructions/morpho-lend.yaml"
+    vars:
+      label: "PT-USDat-14JAN2027/USDC (0xc7e4...43ea)"
+      market_id: "0xc7e49dd404825da16988955201ed22ecf8a7b25f0337db8a698d70d7a9f343ea"
+      loan_token: ${token_list.mainnet.USDC}
+
   - id: "199708234830348815037617604080094469854" # pools_db makina_id
     group_id: "0"
     description: "Morpho USDC loan (market: 0x1e9d...fc64)"
@@ -418,6 +465,52 @@ positions:
       spoke_address: "0x94e7A5dCbE816e498b89aB752661904E2F56c485"
       reserve_id: "12"
 
+  # ── Aave V4 Sentora Hub — RLUSD Yield spoke ──────────────────────
+  # The earn URL identifies Hub 0xD138FcB0…e9c2, but supply targets this
+  # Spoke's reserve 0. Separate liquidation domain from Main/Maple: group 7.
+  # No receipt token; account getUserSuppliedAssets in RLUSD.
+  - id: "319425040420047974359507809602190804692" # pools_db makina_id
+    group_id: "7"
+    description: "AaveV4 Sentora Supply RLUSD (RLUSD Yield, reserve 0)"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "RLUSD - RLUSD Yield / Sentora (reserve 0)"
+      asset_address: ${token_list.mainnet.RLUSD}
+      spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
+      reserve_id: "0"
+
+  # ── Aave V4 Maple SyrupUSDG spoke (Global Dollar hub) ─────────────
+  # syrupUSDG/USDG loop, dusd syrupUSDT-style POSITION model: syrupUSDG is not a
+  # base token. The collateral position mints syrupUSDG from USDG and supplies it
+  # (reserve 1) in one leg, withdraws and queues Maple redemption in one leg, and
+  # is accounted in USDG via convertToExitAssets(supplied + escrowed). Borrow USDG
+  # from reserve 0 (Global Dollar hub — NOT reserve 3, which is USDG on the Core
+  # hub). group_id 6 is the liquidation bucket for Spoke 0x774b9655…E989.
+  # GO-LIVE: Maple must grant this caliber deposit permission on syrupUSDG.
+  # This is the only DCM position redeeming through syrupUSDG's withdrawal
+  # manager; the escrow read is keyed on the caliber, so a second one would
+  # double count.
+  - id: "11689966931513357717592982225541584772" # pools_db makina_id
+    group_id: "6"
+    description: "AaveV4 Maple SyrupUSDG syrupUSDG collateral (Global Dollar, reserve 1)"
+    instructions: !include "../../../instructions/aavev4-maple-syrup.yaml"
+    vars:
+      label: "syrupUSDG - Maple SyrupUSDG / Global Dollar (reserve 1)"
+      spoke_address: "0x774b9655413c34809c1f1b16b654465A89EBE989"
+      reserve_id: "1"
+      pool_address: ${token_list.mainnet.syrupUSDG}
+      asset_address: ${token_list.mainnet.USDG}
+      withdrawal_manager_address: "0xAf63C06970086d535F338565D77c5fA3bDC5fD79"
+  - id: "315467963828577344461473969020947125401" # pools_db makina_id
+    group_id: "6"
+    description: "AaveV4 Maple SyrupUSDG USDG debt (Global Dollar, reserve 0)"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "USDG - Maple SyrupUSDG / Global Dollar (reserve 0)"
+      asset_address: ${token_list.mainnet.USDG}
+      spoke_address: "0x774b9655413c34809c1f1b16b654465A89EBE989"
+      reserve_id: "0"
+
   # ── Fluid ─────────────────────────────────────────────────────────
   - id: "280756842428125260997025717226665040346"
     group_id: "0"
@@ -488,6 +581,22 @@ positions:
       asset_address: ${token_list.mainnet.JAAA}
       aave_token: "0xB0EC6c4482Ac1Ef77bE239C0AC833CF37A27c876"
       aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
+  # ── USCC/RLUSD Horizon loop (group_id: 4) ───────────────────────
+  # USCC (Superstate) as Horizon collateral against the RLUSD borrow below. Reserve: LTV 85%,
+  # LT 88%, bonus 5%, collateral only, supply cap 7.5M USCC shared by all suppliers (dusd
+  # too). eMode 0: category 4 "USCC GHO" only allows GHO borrows.
+  # RISK: USCC transfers are Superstate-allowlist gated, so only allowlisted liquidators can
+  # take it, and a revoked allowlist freezes the exit.
+  - id: "311320401608815590130020786774191105996" # pools_db makina_id — AaveV3 Horizon USCC lending
+    group_id: "4"
+    description: "AaveV3 Horizon Supply USCC"
+    instructions: !include "../../../instructions/aavev3-supply.yaml"
+    position_tokens: ["0x08b798c40b9AB931356d9aB4235F548325C4cb80"] # aHorRwaUSCC
+    vars:
+      label: "USCC - Horizon Lend"
+      asset_address: ${token_list.mainnet.USCC}
+      aave_token: "0x08b798c40b9AB931356d9aB4235F548325C4cb80"
+      aave_pool_instance: "0xAe05Cd22df81871bc7cC2a04BeCfb516bFe332C8"
 
   - id: "317835433613879557430416658618884687921"
     group_id: "4"
@@ -555,3 +664,31 @@ positions:
       vault_address: "0x4880799eE5200fC58DA299e965df644fBf46780B"
       asset_address: ${token_list.mainnet.USDC}
       share_address: ${token_list.mainnet.JAAA}
+
+  # Attached Safe (docs/attached-safe/README.md): `create`, run once.
+  - id: "108190441586059729654767051633271106603975264136610275741002200346967568500452" # keccak256("attached-safe")
+    group_id: "0"
+    description: "Attached Safe"
+    instructions: !include "../../../instructions/attached-safe.yaml"
+
+  # USCC subscribe/redeem through Superstate, delivered to the attached Safe
+  # (docs/superstate-offchain/README.md). Funds the Horizon USCC collateral (group 4).
+  - id: "113754801296779658453198583385743335683021126602415149242606541268952718634785" # keccak256("superstate.uscc.subscribe")
+    group_id: "0"
+    description: "USCC Subscription (USDC to Superstate, USCC minted to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-subscription.yaml"
+    vars:
+      label: "USCC Subscription"
+      fund_token: ${token_list.mainnet.USCC}
+      stablecoin: ${token_list.mainnet.USDC}
+      deposit_address: "0xc874984879f8ed6d879829D0cbFBed32a97ABaA2" # Superstate subaccount USDC subscription address
+      claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-subscribe)}"
+  - id: "110504959099929678971014067507667643402574237725558963114945016510709054718133" # keccak256("superstate.uscc.redeem")
+    group_id: "0"
+    description: "USCC Redemption (USCC burned, USDC paid to the attached Safe)"
+    instructions: !include "../../../instructions/superstate-offchain-redemption.yaml"
+    vars:
+      label: "USCC Redemption"
+      fund_token: ${token_list.mainnet.USCC}
+      stablecoin: ${token_list.mainnet.USDC}
+      claim_kv_key: "${keccak256(makina.mainnet.superstate.uscc-redeem)}"

@@ -1,0 +1,172 @@
+# this is a generated file - do not edit manually
+# root: 0xaa8c9a7b1f2a0a833126afb3ead8f637f206dcc3c528e6d96f91ecd22d388de6
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.makina.account.loopCUSHY]
+position_id = "16838515939890894484516015112317883749839372139418541994421911323744932191268"
+description = "Makina loopCUSHY Machine"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = ["0xe4c4aff51ad4ffbe8b09a1d3f7430efd9ee602fe"]
+commands = [
+  "0x70a082310102ff0000000002e4c4aff51ad4ffbe8b09a1d3f7430efd9ee602fe",
+  "0x8eaa6ac00103ff0000000003ad13e560211755aeed1316681778c765711ac160",
+  "0x771602f7010203ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0x07a2d13a0103ff000000000029cf13a5d5c16fd7ca78d7357f16a0f75b0e24f0",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x76396f28805b75433ba0d0a6c6dca345f33f1690c27244804b8f09b124338cbb",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.makina.claim_assets.loopCUSHY]
+position_id = "16838515939890894484516015112317883749839372139418541994421911323744932191268"
+description = "Makina loopCUSHY Machine"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x8eaa6ac00100ff0000000002ad13e560211755aeed1316681778c765711ac160",
+  "0x661603e00102ff00000000fffb6d2375a07ae6d98c5823b670cb9744ed7cadc4",
+  "0xed3c7d400100ff00000000ffad13e560211755aeed1316681778c765711ac160",
+  "0xed3c7d400101ff00000000ffad13e560211755aeed1316681778c765711ac160",
+]
+state = [
+  "0x948ca268b1b67d516b23736488cc000c5e26f816d437a141c35bfae889d7f348",
+  "0x76396f28805b75433ba0d0a6c6dca345f33f1690c27244804b8f09b124338cbb",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.makina.deposit.loopCUSHY]
+position_id = "16838515939890894484516015112317883749839372139418541994421911323744932191268"
+description = "Makina loopCUSHY Machine"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x86e807f80100030104ff00ff79d6c39f8bdc4fcb83cddf83545c6b53f13ab7fc",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x00000000000000000000000079d6c39f8bdc4fcb83cddf83545c6b53f13ab7fc",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.makina.deposit.loopCUSHY.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of AT to deposit (in AT decimals)"
+type = "Uint"
+
+[[instructions.makina.deposit.loopCUSHY.inputs_slots]]
+index = 1
+name = "min_shares"
+description = "Minimum MT shares to receive (slippage protection, 18 decimals)"
+type = "Uint"
+
+[instructions.makina.request_redeem.loopCUSHY]
+position_id = "16838515939890894484516015112317883749839372139418541994421911323744932191268"
+description = "Makina loopCUSHY Machine"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x8eaa6ac00105ff0000000007ad13e560211755aeed1316681778c765711ac160",
+  "0x32148d73010702ff00000007c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590107ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010300ff000000ffe4c4aff51ad4ffbe8b09a1d3f7430efd9ee602fe",
+  "0x24c7e13f01000401ff000004fb6d2375a07ae6d98c5823b670cb9744ed7cadc4",
+  "0xf71f7a25010504ff000000ffad13e560211755aeed1316681778c765711ac160",
+  "0xf71f7a25010600ff000000ffad13e560211755aeed1316681778c765711ac160",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000fb6d2375a07ae6d98c5823b670cb9744ed7cadc4",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x948ca268b1b67d516b23736488cc000c5e26f816d437a141c35bfae889d7f348",
+  "0x76396f28805b75433ba0d0a6c6dca345f33f1690c27244804b8f09b124338cbb",
+  "0x",
+]
+bitmap = "82412135738664784120036037737381363712"
+
+[[instructions.makina.request_redeem.loopCUSHY.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "Amount of MT shares to redeem (18 decimals)"
+type = "Uint"
+
+[[instructions.makina.request_redeem.loopCUSHY.inputs_slots]]
+index = 1
+name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+type = "Uint"
+
+[instructions.makina.request_redeem_relative.loopCUSHY]
+position_id = "16838515939890894484516015112317883749839372139418541994421911323744932191268"
+description = "Makina loopCUSHY Machine"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310105ff0000000008e4c4aff51ad4ffbe8b09a1d3f7430efd9ee602fe",
+  "0xaa9a091201080002ff0000083d623b199e290358416415ea7e05b635e442e3c0",
+  "0x8eaa6ac00106ff0000000002ad13e560211755aeed1316681778c765711ac160",
+  "0x32148d73010203ff00000002c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590102ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010408ff000000ffe4c4aff51ad4ffbe8b09a1d3f7430efd9ee602fe",
+  "0x24c7e13f01080501ff000005fb6d2375a07ae6d98c5823b670cb9744ed7cadc4",
+  "0xf71f7a25010605ff000000ffad13e560211755aeed1316681778c765711ac160",
+  "0xf71f7a25010708ff000000ffad13e560211755aeed1316681778c765711ac160",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000fb6d2375a07ae6d98c5823b670cb9744ed7cadc4",
+  "0x000000000000000000000000d1a1c248b253f1fc60eacd90777b9a63f8c8c1bc",
+  "0x948ca268b1b67d516b23736488cc000c5e26f816d437a141c35bfae889d7f348",
+  "0x76396f28805b75433ba0d0a6c6dca345f33f1690c27244804b8f09b124338cbb",
+  "0x",
+]
+bitmap = "83741363734449699992939844797661708288"
+
+[[instructions.makina.request_redeem_relative.loopCUSHY.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "Percentage of MT shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[[instructions.makina.request_redeem_relative.loopCUSHY.inputs_slots]]
+index = 1
+name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+type = "Uint"

@@ -1,0 +1,28 @@
+protocol: "superstate"
+
+# account: the claim only, in its own token. The Safe is never counted. See docs/superstate-offchain/README.md.
+
+inputs:
+  kv_store_address:
+    type: "address"
+  claim_kv_key:
+    type: "bytes32"
+
+actions:
+  account:
+    calls:
+      - description: "The outstanding claim, in its own token. The Safe's balance is deliberately not read"
+        target: "${inputs.kv_store_address}"
+        selector: "get(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.claim_kv_key}"
+        return:
+          name: "claim"
+          type: "uint256"
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.claim}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"
