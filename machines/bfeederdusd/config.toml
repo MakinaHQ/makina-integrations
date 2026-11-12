@@ -1,0 +1,25 @@
+name = "bfeederdusd"
+chain = "base"
+address = "0x8C9fd209A0912a8721fF8E40f857693Df8fBc513"
+
+[calibers.base]
+address = "0xbfD1A1d861DD8fBA471885D510DCAcc71a4c2F58"
+swapper = "0xe87596d490f1118dfe64a75498c82b997e539d4b"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/bfeederdusd/base/rootfiles"
+
+[calibers.base.accounting_token]
+address = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
+
+[calibers.mainnet]
+address = "0xbfD1A1d861DD8fBA471885D510DCAcc71a4c2F58"
+swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
+rootfiles = "github:MakinaHQ/makina-integrations/machines/bfeederdusd/mainnet/rootfiles"
+
+[calibers.mainnet.accounting_token]
+address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+decimals = 6
+name = "USD Coin"
+symbol = "USDC"
