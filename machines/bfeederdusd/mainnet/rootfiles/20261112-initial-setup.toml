@@ -1,0 +1,172 @@
+# this is a generated file - do not edit manually
+# root: 0xcf50a87093eb94a035e66d5b175151e218da9166d55207eedad0977dfba58152
+
+[tokens."${token_list.mainnet.USDC}"]
+chainId = 1
+address = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[instructions.makina.account.DUSD]
+position_id = "257907866263469253975271928750178105060"
+description = "Makina DUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = ["0x1e33e98af620f1d563fcd3cfd3c75ace841204ef"]
+commands = [
+  "0x70a082310102ff00000000021e33e98af620f1d563fcd3cfd3c75ace841204ef",
+  "0x8eaa6ac00103ff0000000003901553e1e944736affe002d84e55218a242f01ff",
+  "0x771602f7010203ff000000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0x07a2d13a0103ff00000000006b006870c83b1cd49e766ac9209f8d68763df721",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000bfd1a1d861dd8fba471885d510dcacc71a4c2f58",
+  "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef",
+]
+bitmap = "148873535527910577765226390751398592512"
+inputs_slots = []
+
+[instructions.makina.claim_assets.DUSD]
+position_id = "257907866263469253975271928750178105060"
+description = "Makina DUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x8eaa6ac00100ff0000000002901553e1e944736affe002d84e55218a242f01ff",
+  "0x661603e00102ff00000000ff1303c26cfe06bac5bfee29907f37919643def75c",
+  "0xed3c7d400100ff00000000ff901553e1e944736affe002d84e55218a242f01ff",
+  "0xed3c7d400101ff00000000ff901553e1e944736affe002d84e55218a242f01ff",
+]
+state = [
+  "0x8134214dae542e89e9da9bf898cce9ad9d0bd9a3c9c8bc487ebc62a4e916fd3d",
+  "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef",
+  "0x",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.makina.deposit.DUSD]
+position_id = "257907866263469253975271928750178105060"
+description = "Makina DUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010200ff000000ffa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "0x86e807f80100030104ff00ff94b1828f91c150c5e6776198e170aca4304903d7",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x013c6224952aa566d9dc0935a240476743830cb81bc321b88952f7e792cb7b2d",
+  "0x00000000000000000000000094b1828f91c150c5e6776198e170aca4304903d7",
+  "0x000000000000000000000000bfd1a1d861dd8fba471885d510dcacc71a4c2f58",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+]
+bitmap = "74436767763955288882613195375699296256"
+
+[[instructions.makina.deposit.DUSD.inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of AT to deposit (in AT decimals)"
+type = "Uint"
+
+[[instructions.makina.deposit.DUSD.inputs_slots]]
+index = 1
+name = "min_shares"
+description = "Minimum MT shares to receive (slippage protection, 18 decimals)"
+type = "Uint"
+
+[instructions.makina.request_redeem.DUSD]
+position_id = "257907866263469253975271928750178105060"
+description = "Makina DUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x8eaa6ac00105ff0000000007901553e1e944736affe002d84e55218a242f01ff",
+  "0x32148d73010702ff000000076e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x711ecf590107ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010300ff000000ff1e33e98af620f1d563fcd3cfd3c75ace841204ef",
+  "0x24c7e13f01000401ff0000041303c26cfe06bac5bfee29907f37919643def75c",
+  "0xf71f7a25010504ff000000ff901553e1e944736affe002d84e55218a242f01ff",
+  "0xf71f7a25010600ff000000ff901553e1e944736affe002d84e55218a242f01ff",
+]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000001303c26cfe06bac5bfee29907f37919643def75c",
+  "0x000000000000000000000000bfd1a1d861dd8fba471885d510dcacc71a4c2f58",
+  "0x8134214dae542e89e9da9bf898cce9ad9d0bd9a3c9c8bc487ebc62a4e916fd3d",
+  "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef",
+  "0x",
+]
+bitmap = "82412135738664784120036037737381363712"
+
+[[instructions.makina.request_redeem.DUSD.inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "Amount of MT shares to redeem (18 decimals)"
+type = "Uint"
+
+[[instructions.makina.request_redeem.DUSD.inputs_slots]]
+index = 1
+name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+type = "Uint"
+
+[instructions.makina.request_redeem_relative.DUSD]
+position_id = "257907866263469253975271928750178105060"
+description = "Makina DUSD"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = []
+position_tokens = []
+commands = [
+  "0x70a082310105ff00000000081e33e98af620f1d563fcd3cfd3c75ace841204ef",
+  "0xaa9a091201080002ff0000083d623b199e290358416415ea7e05b635e442e3c0",
+  "0x8eaa6ac00106ff0000000002901553e1e944736affe002d84e55218a242f01ff",
+  "0x32148d73010203ff000000026e2ed2f457c41f38556ab0c2b1185cc9e6563d8d",
+  "0x711ecf590102ff00000000ff00c93e3b09ca2f544487d4298339765eadcd8353",
+  "0x095ea7b3010408ff000000ff1e33e98af620f1d563fcd3cfd3c75ace841204ef",
+  "0x24c7e13f01080501ff0000051303c26cfe06bac5bfee29907f37919643def75c",
+  "0xf71f7a25010605ff000000ff901553e1e944736affe002d84e55218a242f01ff",
+  "0xf71f7a25010708ff000000ff901553e1e944736affe002d84e55218a242f01ff",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x02ae155289faf218c19c3c9e8126b17456b1672ff82428ca3c245923d356f70b",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x0000000000000000000000001303c26cfe06bac5bfee29907f37919643def75c",
+  "0x000000000000000000000000bfd1a1d861dd8fba471885d510dcacc71a4c2f58",
+  "0x8134214dae542e89e9da9bf898cce9ad9d0bd9a3c9c8bc487ebc62a4e916fd3d",
+  "0xac0ec79dcce79f61142b7d5733bbb493647dcc32c18fdc97d06e9a4b7d39eaef",
+  "0x",
+]
+bitmap = "83741363734449699992939844797661708288"
+
+[[instructions.makina.request_redeem_relative.DUSD.inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "Percentage of MT shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[[instructions.makina.request_redeem_relative.DUSD.inputs_slots]]
+index = 1
+name = "min_assets"
+description = "Minimum AT to receive at request time (slippage protection, in AT decimals)"
+type = "Uint"
