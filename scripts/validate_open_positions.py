@@ -35,6 +35,7 @@ CHAIN_ALCHEMY_SLUG = {
     "base": "base-mainnet",
     "arbitrum": "arb-mainnet",
     "monad": "monad-mainnet",
+    "avalanche": "avax-mainnet",
 }
 
 # Minimal ABI for the Caliber contract — only the functions needed to
