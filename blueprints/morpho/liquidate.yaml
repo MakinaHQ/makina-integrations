@@ -36,9 +36,11 @@ protocol: "morpho"
 # A liquidation that would repay more than `max_repaid_assets` reverts in transferFrom.
 #
 # ## Cooldown
-# Caliber cooldowns are keyed on (position id, commands, direction), not on the state, so
-# one action of this blueprint can run once per caliber cooldown per position: one
-# liquidation per market per cooldown (120 s on usdSHFmk as of 2026-11-19).
+# Caliber cooldowns are keyed on (position id, commands, direction), not on the state. The
+# market id is state and the loan token is a command target, so within one position each
+# action runs once per caliber cooldown per loan token (120 s on usdSHFmk as of 2026-11-19).
+# A position holding several markets with the same loan token (e.g. one PT lent against in
+# two USDC markets) liquidates them one at a time.
 #
 # ## Two sizing modes
 # - liquidate_seized_assets: name the collateral amount to seize (partial liquidations).

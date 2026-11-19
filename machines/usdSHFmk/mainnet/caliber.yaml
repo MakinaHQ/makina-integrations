@@ -14,6 +14,12 @@ config:
   caliber_address:
     type: "address"
     value: "0xbeef123217647014429B7670329782e210884E89"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
 
 positions:
 
@@ -118,6 +124,13 @@ positions:
       label: "USDS Staking"
       staking_token_address: ${token_list.mainnet.USDS}
       staking_contract_address: "0x3bD276885c070Fe3D9bafdc5e699E85D2d776A15"
+
+  # Pendle PTs taken as Morpho collateral in liquidations, held to maturity and redeemed
+  - id: "4534653900577794508910448003030841549747250242774668131960239438156352997204" # keccak256("pendle.pt.PT-reUSD-10DEC2026")
+    group_id: "0"
+    description: "Pendle - PT-reUSD-10DEC2026 (liquidations and maturity redemption)"
+    instructions: !include "./instructions/pendle-pt-reusd-10dec2026.yaml"
+    position_tokens: ["0xeCfaFdC7741323a945A163ed068B5a3C43483957"]
 
   # Harvesting
   - id: "777"

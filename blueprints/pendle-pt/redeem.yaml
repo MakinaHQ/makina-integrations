@@ -1,0 +1,165 @@
+protocol: "pendle-pt"
+
+# Pendle PT — redeem at maturity, without a router or swap: PT -> SY -> token_out.
+#
+# After expiry every PT redeems to exactly one unit of its market's accounting asset.
+# The flow is Pendle's own:
+#   1. PT.transfer(YT, amount)      the YT contract redeems what it holds ("floating" PT)
+#   2. YT.redeemPY(caliber)         burns the floating PT, mints SY to the caliber
+#   3. SY.redeem(caliber, syOut, token_out, min_token_out, false)
+# All three run in one weiroll execution, so nothing floats between transactions.
+#
+# ## Expiry guard comes first, on purpose
+# Before expiry, redeemPY burns min(PT, YT) held by the YT contract. With PT alone that is
+# 0: the call succeeds, redeems nothing, and LEAVES THE PT FLOATING in the YT contract, where
+# the next caller of redeemPY takes it. (Seen on a fork: a second redeemPY after expiry swept
+# both its own PT and the first one's.) The action therefore reverts unless PT.isExpired()
+# before the PT is moved.
+#
+# ## The YT and SY are fixed inputs, checked against the PT
+# Weiroll targets are fixed in the commands, so the YT and SY addresses are inputs. The
+# action checks them against PT.YT() and PT.SY() so a misconfigured instruction reverts
+# instead of sending PT to the wrong contract.
+#
+# ## token_out
+# Prefer the SY's yield token, or its accounting asset when the SY lists it in
+# getTokensOut(): both come out 1:1 from the SY. Other tokensOut can route through the
+# issuer and fail (srUSDe's SY reverted when asked for sUSDe on a fork). token_out must be
+# a caliber base token; the caliber's value check then compares the PT position's decrease
+# with the token_out received.
+
+inputs:
+  pt_token_address:
+    type: "address"
+  yt_address:
+    type: "address"
+  sy_address:
+    type: "address"
+  token_out_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+
+actions:
+  redeem-matured:
+    calls:
+      - description: "Check the PT has expired"
+        target: "${inputs.pt_token_address}"
+        selector: "isExpired()"
+        parameters: []
+        return:
+          name: "is_expired"
+          type: "bool"
+
+      - description: "Revert before expiry: a PT sent to the YT contract early would be left for anyone to take"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_expired}"
+
+      - description: "Read the PT's YT"
+        target: "${inputs.pt_token_address}"
+        selector: "YT()"
+        parameters: []
+        return:
+          name: "pt_yt"
+          type: "address"
+
+      - description: "Check the configured YT is the PT's YT"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.yt_address}"
+          - type: "address"
+            value: "${returns.pt_yt}"
+        return:
+          name: "is_yt_valid"
+          type: "bool"
+
+      - description: "Revert if the YT does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_yt_valid}"
+
+      - description: "Read the PT's SY"
+        target: "${inputs.pt_token_address}"
+        selector: "SY()"
+        parameters: []
+        return:
+          name: "pt_sy"
+          type: "address"
+
+      - description: "Check the configured SY is the PT's SY"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.sy_address}"
+          - type: "address"
+            value: "${returns.pt_sy}"
+        return:
+          name: "is_sy_valid"
+          type: "bool"
+
+      - description: "Revert if the SY does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_sy_valid}"
+
+      - description: "Send the PT to its YT contract"
+        target: "${inputs.pt_token_address}"
+        selector: "transfer(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.yt_address}"
+          - type: "uint256"
+            value: "${input_slots.pt_amount}"
+
+      - description: "Redeem the PT into SY, minted to the caliber"
+        target: "${inputs.yt_address}"
+        selector: "redeemPY(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "sy_out"
+          type: "uint256"
+
+      - description: "Redeem the SY into token_out, paid to the caliber"
+        target: "${inputs.sy_address}"
+        selector: "redeem(address,uint256,address,uint256,bool)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "uint256"
+            value: "${returns.sy_out}"
+          - type: "address"
+            value: "${inputs.token_out_address}"
+          - type: "uint256"
+            value: "${input_slots.min_token_out}"
+          - type: "bool"
+            value: "false"
+
+    input_slots:
+      pt_amount:
+        type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.pt_token_address}
+        description: "PT to redeem, in PT decimals. Usually the caliber's whole PT balance."
+      min_token_out:
+        type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.token_out_address}
+        description: "Least token_out to accept, in token_out decimals."

@@ -1,0 +1,174 @@
+# PT-reUSD-10DEC2026 — liquidate Morpho borrowers who post it as collateral, hold the PT as a
+# position valued by Pendle's oracle, and redeem it at maturity into reUSD.
+#
+# One position per PT: Makina lets a token be the position token of only one position, so
+# every Morpho market with this PT as collateral gets its liquidation leaves here.
+#
+#   PT      0xeCfaFdC7741323a945A163ed068B5a3C43483957 (6 decimals, expiry 2026-12-10)
+#   YT      0xA8bD3B21291AcE53927b35563fc80615919E63D7
+#   SY      0x9487Bd5A3b16Ecb5F3184453E3ee75B800141648 (18 decimals; yield token and only tokenOut reUSD)
+#   market  0x13285bcbc27f92b47b4edb99d744c07b48c977c0 (Pendle; accounting asset USDC)
+#   reUSD   0x5086bf358635B81D8C47C66d1C8b9E567Db70c72 (18 decimals)
+#
+# Morpho markets (both 91.5% LLTV, oracle 0x217d6ddcdb95112c51657f6270e8c079cfdb51f0, which
+# reads Pendle's PT-to-asset TWAP, so the liquidation gain is exactly Morpho's bonus):
+#   USDC 0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64
+#   USDT 0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca
+# The AUSD market 0xea6abacc02dadfdb1bc2f4f1571da3fcb9c2b3028230d80fc71447a177cf4e99 holds
+# about 1 AUSD and is left out.
+#
+# Before go-live: addBaseToken(reUSD) on this caliber (the OracleRegistry already prices it),
+# and an exit for the reUSD (Re's KYC-gated instant redemption, blueprints/re/withdraw.yaml).
+#
+# Value checks (Caliber._managePosition):
+#   - liquidate: the loan token paid (an affected base token) against the PT position's
+#     increase at Pendle's 15-minute TWAP in USDC; up to maxPositionIncreaseLossBps (1%) loss.
+#   - redeem: the PT position's decrease (1 USDC per PT after expiry) against the reUSD
+#     received at the OracleRegistry's reUSD price.
+# Cooldowns are keyed on (position, commands, direction). The market id sits in the state,
+# but the loan token is a command target, so the USDC and USDT leaves cool down separately;
+# markets of this PT that share a loan token would share one cooldown.
+#
+# Template for another PT: copy this file and change the addresses above, the loan tokens,
+# token_out (the SY's yield token or accounting asset, a caliber base token) and
+# decimals_adjustment (1e18 when the PT and the accounting asset share decimals, as here:
+# both 6).
+
+# ── Liquidate, USDC market ─────────────────────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: "PT-reUSD-10DEC2026 / USDC 91.5%"
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_seized_assets"
+    inputs: &liquidate_usdc
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
+      loan_token:
+        type: "address"
+        value: ${token_list.mainnet.USDC}
+      collateral_token:
+        type: "address"
+        value: "0xeCfaFdC7741323a945A163ed068B5a3C43483957" # PT-reUSD-10DEC2026
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: "PT-reUSD-10DEC2026 / USDC 91.5%"
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_repaid_shares"
+    inputs: *liquidate_usdc
+
+# ── Liquidate, USDT market ─────────────────────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "PT-reUSD-10DEC2026 / USDT 91.5%"
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_seized_assets"
+    inputs: &liquidate_usdt
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
+      loan_token:
+        type: "address"
+        value: ${token_list.mainnet.USDT}
+      collateral_token:
+        type: "address"
+        value: "0xeCfaFdC7741323a945A163ed068B5a3C43483957" # PT-reUSD-10DEC2026
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${token_list.mainnet.USDT}
+  instruction:
+    label: "PT-reUSD-10DEC2026 / USDT 91.5%"
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_repaid_shares"
+    inputs: *liquidate_usdt
+
+# ── Account: PT balance x Pendle PT-to-asset rate, in USDC ─────────────────────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${token_list.mainnet.USDC}
+  instruction:
+    label: "PT-reUSD-10DEC2026"
+    path: "../../../blueprints/pendle-pt/account.yaml:account-pt-asset-rate"
+    inputs:
+      pt_token_address:
+        type: "address"
+        value: "0xeCfaFdC7741323a945A163ed068B5a3C43483957"
+      unsigned_math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      pendle_pylp_oracle_address:
+        type: "address"
+        value: "0x5542be50420E88dd7D5B4a3D488FA6ED82F6DAc2" # Pendle PY/LP oracle, as used by dbit
+      twap_duration:
+        type: "uint32"
+        value: "900" # 15 minutes
+      pendle_market_address:
+        type: "address"
+        value: "0x13285bcbc27f92b47b4edb99d744c07b48c977c0"
+      decimals_adjustment:
+        type: "uint256"
+        value: "1000000000000000000" # 1e18: PT and USDC both have 6 decimals
+      vault_token_address:
+        type: "address"
+        value: ${token_list.mainnet.USDC} # unused by account-pt-asset-rate
+
+# ── Redeem at maturity: PT -> SY -> reUSD ──────────────────────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - "0x5086bf358635B81D8C47C66d1C8b9E567Db70c72" # reUSD, a base token once added
+  instruction:
+    label: "PT-reUSD-10DEC2026"
+    path: "../../../blueprints/pendle-pt/redeem.yaml:redeem-matured"
+    inputs:
+      pt_token_address:
+        type: "address"
+        value: "0xeCfaFdC7741323a945A163ed068B5a3C43483957"
+      yt_address:
+        type: "address"
+        value: "0xA8bD3B21291AcE53927b35563fc80615919E63D7"
+      sy_address:
+        type: "address"
+        value: "0x9487Bd5A3b16Ecb5F3184453E3ee75B800141648"
+      token_out_address:
+        type: "address"
+        value: "0x5086bf358635B81D8C47C66d1C8b9E567Db70c72" # reUSD
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
