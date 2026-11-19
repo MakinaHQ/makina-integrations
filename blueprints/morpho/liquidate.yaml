@@ -1,0 +1,421 @@
+protocol: "morpho"
+
+# Morpho Blue liquidation from the caliber's own balance — no callback, no flash loan.
+#
+# The caliber repays a borrower's debt in one fixed market and receives the seized
+# collateral, which it then holds until an exit position (an issuer redemption, a swap)
+# turns it back into the loan token. Built for collateral that cannot be sold inside the
+# liquidation transaction, so the caliber's capital is what makes the liquidation possible.
+#
+# ## No callback, on purpose
+# Morpho's `liquidate(..., data)` calls `onMorphoLiquidate` on msg.sender when `data` is
+# non-empty. The Caliber implements no such callback, so `data` is always empty and Morpho
+# pulls the repaid loan token from the caliber with transferFrom after sending the
+# collateral. The caliber must therefore hold the loan token before the call.
+#
+# ## The price guard is the caliber's own value check
+# Use as a MANAGEMENT instruction whose position accounts to 0 (see `account_0` below)
+# and whose affected_tokens are [loan token, collateral token]; both must be caliber base
+# tokens. With a zero position change, Caliber._managePosition reverts on ANY fall in the
+# affected tokens' OracleRegistry value (`_checkPositionMinDelta(0, loss, maxLossBps)`
+# needs loss == 0). A liquidation therefore goes through only if the OracleRegistry values
+# the seized collateral at or above the loan token paid. Morpho pays collateral worth
+# repaid × LIF at the MARKET oracle, so the leaf works while the OracleRegistry price of the
+# collateral stays above (market oracle price ÷ LIF). If it falls further, every call
+# reverts with MaxValueLossExceeded.
+#
+# ## Fixed market, variable borrower and size
+# The market id is a fixed input, so the leaf can only liquidate that market; the market
+# params are read from Morpho, and the declared loan and collateral tokens are checked
+# against them, so the affected_tokens can never disagree with the market. The borrower
+# and the size are input slots (left out of the leaf hash), chosen at execution time.
+#
+# ## Allowance
+# The caliber approves `max_repaid_assets` of the loan token to Morpho, which pulls only
+# what the liquidation repays, and then resets the allowance to 0 so nothing is left open.
+# A liquidation that would repay more than `max_repaid_assets` reverts in transferFrom.
+#
+# ## Cooldown
+# Caliber cooldowns are keyed on (position id, commands, direction), not on the state, so
+# one action of this blueprint can run once per caliber cooldown per position: one
+# liquidation per market per cooldown (120 s on usdSHFmk as of 2026-11-19).
+#
+# ## Two sizing modes
+# - liquidate_seized_assets: name the collateral amount to seize (partial liquidations).
+# - liquidate_repaid_shares: name the borrow shares to repay (closing a position exactly,
+#   e.g. all of `position(id, borrower).borrowShares`).
+# Morpho requires exactly one of seizedAssets and repaidShares to be zero.
+
+inputs:
+  morpho_address:
+    type: "address"
+  caliber_helper_address:
+    type: "address"
+  boolean_helper_address:
+    type: "address"
+  market_id:
+    type: "bytes32"
+  loan_token:
+    type: "address"
+  collateral_token:
+    type: "address"
+
+actions:
+  # ==========================================================================
+  # liquidate_seized_assets: seize an exact collateral amount.
+  # ==========================================================================
+  liquidate_seized_assets:
+    calls:
+      - description: "Get market parameters from market ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "market_loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "market_collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "market_oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "market_irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "market_lltv"
+          type: "uint256"
+
+      - description: "Check the declared loan token is the market's loan token"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.loan_token}"
+          - type: "address"
+            value: "${returns.market_loan_token}"
+        return:
+          name: "is_loan_token_valid"
+          type: "bool"
+
+      - description: "Revert if the loan token does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_loan_token_valid}"
+
+      - description: "Check the declared collateral token is the market's collateral token"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.collateral_token}"
+          - type: "address"
+            value: "${returns.market_collateral_token}"
+        return:
+          name: "is_collateral_token_valid"
+          type: "bool"
+
+      - description: "Revert if the collateral token does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_collateral_token_valid}"
+
+      - description: "Approve Morpho to pull at most max_repaid_assets of the loan token"
+        target: "${inputs.loan_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${input_slots.max_repaid_assets}"
+
+      - description: "Liquidate: seize an exact collateral amount, repay what it costs (no callback)"
+        target: "${inputs.morpho_address}"
+        selector: "liquidate((address,address,address,address,uint256),address,uint256,uint256,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.market_loan_token}"
+              - type: "address"
+                value: "${returns.market_collateral_token}"
+              - type: "address"
+                value: "${returns.market_oracle}"
+              - type: "address"
+                value: "${returns.market_irm}"
+              - type: "uint256"
+                value: "${returns.market_lltv}"
+          - type: "address"
+            value: "${input_slots.borrower}"
+          - type: "uint256"
+            value: "${input_slots.seized_assets}"
+          - type: "uint256"
+            value: "0"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Reset the loan token allowance to 0"
+        target: "${inputs.loan_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "0"
+
+    input_slots:
+      borrower:
+        type: "address"
+        description: "The borrower to liquidate. Must be liquidatable in this market at execution time."
+      seized_assets:
+        type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.collateral_token}
+        description: "Collateral to seize, in the collateral token's decimals."
+      max_repaid_assets:
+        type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.loan_token}
+        description: "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+
+  # ==========================================================================
+  # liquidate_repaid_shares: repay an exact number of borrow shares.
+  # ==========================================================================
+  liquidate_repaid_shares:
+    calls:
+      - description: "Get market parameters from market ID"
+        target: "${inputs.morpho_address}"
+        selector: "idToMarketParams(bytes32)"
+        parameters:
+          - type: "bytes32"
+            value: "${inputs.market_id}"
+        return:
+          name: "market_params"
+          type: "(address,address,address,address,uint256)"
+
+      - description: "Extract loan token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "0"
+        return:
+          name: "market_loan_token"
+          type: "address"
+
+      - description: "Extract collateral token from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "1"
+        return:
+          name: "market_collateral_token"
+          type: "address"
+
+      - description: "Extract oracle from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "2"
+        return:
+          name: "market_oracle"
+          type: "address"
+
+      - description: "Extract IRM from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "3"
+        return:
+          name: "market_irm"
+          type: "address"
+
+      - description: "Extract LLTV from market params"
+        target: "${inputs.caliber_helper_address}"
+        selector: "extractElementFromStaticTuple(bytes,uint256)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value: "${returns.market_params}"
+          - type: "uint256"
+            value: "4"
+        return:
+          name: "market_lltv"
+          type: "uint256"
+
+      - description: "Check the declared loan token is the market's loan token"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.loan_token}"
+          - type: "address"
+            value: "${returns.market_loan_token}"
+        return:
+          name: "is_loan_token_valid"
+          type: "bool"
+
+      - description: "Revert if the loan token does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_loan_token_valid}"
+
+      - description: "Check the declared collateral token is the market's collateral token"
+        target: "${inputs.caliber_helper_address}"
+        selector: "addressEq(address,address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.collateral_token}"
+          - type: "address"
+            value: "${returns.market_collateral_token}"
+        return:
+          name: "is_collateral_token_valid"
+          type: "bool"
+
+      - description: "Revert if the collateral token does not match"
+        target: "${inputs.boolean_helper_address}"
+        selector: "revertIfFalse(bool)"
+        parameters:
+          - type: "bool"
+            value: "${returns.is_collateral_token_valid}"
+
+      - description: "Approve Morpho to pull at most max_repaid_assets of the loan token"
+        target: "${inputs.loan_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "${input_slots.max_repaid_assets}"
+
+      - description: "Liquidate: repay an exact number of borrow shares, seize what they buy (no callback)"
+        target: "${inputs.morpho_address}"
+        selector: "liquidate((address,address,address,address,uint256),address,uint256,uint256,bytes)"
+        parameters:
+          - type: "(address,address,address,address,uint256)"
+            value:
+              - type: "address"
+                value: "${returns.market_loan_token}"
+              - type: "address"
+                value: "${returns.market_collateral_token}"
+              - type: "address"
+                value: "${returns.market_oracle}"
+              - type: "address"
+                value: "${returns.market_irm}"
+              - type: "uint256"
+                value: "${returns.market_lltv}"
+          - type: "address"
+            value: "${input_slots.borrower}"
+          - type: "uint256"
+            value: "0"
+          - type: "uint256"
+            value: "${input_slots.repaid_shares}"
+          - type: "bytes"
+            value: "0x"
+
+      - description: "Reset the loan token allowance to 0"
+        target: "${inputs.loan_token}"
+        selector: "approve(address,uint256)"
+        parameters:
+          - type: "address"
+            value: "${inputs.morpho_address}"
+          - type: "uint256"
+            value: "0"
+
+    input_slots:
+      borrower:
+        type: "address"
+        description: "The borrower to liquidate. Must be liquidatable in this market at execution time."
+      repaid_shares:
+        type: "uint256"
+        description: "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
+      max_repaid_assets:
+        type: "uint256"
+        input_type:
+          amount:
+            token: ${inputs.loan_token}
+        description: "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+
+  # ==========================================================================
+  # account_0: the liquidation position never holds value of its own.
+  # ==========================================================================
+  # The seized collateral and the loan token are caliber base tokens, valued by the
+  # caliber's base-token registry. Accounting returns 0 so nothing is counted twice, and
+  # so the management value check above runs with a zero position change. Same shape as
+  # blueprints/noon-otc/account.yaml:account_0.
+  account_0:
+    calls: []
+
+    reserved_slots:
+      - type: "uint256"
+        value: "${builtins.UINT256_0}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

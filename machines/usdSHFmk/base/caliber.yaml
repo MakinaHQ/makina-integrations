@@ -11,6 +11,12 @@ config:
   caliber_address:
     type: "address"
     value: "0xbeef123217647014429B7670329782e210884E89"
+  caliber_helper_address:
+    type: "address"
+    value: "0xC62d6FDC4e77C4d006784bc4805703b37fFCc4b7"
+  boolean_helper_address:
+    type: "address"
+    value: "0x8dc60173F37B34998FD5B2aeF47Dd68C68CC22C4"
 
 positions:
 
@@ -18,7 +24,7 @@ positions:
   - id: "107748699282353890608450452296395923511697059219688206203817978138856427849492"
     group_id: "0"
     description: "Morpho - Steakhouse Prime USDC Instant"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
     vars:
       label: "USDC Prime Instant"
       asset_address: ${token_list.base.USDC}
@@ -27,7 +33,7 @@ positions:
   - id: "112518405458259504721404525495674933003959058649730723355561134056878651038998"
     group_id: "0"
     description: "Morpho - Steakhouse USDC High Yield Instant"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
     vars:
       label: "USDC High Yield Instant"
       asset_address: ${token_list.base.USDC}
@@ -36,11 +42,39 @@ positions:
   - id: "15189847262677934881531015165791414976899845815171706841773772312513674845211"
     group_id: "0"
     description: "Morpho - Steakhouse USDC Turbo"
-    instructions: !include "../../../instructions/morpho-vault.yaml"
+    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
     vars:
       label: "USDC Turbo"
       asset_address: ${token_list.base.USDC}
       vault_address: "0xBEEFFFe68dFc2D3BD1ABdAd37c70634973b16478"
+
+  # Liquidations — the caliber repays from its own USDC and holds the seized mGLO until it
+  # redeems it with Midas. Needs addBaseToken(mGLO) on this caliber before go-live; the
+  # OracleRegistry already prices mGLO on Base.
+  - id: "55948954168096303617893841822166485818052925009390814643513582551906800901618" # keccak256("morpho.liquidate.base.0xe0cda5bceeae3b1848cabfadba74ef8bf446e80874068eecbf0687d39b0021d9")
+    group_id: "0"
+    description: "Morpho - liquidate mGLO/USDC 91.5% (oracle 0xbfa7…c5Be)"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"
+      market_id: "0xe0cda5bceeae3b1848cabfadba74ef8bf446e80874068eecbf0687d39b0021d9"
+      loan_token: ${token_list.base.USDC}
+      collateral_token: ${token_list.base.mGLO}
+
+  - id: "63779458687693484263819886032587288929014600646574613702279547987872169945854" # keccak256("morpho.liquidate.base.0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b")
+    group_id: "0"
+    description: "Morpho - liquidate mGLO/USDC 91.5% (oracle 0x182e…A109)"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"
+      market_id: "0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b"
+      loan_token: ${token_list.base.USDC}
+      collateral_token: ${token_list.base.mGLO}
+
+  # TODO: mGLO redemption (exit for the liquidated mGLO) through
+  # instructions/midas-redemption.yaml against Midas's Base mGLO redemption vault
+  # 0xa80f9bffff91cbc13314fefd05560032af018f18 (USDC payout, greenlist enforced), once
+  # Midas greenlists this caliber.
 
   # Harvesting
   - id: "777"
