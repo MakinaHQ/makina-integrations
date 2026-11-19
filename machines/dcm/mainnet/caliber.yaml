@@ -478,6 +478,36 @@ positions:
       asset_address: ${token_list.mainnet.RLUSD}
       spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
       reserve_id: "0"
+  # USDe/PRIME collateral with RLUSD debt on the same Spoke (group 7). RLUSD
+  # has collateral factor 0 here, so only USDe (91.5%) and PRIME (89.5%) back
+  # the borrow. Enable collateral on each supply before borrowing.
+  - id: "131032346166927260747122765840256404474" # pools_db makina_id
+    group_id: "7"
+    description: "AaveV4 Sentora Supply USDe (RLUSD Yield, reserve 1)"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "USDe - RLUSD Yield / Sentora (reserve 1)"
+      asset_address: ${token_list.mainnet.USDe}
+      spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
+      reserve_id: "1"
+  - id: "262317813904106805611575232172206873036" # pools_db makina_id
+    group_id: "7"
+    description: "AaveV4 Sentora Supply PRIME (RLUSD Yield, reserve 2)"
+    instructions: !include "../../../instructions/aavev4-supply.yaml"
+    vars:
+      label: "PRIME - RLUSD Yield / Sentora (reserve 2)"
+      asset_address: ${token_list.mainnet.PRIME}
+      spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
+      reserve_id: "2"
+  - id: "112934494638516119578738818607297572822" # pools_db makina_id
+    group_id: "7"
+    description: "AaveV4 Sentora Borrow RLUSD (RLUSD Yield, reserve 0)"
+    instructions: !include "../../../instructions/aavev4-borrow.yaml"
+    vars:
+      label: "RLUSD debt - RLUSD Yield / Sentora (reserve 0)"
+      asset_address: ${token_list.mainnet.RLUSD}
+      spoke_address: "0x9EbF0C19BF7dFE859820Cc09E846114b53814e52"
+      reserve_id: "0"
 
   # ── Aave V4 Maple SyrupUSDG spoke (Global Dollar hub) ─────────────
   # syrupUSDG/USDG loop, dusd syrupUSDT-style POSITION model: syrupUSDG is not a
@@ -512,6 +542,33 @@ positions:
       reserve_id: "0"
 
   # ── Fluid ─────────────────────────────────────────────────────────
+  - id: "245582058048879173309055152932056167470"
+    group_id: "0"
+    description: "Fluid USDC Lending"
+    instructions: !include "./instructions/fluid-lending.yaml"
+    position_tokens: ["0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33"]
+    vars:
+      label: "USDC"
+      asset_address: ${token_list.mainnet.USDC}
+      vault_address: "0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33"
+  - id: "284817308900878254659675194774772439841"
+    group_id: "0"
+    description: "Fluid USDT Lending"
+    instructions: !include "./instructions/fluid-lending.yaml"
+    position_tokens: ["0x5C20B550819128074FD538Edf79791733ccEdd18"]
+    vars:
+      label: "USDT"
+      asset_address: ${token_list.mainnet.USDT}
+      vault_address: "0x5C20B550819128074FD538Edf79791733ccEdd18"
+  - id: "187487145492373933671944618718033568251"
+    group_id: "0"
+    description: "Fluid GHO Lending"
+    instructions: !include "./instructions/fluid-lending.yaml"
+    position_tokens: ["0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"]
+    vars:
+      label: "GHO"
+      asset_address: ${token_list.mainnet.GHO}
+      vault_address: "0x6A29A46E21C730DcA1d8b23d637c101cec605C5B"
   - id: "280756842428125260997025717226665040346"
     group_id: "0"
     description: "Fluid Lite USD (deposit USDC)"
