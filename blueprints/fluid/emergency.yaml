@@ -1,0 +1,35 @@
+# Regular (unstaked) Fluid fTokens only. maxRedeem includes the owner's balance,
+# cash available at Liquidity, and the fToken's expanding withdrawal limit.
+# Read and redeem in one transaction; do not size an emergency exit off-chain.
+# A zero/insignificant amount or protocol pause remains an atomic revert.
+protocol: "fluid"
+
+inputs:
+  vault_address:
+    type: "address"
+  caliber_address:
+    type: "address"
+
+actions:
+  emergency_redeem:
+    calls:
+      - description: "Read shares redeemable within Fluid's current liquidity and withdrawal limits"
+        target: "${inputs.vault_address}"
+        selector: "maxRedeem(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "redeemable_shares"
+          type: "uint256"
+
+      - description: "Redeem the available shares to the caliber"
+        target: "${inputs.vault_address}"
+        selector: "redeem(uint256,address,address)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.redeemable_shares}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
+          - type: "address"
+            value: "${inputs.caliber_address}"
