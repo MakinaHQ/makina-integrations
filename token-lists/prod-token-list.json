@@ -590,6 +590,13 @@
       "name": "USDT0",
       "decimals": 6,
       "symbol": "USDT0"
+    },
+    {
+      "chainId": 196,
+      "address": "0xB6CEceAB302E2E4948951eE7843FC24E92933061",
+      "name": "USDC",
+      "decimals": 6,
+      "symbol": "USDC"
     }
   ]
 }
