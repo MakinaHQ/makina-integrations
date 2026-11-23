@@ -1,0 +1,34 @@
+# Reuses the complete existing Makina deposit/account/request-redeem/claim flow.
+# CaliberMailbox: 0x70AB63687aa128585EA71459DB49836d3CE6074d
+config:
+  caliber_address:
+    type: "address"
+    value: "0xbfD1A1d861DD8fBA471885D510DCAcc71a4c2F58"
+  key_value_store_address:
+    type: "address"
+    value: "0x901553E1E944736AfFE002d84e55218a242f01ff"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
+  unsigned_math_helper_address:
+    type: "address"
+    value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
+
+positions:
+  - id: "257907866263469253975271928750178105060"
+    group_id: "0"
+    description: "Makina DUSD"
+    instructions: !include "../../../instructions/makina.yaml"
+    position_tokens: ["0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"]
+    vars:
+      label: "DUSD"
+      machine_token: "0x1e33E98AF620F1D563fCD3cfD3c75ACe841204ef"
+      machine: "0x6b006870C83b1Cd49E766Ac9209f8d68763Df721"
+      depositor: "0x94B1828F91c150C5E6776198e170aCa4304903d7"
+      redeemer: "0x1303c26cFE06bac5bfEE29907f37919643DEF75c"
+      accounting_token: ${token_list.mainnet.USDC}
+      redemption_request_id_key: ${keccak256("makina.mainnet.dusd.redemption_request_id")}
+      pending_redemption_share_amount_key: ${keccak256("makina.mainnet.dusd.pending_redemption_share_amount")}

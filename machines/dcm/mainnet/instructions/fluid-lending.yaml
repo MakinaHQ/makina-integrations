@@ -1,0 +1,84 @@
+# Regular Fluid fToken lending: unstaked shares, distinct from Fluid Lite.
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fluid/emergency.yaml:emergency_redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fluid/deposit.yaml:deposit"
+    inputs:
+      underlying_asset_address:
+        type: "address"
+        value: ${position.asset_address}
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fluid/account.yaml:account"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fluid/withdraw.yaml:redeem"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
+
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.asset_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/fluid/withdraw.yaml:redeem_relative"
+    inputs:
+      vault_address:
+        type: "address"
+        value: ${position.vault_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"
+      math_helper_address:
+        type: "address"
+        value: "${config.unsigned_math_helper_address}"
