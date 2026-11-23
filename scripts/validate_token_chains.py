@@ -36,6 +36,7 @@ CHAIN_TO_CHAIN_ID: dict[str, int] = {
     "arbitrum": 42161,
     "monad": 143,
     "avalanche": 43114,
+    "xlayer": 196,
 }
 
 
