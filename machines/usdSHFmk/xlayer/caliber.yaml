@@ -20,6 +20,7 @@ positions:
       label: "Gauntlet USDC Earn"
       asset_address: ${token_list.196.USDC}
       vault_address: "0x4802f950Ec247bcc9126ADF8e10ea025dEC3BB92"
+    position_tokens: ["0x4802f950Ec247bcc9126ADF8e10ea025dEC3BB92"]
 
   - id: "89770044574157788127428634312481291795045838112527768369704445749420974369255"
     group_id: "0"
@@ -29,6 +30,7 @@ positions:
       label: "Steakhouse USDC"
       asset_address: ${token_list.196.USDC}
       vault_address: "0xbEEFf8a9057E146E38a1853bdf2c5528184F2Ad4"
+    position_tokens: ["0xbEEFf8a9057E146E38a1853bdf2c5528184F2Ad4"]
 
   # Harvesting
   - id: "777"
