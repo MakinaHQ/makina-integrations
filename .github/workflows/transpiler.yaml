@@ -127,7 +127,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: MakinaHQ/transpiler
-          ref: f1b8bfefd53ef4db63041243b6fa33ba9b0c5d13
+          ref: d4ad3c1c8c69ebe2b76cef1d7b8cdb3e465b373e
           path: transpiler
           persist-credentials: false
 
