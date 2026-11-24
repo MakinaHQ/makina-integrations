@@ -1,3 +1,7 @@
+# Generic Morpho vault template, for both Morpho Vault V1 and V2.
+# Five ERC-4626 actions (deposit, account, redeem, relative redeem, withdraw),
+# without emergency redemption. Requires `unsigned_math_helper_address`.
+# Use morpho-vault-v1.yaml or morpho-vault-v2.yaml to add the emergency leg.
 - is_debt: false
   instruction_type: "MANAGEMENT"
   affected_tokens:

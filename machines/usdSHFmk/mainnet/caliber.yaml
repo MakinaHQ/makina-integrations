@@ -21,7 +21,7 @@ positions:
   - id: "113381721232607674663021988927911303225850827259126640828557600167613363278037"
     group_id: "0"
     description: "Morpho - USDC High Yield Instant"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDC High Yield Instant"
       asset_address: ${token_list.mainnet.USDC}
@@ -30,7 +30,7 @@ positions:
   - id: "92913126632701618168692101400696791611252150486759189953517405985285166360833"
     group_id: "0"
     description: "Morpho - USDC Prime Instant"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDC Prime Instant"
       asset_address: ${token_list.mainnet.USDC}
@@ -48,7 +48,7 @@ positions:
   - id: "62637211969224093105524059488197642861679330667763208449264095370504718130145" #
     group_id: "0"
     description: "Morpho - USDT High Yield Instant"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDT High Yield Instant"
       asset_address: ${token_list.mainnet.USDT}
@@ -57,7 +57,7 @@ positions:
   - id: "4006181232054141208147454663884125496812341165091287999287630871414616434294"
     group_id: "0"
     description: "Morpho - USDT Prime Instant"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDT Prime Instant"
       asset_address: ${token_list.mainnet.USDT}
@@ -66,7 +66,7 @@ positions:
   - id: "83590566332089234788126563161359194710771879875955496717246010493571215713520"
     group_id: "0"
     description: "Morpho - USDC High Yield Term"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDC High Yield Term"
       asset_address: ${token_list.mainnet.USDC}
@@ -75,7 +75,7 @@ positions:
   - id: "90921336893967830107325790067136229287057003113729923288594188276183277958283"
     group_id: "0"
     description: "Morpho - USDC Turbo"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "USDC Turbo"
       asset_address: ${token_list.mainnet.USDC}
@@ -84,7 +84,7 @@ positions:
   - id: "59240718622654600712413168424615621118428849033569937066928751029814600930804"
     group_id: "0"
     description: "Morpho - AUSD Turbo"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "AUSD Turbo"
       asset_address: ${token_list.mainnet.AUSD}
@@ -93,7 +93,7 @@ positions:
   - id: "83497740258054099744938802050405228295126607095228098589710251173730378877153"
     group_id: "0"
     description: "Morpho - AUSD High Yield Term"
-    instructions: !include "../../../instructions/morpho-vault-v1-legacy.yaml"
+    instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "AUSD High Yield Term"
       asset_address: ${token_list.mainnet.AUSD}
