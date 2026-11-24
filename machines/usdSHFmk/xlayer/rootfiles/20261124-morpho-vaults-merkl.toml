@@ -1,7 +1,7 @@
 # this is a generated file - do not edit manually
 # root: 0x5875bf312d80559ca5f4fac761713651a5343b3798086f31ebbe271c1be832df
 
-[tokens."${token_list.196.USDC}"]
+[tokens."${token_list.xlayer.USDC}"]
 chainId = 196
 address = "0xb6ceceab302e2e4948951ee7843fc24e92933061"
 name = "USDC"

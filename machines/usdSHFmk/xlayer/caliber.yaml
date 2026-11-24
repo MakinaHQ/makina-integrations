@@ -15,7 +15,7 @@ positions:
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "Gauntlet USDC Earn"
-      asset_address: ${token_list.196.USDC}
+      asset_address: ${token_list.xlayer.USDC}
       vault_address: "0x4802f950Ec247bcc9126ADF8e10ea025dEC3BB92"
     position_tokens: ["0x4802f950Ec247bcc9126ADF8e10ea025dEC3BB92"]
 
@@ -25,7 +25,7 @@ positions:
     instructions: !include "../../../instructions/morpho-vault.yaml"
     vars:
       label: "Steakhouse USDC"
-      asset_address: ${token_list.196.USDC}
+      asset_address: ${token_list.xlayer.USDC}
       vault_address: "0xbEEFf8a9057E146E38a1853bdf2c5528184F2Ad4"
     position_tokens: ["0xbEEFf8a9057E146E38a1853bdf2c5528184F2Ad4"]
 

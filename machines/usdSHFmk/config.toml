@@ -35,12 +35,12 @@ decimals = 6
 name = "USD Coin"
 symbol = "USDC"
 
-[calibers.196]
+[calibers.xlayer]
 address = "0xbeef123217647014429B7670329782e210884E89"
 swapper = "0x923c98b22F9c367A109E93f7dfBaCa28b20C17C3"
 rootfiles = "github:MakinaHQ/makina-integrations/machines/usdSHFmk/xlayer/rootfiles"
 
-[calibers.196.accounting_token]
+[calibers.xlayer.accounting_token]
 address = "0xB6CEceAB302E2E4948951eE7843FC24E92933061"
 decimals = 6
 name = "USDC"
