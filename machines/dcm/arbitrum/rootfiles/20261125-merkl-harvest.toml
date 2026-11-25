@@ -1,0 +1,345 @@
+# this is a generated file - do not edit manually
+# root: 0x462235efdf381a241f7149c2afcf2679c8b1407b72851b5d2033bb1e3fe3ccb7
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
+[instructions.morpho.account_vault."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000002390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+  "0x4cdad5060102ff0000000000390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000002beeff72b77e7584a450e887125f25e8d8819016a",
+  "0x4cdad5060102ff0000000000beeff72b77e7584a450e887125f25e8d8819016a",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.deposit_vault."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff004b506865409877c9fa29bfb1eba929984b9bbc",
+  "0x6e553f65010002ff000000ff390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Gauntlet USDG Premium".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Gauntlet USDG Premium".inputs_slots.input_type.amount]
+token = "0x004b506865409877c9fa29bfb1eba929984b9bbc"
+
+[instructions.morpho.deposit_vault."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff004b506865409877c9fa29bfb1eba929984b9bbc",
+  "0x6e553f65010002ff000000ffbeeff72b77e7584a450e887125f25e8d8819016a",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff72b77e7584a450e887125f25e8d8819016a",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."Steakhouse USDG Pro".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."Steakhouse USDG Pro".inputs_slots.input_type.amount]
+token = "0x004b506865409877c9fa29bfb1eba929984b9bbc"
+
+[instructions.morpho.emergency_redeem_vault."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310100ff0000000001390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+  "0xba08765201010000ff0000ff390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+]
+state = [
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.morpho.emergency_redeem_vault."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310100ff0000000001beeff72b77e7584a450e887125f25e8d8819016a",
+  "0xba08765201010000ff0000ffbeeff72b77e7584a450e887125f25e8d8819016a",
+]
+state = [
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "170141183460469231731687303715884105728"
+inputs_slots = []
+
+[instructions.morpho.redeem_vault."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ff390c1bb01f3f627144a40617e287d4ce3d5abcfa"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Gauntlet USDG Premium".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Gauntlet USDG Premium".inputs_slots.input_type.amount]
+token = "0x390c1bb01f3f627144a40617e287d4ce3d5abcfa"
+
+[instructions.morpho.redeem_vault."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff72b77e7584a450e887125f25e8d8819016a"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."Steakhouse USDG Pro".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."Steakhouse USDG Pro".inputs_slots.input_type.amount]
+token = "0xbeeff72b77e7584a450e887125f25e8d8819016a"
+
+[instructions.morpho.redeem_vault_relative."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ff390c1bb01f3f627144a40617e287d4ce3d5abcfa",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Gauntlet USDG Premium".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff72b77e7584a450e887125f25e8d8819016a",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff72b77e7584a450e887125f25e8d8819016a",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."Steakhouse USDG Pro".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Gauntlet USDG Premium"]
+position_id = "304988106812665501511560259101234316331"
+description = "Morpho Vault Gauntlet USDG Premium"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ff390c1bb01f3f627144a40617e287d4ce3d5abcfa"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Gauntlet USDG Premium".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."Steakhouse USDG Pro"]
+position_id = "176811302464815864743323663093751422246"
+description = "Morpho Vault Steakhouse USDG Pro"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x004b506865409877c9fa29bfb1eba929984b9bbc"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff72b77e7584a450e887125f25e8d8819016a"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000dc385c31c322351dac9ff4d7ded24e29b5d94768",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."Steakhouse USDG Pro".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
+type = "Uint"

@@ -7,6 +7,10 @@ config:
     value: "0x3D623B199E290358416415eA7e05B635E442e3c0"
 
 positions:
+  - id: "777"
+    group_id: "0"
+    description: "Merkl Harvest"
+    instructions: !include "./instructions/merkl.yaml"
   - id: "176811302464815864743323663093751422246"
     group_id: "0"
     description: "Morpho Vault Steakhouse USDG Pro"
