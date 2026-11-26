@@ -1,0 +1,894 @@
+# this is a generated file - do not edit manually
+# root: 0x407b51042a1421680218ca36dbe5efc9ac4a1446b4ff4d954343e0fcb6511492
+
+[tokens."${token_list.base.USDC}"]
+chainId = 8453
+address = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+name = "USD Coin"
+decimals = 6
+symbol = "USDC"
+
+[tokens."${token_list.base.mGLO}"]
+chainId = 8453
+address = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
+name = "Midas Fasanara Global Open"
+decimals = 18
+symbol = "mGLO"
+
+[instructions.merkl.harvest.Merkl]
+position_id = "777"
+description = "Merkl Harvest"
+is_debt = false
+group_id = "0"
+instruction_type = 2
+affected_tokens = []
+position_tokens = []
+commands = ["0x71ee95c00180818283ff00ff3ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"]
+state = [
+  "0xf8f2b2336f8f3139d343c33f49815a0c35e3c7a97a44fc9c538082a5c09c4dc3",
+  "0x1dca9170fb2417b0113118895cab68fdb33ddab264493656f2abd26bca5a91f4",
+  "0x1e58b0d11629f42685647974a200e9e62d553a9eb56dc6cc9130d61e10495de0",
+  "0xe027b98039a9275e4a147b3a9796d2521411ef59a5356320f3bbd4f66848455a",
+]
+bitmap = "0"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 0
+name = "merkl_claim_data.users"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "users"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 1
+name = "merkl_claim_data.tokens"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Address"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "tokens"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 2
+name = "merkl_claim_data.amounts"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type]
+Array = "Uint"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "amounts"
+
+[[instructions.merkl.harvest.Merkl.inputs_slots]]
+index = 3
+name = "merkl_claim_data.proofs"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.type.Array]
+Array = "FixedBytes32"
+
+[instructions.merkl.harvest.Merkl.inputs_slots.meta_type]
+type = "MerklClaimData"
+name = "merkl_claim_data"
+field = "proofs"
+
+[instructions.morpho.account_0."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.account_0."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
+position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0x182e…A109)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xfcc9cc1209651ed8867332d6f664cf82743a2584"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.account_0."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"]
+position_id = "55948954168096303617893841822166485818052925009390814643513582551906800901618"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0xbfa7…c5Be)"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0xfcc9cc1209651ed8867332d6f664cf82743a2584"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC High Yield Instant"]
+position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
+description = "Morpho - Steakhouse USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000002beeff7ae5e00aae3db302e4b0d8c883810a58100",
+  "0x4cdad5060102ff0000000000beeff7ae5e00aae3db302e4b0d8c883810a58100",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC Prime Instant"]
+position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
+description = "Morpho - Steakhouse Prime USDC Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000002beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+  "0x4cdad5060102ff0000000000beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.account_vault."USDC Turbo"]
+position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+description = "Morpho - Steakhouse USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000002beefffe68dfc2d3bd1abdad37c70634973b16478",
+  "0x4cdad5060102ff0000000000beefffe68dfc2d3bd1abdad37c70634973b16478",
+]
+state = [
+  "0x",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+inputs_slots = []
+
+[instructions.morpho.deposit_vault."USDC High Yield Instant"]
+position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
+description = "Morpho - Steakhouse USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x6e553f65010002ff000000ffbeeff7ae5e00aae3db302e4b0d8c883810a58100",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beeff7ae5e00aae3db302e4b0d8c883810a58100",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.deposit_vault."USDC Prime Instant"]
+position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
+description = "Morpho - Steakhouse Prime USDC Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x6e553f65010002ff000000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.deposit_vault."USDC Turbo"]
+position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+description = "Morpho - Steakhouse USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x095ea7b3010100ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x6e553f65010002ff000000ffbeefffe68dfc2d3bd1abdad37c70634973b16478",
+]
+state = [
+  "0x4a444f324d327a31a252465094d0cf0bf263cc614b736fad77deec31792c3a1e",
+  "0x000000000000000000000000beefffe68dfc2d3bd1abdad37c70634973b16478",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
+type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d04050603000c018aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xac2597c4e15ea29efa36184abf705e394f22e0edf44f346c84763616398739be",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x0000000000000000000000005d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 1
+name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
+type = "Uint"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
+position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0x182e…A109)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xfcc9cc1209651ed8867332d6f664cf82743a2584",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d04050603000c018aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xac2597c4e15ea29efa36184abf705e394f22e0edf44f346c84763616398739be",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x000000000000000000000000fcc9cc1209651ed8867332d6f664cf82743a2584",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 1
+name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
+type = "Uint"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"]
+position_id = "55948954168096303617893841822166485818052925009390814643513582551906800901618"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0xbfa7…c5Be)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xfcc9cc1209651ed8867332d6f664cf82743a2584",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d04050603000c018aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xac2597c4e15ea29efa36184abf705e394f22e0edf44f346c84763616398739be",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0xe0cda5bceeae3b1848cabfadba74ef8bf446e80874068eecbf0687d39b0021d9",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x000000000000000000000000fcc9cc1209651ed8867332d6f664cf82743a2584",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 1
+name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
+type = "Uint"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d0405060300010c8aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xca51d611ef17011a672d8a848d82801516018fb737a033d0e95776daf0146e92",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x0000000000000000000000005d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 1
+name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
+position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0x182e…A109)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xfcc9cc1209651ed8867332d6f664cf82743a2584",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d0405060300010c8aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xca51d611ef17011a672d8a848d82801516018fb737a033d0e95776daf0146e92",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x29ae7ac08be3a58e11151fed74701fb8e6ffd8e76b1870cf17ad70f332752d0b",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x000000000000000000000000fcc9cc1209651ed8867332d6f664cf82743a2584",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 1
+name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"]
+position_id = "55948954168096303617893841822166485818052925009390814643513582551906800901618"
+description = "Morpho - liquidate mGLO/USDC 91.5% (oracle 0xbfa7…c5Be)"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xfcc9cc1209651ed8867332d6f664cf82743a2584",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d0405060300010c8aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xca51d611ef17011a672d8a848d82801516018fb737a033d0e95776daf0146e92",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0xe0cda5bceeae3b1848cabfadba74ef8bf446e80874068eecbf0687d39b0021d9",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x000000000000000000000000fcc9cc1209651ed8867332d6f664cf82743a2584",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 1
+name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.redeem_vault."USDC High Yield Instant"]
+position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
+description = "Morpho - Steakhouse USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeeff7ae5e00aae3db302e4b0d8c883810a58100"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0xbeeff7ae5e00aae3db302e4b0d8c883810a58100"
+
+[instructions.morpho.redeem_vault."USDC Prime Instant"]
+position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
+description = "Morpho - Steakhouse Prime USDC Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0xbeefe94c8ad530842bfe7d8b397938ffc1cb83b2"
+
+[instructions.morpho.redeem_vault."USDC Turbo"]
+position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+description = "Morpho - Steakhouse USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xba08765201000101ff0000ffbeefffe68dfc2d3bd1abdad37c70634973b16478"]
+state = [
+  "0xb15298e086a78295e2256286b6732ccd460871f4fab230771100451e181985d6",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
+type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0xbeefffe68dfc2d3bd1abdad37c70634973b16478"
+
+[instructions.morpho.redeem_vault_relative."USDC High Yield Instant"]
+position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
+description = "Morpho - Steakhouse USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beeff7ae5e00aae3db302e4b0d8c883810a58100",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeeff7ae5e00aae3db302e4b0d8c883810a58100",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC Prime Instant"]
+position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
+description = "Morpho - Steakhouse Prime USDC Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[instructions.morpho.redeem_vault_relative."USDC Turbo"]
+position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+description = "Morpho - Steakhouse USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = [
+  "0x70a082310102ff0000000003beefffe68dfc2d3bd1abdad37c70634973b16478",
+  "0xaa9a091201030001ff0000033d623b199e290358416415ea7e05b635e442e3c0",
+  "0xba08765201030202ff0000ffbeefffe68dfc2d3bd1abdad37c70634973b16478",
+]
+state = [
+  "0xc1f391695ad9edea00e1476e5c61b3c06bd63e06140b26c9bcd6e670140134df",
+  "0x0000000000000000000000000000000000000000000000000000000000002710",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+  "0x",
+]
+bitmap = "127605887595351923798765477786913079296"
+
+[[instructions.morpho.redeem_vault_relative."USDC Turbo".inputs_slots]]
+index = 0
+name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC High Yield Instant"]
+position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
+description = "Morpho - Steakhouse USDC High Yield Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeeff7ae5e00aae3db302e4b0d8c883810a58100"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."USDC High Yield Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC Prime Instant"]
+position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
+description = "Morpho - Steakhouse Prime USDC Instant"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeefe94c8ad530842bfe7d8b397938ffc1cb83b2"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."USDC Prime Instant".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
+type = "Uint"
+
+[instructions.morpho.withdraw_vault."USDC Turbo"]
+position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
+description = "Morpho - Steakhouse USDC Turbo"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"]
+position_tokens = []
+commands = ["0xb460af9401000101ff0000ffbeefffe68dfc2d3bd1abdad37c70634973b16478"]
+state = [
+  "0xb816d86e70c0575d45c6ed11871cbf975a40cbd4803f7815aca294f6d0b656de",
+  "0x000000000000000000000000beef123217647014429b7670329782e210884e89",
+]
+bitmap = "85070591730234615865843651857942052864"
+
+[[instructions.morpho.withdraw_vault."USDC Turbo".inputs_slots]]
+index = 0
+name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
+type = "Uint"

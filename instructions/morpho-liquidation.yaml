@@ -1,0 +1,89 @@
+# Morpho Blue liquidation — the caliber repays a borrower's debt in one fixed market from
+# its own loan token balance and keeps the seized collateral as a base token. Pair it with
+# an exit position (an issuer redemption or a swap) for the collateral.
+#
+# Expected caliber vars (per-position):
+#   label:             string   — e.g. "mGLO/USDC 91.5% (0xe0cd…21d9) liquidation"
+#   market_id:         bytes32  — Morpho market identifier
+#   loan_token:        address  — the market's loan token; must be a caliber base token
+#   collateral_token:  address  — the market's collateral token; must be a caliber base token
+#                                 with an OracleRegistry price route
+#
+# Expected config:
+#   morpho_address
+#   caliber_helper_address   — extractElementFromStaticTuple, addressEq
+#   boolean_helper_address   — revertIfFalse
+#
+# Preconditions before go-live (see blueprints/morpho/liquidate.yaml):
+#   - addBaseToken(collateral_token) executed on the caliber (risk-manager timelock).
+#   - The OracleRegistry price of the collateral stays above market oracle ÷ LIF, or the
+#     value check reverts every call.
+#   - The caliber holds enough loan token for the liquidations it should be able to take.
+
+# MANAGEMENT — liquidate by seized collateral amount
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: # loan token out + collateral in — both base tokens; the value check is the price guard
+    - ${position.loan_token}
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_seized_assets"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+
+# MANAGEMENT — liquidate by repaid borrow shares
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens:
+    - ${position.loan_token}
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/liquidate.yaml:liquidate_repaid_shares"
+    inputs:
+      morpho_address:
+        type: "address"
+        value: "${config.morpho_address}"
+      caliber_helper_address:
+        type: "address"
+        value: "${config.caliber_helper_address}"
+      boolean_helper_address:
+        type: "address"
+        value: "${config.boolean_helper_address}"
+      market_id:
+        type: "bytes32"
+        value: ${position.market_id}
+      loan_token:
+        type: "address"
+        value: ${position.loan_token}
+      collateral_token:
+        type: "address"
+        value: ${position.collateral_token}
+
+# ACCOUNTING — 0; the held collateral is valued by the caliber's base-token registry
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.collateral_token}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/morpho/liquidate.yaml:account_0"
+    inputs: {}

@@ -77,3 +77,54 @@ actions:
         value: "${returns.asset_balance}"
       - type: "uint256"
         value: "${builtins.UINT256_MAX}"
+
+  account-pt-asset-rate:
+    # Values a held PT in its Pendle market's accounting asset, which must be a caliber
+    # base token: e.g. PT-sUSDS -> USDS, PT-reUSD -> USDC.
+    # 1. Get PT balance
+    # 2. Get asset per PT from the Pendle PY/LP oracle (TWAP). After expiry the rate is
+    #    exactly 1e18, so the position reads at par on maturity day with no special case.
+    # 3. asset = PT balance * rate / decimals_adjustment. With a 1e18 rate,
+    #    decimals_adjustment is 1e18 when the PT and the asset share decimals, and
+    #    1e18 * 10^(PT decimals - asset decimals) otherwise (1e30 for an 18-decimal PT
+    #    valued in 6-decimal USDC).
+    # vault_token_address is unused here.
+    calls:
+      - description: "Get PT token balance"
+        target: ${inputs.pt_token_address}
+        selector: "balanceOf(address)"
+        parameters:
+          - type: "address"
+            value: "${inputs.caliber_address}"
+        return:
+          name: "pt_token_balance"
+          type: "uint256"
+      - description: "Get asset per PT from Pendle Oracle"
+        target: "${inputs.pendle_pylp_oracle_address}"
+        selector: "getPtToAssetRate(address,uint32)"
+        parameters:
+          - type: "address"
+            value: "${inputs.pendle_market_address}"
+          - type: "uint32"
+            value: "${inputs.twap_duration}"
+        return:
+          name: "asset_per_pt"
+          type: "uint256"
+      - description: "Calculate asset equivalent of PT balance"
+        target: "${inputs.unsigned_math_helper_address}"
+        selector: "mulDiv(uint256,uint256,uint256)"
+        parameters:
+          - type: "uint256"
+            value: "${returns.pt_token_balance}"
+          - type: "uint256"
+            value: "${returns.asset_per_pt}"
+          - type: "uint256"
+            value: "${inputs.decimals_adjustment}"
+        return:
+          name: "asset_balance"
+          type: "uint256"
+    reserved_slots:
+      - type: "uint256"
+        value: "${returns.asset_balance}"
+      - type: "uint256"
+        value: "${builtins.UINT256_MAX}"

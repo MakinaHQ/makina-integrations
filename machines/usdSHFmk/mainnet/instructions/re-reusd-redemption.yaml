@@ -1,0 +1,64 @@
+# Re Protocol — reUSD instant redemption, for reUSD the caliber takes as Morpho collateral.
+# The exit legs and accounting of instructions/reusd-swap.yaml, without its swap-in: this
+# caliber never mints reUSD. reUSD and the payout token (sUSDe today) are base tokens, so the
+# position accounts as 0 and value conservation rests on the min_payout argument.
+#
+# Expected position vars:
+#   label                       string  — display name
+#   reusd_address               address — reUSD share token
+#   gateway_address             address — RedemptionGateway (instant redeem entry)
+#   instant_redemption_address  address — InstantRedemption (reUSD approval spender)
+#
+# Expected caliber config:
+#   caliber_address
+#
+# Gate: RedemptionGateway.redeemInstant needs this caliber approved in Re's KYC registry.
+
+# ── ACCOUNTING: 0 (reUSD valued by the caliber base-token registry) ───────
+- is_debt: false
+  instruction_type: "ACCOUNTING"
+  affected_tokens:
+    - ${position.reusd_address}
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/account.yaml:account_0"
+    inputs: {}
+
+# ── SWAP OUT (absolute): reUSD -> sUSDe (gateway.redeemInstant) ───────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # reUSD -> sUSDe, both base tokens
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/withdraw.yaml:redeem"
+    inputs:
+      gateway_address:
+        type: "address"
+        value: ${position.gateway_address}
+      instant_redemption_address:
+        type: "address"
+        value: ${position.instant_redemption_address}
+      reusd_address:
+        type: "address"
+        value: ${position.reusd_address}
+
+# ── SWAP OUT (relative): bps of reUSD balance -> sUSDe ────────────────────
+- is_debt: false
+  instruction_type: "MANAGEMENT"
+  affected_tokens: [] # reUSD -> sUSDe, both base tokens
+  instruction:
+    label: ${position.label}
+    path: "../../../blueprints/re/withdraw.yaml:redeem_relative"
+    inputs:
+      gateway_address:
+        type: "address"
+        value: ${position.gateway_address}
+      instant_redemption_address:
+        type: "address"
+        value: ${position.instant_redemption_address}
+      reusd_address:
+        type: "address"
+        value: ${position.reusd_address}
+      caliber_address:
+        type: "address"
+        value: "${config.caliber_address}"

@@ -14,6 +14,12 @@ config:
   caliber_address:
     type: "address"
     value: "0xbeef123217647014429B7670329782e210884E89"
+  caliber_helper_address:
+    type: "address"
+    value: "0x6E2ED2f457c41F38556Ab0c2b1185cc9e6563d8D"
+  boolean_helper_address:
+    type: "address"
+    value: "0x00c93e3b09Ca2f544487d4298339765EadCD8353"
 
 positions:
 
@@ -118,6 +124,69 @@ positions:
       label: "USDS Staking"
       staking_token_address: ${token_list.mainnet.USDS}
       staking_contract_address: "0x3bD276885c070Fe3D9bafdc5e699E85D2d776A15"
+
+  # Pendle PTs taken as Morpho collateral in liquidations, held to maturity and redeemed
+  - id: "4534653900577794508910448003030841549747250242774668131960239438156352997204" # keccak256("pendle.pt.PT-reUSD-10DEC2026")
+    group_id: "0"
+    description: "Pendle - PT-reUSD-10DEC2026 (liquidations and maturity redemption)"
+    instructions: !include "./instructions/pendle-pt-reusd-10dec2026.yaml"
+    position_tokens: ["0xeCfaFdC7741323a945A163ed068B5a3C43483957"]
+
+  # reUSD taken as Morpho collateral in liquidations, redeemed through Re's RedemptionGateway.
+  # Needs addBaseToken(reUSD) and addBaseToken(sUSDe), the active payout token, before go-live.
+  - id: "37611196340603059480325384631170655659320675888912929064662778164611977473709" # keccak256("morpho.liquidate.mainnet.0x4565ac05d38b19374ccbb04c17cca60ca9353cd41824f0803d0fc7704f60eaed")
+    group_id: "0"
+    description: "Morpho - liquidate reUSD/USDC 91.5%"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate reUSD/USDC 91.5% (0x4565…eaed)"
+      market_id: "0x4565ac05d38b19374ccbb04c17cca60ca9353cd41824f0803d0fc7704f60eaed"
+      loan_token: ${token_list.mainnet.USDC}
+      collateral_token: ${token_list.mainnet.reUSD}
+
+  - id: "98097021421501310507397574454980703555887873631736822274911605659466303342313" # keccak256("morpho.liquidate.mainnet.0x9105a5447f3eecdf768f04da12d580a878106e2e6b234312db2ee0f304539e35")
+    group_id: "0"
+    description: "Morpho - liquidate reUSD/USDT 91.5%"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate reUSD/USDT 91.5% (0x9105…9e35)"
+      market_id: "0x9105a5447f3eecdf768f04da12d580a878106e2e6b234312db2ee0f304539e35"
+      loan_token: ${token_list.mainnet.USDT}
+      collateral_token: ${token_list.mainnet.reUSD}
+
+  - id: "10430719020175550785727655569839362911809325775093447110150665487574967858557" # keccak256("re.reusd.redeem")
+    group_id: "0"
+    description: "Re Protocol reUSD instant redemption"
+    instructions: !include "./instructions/re-reusd-redemption.yaml"
+    vars:
+      label: "reUSD Redemption"
+      reusd_address: ${token_list.mainnet.reUSD}
+      gateway_address: "0x8aEb9453EF22Cb38abC7a3Af9c208F65C1BfE31e"
+      instant_redemption_address: "0xa31deEbb3680A3007120e74bCbDf4df36F042A40"
+
+  # Midas mTokens taken as Morpho collateral in liquidations. Needs addBaseToken and an
+  # OracleRegistry price for each, before go-live.
+  # TODO: Midas redemption positions (instructions/midas-redemption.yaml) for mF-ONE and
+  # mM1-USD, once Midas greenlists this caliber and a key-value store is deployed for it.
+  - id: "90183780124464233487285609952172368033821174467079843756483689745734416240422" # keccak256("morpho.liquidate.mainnet.0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba")
+    group_id: "0"
+    description: "Morpho - liquidate mF-ONE/USDC 91.5%"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate mF-ONE/USDC 91.5% (0xef2c…d0ba)"
+      market_id: "0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba"
+      loan_token: ${token_list.mainnet.USDC}
+      collateral_token: "0x238a700eD6165261Cf8b2e544ba797BC11e466Ba" # mF-ONE
+
+  - id: "111483865423412277495337994670931125556234846054116428353395613207831859575263" # keccak256("morpho.liquidate.mainnet.0x4abde0597e71acc6d4dacd3d3edb2929e7289a40754a20eaeccaa66ff717be99")
+    group_id: "0"
+    description: "Morpho - liquidate mM1-USD/USDC 86%"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate mM1-USD/USDC 86% (0x4abd…be99)"
+      market_id: "0x4abde0597e71acc6d4dacd3d3edb2929e7289a40754a20eaeccaa66ff717be99"
+      loan_token: ${token_list.mainnet.USDC}
+      collateral_token: "0xCc5C22C7A6BCC25e66726AeF011dDE74289ED203" # mM1-USD
 
   # Harvesting
   - id: "777"
