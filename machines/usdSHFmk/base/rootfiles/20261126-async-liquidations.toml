@@ -1,5 +1,5 @@
 # this is a generated file - do not edit manually
-# root: 0x8d86bdb32192e85de15806c0cba003c8657ce32bbdc251d5050f536856763738
+# root: 0x407b51042a1421680218ca36dbe5efc9ac4a1446b4ff4d954343e0fcb6511492
 
 [tokens."${token_list.base.USDC}"]
 chainId = 8453
@@ -79,6 +79,22 @@ Array = "FixedBytes32"
 type = "MerklClaimData"
 name = "merkl_claim_data"
 field = "proofs"
+
+[instructions.morpho.account_0."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 1
+affected_tokens = ["0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34"]
+position_tokens = []
+commands = []
+state = [
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+]
+bitmap = "255211775190703847597530955573826158592"
+inputs_slots = []
 
 [instructions.morpho.account_0."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
 position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
@@ -194,7 +210,11 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.deposit_vault."USDC Prime Instant"]
 position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
@@ -218,7 +238,11 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.deposit_vault."USDC Turbo"]
 position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
@@ -242,7 +266,77 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots]]
 index = 0
 name = "amount_to_deposit"
+description = "Amount of asset to deposit into the vault"
 type = "Uint"
+
+[instructions.morpho.deposit_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d04050603000c018aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xac2597c4e15ea29efa36184abf705e394f22e0edf44f346c84763616398739be",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x0000000000000000000000005d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 1
+name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
+type = "Uint"
+
+[[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
 position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
@@ -292,17 +386,23 @@ bitmap = "42493757490249029311893581958337265664"
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 0
 name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
 type = "Address"
 
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 1
 name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
 type = "Uint"
 
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 2
 name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
 type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"]
 position_id = "55948954168096303617893841822166485818052925009390814643513582551906800901618"
@@ -352,17 +452,92 @@ bitmap = "42493757490249029311893581958337265664"
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 0
 name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
 type = "Address"
 
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 1
 name = "repaid_shares"
+description = "Borrow shares to repay (Morpho shares, not assets). Use the borrower's full borrowShares to close the position."
 type = "Uint"
 
 [[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 2
 name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
 type = "Uint"
+
+[instructions.morpho.liquidate_repaid_shares."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)"]
+position_id = "31167390822132994836240013623246670066724888913951931489960363038854566518589"
+description = "Morpho - liquidate USDe/USDC 91.5%"
+is_debt = false
+group_id = "0"
+instruction_type = 0
+affected_tokens = [
+  "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+]
+position_tokens = []
+commands = [
+  "0x2c3c91578103ff0000000083bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x62de91e901830cff0000000dc62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018304ff00000004c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018305ff00000005c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018306ff00000006c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x62de91e9018307ff00000003c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x16694e5b01080dff00000008c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590108ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x16694e5b010904ff00000009c62d6fdc4e77c4d006784bc4805703b37ffcc4b7",
+  "0x711ecf590109ff00000000ff8dc60173f37b34998fd5b2aef47dd68c68cc22c4",
+  "0x095ea7b3010b02ff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0xd8eabcb841000000000000ffbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0d0405060300010c8aff00000000000000000000000000000000000000000000",
+  "0x095ea7b3010b0cff000000ff833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+]
+state = [
+  "0x33c40185e5db418a44ff63453d84f629163460c395f5dca0bb1e04fa3c48a9cf",
+  "0xca51d611ef17011a672d8a848d82801516018fb737a033d0e95776daf0146e92",
+  "0x01af17d21a786ccc254623215b91e7b289a582c8f111361c137bc20245d22992",
+  "0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354",
+  "0x0000000000000000000000000000000000000000000000000000000000000001",
+  "0x0000000000000000000000000000000000000000000000000000000000000002",
+  "0x0000000000000000000000000000000000000000000000000000000000000003",
+  "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "0x000000000000000000000000833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "0x0000000000000000000000005d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+  "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "0x",
+]
+bitmap = "42493757490249029311893581958337265664"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 0
+name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
+type = "Address"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 1
+name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34"
+
+[[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots]]
+index = 2
+name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
+type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate USDe/USDC 91.5% (0x54cf…7354)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)"]
 position_id = "63779458687693484263819886032587288929014600646574613702279547987872169945854"
@@ -412,17 +587,26 @@ bitmap = "42493757490249029311893581958337265664"
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 0
 name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
 type = "Address"
 
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 1
 name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
 type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
 
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots]]
 index = 2
 name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
 type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0x29ae…2d0b)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)"]
 position_id = "55948954168096303617893841822166485818052925009390814643513582551906800901618"
@@ -472,17 +656,26 @@ bitmap = "42493757490249029311893581958337265664"
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 0
 name = "borrower"
+description = "The borrower to liquidate. Must be liquidatable in this market at execution time."
 type = "Address"
 
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 1
 name = "seized_assets"
+description = "Collateral to seize, in the collateral token's decimals."
 type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0xfcc9cc1209651ed8867332d6f664cf82743a2584"
 
 [[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots]]
 index = 2
 name = "max_repaid_assets"
+description = "Most loan token Morpho may pull for this liquidation, in the loan token's decimals. Must not exceed the caliber's balance."
 type = "Uint"
+
+[instructions.morpho.liquidate_seized_assets."Liquidate mGLO/USDC 91.5% (0xe0cd…21d9)".inputs_slots.input_type.amount]
+token = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913"
 
 [instructions.morpho.redeem_vault."USDC High Yield Instant"]
 position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
@@ -502,7 +695,11 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC High Yield Instant".inputs_slots.input_type.amount]
+token = "0xbeeff7ae5e00aae3db302e4b0d8c883810a58100"
 
 [instructions.morpho.redeem_vault."USDC Prime Instant"]
 position_id = "107748699282353890608450452296395923511697059219688206203817978138856427849492"
@@ -522,7 +719,11 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Prime Instant".inputs_slots.input_type.amount]
+token = "0xbeefe94c8ad530842bfe7d8b397938ffc1cb83b2"
 
 [instructions.morpho.redeem_vault."USDC Turbo"]
 position_id = "15189847262677934881531015165791414976899845815171706841773772312513674845211"
@@ -542,7 +743,11 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots]]
 index = 0
 name = "shares_to_redeem"
+description = "The number of shares to redeem from the vault"
 type = "Uint"
+
+[instructions.morpho.redeem_vault."USDC Turbo".inputs_slots.input_type.amount]
+token = "0xbeefffe68dfc2d3bd1abdad37c70634973b16478"
 
 [instructions.morpho.redeem_vault_relative."USDC High Yield Instant"]
 position_id = "112518405458259504721404525495674933003959058649730723355561134056878651038998"
@@ -568,6 +773,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."USDC High Yield Instant".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."USDC Prime Instant"]
@@ -594,6 +800,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."USDC Prime Instant".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.redeem_vault_relative."USDC Turbo"]
@@ -620,6 +827,7 @@ bitmap = "127605887595351923798765477786913079296"
 [[instructions.morpho.redeem_vault_relative."USDC Turbo".inputs_slots]]
 index = 0
 name = "bps_to_redeem"
+description = "The percentage of shares to redeem, in basis points (bps), 10000 bps = 100%"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."USDC High Yield Instant"]
@@ -640,6 +848,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."USDC High Yield Instant".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."USDC Prime Instant"]
@@ -660,6 +869,7 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."USDC Prime Instant".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"
 
 [instructions.morpho.withdraw_vault."USDC Turbo"]
@@ -680,4 +890,5 @@ bitmap = "85070591730234615865843651857942052864"
 [[instructions.morpho.withdraw_vault."USDC Turbo".inputs_slots]]
 index = 0
 name = "assets_to_withdraw"
+description = "The number of assets to withdraw from the vault"
 type = "Uint"

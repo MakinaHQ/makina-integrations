@@ -71,10 +71,23 @@ positions:
       loan_token: ${token_list.base.USDC}
       collateral_token: ${token_list.base.mGLO}
 
+  # USDe is redeemed at par through Ethena's Base PSM by the caliber's swap (the Steakhouse
+  # swapper routes USDe -> USDC through the PSM), so no exit position is needed here. Needs
+  # addBaseToken(USDe) and an OracleRegistry price for USDe on Base before go-live.
+  - id: "31167390822132994836240013623246670066724888913951931489960363038854566518589" # keccak256("morpho.liquidate.base.0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354")
+    group_id: "0"
+    description: "Morpho - liquidate USDe/USDC 91.5%"
+    instructions: !include "../../../instructions/morpho-liquidation.yaml"
+    vars:
+      label: "Liquidate USDe/USDC 91.5% (0x54cf…7354)"
+      market_id: "0x54cf9be57fdfa6457a660991907434ff9d295c465a603a50126ff647d50b7354"
+      loan_token: ${token_list.base.USDC}
+      collateral_token: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34" # USDe (Base)
+
   # TODO: mGLO redemption (exit for the liquidated mGLO) through
   # instructions/midas-redemption.yaml against Midas's Base mGLO redemption vault
-  # 0xa80f9bffff91cbc13314fefd05560032af018f18 (USDC payout, greenlist enforced), once
-  # Midas greenlists this caliber.
+  # 0xa80f9bffff91cbc13314fefd05560032af018f18 (USDC payout, greenlist enforced). Needs
+  # Midas's M_GLOBAL_GREENLISTED_ROLE for this caliber and a key-value store deployed for it.
 
   # Harvesting
   - id: "777"
